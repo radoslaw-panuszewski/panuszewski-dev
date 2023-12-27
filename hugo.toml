@@ -34,10 +34,10 @@ disable404     = false
 disableHugoGeneratorInject = false
 
 [permalinks]
-posts = "/posts/:year/:month/:title/"
+posts = "/posts/:title/"
 
 [author]
-name = "Jane Doe"
+name = "Radosław Panuszewski"
 
 [blackfriday]
 hrefTargetBlank = true
@@ -55,7 +55,7 @@ dateformNumTime = "2006-01-02 15:04"
 
 # Metadata mostly used in document's head
 #
-description = "Nice theme for homepages and blogs"
+description = ""
 keywords = ""
 images = [""]
 
@@ -94,7 +94,7 @@ enableSharingButtons = true
 #
 # Enables the global language menu.
 #
-enableGlobalLanguageMenu = true
+enableGlobalLanguageMenu = false
 
 # Integrate Javascript files or stylesheets by adding the url to the external assets or by
 # linking local files with their path relative to the static folder, e.g. "css/styles.css"
@@ -186,13 +186,8 @@ url  = "https://stackoverflow.com/users/5254851/rados%c5%82aw-panuszewski"
 
 [languages]
 [languages.en]
-subtitle  = "Hello Friend NG Theme"
+subtitle  = ""
 weight    = 1
-copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
-
-[languages.fr]
-subtitle  = "Hello Friend NG Theme"
-weight    = 2
 copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
 
 [menu]
@@ -204,9 +199,4 @@ url        = "about/"
 identifier = "posts"
 name       = "Posts"
 url        = "posts/"
-
-[deployment]
-[[deployment.targets]]
-name = "prod"
-URL = "gs://panuszewski.dev"
 
