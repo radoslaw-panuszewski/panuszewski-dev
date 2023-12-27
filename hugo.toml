@@ -1,4 +1,4 @@
-baseURL = "https://storage.googleapis.com/panuszewski.dev/"
+baseURL = "https://panuszewski.dev"
 title   = "panuszewski.dev"
 languageCode = "en-us"
 theme = "hello-friend-ng"
