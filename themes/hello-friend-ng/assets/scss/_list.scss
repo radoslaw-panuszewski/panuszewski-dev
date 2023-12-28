@@ -48,10 +48,6 @@
   }
 
   .post {
-    &-title {
-      font-size: 1rem;
-      margin: 5px 0 5px 0;
-    }
 
     &-year {
       padding-top: 6px;
@@ -66,19 +62,44 @@
 
     &-item {
       border-bottom: 1px grey dashed;
+      margin: 25px auto;
 
-      &-inner {
+      &-cover-image {
+        width: 800px;
+        height: 300px;
+        object-fit: cover;
+
+        @media #{$media-size-tablet} {
+          width: 660px;
+        }
+      }
+
+      &-title {
+        font-size: 1.3rem;
+        display: inline-block;
+        justify-content: space-between;
+        padding: 12px 0;
+        text-decoration: none;
+      }
+
+      [data-theme=dark] &-title {
+        color: $dark-color-variant;
+      }
+      [data-theme=light] &-title {
+        color: $light-color-variant;
+      }
+
+      &-summary {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        padding: 12px 0;
         text-decoration: none;
       }
     }
 
     &-day {
       flex-shrink: 0;
-      margin-left: 1em;
+      margin-left: 1.5rem;
       @include dimmed;
     }
   }

@@ -1,13 +1,14 @@
 ---
-title: "Better MongoDB support in DataGrip"
+title: "DataGrip + MongoDB: Explore your documents in tree mode"
 date: 2023-12-10
 toc: false
-images:
+coverImage: forest.jpeg
 tags:
   - datagrip
   - mongodb
 ---
 If you use DataGrip to explore the contents of MongoDB databases, you may have encountered several issues with the interface. And if you don’t like to click too much (like me), those issues may have driven you mad already 😵
+<!--more-->
 
 Let’s say you have a collection of movie characters, and you want to view a single document. We can execute a simple `db.people.findOne()` and see the result:
 

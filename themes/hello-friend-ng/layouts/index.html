@@ -18,6 +18,22 @@
                     {{ partial "social-icons.html" . }}
                 </div>
             {{- end }}
+
+            <div class="posts">
+                <ul class="posts-list">
+                    {{ range ( where .Site.RegularPages "Type" "posts") }}
+
+                    <li class="post-item">
+                        <a href="{{ .Permalink }}" class="post-item-title">
+                            <img src="/{{ .Params.coverImage }}" class="post-item-cover-image"/>
+                            <span class="post-item-title">{{.Title}}</span>
+                        </a>
+                        <span class="post-item-summary"> {{ .Summary }} </span>
+                    </li>
+                    {{ end }}
+                </ul>
+            </div>
+
         </div>
     </main>
 {{ end }}
