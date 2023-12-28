@@ -58,6 +58,12 @@
     font-style: italic;
   }
 
+  &-cover-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
+
   &-info {
     margin-top: 30px;
     font-size: 0.8rem;
