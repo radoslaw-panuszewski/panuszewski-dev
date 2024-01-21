@@ -251,6 +251,7 @@ pre {
   border-radius: 8px;
   font-size: 0.95rem;
   overflow: auto;
+  border: none;
 
   @media #{$media-size-phone} {
     white-space: pre-wrap;
@@ -268,15 +269,15 @@ pre {
     @media (prefers-color-scheme: dark) {
       color: inherit;
     }
-  
+
     @media (prefers-color-scheme: light) {
       color: #ccc;
     }
-  
+
     [data-theme=dark] & {
       color: inherit;
     }
-  
+
     [data-theme=light] & {
       color: #ccc;
     }
@@ -285,7 +286,7 @@ pre {
 
 blockquote {
   border-left: 3px solid #3eb0ef;
-  margin: 40px;
+  margin: 20px;
   padding: 10px 20px;
 
   @media #{$media-size-phone} {
@@ -427,9 +428,4 @@ hr {
   background-attachment: fixed;
   background-size: cover;
   background-position: center center;
-}
-
-// Prism JS Additionals
-.highlight {
-  margin: 30px auto;
 }

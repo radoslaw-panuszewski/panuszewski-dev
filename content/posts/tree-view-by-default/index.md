@@ -6,6 +6,8 @@ coverImage: forest.jpeg
 tags:
   - datagrip
   - mongodb
+  - intellij
+  - IDE plugin
 ---
 If you use DataGrip to explore the contents of MongoDB databases, you may have encountered several issues with the interface. And if you don’t like to click too much (like me), those issues may have driven you mad already 😵
 <!--more-->

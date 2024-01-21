@@ -55,3 +55,10 @@ if (themeToggle) {
 } else {
   localStorage.removeItem("theme");
 }
+
+for (a of document.getElementsByTagName("a")) {
+  if (a.type == "reference") {
+    var linkedHeader = document.getElementById(a.href.slice(a.href.lastIndexOf('/') + 2))
+    a.innerText = linkedHeader.innerText
+  }
+}
