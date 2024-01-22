@@ -219,7 +219,7 @@ dependencies {
 }
 ```
 
-The Library B now needs to explicitly require the Ktor feature (in Gradle terms: _capability_). It can be done like this:
+The client now needs to explicitly require the Ktor feature (in Gradle terms: _capability_). It can be done like this:
 
 ```kotlin {title="Client -> build.gradle.kts"}
 dependencies {
@@ -231,7 +231,7 @@ dependencies {
 }
 ```
 
-What's nice about this approach is that **Library B will automatically get all dependencies required for the Ktor support to work properly.** Not so nice is the verbose syntax which most of the Gradle users are not very familiar with.
+What's nice about this approach is that the **client will automatically get all dependencies required for the Ktor support to work properly.** Not so nice is the verbose syntax which most of the Gradle users are not very familiar with.
 
 While you may like it or not, Feature Variants are a viable option to solve the problem of conditional dependencies in a single-module library.
 
