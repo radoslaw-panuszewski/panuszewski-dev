@@ -261,6 +261,6 @@ For example, let's say we develop some utility for Spring Webflux. It basically 
 ```kotlin
 compileOnly("org.springframework:spring-webflux:6.1.2")
 ```
-It makes the library consumers responsible for providing it at runtime. Otherwise, they will most likely get `NoClassDefFoundError`. It's not the most gentle way of informing our clients that they are missing a dependency to Webflux, isn't it? Simply making Webflux a transitive dependency (by replacing `compileOnly` with `implementation`) would eliminate those exceptions, making our library work seamlessly.
+It makes the library consumers responsible for providing it at runtime. Otherwise, they will most likely get `NoClassDefFoundError`. It's not the most gentle way of informing our clients that they are missing a dependency to Webflux, isn't it? Simply making Webflux a transitive dependency (by replacing `compileOnly` with `api` or `implementation`) would eliminate those exceptions, making our library work seamlessly.
 
  Thus, it is advisable to refrain from using `compileOnly` to specify a library's provided dependencies. While the intention may be to reduce the number of transitive dependencies, ultimately, **users will either need to supply the missing dependency themselves or encounter a runtime error**. It is more effective to ensure everything works by default.
