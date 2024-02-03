@@ -201,3 +201,7 @@ url        = "about/"
 #name       = "Posts"
 #url        = "posts/"
 
+[services]
+[services.googleAnalytics]
+ID = 'G-7HVN3M47BR'
+
