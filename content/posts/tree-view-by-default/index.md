@@ -65,4 +65,4 @@ What it does?
 
 You can install it directly from your DataGrip via searching for plugin Tree View By Default. Just make sure you have DataGrip in version `2022.3` or newer. I will keep the plugin compatible with all the upcoming versions since `2022.3`.
 
-If it happens to make your life a little easier, don’t hesitate to throw a ★ on the GitHub repo and rate the plugin on the JetBrains marketplace 😉
+If it happens to make your life a little easier, don’t hesitate to throw a ★ on GitHub and rate the plugin on the JetBrains marketplace 😉
