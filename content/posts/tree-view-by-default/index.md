@@ -1,5 +1,5 @@
 ---
-title: "DataGrip + MongoDB: Explore your documents in tree mode"
+title: "Tree View By Default - plugin for better MongoDB support in DataGrip"
 date: 2023-12-10
 toc: false
 coverImage: forest.jpeg
