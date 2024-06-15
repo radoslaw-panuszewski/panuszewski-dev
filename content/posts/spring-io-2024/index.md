@@ -150,7 +150,7 @@ Spring HTTP Interface currently doesn't have any autoconfiguration in place - yo
 
 ## Spring Boot Gradle Plugin + Buildpacks = ❤️
 
-Always wanted to try out the hot new technologies like native image, AOT or CDS, but the configuration was just too painful? Buildpacks can do all those things for you if you only pass them a single environment variable. Even better, Spring Boot Gradle Plugin has really great integration with Buildpacks - you don't even need to install the `pack` CLI, your Gradle build is all you need. Additionally, this way of using Buildpacks is much faster than traditional `pack` command, because it nicely cooperates with the Gradle cache.
+Always wanted to try out the hot new technologies like [GraalVM Native Image](https://www.graalvm.org/22.0/reference-manual/native-image/), [Spring AOT](https://docs.spring.io/spring-framework/reference/core/aot.html#aot.bestpractices.bean-registration) or [JVM Class Data Sharing (CDS)](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html#GUID-0260F857-A70E-4399-A1DF-A5766BE33285) but the configuration was just too painful? Buildpacks can do all those things for you if you only pass them a single environment variable. Even better, Spring Boot Gradle Plugin has really great integration with Buildpacks and you don't even need to install the `pack` CI to use it. Additionally, this way of using Buildpacks is much faster than traditional `pack` command, because it's all baked into your build and makes a good use of Gradle cache. 
 
 It's as simple as applying a plugin:
 ```kotlin
@@ -163,9 +163,9 @@ and executing a task:
 ./gradlew bootBuildImage
 ```
 
-Under the hood, it will run [paketobuildpacks/builder-jammy-base](https://github.com/paketo-buildpacks/builder-jammy-base) and go through all the buildpacks it includes. It basically means that it will set up a JVM in the container, copy JAR file built by the `bootRun` task and specify it as an entrypoint. But it does a lot more! The container you will get is well-optimized and based on sensible defaults. It will even automatically [calculate](https://paketo.io/docs/reference/java-reference/#memory-calculator) how much memory your app needs!
+Under the hood, it will run [paketobuildpacks/builder-jammy-base](https://github.com/paketo-buildpacks/builder-jammy-base) and go through all the buildpacks it includes. It will set up a JVM in the container, copy JAR file built by the `bootRun` task and specify it as an entrypoint. But it does a lot more! The image it produces is well-optimized and based on sensible defaults. It will even automatically [calculate](https://paketo.io/docs/reference/java-reference/#memory-calculator) how much memory your app needs and apply the `-Xmx` JVM option accordingly!
 
-Below you can find quick configs for the cool stuff I mentioned earlier. Just copy-paste and check out whether the startup times of your app improved ;)
+Below you can find quick configs for the cool stuff I mentioned earlier. Just copy-paste them into your `build.gradle.kts`, run `./gradlew bootBuildImage` and observe how the startup times of your app improved ;)
 
 ### Native image
 ```kotlin
