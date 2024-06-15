@@ -61,6 +61,8 @@ Not really useful, isn't it? Let's install some plugin to fix it ;)
 
 -> [GitHub](https://github.com/radoslaw-panuszewski/gradle-jumper)
 
+{{< youtube _GOiKZQXzfI >}}
+
 The Gradle Jumper plugin  adds enhanced "go to declaration" support for Gradle typesafe (and not typesafe) accessors. Instead of going to the generated code, you will jump directly to the place which is semantically referenced.
 
 So basically, in our example, after Cmd-Clicking on the `mySubproject`, IDE will open the `my-subproject.gradle.kts` file for you:
