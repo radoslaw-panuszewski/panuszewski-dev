@@ -14,7 +14,7 @@ No time to watch the entire conference? Here you can find a list of topics which
 
 ## Autowiring improvements
 
-Spring Core is like the heart for the entire Spring Framework where the dependency injection support resides. Guys responsible for this module has recently begun to revisit the old stuff and resolving some long-standing issues.
+Spring Core is like the heart for the entire Spring Framework where the dependency injection support resides. Guys responsible for this module have recently begun to revisit the old stuff and resolving some long-standing issues.
 
 ### Fast path for autowiring
 
@@ -150,7 +150,7 @@ Spring HTTP Interface currently doesn't have any autoconfiguration in place - yo
 
 ## Spring Boot Gradle Plugin + Buildpacks = ❤️
 
-Always wanted to try out the hot new technologies like [GraalVM Native Image](https://www.graalvm.org/22.0/reference-manual/native-image/), [Spring AOT](https://docs.spring.io/spring-framework/reference/core/aot.html#aot.bestpractices.bean-registration) or [JVM Class Data Sharing (CDS)](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html#GUID-0260F857-A70E-4399-A1DF-A5766BE33285) but the configuration was just too painful? Buildpacks can do all those things for you if you only pass them a single environment variable. Even better, Spring Boot Gradle Plugin has really great integration with Buildpacks and you don't even need to install the `pack` CI to use it. Additionally, this way of using Buildpacks is much faster than traditional `pack` command, because it's all baked into your build and makes a good use of Gradle cache. 
+Always wanted to try out the hot new technologies like [GraalVM Native Image](https://www.graalvm.org/22.0/reference-manual/native-image/), [Spring AOT](https://docs.spring.io/spring-framework/reference/core/aot.html#aot.bestpractices.bean-registration) or [JVM Class Data Sharing (CDS)](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html#GUID-0260F857-A70E-4399-A1DF-A5766BE33285) but the configuration was just too painful? Buildpacks can do all those things for you if you only pass them a single environment variable. Even better, Spring Boot Gradle Plugin has really great integration with Buildpacks and you don't even need to install the `pack` CLI to use it. Additionally, this way of using Buildpacks is much faster than traditional `pack` command, because it's all baked into your build and makes a good use of Gradle cache. 
 
 It's as simple as applying a plugin:
 ```kotlin
@@ -209,4 +209,4 @@ Do you [hear elevator music](https://github.com/oracle/graal/issues/5327) in you
 Let me introduce [Layered Native Images](https://github.com/oracle/graal/issues/7626). In a nutshell: it will allow you to use a pre-compiled Spring Framework (or any other framework you like) as base image for your application. Given that GraalVM won't have to recompile the good chunk of Spring code every time, it can result in significantly faster build times. Imagine that you can compile your app to native image almost as fast as building a fat jar. That could be a game-changer for many developers!
 
 ## Summary
-It was my first time on Spring I/O and it was awesome 🚀 Thanks for the organizers for their amazing work!
+It was my first time on Spring I/O and it was awesome 🚀 Thanks to the organizers for their amazing work!
