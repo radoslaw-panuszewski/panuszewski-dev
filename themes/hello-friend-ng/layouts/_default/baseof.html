@@ -4,6 +4,8 @@
         {{ partial "head.html" . }}
     </head>
 
+    {{ template "_internal/google_analytics.html" . }}
+
     {{ block "body" . }}
         <body>
     {{ end }}
