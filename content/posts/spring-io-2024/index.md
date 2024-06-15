@@ -97,7 +97,7 @@ It works similarly to `autowireCandidate` but it does not disable autowiring com
 
 ## Spring HTTP Interface
 
-Have you ever heard of Feign? Probably yes. It's a widely used library for declarative REST clients in JAVA and many people like it. In my case, it's rather a love-hate relationship, but let's come back to it later ;)
+Have you ever heard of Feign? Probably yes. It's a widely used library for declarative HTTP clients in Java and many people like it. In my case, it's rather a love-hate relationship, but let's come back to it later ;)
 
 Since 6.0, Spring has its own Feign-like solution called [HTTP Interface](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface). The basic usage looks like that:
 ```kotlin
@@ -144,7 +144,7 @@ interface GithubClient {
 }
 ```
 
-This little nested `Config` class is what confuses people a lot. You really want to omit the `@Configuration` annotation or exclude it from component scan in any other way. Otherwise, multiple Feign clients will register multiple conflicting `circuitBreaker` beans. The way it works is that Feign creates a "child Spring context" for every client - and this child context has its own set of beans. It allows every client to define its own configuration for circuit breaker... but it's also really easy to get it wrong.
+This little nested `Config` class is what confuses people a lot. You really want to omit the `@Configuration` annotation or exclude it from component scan in any other way. Otherwise, multiple Feign clients will register multiple conflicting `circuitBreaker` beans. The way it works is that Feign creates a "child Spring context" for every client, and this child context has its own set of beans. It allows every client to define its own configuration for circuit breaker... but it's also very easy to get it wrong.
 
 Spring HTTP Interface currently doesn't have any autoconfiguration in place - you have to use a factory to create proxied interface instances. The ongoing work on that feature can be tracked in [#31337](https://github.com/spring-projects/spring-boot/issues/31337). Most likely, no child contexts will be used for that ;)
 
