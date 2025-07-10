@@ -2,11 +2,12 @@ import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.plugin.compose)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.maven.publish)
-    alias(libs.plugins.antlr.kotlin)
+    kotlin("multiplatform")
+    kotlin("plugin.compose")
+    id("org.jetbrains.compose")
+    id("com.vanniktech.maven.publish")
+
+    id("com.strumenta.antlr-kotlin") version "1.0.5"
 }
 
 group = "dev.bnorm.storyboard"
@@ -22,8 +23,11 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                api(project(":storyboard"))
                 implementation(compose.material)
-                implementation(libs.antlr.kotlin.runtime)
+
+                implementation("de.cketti.unicode:kotlin-codepoints-deluxe:0.7.0")
+                implementation("com.strumenta:antlr-kotlin-runtime:1.0.5")
             }
         }
     }
@@ -38,21 +42,6 @@ val generateKotlinGrammarSource by tasks.registering(AntlrKotlinTask::class) {
     doFirst { delete(layout.buildDirectory.dir(outDir)) }
 
     source = fileTree(layout.projectDirectory.dir("antlr/kotlin")) {
-        include("**/*.g4")
-    }
-    packageName = pkgName
-    outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
-}
-
-val generateXmlGrammarSource by tasks.registering(AntlrKotlinTask::class) {
-    val pkgName = "dev.bnorm.storyboard.text.highlight.antlr.xml"
-    val outDir = "generatedAntlr/${pkgName.replace(".", "/")}"
-
-    inputs.dir(layout.projectDirectory.dir("antlr"))
-    outputs.dir(layout.buildDirectory.dir(outDir))
-    doFirst { delete(layout.buildDirectory.dir(outDir)) }
-
-    source = fileTree(layout.projectDirectory.dir("antlr/xml")) {
         include("**/*.g4")
     }
     packageName = pkgName

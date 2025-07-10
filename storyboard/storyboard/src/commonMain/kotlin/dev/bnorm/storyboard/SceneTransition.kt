@@ -7,13 +7,13 @@ import kotlin.jvm.JvmField
 public fun interface SceneEnterTransition : (AdvanceDirection) -> EnterTransition {
     public companion object {
         @JvmField
-        public val None: SceneEnterTransition = SceneEnterTransition { EnterTransition.None }
+        public val Default: SceneEnterTransition = SceneEnterTransition { EnterTransition.Companion.None }
     }
 }
 
 public fun interface SceneExitTransition : (AdvanceDirection) -> ExitTransition {
     public companion object {
         @JvmField
-        public val None: SceneExitTransition = SceneExitTransition { ExitTransition.None }
+        public val Default: SceneExitTransition = SceneExitTransition { ExitTransition.None }
     }
 }

@@ -17,9 +17,9 @@ With the Compose plugin present, Storyboard can be used just like any other libr
 
 ```kotlin
 dependencies {
-    implementation("dev.bnorm.storyboard:storyboard:0.1.0-alpha03")
-    implementation("dev.bnorm.storyboard:storyboard-easel:0.1.0-alpha03")
-    implementation("dev.bnorm.storyboard:storyboard-text:0.1.0-alpha03")
+    implementation("dev.bnorm.storyboard:storyboard:0.1.0-alpha01")
+    implementation("dev.bnorm.storyboard:storyboard-easel:0.1.0-alpha01")
+    implementation("dev.bnorm.storyboard:storyboard-text:0.1.0-alpha01")
 }
 ```
 
@@ -142,18 +142,9 @@ There are also some experimental libraries that hold common utilities for buildi
 
 Want to see Storyboard in action?
 
-* **Kotlin + Power-Assert = Love** _(KotlinConf 2024)_ - 
-  [Storyboard](https://deck.bnorm.dev/kotlinconf2024),
-  [Code](https://github.com/bnorm/deck.bnorm.dev/tree/kotlinconf2024/kotlinconf2024),
-  [Recording](https://www.youtube.com/watch?v=N8u-6d0iCiE)
-* **Writing Your Third Kotlin Compiler Plugin** _(KotlinConf 2025)_ - 
-  [Storyboard](https://deck.bnorm.dev/kc25),
-  [Code](https://github.com/bnorm/deck.bnorm.dev/tree/kc25/kotlinconf2025/story),
-  [Recording](https://www.youtube.com/watch?v=9P7qUGi5_gc)
-* **(Re)creating Magic(Move) with Compose** _(droidcon NYC 2025)_ -
-  [Storyboard](https://deck.bnorm.dev/dcnyc25),
-  [Code](https://github.com/bnorm/deck.bnorm.dev/tree/dcnyc25/dcnyc25/story),
-  Recording coming soon!
+* **Kotlin + Power-Assert = Love** _(KotlinConf 2024)_ - [Storyboard](https://deck.bnorm.dev/kotlinconf2024), [Code](https://github.com/bnorm/deck.bnorm.dev/tree/kotlinconf2024/kotlinconf2024), [Recording](https://www.youtube.com/watch?v=N8u-6d0iCiE)
+* **Writing Your Third Kotlin Compiler Plugin** _(KotlinConf 2025)_ - [Storyboard](https://deck.bnorm.dev/kc25), [Code](https://github.com/bnorm/deck.bnorm.dev/tree/kc25/kotlinconf2025/story)
+* **(Re)creating Magic(Move) with Compose** _(droidcon NYC 2025)_ - [_Coming Soon!_](https://nyc.droidcon.com/speakers/brian-norman)
 
 [//]: # (Storyboard Links)
 

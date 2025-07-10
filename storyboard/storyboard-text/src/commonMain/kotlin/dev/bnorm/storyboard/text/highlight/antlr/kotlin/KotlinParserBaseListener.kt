@@ -1,4 +1,4 @@
-// Generated from /Users/brian/code/bnorm/deck.bnorm.dev/storyboard/storyboard-text/antlr/kotlin/KotlinParser.g4 by ANTLR 4.13.1
+// Generated from /Users/radoslaw.panuszewski/IdeaProjects/storyboard/storyboard-text/antlr/kotlin/KotlinParser.g4 by ANTLR 4.13.1
 package dev.bnorm.storyboard.text.highlight.antlr.kotlin
 
 import org.antlr.v4.kotlinruntime.ParserRuleContext
@@ -10,7 +10,7 @@ import org.antlr.v4.kotlinruntime.tree.TerminalNode
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-internal open class KotlinParserBaseListener : KotlinParserListener {
+public open class KotlinParserBaseListener : KotlinParserListener {
     /**
      * The default implementation does nothing.
      */
@@ -170,16 +170,6 @@ internal open class KotlinParserBaseListener : KotlinParserListener {
      * The default implementation does nothing.
      */
     override fun exitClassParameter(ctx: KotlinParser.ClassParameterContext) {}
-
-    /**
-     * The default implementation does nothing.
-     */
-    override fun enterContext(ctx: KotlinParser.ContextContext) {}
-
-    /**
-     * The default implementation does nothing.
-     */
-    override fun exitContext(ctx: KotlinParser.ContextContext) {}
 
     /**
      * The default implementation does nothing.
@@ -600,16 +590,6 @@ internal open class KotlinParserBaseListener : KotlinParserListener {
      * The default implementation does nothing.
      */
     override fun exitTypeProjectionModifier(ctx: KotlinParser.TypeProjectionModifierContext) {}
-
-    /**
-     * The default implementation does nothing.
-     */
-    override fun enterFunctionContext(ctx: KotlinParser.FunctionContextContext) {}
-
-    /**
-     * The default implementation does nothing.
-     */
-    override fun exitFunctionContext(ctx: KotlinParser.FunctionContextContext) {}
 
     /**
      * The default implementation does nothing.
@@ -1160,6 +1140,16 @@ internal open class KotlinParserBaseListener : KotlinParserListener {
      * The default implementation does nothing.
      */
     override fun exitMultiLineStringLiteral(ctx: KotlinParser.MultiLineStringLiteralContext) {}
+
+    /**
+     * The default implementation does nothing.
+     */
+    override fun enterMultiDollar(ctx: KotlinParser.MultiDollarContext) {}
+
+    /**
+     * The default implementation does nothing.
+     */
+    override fun exitMultiDollar(ctx: KotlinParser.MultiDollarContext) {}
 
     /**
      * The default implementation does nothing.
