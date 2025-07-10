@@ -28,6 +28,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "storyboard-playground"
+rootProject.name = "slides"
 
 includeBuild("../storyboard")

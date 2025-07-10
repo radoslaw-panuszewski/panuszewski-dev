@@ -21,7 +21,7 @@ kotlin {
             }
         }
     }
-    jvmToolchain(21)
+    jvmToolchain(24)
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
