@@ -11,6 +11,8 @@ import dev.bnorm.storyboard.text.highlight.antlr.kotlin.KotlinParserBaseListener
 import org.antlr.v4.kotlinruntime.*
 import org.antlr.v4.kotlinruntime.tree.ParseTreeWalker
 import org.antlr.v4.kotlinruntime.tree.TerminalNode
+import kotlin.math.max
+import kotlin.math.min
 
 // TODO support passing the scope to qualifier?
 //  - do we really want to rebuild call resolution?
@@ -34,6 +36,8 @@ internal fun highlightKotlin(
         withStyle(codeStyle.simple) { append(text) }
 
         val formatListener = object : KotlinParserBaseListener() {
+            private var multiDollars = 0
+
             private var scopes = ArrayDeque<CodeScope>().apply {
                 addFirst(scope)
             }
@@ -63,13 +67,7 @@ internal fun highlightKotlin(
             }
 
             override fun enterModifier(ctx: KotlinParser.ModifierContext) {
-                val context = ctx.functionModifier()?.context()
-                if (context != null) {
-                    // Only the 'context' keyword is highlighted as a keyword.
-                    addStyle(codeStyle.keyword, context.CONTEXT().symbol)
-                } else {
-                    addStyle(codeStyle.keyword, ctx)
-                }
+                addStyle(codeStyle.keyword, ctx)
             }
 
             override fun enterPrimaryConstructor(ctx: KotlinParser.PrimaryConstructorContext) {
@@ -148,11 +146,20 @@ internal fun highlightKotlin(
                 addStyle(codeStyle.string, ctx.stop!!.startIndex, ctx.stop!!.stopIndex + 1)
             }
 
+            override fun enterMultiDollar(ctx: KotlinParser.MultiDollarContext) {
+                multiDollars = max(ctx.DOLLAR().size, 1)
+            }
+
             override fun enterLineStringContent(ctx: KotlinParser.LineStringContentContext) {
                 ctx.LineStrRef()?.let {
-                    addStyle(codeStyle.keyword, it.symbol.startIndex, it.symbol.startIndex + 1)
-                    val style = identifierStyle(it.text.substring(1)) ?: codeStyle.simple
-                    addStyle(style, it.symbol.startIndex + 1, it.symbol.stopIndex + 1)
+                    val dollarCount = it.symbol.text.orEmpty().count { it == '$' }
+                    if (dollarCount == multiDollars) {
+                        addStyle(codeStyle.keyword, it.symbol.startIndex, it.symbol.startIndex + dollarCount)
+                        val style = identifierStyle(it.text.substring(dollarCount)) ?: codeStyle.simple
+                        addStyle(style, it.symbol.startIndex + dollarCount, it.symbol.stopIndex + dollarCount)
+                    } else {
+                        addStyle(codeStyle.string, it.symbol)
+                    }
                 }
                 ctx.LineStrEscapedChar()?.let { addStyle(codeStyle.keyword, it.symbol) }
                 ctx.LineStrText()?.let { addStyle(codeStyle.string, it.symbol) }
@@ -165,9 +172,14 @@ internal fun highlightKotlin(
 
             override fun enterMultiLineStringContent(ctx: KotlinParser.MultiLineStringContentContext) {
                 ctx.MultiLineStrRef()?.let {
-                    addStyle(codeStyle.keyword, it.symbol.startIndex, it.symbol.startIndex + 1)
-                    val style = identifierStyle(ctx.text.substring(1)) ?: codeStyle.simple
-                    addStyle(style, it.symbol.startIndex + 1, it.symbol.stopIndex + 1)
+                    val dollarCount = it.symbol.text.orEmpty().count { it == '$' }
+                    if (dollarCount == multiDollars) {
+                        addStyle(codeStyle.keyword, it.symbol.startIndex, it.symbol.startIndex + dollarCount)
+                        val style = identifierStyle(ctx.text.substring(dollarCount)) ?: codeStyle.simple
+                        addStyle(style, it.symbol.startIndex + dollarCount, it.symbol.stopIndex + dollarCount)
+                    } else {
+                        addStyle(codeStyle.string, it.symbol)
+                    }
                 }
                 ctx.MultiLineStringQuote()?.let { addStyle(codeStyle.string, it.symbol) }
                 ctx.MultiLineStrText()?.let { addStyle(codeStyle.string, it.symbol) }
@@ -224,12 +236,11 @@ internal fun highlightKotlin(
                     Tokens.IN,
                     Tokens.NOT_IS,
                     Tokens.NOT_IN,
+                    Tokens.DOLLAR,
                         -> addStyle(codeStyle.keyword, symbol)
-
                     Tokens.RETURN_AT,
                     Tokens.CONTINUE_AT,
-                    Tokens.BREAK_AT,
-                        -> {
+                    Tokens.BREAK_AT -> {
                         val indexOfAt = symbol.text!!.indexOf("@")
                         addStyle(codeStyle.keyword, symbol.startIndex, symbol.startIndex + indexOfAt)
                         addStyle(codeStyle.label, symbol.startIndex + indexOfAt, symbol.stopIndex + 1)

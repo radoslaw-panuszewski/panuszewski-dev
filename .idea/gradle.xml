@@ -9,7 +9,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/librettist-core" />
+            <option value="$PROJECT_DIR$/examples" />
+            <option value="$PROJECT_DIR$/examples/basic" />
+            <option value="$PROJECT_DIR$/examples/interactive" />
+            <option value="$PROJECT_DIR$/examples/shared" />
+            <option value="$PROJECT_DIR$/storyboard" />
+            <option value="$PROJECT_DIR$/storyboard-easel" />
+            <option value="$PROJECT_DIR$/storyboard-text" />
           </set>
         </option>
       </GradleProjectSettings>

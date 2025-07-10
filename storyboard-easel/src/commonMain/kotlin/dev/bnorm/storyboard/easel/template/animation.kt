@@ -58,8 +58,8 @@ inline fun AdvanceDirection.exit(
 }
 
 fun enter(
-    start: SceneEnterTransition = SceneEnterTransition.None,
-    end: SceneEnterTransition = SceneEnterTransition.None,
+    start: SceneEnterTransition = SceneEnterTransition.Default,
+    end: SceneEnterTransition = SceneEnterTransition.Default,
 ): SceneEnterTransition = SceneEnterTransition { direction ->
     direction.enter(
         { start(direction) },
@@ -68,8 +68,8 @@ fun enter(
 }
 
 fun exit(
-    start: SceneExitTransition = SceneExitTransition.None,
-    end: SceneExitTransition = SceneExitTransition.None,
+    start: SceneExitTransition = SceneExitTransition.Default,
+    end: SceneExitTransition = SceneExitTransition.Default,
 ): SceneExitTransition = SceneExitTransition { direction ->
     direction.exit(
         { start(direction) },

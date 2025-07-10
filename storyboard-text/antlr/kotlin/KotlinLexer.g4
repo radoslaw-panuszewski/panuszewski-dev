@@ -177,7 +177,6 @@ CROSSINLINE: 'crossinline';
 REIFIED: 'reified';
 EXPECT: 'expect';
 ACTUAL: 'actual';
-CONTEXT: 'context';
 
 // SECTION: literals
 
@@ -307,7 +306,7 @@ IdentifierOrSoftKey
     ;
 
 FieldIdentifier
-    : '$' IdentifierOrSoftKey
+    : DOLLAR* IdentifierOrSoftKey
     ;
 
 fragment UniCharacterLiteral
@@ -338,6 +337,8 @@ fragment Letter
 QUOTE_OPEN: '"' -> pushMode(LineString);
 
 TRIPLE_QUOTE_OPEN: '"""' -> pushMode(MultiLineString);
+
+DOLLAR: '$';
 
 mode LineString;
 

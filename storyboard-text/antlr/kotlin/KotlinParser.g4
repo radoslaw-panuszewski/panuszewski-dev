@@ -82,10 +82,6 @@ classParameter
     : modifiers? (VAL | VAR)? NL* simpleIdentifier COLON NL* type (NL* ASSIGNMENT NL* expression)?
     ;
 
-context
-    : CONTEXT NL* LPAREN NL* parameter (NL* COMMA NL* parameter)* (NL* COMMA)? NL* RPAREN
-    ;
-
 delegationSpecifiers
     : annotatedDelegationSpecifier (NL* COMMA NL* annotatedDelegationSpecifier)*
     ;
@@ -291,12 +287,8 @@ typeProjectionModifier
     | annotation
     ;
 
-functionContext
-    : CONTEXT LPAREN NL* receiverType (NL* COMMA NL* receiverType)* (NL* COMMA)? RPAREN
-    ;
-
 functionType
-    : (functionContext)? (receiverType NL* DOT NL*)? functionTypeParameters NL* ARROW NL* type
+    : (receiverType NL* DOT NL*)? functionTypeParameters NL* ARROW NL* type
     ;
 
 functionTypeParameters
@@ -553,7 +545,11 @@ lineStringLiteral
     ;
 
 multiLineStringLiteral
-    : TRIPLE_QUOTE_OPEN (multiLineStringContent | multiLineStringExpression | MultiLineStringQuote)* TRIPLE_QUOTE_CLOSE
+    : multiDollar TRIPLE_QUOTE_OPEN (multiLineStringContent | multiLineStringExpression | MultiLineStringQuote)* TRIPLE_QUOTE_CLOSE
+    ;
+
+multiDollar
+    : DOLLAR*
     ;
 
 lineStringContent
@@ -837,12 +833,10 @@ functionModifier
     | INLINE
     | EXTERNAL
     | SUSPEND
-    | context
     ;
 
 propertyModifier
     : CONST
-    | context
     ;
 
 inheritanceModifier

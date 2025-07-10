@@ -3,7 +3,6 @@ package dev.bnorm.storyboard
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
-import kotlin.jvm.JvmField
 
 public class SceneFormat(
     /** Defines the pixel dimensions of each scene in a Storyboard. */
@@ -12,7 +11,6 @@ public class SceneFormat(
     public val density: Density,
 ) {
     public companion object {
-        @JvmField
         public val Default: SceneFormat = SceneFormat(
             size = IntSize(1920, 1080),
             density = Density(2f),

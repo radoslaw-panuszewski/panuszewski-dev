@@ -1,13 +1,10 @@
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.compose.reload.ComposeHotRun
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.plugin.serialization)
-    alias(libs.plugins.kotlin.plugin.compose)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.compose.hot.reload)
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
+    kotlin("plugin.compose")
+    id("org.jetbrains.compose")
 }
 
 group = "dev.bnorm.storyboard.example"
@@ -23,6 +20,7 @@ kotlin {
     }
 
     sourceSets {
+        val ktor_version = "3.1.1"
         commonMain {
             dependencies {
                 implementation(project(":storyboard"))
@@ -34,20 +32,20 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.components.resources)
 
-                implementation(libs.ktor.client)
-                implementation(libs.ktor.client.contentNegotiation)
-                implementation(libs.ktor.serialization.json)
+                implementation("io.ktor:ktor-client-core:${ktor_version}")
+                implementation("io.ktor:ktor-client-content-negotiation:${ktor_version}")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:${ktor_version}")
             }
         }
         jvmMain {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(libs.ktor.client.engine.okhttp)
+                implementation("io.ktor:ktor-client-okhttp:$ktor_version")
             }
         }
         wasmJsMain {
             dependencies {
-                implementation(libs.ktor.client.engine.js)
+                implementation("io.ktor:ktor-client-js:$ktor_version")
             }
         }
     }
@@ -56,8 +54,4 @@ kotlin {
 compose {
     resources.publicResClass = true
     desktop.application.mainClass = "Main_desktopKt"
-}
-
-tasks.withType<ComposeHotRun>().configureEach {
-    mainClass.set("Main_desktopKt")
 }

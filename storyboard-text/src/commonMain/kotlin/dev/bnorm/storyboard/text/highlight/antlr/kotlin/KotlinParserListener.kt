@@ -1,4 +1,4 @@
-// Generated from /Users/brian/code/bnorm/deck.bnorm.dev/storyboard/storyboard-text/antlr/kotlin/KotlinParser.g4 by ANTLR 4.13.1
+// Generated from /Users/radoslaw.panuszewski/IdeaProjects/storyboard/storyboard-text/antlr/kotlin/KotlinParser.g4 by ANTLR 4.13.1
 package dev.bnorm.storyboard.text.highlight.antlr.kotlin
 
 import org.antlr.v4.kotlinruntime.tree.ParseTreeListener
@@ -6,7 +6,7 @@ import org.antlr.v4.kotlinruntime.tree.ParseTreeListener
 /**
  * This interface defines a complete listener for a parse tree produced by [KotlinParser].
  */
-internal interface KotlinParserListener : ParseTreeListener {
+public interface KotlinParserListener : ParseTreeListener {
     /**
      * Enter a parse tree produced by [KotlinParser.kotlinFile].
      *
@@ -230,20 +230,6 @@ internal interface KotlinParserListener : ParseTreeListener {
      * @param ctx The parse tree
      */
     public fun exitClassParameter(ctx: KotlinParser.ClassParameterContext)
-
-    /**
-     * Enter a parse tree produced by [KotlinParser.context].
-     *
-     * @param ctx The parse tree
-     */
-    public fun enterContext(ctx: KotlinParser.ContextContext)
-
-    /**
-     * Exit a parse tree produced by [KotlinParser.context].
-     *
-     * @param ctx The parse tree
-     */
-    public fun exitContext(ctx: KotlinParser.ContextContext)
 
     /**
      * Enter a parse tree produced by [KotlinParser.delegationSpecifiers].
@@ -832,20 +818,6 @@ internal interface KotlinParserListener : ParseTreeListener {
      * @param ctx The parse tree
      */
     public fun exitTypeProjectionModifier(ctx: KotlinParser.TypeProjectionModifierContext)
-
-    /**
-     * Enter a parse tree produced by [KotlinParser.functionContext].
-     *
-     * @param ctx The parse tree
-     */
-    public fun enterFunctionContext(ctx: KotlinParser.FunctionContextContext)
-
-    /**
-     * Exit a parse tree produced by [KotlinParser.functionContext].
-     *
-     * @param ctx The parse tree
-     */
-    public fun exitFunctionContext(ctx: KotlinParser.FunctionContextContext)
 
     /**
      * Enter a parse tree produced by [KotlinParser.functionType].
@@ -1616,6 +1588,20 @@ internal interface KotlinParserListener : ParseTreeListener {
      * @param ctx The parse tree
      */
     public fun exitMultiLineStringLiteral(ctx: KotlinParser.MultiLineStringLiteralContext)
+
+    /**
+     * Enter a parse tree produced by [KotlinParser.multiDollar].
+     *
+     * @param ctx The parse tree
+     */
+    public fun enterMultiDollar(ctx: KotlinParser.MultiDollarContext)
+
+    /**
+     * Exit a parse tree produced by [KotlinParser.multiDollar].
+     *
+     * @param ctx The parse tree
+     */
+    public fun exitMultiDollar(ctx: KotlinParser.MultiDollarContext)
 
     /**
      * Enter a parse tree produced by [KotlinParser.lineStringContent].
