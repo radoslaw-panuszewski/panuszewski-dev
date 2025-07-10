@@ -17,7 +17,7 @@ import dev.panuszewski.stages.KotlinTimelineStage.KOTLIN_2_1
 import dev.panuszewski.stages.KotlinTimelineStage.KOTLIN_2_2
 import dev.panuszewski.stages.Timeline
 
-fun createStoryboard(decorator: SceneDecorator): Storyboard {
+fun createStoryboard(decorator: SceneDecorator = theme): Storyboard {
     return Storyboard.build(
         title = "Basic Storyboard",
         format = SceneFormat.Default,
