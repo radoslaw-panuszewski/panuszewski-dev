@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "slides"
+rootProject.name = "talks"
 
 include("kotlin-new-features")
 includeBuild("../storyboard")
