@@ -18,4 +18,7 @@ dependencyResolutionManagement {
 rootProject.name = "talks"
 
 include("kotlin-new-features")
+include("template")
 includeBuild("../storyboard")
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

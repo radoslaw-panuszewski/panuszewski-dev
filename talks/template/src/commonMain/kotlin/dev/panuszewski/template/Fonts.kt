@@ -5,8 +5,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import org.jetbrains.compose.resources.Font
-import talks.kotlin_new_features.generated.resources.*
-import talks.kotlin_new_features.generated.resources.Res
+import talks.template.generated.resources.*
+import talks.template.generated.resources.Res
 
 val JetBrainsMono
     @Composable

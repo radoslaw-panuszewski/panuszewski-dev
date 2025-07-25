@@ -90,7 +90,7 @@ private val SAMPLES = buildCodeSamples {
                 log.warning("Element is null or invalid, continuing...")
                 continue
             }
-            if (variable == 0) return true // If variable is zero, return true
+            if (variable == 0) return true
         }
         return false
     }

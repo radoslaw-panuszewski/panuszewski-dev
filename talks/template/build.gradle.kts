@@ -13,29 +13,12 @@ plugins {
 
 kotlin {
     jvmToolchain(24)
-
-    jvm {
-        binaries {
-            executable {
-                mainClass = "dev.panuszewski.Main_desktopKt"
-            }
-        }
-    }
-
-    wasmJs {
-        binaries.executable()
-        browser {
-            commonWebpackConfig {
-                outputFileName = "kotlin-new-features.js"
-            }
-        }
-    }
+    jvm()
+    wasmJs()
 
     sourceSets {
         commonMain {
             dependencies {
-                implementation(projects.template)
-
                 implementation(libs.storyboard)
                 implementation(libs.storyboard.easel)
                 implementation(libs.storyboard.text)
@@ -44,12 +27,6 @@ kotlin {
 
                 implementation(compose.material)
                 implementation(compose.components.resources)
-            }
-        }
-
-        jvmMain {
-            dependencies {
-                implementation(compose.desktop.currentOs)
             }
         }
 
