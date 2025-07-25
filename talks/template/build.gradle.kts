@@ -1,44 +1,14 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-@file:Suppress("OPT_IN_USAGE")
-
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.jetbrains.compose.hot.reload)
+    `compose-convention`
 }
 
 kotlin {
-    jvmToolchain(24)
-    jvm()
-    wasmJs()
-
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.storyboard)
-                implementation(libs.storyboard.easel)
-                implementation(libs.storyboard.text)
-
-                implementation(libs.haze)
-
-                implementation(compose.material)
-                implementation(compose.components.resources)
-            }
-        }
-
-        all {
-            languageSettings {
-                enableLanguageFeature("ContextParameters")
-
-                optIn("androidx.compose.animation.core.ExperimentalTransitionApi")
-                optIn("androidx.compose.animation.ExperimentalAnimationApi")
-                optIn("androidx.compose.animation.ExperimentalSharedTransitionApi")
-                optIn("androidx.compose.ui.ExperimentalComposeUiApi")
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                api(libs.storyboard)
+                api(libs.storyboard.easel)
+                api(libs.storyboard.text)
             }
         }
     }
