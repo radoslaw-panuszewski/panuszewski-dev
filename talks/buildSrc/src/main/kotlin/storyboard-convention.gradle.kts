@@ -11,7 +11,7 @@ kotlin {
     jvm {
         binaries {
             executable {
-                mainClass = "dev.panuszewski.MainKt"
+                mainClass = "dev.panuszewski.JvmMainKt"
             }
         }
     }
