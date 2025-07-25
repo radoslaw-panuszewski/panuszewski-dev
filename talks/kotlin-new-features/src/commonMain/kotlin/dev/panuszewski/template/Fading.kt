@@ -1,4 +1,4 @@
-package dev.panuszewski.stages
+package dev.panuszewski.template
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
@@ -51,15 +51,3 @@ fun <T> fadeInSpec(): TweenSpec<T> =
 
 fun <T> fadeOutSpec(): TweenSpec<T> =
     tween(durationMillis = ANIMATION_DURATION, delayMillis = 0, easing = EaseOut)
-
-//val BoxMovementSpec: BoundsTransform = BoundsTransform { _, _ ->
-//    spring(
-//        dampingRatio = Spring.DampingRatioNoBouncy,
-//        stiffness = Spring.StiffnessMediumLow,
-//        visibilityThreshold = Rect.VisibilityThreshold
-//    )
-//}
-val BoxMovementSpec: BoundsTransform = BoundsTransform { _, _ -> tween(durationMillis = ANIMATION_DURATION, delayMillis = 0, easing = EaseInOut) }
-val TextMovementSpec: BoundsTransform = BoxMovementSpec
-
-fun TextTagScope.tag() = tag("")

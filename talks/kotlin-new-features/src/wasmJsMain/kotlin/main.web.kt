@@ -3,11 +3,10 @@ package dev.bnorom.kc25.story.web
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
 import dev.bnorm.storyboard.easel.WebStoryEasel
 import dev.panuszewski.createStoryboard
-import dev.panuszewski.template.code.CodeSample
+import dev.panuszewski.template.CodeSample
 import kotlinx.browser.document
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

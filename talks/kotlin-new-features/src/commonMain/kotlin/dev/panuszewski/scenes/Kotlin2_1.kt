@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import dev.bnorm.kc25.components.temp.BULLET_1
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.StoryboardBuilder
@@ -31,9 +30,10 @@ import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.easel.template.RevealEach
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.stages.BoxMovementSpec
-import dev.panuszewski.stages.KotlinTimelineStage.KOTLIN_2_1
-import dev.panuszewski.stages.TextMovementSpec
+import dev.panuszewski.template.BoxMovementSpec
+import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
+import dev.panuszewski.template.BULLET_1
+import dev.panuszewski.template.TextMovementSpec
 
 fun StoryboardBuilder.Kotlin2_1(startState: Int = 0) {
     scene(stateCount = 4 - startState) {

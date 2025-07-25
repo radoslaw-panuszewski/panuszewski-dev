@@ -11,19 +11,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.easel.LocalStoryboard
 import dev.bnorm.storyboard.text.magic.DefaultFadeDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultMoveDurationMillis
 import dev.bnorm.storyboard.text.magic.MagicText
-import dev.bnorm.storyboard.text.splitByTags
+import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.toDpSize
-import dev.panuszewski.template.code.CodeSample
 
 @Composable
 fun Transition<CodeSample>.MagicCodeSample(
     modifier: Modifier = Modifier,
+    split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
+) {
+    MagicText(createChildTransition { it.string.split() }, modifier)
+}
+
+@Composable
+fun Transition<CodeSample>.ScrollableMagicCodeSample(
+    modifier: Modifier = Modifier,
+    split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
 ) {
     val state = rememberScrollState()
     animateScroll(state)
@@ -35,7 +44,7 @@ fun Transition<CodeSample>.MagicCodeSample(
             // Allow scrolling to the very bottom.
             .padding(bottom = LocalStoryboard.current?.format?.toDpSize()?.height ?: 0.dp)
     ) {
-        MagicText(createChildTransition { it.string.splitByTags() })
+        MagicCodeSample(modifier, split)
     }
 }
 

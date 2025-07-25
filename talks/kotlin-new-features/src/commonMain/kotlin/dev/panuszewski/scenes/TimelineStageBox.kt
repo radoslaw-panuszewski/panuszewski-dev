@@ -1,4 +1,4 @@
-package dev.panuszewski.stages
+package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -20,11 +19,13 @@ import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
-import dev.panuszewski.template.code2
+import dev.panuszewski.template.BoxMovementSpec
+import dev.panuszewski.template.FadeInOutAnimatedVisibility
+import dev.panuszewski.template.TextMovementSpec
 
 @Composable
 context(animatedVisibilityScope: AnimatedVisibilityScope, _: SharedTransitionScope)
-fun SceneScope<Int>.TimelineStageBox(
+fun TimelineStageBox(
     stage: KotlinTimelineStage,
     visible: Transition<Boolean>
 ) {

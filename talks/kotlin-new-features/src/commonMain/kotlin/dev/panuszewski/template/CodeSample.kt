@@ -1,4 +1,4 @@
-package dev.panuszewski.template.code
+package dev.panuszewski.template
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
@@ -10,7 +10,6 @@ import dev.bnorm.storyboard.text.addStyleByTag
 import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.CodeStyle
 import dev.bnorm.storyboard.text.replaceAllByTag
-import dev.panuszewski.template.INTELLIJ_DARK_CODE_STYLE
 import kotlin.collections.iterator
 
 @Immutable

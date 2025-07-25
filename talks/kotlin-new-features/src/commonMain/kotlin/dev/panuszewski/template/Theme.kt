@@ -1,52 +1,31 @@
 package dev.panuszewski.template
 
-import androidx.compose.animation.core.InfiniteTransition
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.SceneDecorator
 
-fun storyDecorator(
-    infiniteTransition: InfiniteTransition? = null,
-): SceneDecorator = SceneDecorator { content ->
-    MaterialTheme(
-        colors = DARK_COLORS,
-        typography = Kc25Typography(),
-    ) {
+val DECORATOR = SceneDecorator { content ->
+    MaterialTheme(DARK_COLORS, Typography()) {
         Surface {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(Brush.verticalGradient(listOf(Color(0xFF1D002E), Color.Black)))
-            ) {
-                content()
-            }
+            content()
         }
     }
 }
 
-val BIRD_YELLOW = Color(0xFFFF9419)
-val BIRD_RED = Color(0xFFFF021D)
-val BIRD_PURPLE = Color(0xFFE600FF)
-
 val DARK_COLORS = darkColors(
     background = Color.Black,
-    surface = Color(0xFF1D002E),
+    surface = Color(0xFF1E1F22),
     onBackground = Color(0xFFBCBEC4),
-    primary = Color(0xFF8854FF),
-    secondary = Color(0xFFFF5800),
+    primary = Color(0xFF0E4A3E),
+    primaryVariant = Color(0xFF145F50),
+    secondary = Color(0xFF942DF3),
 )
 
 val Typography.code1: TextStyle
@@ -79,16 +58,6 @@ val Typography.code3: TextStyle
         letterSpacing = 0.4.sp
     )
 
-
-@Composable
-private fun Kc25Typography(): Typography {
-    val typography = Typography(defaultFontFamily = Inter)
-    return typography.copy(
-        body1 = typography.body1.copy(
-            fontWeight = FontWeight.Normal,
-            fontSize = 24.sp,
-            lineHeight = 24.sp,
-            letterSpacing = 0.sp
-        )
-    )
-}
+const val BULLET_1 = " • "
+const val BULLET_2 = " ◦ "
+const val BULLET_3 = " ‣ "

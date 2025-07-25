@@ -1,13 +1,15 @@
-package dev.panuszewski.template.code
+package dev.panuszewski.template
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import dev.bnorm.storyboard.text.TextTagScope
 import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.CodeStyle
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.highlight.highlight
-import dev.panuszewski.template.INTELLIJ_DARK_CODE_STYLE
+
+fun TextTagScope.tag() = tag("")
 
 fun AnnotatedString.toCode(
     codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
@@ -18,7 +20,7 @@ fun AnnotatedString.toCode(
         codeStyle = codeStyle,
         language = Language.Kotlin,
         scope = scope,
-        identifierStyle = { identifierType(codeStyle, it) ?: it.toStyle(codeStyle) }
+        identifierStyle = { identifierType(codeStyle, it) }
     )
     return buildAnnotatedString {
         append(this@toCode)
@@ -37,10 +39,6 @@ fun String.toCode(
         codeStyle = codeStyle,
         language = Language.Kotlin,
         scope = scope,
-        identifierStyle = { identifierType(codeStyle, it) ?: it.toStyle(codeStyle) },
+        identifierStyle = { identifierType(codeStyle, it) },
     )
-}
-
-fun String.toStyle(codeStyle: CodeStyle): SpanStyle? {
-    return null
 }

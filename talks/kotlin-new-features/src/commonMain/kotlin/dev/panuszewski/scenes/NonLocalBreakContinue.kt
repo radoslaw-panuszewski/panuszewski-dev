@@ -21,18 +21,16 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
-import dev.bnorm.storyboard.text.magic.MagicText
-import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.stages.BoxMovementSpec
-import dev.panuszewski.stages.FadeInOutAnimatedVisibility
-import dev.panuszewski.stages.KotlinTimelineStage.KOTLIN_2_1
-import dev.panuszewski.stages.TextMovementSpec
-import dev.panuszewski.stages.tag
-import dev.panuszewski.template.code.buildCodeSamples
+import dev.panuszewski.template.BoxMovementSpec
+import dev.panuszewski.template.FadeInOutAnimatedVisibility
+import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
+import dev.panuszewski.template.MagicCodeSample
+import dev.panuszewski.template.TextMovementSpec
+import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code1
 
-fun StoryboardBuilder.GuardConditions() {
+fun StoryboardBuilder.NonLocalBreakContinue() {
     scene(stateCount = SAMPLES.size + 1) {
         Box(Modifier.padding(horizontal = 100.dp, vertical = 50.dp)) {
             Box(
@@ -56,11 +54,11 @@ fun StoryboardBuilder.GuardConditions() {
                 ) {
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "Guard Conditions",
+                        "Non-local break & continue",
                         style = MaterialTheme.typography.h4,
                         modifier = Modifier
                             .sharedBounds(
-                                sharedContentState = rememberSharedContentState("text/Guard Conditions"),
+                                sharedContentState = rememberSharedContentState("text/Non-local break & continue"),
                                 animatedVisibilityScope = contextOf<AnimatedVisibilityScope>(),
                                 boundsTransform = TextMovementSpec
                             )
@@ -68,13 +66,13 @@ fun StoryboardBuilder.GuardConditions() {
                     Box(
                         modifier = Modifier.padding(32.dp).fillMaxSize(),
                     ) {
-                        transition.createChildTransition {
-                            if (it.toState() >= 1) {
-                                transition.FadeInOutAnimatedVisibility(visible = { it != Frame.End }) {
-                                    ProvideTextStyle(MaterialTheme.typography.code1) {
-                                        MagicText(SAMPLES[(it.toState() - 1).coerceIn(SAMPLES.indices)].string.toWords())
-                                    }
-                                }
+                        val codeSampleTransition = transition.createChildTransition {
+                            SAMPLES[(it.toState() - 1).coerceIn(SAMPLES.indices)]
+                        }
+
+                        transition.FadeInOutAnimatedVisibility(visible = { it.toState() >= 1 && it != Frame.End }) {
+                            ProvideTextStyle(MaterialTheme.typography.code1) {
+                                codeSampleTransition.MagicCodeSample()
                             }
                         }
                     }
@@ -85,34 +83,16 @@ fun StoryboardBuilder.GuardConditions() {
 }
 
 private val SAMPLES = buildCodeSamples {
-    val p1 by tag()
-    val p2 by tag()
-    val p3 by tag()
-
-    val oldWhen by tag()
-    val newWhen by tag()
-
-    val codeSample = """
-        fun checkUserAccess(${p1}user: User${p1})${p2} {
-            ${p3}when (user) {
-                is Admin -> allowFullAccess()
-                is Guest -> denyAccess()${oldWhen}
-                is Manager -> {
-                    if (user.hasPermission("edit")) {
-                        allowEditAccess()
-                    } else {
-                        allowViewAccess()
-                    }
-                }${oldWhen}${newWhen}
-                is Manager -> allowViewAccess()
-                is Manager if user.hasPermission("edit") -> allowEditAccess()${newWhen}
-            }${p3}
-        }${p2}
-    """.trimIndent().toCodeSample()
-
-    codeSample.hide(p1, p2, p3, oldWhen, newWhen)
-        .then { reveal(p1, p2) }
-        .then { reveal(p3) }
-        .then { reveal(oldWhen).focus(oldWhen) }
-        .then { reveal(newWhen).hide(oldWhen).focus(newWhen) }
+    """
+    fun processList(elements: List<Int>): Boolean {
+        for (element in elements) {
+            val variable = element.nullableMethod() ?: run {
+                log.warning("Element is null or invalid, continuing...")
+                continue
+            }
+            if (variable == 0) return true // If variable is zero, return true
+        }
+        return false
+    }
+    """.trimIndent().toCodeSample().let(::listOf)
 }

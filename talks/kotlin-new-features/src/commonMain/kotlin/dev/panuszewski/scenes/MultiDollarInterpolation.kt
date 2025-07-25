@@ -21,16 +21,16 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
-import dev.bnorm.storyboard.text.magic.MagicText
-import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.stages.BoxMovementSpec
-import dev.panuszewski.stages.FadeInOutAnimatedVisibility
-import dev.panuszewski.stages.KotlinTimelineStage.KOTLIN_2_1
-import dev.panuszewski.stages.TextMovementSpec
-import dev.panuszewski.stages.tag
-import dev.panuszewski.template.code.buildCodeSamples
+import dev.panuszewski.template.BoxMovementSpec
+import dev.panuszewski.template.FadeInOutAnimatedVisibility
+import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
+import dev.panuszewski.template.MagicCodeSample
+import dev.panuszewski.template.TextMovementSpec
+import dev.panuszewski.template.CodeSample
+import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code1
+import dev.panuszewski.template.tag
 
 fun StoryboardBuilder.MultiDollarInterpolation() {
     scene(stateCount = SAMPLES.size + 1) {
@@ -68,16 +68,13 @@ fun StoryboardBuilder.MultiDollarInterpolation() {
                     Box(
                         modifier = Modifier.padding(32.dp).fillMaxSize(),
                     ) {
-                        transition.createChildTransition {
-                            if (it.toState() >= 1) {
-                                transition.FadeInOutAnimatedVisibility(visible = { it != Frame.End }) {
-                                    ProvideTextStyle(MaterialTheme.typography.code1) {
-                                        val sample = SAMPLES[(it.toState() - 1).coerceIn(SAMPLES.indices)]
-                                        val sampleString = sample.string
-                                        val words = sampleString.toWords()
-                                        MagicText(words)
-                                    }
-                                }
+                        val codeSampleTransition = transition.createChildTransition {
+                            SAMPLES[(it.toState() - 1).coerceIn(SAMPLES.indices)]
+                        }
+
+                        transition.FadeInOutAnimatedVisibility(visible = { it.toState() >= 1 && it != Frame.End }) {
+                            ProvideTextStyle(MaterialTheme.typography.code1) {
+                                codeSampleTransition.MagicCodeSample()
                             }
                         }
                     }
@@ -87,7 +84,7 @@ fun StoryboardBuilder.MultiDollarInterpolation() {
     }
 }
 
-private val SAMPLES = buildCodeSamples {
+private val SAMPLES: List<CodeSample> = buildCodeSamples {
     val escaped by tag()
     val unescapedSingle by tag()
     val unescapedDouble by tag()
