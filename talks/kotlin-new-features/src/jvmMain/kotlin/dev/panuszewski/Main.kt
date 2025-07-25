@@ -14,7 +14,7 @@ fun main() {
 
     application {
         remember {
-            createStoryboard().also { state.updateStoryboard(it) }
+            KotlinNewFeatures().also { state.updateStoryboard(it) }
         }
 
         MaterialTheme(colors = darkColors()) {

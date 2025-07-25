@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package dev.panuszewski
 
 import dev.bnorm.kc25.sections.stages.GuardConditions
@@ -12,8 +14,8 @@ import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_2
 import dev.panuszewski.scenes.KotlinTimeline
 import dev.panuszewski.template.DECORATOR
 
-fun createStoryboard(decorator: SceneDecorator = DECORATOR): Storyboard {
-    return Storyboard.build(
+fun KotlinNewFeatures(decorator: SceneDecorator = DECORATOR): Storyboard =
+    Storyboard.build(
         title = "Basic Storyboard",
         format = SceneFormat.Default,
         decorator = decorator,
@@ -28,5 +30,4 @@ fun createStoryboard(decorator: SceneDecorator = DECORATOR): Storyboard {
         Kotlin2_1(startState = 3)
         KotlinTimeline(stageToBeExpanded = KOTLIN_2_2)
     }
-}
 
