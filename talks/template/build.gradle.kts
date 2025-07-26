@@ -9,6 +9,7 @@ kotlin {
                 api(libs.storyboard)
                 api(libs.storyboard.easel)
                 api(libs.storyboard.text)
+                api(libs.haze)
             }
         }
     }
