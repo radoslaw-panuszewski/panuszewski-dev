@@ -1,4 +1,4 @@
-package dev.bnorm.kc25.sections.stages
+package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.createChildTransition

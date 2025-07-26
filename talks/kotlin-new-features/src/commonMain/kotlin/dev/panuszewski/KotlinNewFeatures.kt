@@ -1,10 +1,9 @@
 package dev.panuszewski
 
-import dev.bnorm.kc25.sections.stages.GuardConditions
-import dev.bnorm.kc25.sections.stages.Kotlin2_1
-import dev.bnorm.kc25.sections.stages.MultiDollarInterpolation
-import dev.bnorm.kc25.sections.stages.NonLocalBreakContinue
-import dev.bnorm.storyboard.SceneDecorator
+import dev.panuszewski.scenes.GuardConditions
+import dev.panuszewski.scenes.Kotlin2_1
+import dev.panuszewski.scenes.MultiDollarInterpolation
+import dev.panuszewski.scenes.NonLocalBreakContinue
 import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
