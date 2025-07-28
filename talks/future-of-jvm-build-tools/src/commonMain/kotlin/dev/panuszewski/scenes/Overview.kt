@@ -13,16 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.toState
@@ -33,10 +28,20 @@ import talks.future_of_jvm_build_tools.generated.resources.gradle
 import talks.future_of_jvm_build_tools.generated.resources.maven
 
 fun StoryboardBuilder.Overview() {
-    scene(3) {
+    scene(4) {
         val axisLength by transition.animateFloat(
             transitionSpec = { tween(durationMillis = 500) },
             targetValueByState = { if (it.toState() >= 2) 0.99f else 0f }
+        )
+
+        val moveToCorners by transition.animateFloat(
+            transitionSpec = { tween(durationMillis = 1000) },
+            targetValueByState = { if (it.toState() >= 3) 1f else 0f }
+        )
+
+        val scale by transition.animateFloat(
+            transitionSpec = { tween(durationMillis = 1000) },
+            targetValueByState = { if (it.toState() >= 3) 0.5f else 1f }
         )
 
         Box(
@@ -45,7 +50,14 @@ fun StoryboardBuilder.Overview() {
                 .background(Color.White)
                 .drawBehind { drawCoordinateSystem(axisLength) }
         ) {
-            Box(Modifier.align(Alignment.Center).offset(x = (-100).dp)) {
+            Box(
+                Modifier
+                    .align(Alignment.Center)
+                    .offset(
+                        x = (-100 + (-300 * moveToCorners)).dp,
+                        y = (-200 * moveToCorners).dp
+                    )
+            ) {
                 transition.AnimatedVisibility(
                     visible = { it.toState() >= 1 },
                     enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
@@ -53,12 +65,21 @@ fun StoryboardBuilder.Overview() {
                 ) {
                     ResourceImage(
                         resource = Res.drawable.maven,
-                        modifier = Modifier.height(150.dp)
+                        modifier = Modifier
+                            .height(150.dp)
+                            .scale(scale)
                     )
                 }
             }
 
-            Box(Modifier.align(Alignment.Center).offset(x = 100.dp)) {
+            Box(
+                Modifier
+                    .align(Alignment.Center)
+                    .offset(
+                        x = (100 + (300 * moveToCorners)).dp,
+                        y = (200 * moveToCorners).dp
+                    )
+            ) {
                 transition.AnimatedVisibility(
                     visible = { it.toState() >= 1 },
                     enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
@@ -66,11 +87,12 @@ fun StoryboardBuilder.Overview() {
                 ) {
                     ResourceImage(
                         resource = Res.drawable.gradle,
-                        modifier = Modifier.height(138.dp)
+                        modifier = Modifier
+                            .height(138.dp)
+                            .scale(scale)
                     )
                 }
             }
         }
     }
 }
-
