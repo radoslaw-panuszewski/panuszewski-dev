@@ -16,8 +16,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     decorator = LIGHT_THEME,
 ) {
     section("The Future of JVM Build Tools") {
-        // TODO zrobić animację która słowo Future zamienia na Present
-//        Title()
+        Title()
         Overview()
     }
 

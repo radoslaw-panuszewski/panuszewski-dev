@@ -8,19 +8,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -30,13 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
-import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.MagicText
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.drawCoordinateSystem
 import talks.future_of_jvm_build_tools.generated.resources.Res
@@ -89,8 +82,8 @@ fun StoryboardBuilder.Overview() {
                     Modifier
                         .align(Alignment.Center)
                         .offset(
-                            x = (-100 + (-300 * moveToCorners)).dp,
-                            y = (-200 * moveToCorners).dp
+                            x = (-100 + (-100 * moveToCorners)).dp,
+                            y = (-120 * moveToCorners).dp
                         )
                 ) {
                     transition.AnimatedVisibility(
@@ -99,9 +92,9 @@ fun StoryboardBuilder.Overview() {
                         exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
                     ) {
                         ResourceImage(
-                            resource = Res.drawable.maven,
+                            resource = Res.drawable.gradle,
                             modifier = Modifier
-                                .height(150.dp)
+                                .height(138.dp)
                                 .scale(scale)
                         )
                     }
@@ -111,8 +104,8 @@ fun StoryboardBuilder.Overview() {
                     Modifier
                         .align(Alignment.Center)
                         .offset(
-                            x = (100 + (300 * moveToCorners)).dp,
-                            y = (200 * moveToCorners).dp
+                            x = (100 + (-150 * moveToCorners)).dp,
+                            y = (1 * moveToCorners).dp
                         )
                 ) {
                     transition.AnimatedVisibility(
@@ -121,9 +114,9 @@ fun StoryboardBuilder.Overview() {
                         exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
                     ) {
                         ResourceImage(
-                            resource = Res.drawable.gradle,
+                            resource = Res.drawable.maven,
                             modifier = Modifier
-                                .height(138.dp)
+                                .height(150.dp)
                                 .scale(scale)
                         )
                     }

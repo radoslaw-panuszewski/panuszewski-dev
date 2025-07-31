@@ -50,7 +50,6 @@ fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer
         strokeWidth = strokeWidth
     )
 
-
     if (axisLength > 0.05f) {
         drawArrowhead(
             start = Offset(endX, xAxisY),
@@ -59,20 +58,20 @@ fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer
             color = Color.Black,
             strokeWidth = strokeWidth
         )
-    }
 
-    drawText(
-        textMeasurer = textMeasurer,
-        text = "Toolability",
-        topLeft = Offset(size.width - 80.dp.toPx(), xAxisY + 10.dp.toPx())
-    )
-
-    rotate(degrees = -90f) {
         drawText(
             textMeasurer = textMeasurer,
-            text = "Extensibility",
-            topLeft = Offset(center.x + 150.dp.toPx(), center.y - 470.dp.toPx()),
+            text = "Toolability",
+            topLeft = Offset(axisLength * (size.width - 80.dp.toPx()), xAxisY + 10.dp.toPx())
         )
+
+        rotate(degrees = -90f) {
+            drawText(
+                textMeasurer = textMeasurer,
+                text = "Extensibility",
+                topLeft = Offset(axisLength * (center.x + 150.dp.toPx()), center.y - 470.dp.toPx()),
+            )
+        }
     }
 }
 
