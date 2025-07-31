@@ -10,7 +10,6 @@ import dev.bnorm.storyboard.text.addStyleByTag
 import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.CodeStyle
 import dev.bnorm.storyboard.text.replaceAllByTag
-import kotlin.collections.iterator
 
 @Immutable
 class CodeSample private constructor(
@@ -39,7 +38,7 @@ class CodeSample private constructor(
         for ((tag, replacement) in replaced) {
             str = str.replaceAllByTag(tag, replacement)
         }
-        str.toCode(INTELLIJ_DARK_CODE_STYLE, CodeScope.File, { _, _ -> null })
+        str
     }
 
     val scroll: Int by lazy {
@@ -143,7 +142,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         scope: CodeScope = CodeScope.File,
         identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample(lazy { extractTags(this) })
+        return CodeSample(lazy { extractTags(this).toCode(codeStyle, scope, identifierType) })
     }
 
     fun AnnotatedString.toCodeSample(
@@ -151,7 +150,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         scope: CodeScope = CodeScope.File,
         identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample(lazy { this })
+        return CodeSample(lazy { toCode(codeStyle, scope, identifierType) })
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })

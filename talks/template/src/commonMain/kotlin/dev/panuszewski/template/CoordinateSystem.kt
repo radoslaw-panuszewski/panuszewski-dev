@@ -1,19 +1,26 @@
 package dev.panuszewski.template
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun DrawScope.drawCoordinateSystem(axisLength: Float) {
-    val xAxisY = size.height - 20.dp.toPx()
-    val yAxisX = 20.dp.toPx()
+fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer) {
+    val xAxisY = size.height - 40.dp.toPx()
+    val yAxisX = 40.dp.toPx()
     val strokeWidth = 2.dp.toPx()
     val arrowSize = 10.dp.toPx()
 
@@ -51,6 +58,20 @@ fun DrawScope.drawCoordinateSystem(axisLength: Float) {
             size = arrowSize,
             color = Color.Black,
             strokeWidth = strokeWidth
+        )
+    }
+
+    drawText(
+        textMeasurer = textMeasurer,
+        text = "Toolability",
+        topLeft = Offset(size.width - 80.dp.toPx(), xAxisY + 10.dp.toPx())
+    )
+
+    rotate(degrees = -90f) {
+        drawText(
+            textMeasurer = textMeasurer,
+            text = "Extensibility",
+            topLeft = Offset(center.x + 150.dp.toPx(), center.y - 470.dp.toPx()),
         )
     }
 }

@@ -21,3 +21,20 @@ val INTELLIJ_DARK_CODE_STYLE = CodeStyle.build {
     typeParameters = simple + SpanStyle(color = Color(0xFF16BAAC))
     label += simple + SpanStyle(color = Color(0xFF16BAAC))
 }
+
+val INTELLIJ_LIGHT_CODE_STYLE = CodeStyle.build {
+    simple += SpanStyle(color = Color(0xFF000000))
+    number = simple + SpanStyle(color = Color(0xFF1750EB))
+    keyword = simple + SpanStyle(color = Color(0xFF0033B3))
+    punctuation = simple + SpanStyle(color = Color(0xFF000000))
+    annotation = simple + SpanStyle(color = Color(0xFF9E880D))
+    comment = simple + SpanStyle(color = Color(0xFF8C8C8C))
+    string = simple + SpanStyle(color = Color(0xFF067D17))
+    property = simple + SpanStyle(color = Color(0xFF871094))
+    staticProperty = property + SpanStyle(fontStyle = FontStyle.Italic)
+    functionDeclaration = simple + SpanStyle(color = Color(0xFF000000))
+    extensionFunctionCall = simple + SpanStyle(color = Color(0xFF000000), fontStyle = FontStyle.Italic)
+    staticFunctionCall = simple + SpanStyle(fontStyle = FontStyle.Italic)
+    typeParameters = simple + SpanStyle(color = Color(0xFF20999D))
+    label += simple + SpanStyle(color = Color(0xFF20999D))
+}

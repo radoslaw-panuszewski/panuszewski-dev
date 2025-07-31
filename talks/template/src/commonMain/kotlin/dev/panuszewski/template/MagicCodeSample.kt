@@ -22,6 +22,14 @@ import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.toDpSize
 
 @Composable
+fun Transition<AnnotatedString>.MagicText(
+    modifier: Modifier = Modifier,
+    split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
+) {
+    MagicText(createChildTransition { it.split() }, modifier)
+}
+
+@Composable
 fun Transition<CodeSample>.MagicCodeSample(
     modifier: Modifier = Modifier,
     split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
