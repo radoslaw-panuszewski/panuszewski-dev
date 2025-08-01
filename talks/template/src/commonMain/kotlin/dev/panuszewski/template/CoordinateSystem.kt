@@ -1,15 +1,11 @@
 package dev.panuszewski.template
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.dp
@@ -18,7 +14,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer) {
+fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer, xLabel: String, yLabel: String) {
     val xAxisY = size.height - 40.dp.toPx()
     val yAxisX = 40.dp.toPx()
     val strokeWidth = 2.dp.toPx()
@@ -61,14 +57,14 @@ fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer
 
         drawText(
             textMeasurer = textMeasurer,
-            text = "Toolability",
+            text = xLabel,
             topLeft = Offset(axisLength * (size.width - 80.dp.toPx()), xAxisY + 10.dp.toPx())
         )
 
         rotate(degrees = -90f) {
             drawText(
                 textMeasurer = textMeasurer,
-                text = "Extensibility",
+                text = yLabel,
                 topLeft = Offset(axisLength * (center.x + 150.dp.toPx()), center.y - 470.dp.toPx()),
             )
         }
