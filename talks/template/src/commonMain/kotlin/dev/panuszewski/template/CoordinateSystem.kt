@@ -14,7 +14,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun DrawScope.drawCoordinateSystem(axisLength: Float, textMeasurer: TextMeasurer, xLabel: String, yLabel: String) {
+fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, xLabel: String, yLabel: String) {
     val xAxisY = size.height - 40.dp.toPx()
     val yAxisX = 40.dp.toPx()
     val strokeWidth = 2.dp.toPx()

@@ -16,7 +16,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     decorator = LIGHT_THEME,
 ) {
     section("The Future of JVM Build Tools") {
-        Title()
+//        Title()
         Overview()
     }
 
