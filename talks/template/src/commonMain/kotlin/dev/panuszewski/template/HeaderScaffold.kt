@@ -3,7 +3,14 @@ package dev.panuszewski.template
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
@@ -35,7 +42,7 @@ fun HeaderScaffold(
                     .fillMaxWidth()
                     .padding(bottom = 32.dp)
             ) {
-                ProvideTextStyle(MaterialTheme.typography.h3) {
+                ProvideTextStyle(MaterialTheme.typography.h4) {
                     section.title()
                 }
             }
@@ -48,7 +55,7 @@ fun HeaderScaffold(
 @Composable
 fun Header(
     modifier: Modifier = Modifier,
-    lineFraction: Float = 1f,
+    lineFraction: Float = 0f,
     title: @Composable () -> Unit,
 ) {
     Column(

@@ -3,6 +3,7 @@ package dev.panuszewski
 import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
+import dev.panuszewski.scenes.Maven
 import dev.panuszewski.scenes.Overview
 import dev.panuszewski.template.LIGHT_THEME
 import dev.panuszewski.template.SectionTitle
@@ -18,7 +19,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     }
 
     section("Maven") {
-        SectionTitle()
+        SectionTitle(animateToHeader = true)
+        Maven()
     }
 }
-

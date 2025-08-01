@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
+import dev.bnorm.storyboard.easel.template.SceneEnter
+import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.panuszewski.components.BuildToolChart
 import dev.panuszewski.components.BuildToolItem
 import dev.panuszewski.components.SlideDirection.FROM_LEFT
@@ -31,7 +33,11 @@ import talks.future_of_jvm_build_tools.generated.resources.maven
 
 @Suppress("FunctionName")
 fun StoryboardBuilder.Overview() {
-    scene(7) {
+    scene(
+        stateCount = 7,
+        enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
+        exitTransition = SceneExit(alignment = Alignment.CenterEnd),
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

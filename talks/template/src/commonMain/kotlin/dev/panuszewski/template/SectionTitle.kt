@@ -57,19 +57,19 @@ fun SectionTitle(
     title: @Composable () -> Unit = SceneSection.title,
 ) {
     val titleTextStyle = MaterialTheme.typography.h2
-    val headerTextStyle = MaterialTheme.typography.h3
+    val headerTextStyle = MaterialTheme.typography.h4
 
     val moveDuration = 300
     val lineDuration = 300
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val textStyle by showAsHeader.animateTextStyle(
-                transitionSpec = {
-                    when (targetState) {
-                        true -> tween(moveDuration, delayMillis = 0, EaseInOut)
-                        false -> tween(moveDuration, lineDuration, EaseInOut)
-                    }
-                },
+            transitionSpec = {
+                when (targetState) {
+                    true -> tween(moveDuration, delayMillis = 0, EaseInOut)
+                    false -> tween(moveDuration, lineDuration, EaseInOut)
+                }
+            },
             targetValueByState = { if (it) headerTextStyle else titleTextStyle }
         )
         val height by showAsHeader.animateDp(
@@ -97,7 +97,7 @@ fun SectionTitle(
                     false -> tween(lineDuration, delayMillis = 0, EaseInOut)
                 }
             },
-            targetValueByState = { if (it) 1f else 0f },
+            targetValueByState = { if (it) 0f else 0f },
         )
 
         ProvideTextStyle(textStyle) {
