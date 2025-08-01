@@ -2,7 +2,9 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -75,6 +77,8 @@ fun StoryboardBuilder.Overview() {
                 targetValueByState = { if (it.toState() >= 3) 0.5f else 1f }
             )
 
+            val isVisible = transition.createChildTransition { it.toState() >= 1 }
+
             val textMeasurer = rememberTextMeasurer()
 
             BuildToolsChart(
@@ -92,7 +96,7 @@ fun StoryboardBuilder.Overview() {
                     moveToCorners = moveToCorners,
                     scale = scale,
                     height = 138.dp,
-                    isVisible = transition.currentState.toState() >= 1,
+                    isVisible = isVisible,
                     slideInFromLeft = true
                 )
                 
@@ -105,7 +109,7 @@ fun StoryboardBuilder.Overview() {
                     moveToCorners = moveToCorners,
                     scale = scale,
                     height = 150.dp,
-                    isVisible = transition.currentState.toState() >= 1,
+                    isVisible = isVisible,
                     slideInFromLeft = false
                 )
             }
@@ -146,7 +150,7 @@ private fun BoxScope.BuildToolItem(
     moveToCorners: Float,
     scale: Float,
     height: Dp,
-    isVisible: Boolean,
+    isVisible: Transition<Boolean>,
     slideInFromLeft: Boolean = true
 ) {
     Box(
@@ -157,8 +161,8 @@ private fun BoxScope.BuildToolItem(
                 y = (targetY * moveToCorners)
             )
     ) {
-        AnimatedVisibility(
-            visible = isVisible,
+        isVisible.AnimatedVisibility(
+            visible = { it },
             enter = slideInHorizontally(initialOffsetX = { if (slideInFromLeft) -it else it }) + fadeIn(),
             exit = slideOutHorizontally(targetOffsetX = { if (slideInFromLeft) -it else it }) + fadeOut()
         ) {
