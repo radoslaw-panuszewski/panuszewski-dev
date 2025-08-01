@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -12,22 +13,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
-import dev.panuszewski.components.BuildToolItem
 import dev.panuszewski.components.BuildToolChart
+import dev.panuszewski.components.BuildToolItem
 import dev.panuszewski.components.SlideDirection.FROM_LEFT
 import dev.panuszewski.components.SlideDirection.FROM_RIGHT
 import dev.panuszewski.template.ResourceImage
+import dev.panuszewski.template.code1
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.amper
 import talks.future_of_jvm_build_tools.generated.resources.gradle
+import talks.future_of_jvm_build_tools.generated.resources.ideal_build_tool
 import talks.future_of_jvm_build_tools.generated.resources.maven
 
 @Suppress("FunctionName")
 fun StoryboardBuilder.Overview() {
-    scene(6) {
+    scene(7) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,13 +76,33 @@ fun StoryboardBuilder.Overview() {
                     slideDirection = FROM_RIGHT,
                     visibleSince = 4,
                     moveToTargetSince = 5,
-                    initialX = 300.dp,
+                    initialX = 100.dp,
                     targetX = 200.dp,
                     targetY = 120.dp,
                 ) {
                     Column(modifier = it, horizontalAlignment = Alignment.CenterHorizontally) {
                         ResourceImage(Res.drawable.amper, modifier = Modifier.height(120.dp))
                         ProvideTextStyle(MaterialTheme.typography.h5) { Text("Amper", fontWeight = Bold) }
+                    }
+                }
+
+                BuildToolItem(
+                    slideDirection = FROM_RIGHT,
+                    visibleSince = 6,
+                    moveToTargetSince = 0,
+                    targetX = 380.dp,
+                    targetY = -180.dp,
+                ) {
+                    Column(modifier = it, horizontalAlignment = Alignment.CenterHorizontally) {
+                        ResourceImage(Res.drawable.ideal_build_tool, modifier = it.height(180.dp))
+                        ProvideTextStyle(MaterialTheme.typography.code1) {
+                            Text(
+                                text = "Ideal Build Tool",
+                                fontSize = 20.sp,
+                                fontWeight = Bold,
+                                modifier = Modifier.offset(y = -32.dp)
+                            )
+                        }
                     }
                 }
             }

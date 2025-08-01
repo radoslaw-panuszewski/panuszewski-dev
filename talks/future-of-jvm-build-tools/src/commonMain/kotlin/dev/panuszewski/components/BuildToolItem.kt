@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
 
@@ -25,7 +26,8 @@ import dev.bnorm.storyboard.toState
 context(sceneScope: SceneScope<Int>, boxScope: BoxScope, chartContext: BuildToolChartContext)
 fun BuildToolItem(
     slideDirection: SlideDirection,
-    initialX: Dp,
+    initialX: Dp = 0.dp,
+    initialY: Dp = 0.dp,
     targetX: Dp,
     targetY: Dp,
     visibleSince: Int? = null,
@@ -51,7 +53,7 @@ fun BuildToolItem(
             .align(Alignment.Center)
             .offset(
                 x = (initialX + ((targetX - initialX) * moveToTarget)),
-                y = (targetY * moveToTarget)
+                y = initialY + ((targetY - initialY) * moveToTarget)
             )
     ) {
         sceneScope.transition.AnimatedVisibility(
