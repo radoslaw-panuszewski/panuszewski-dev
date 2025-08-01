@@ -3,7 +3,6 @@ package dev.panuszewski.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -29,17 +28,26 @@ import org.jetbrains.compose.resources.DrawableResource
 context(sceneScope: SceneScope<Int>, boxScope: BoxScope, chartContext: BuildToolChartContext)
 fun BuildToolItem(
     resource: DrawableResource,
+    slideDirection: SlideDirection,
     initialX: Dp,
     targetX: Dp,
     targetY: Dp,
-    scale: Float,
     height: Dp,
-    isVisible: Transition<Boolean>,
-    slideDirection: SlideDirection,
+    visibleSince: Int? = null,
+    moveToTargetSince: Int? = null,
 ) = with(boxScope) {
+
+    val isVisibleSince = visibleSince ?: chartContext.itemsVisibleSinceState ?: 0
+    val moveAndScaleSince = moveToTargetSince ?: chartContext.moveItemsToTargetSinceState ?: 0
+
     val moveToTarget by sceneScope.transition.animateFloat(
         transitionSpec = { tween(durationMillis = 1000) },
-        targetValueByState = { if (it.toState() >= chartContext.moveItemsToTargetSinceState) 1f else 0f }
+        targetValueByState = { if (it.toState() >= moveAndScaleSince) 1f else 0f }
+    )
+
+    val scale by sceneScope.transition.animateFloat(
+        transitionSpec = { tween(durationMillis = 1000) },
+        targetValueByState = { if (it.toState() >= moveAndScaleSince) 0.5f else 1f }
     )
 
     Box(
@@ -50,16 +58,14 @@ fun BuildToolItem(
                 y = (targetY * moveToTarget)
             )
     ) {
-        isVisible.AnimatedVisibility(
-            visible = { it },
+        sceneScope.transition.AnimatedVisibility(
+            visible = { it.toState() >= isVisibleSince },
             enter = slideDirection.enter,
             exit = slideDirection.exit
         ) {
             ResourceImage(
                 resource = resource,
-                modifier = Modifier
-                    .height(height)
-                    .scale(scale)
+                modifier = Modifier.height(height).scale(scale)
             )
         }
     }

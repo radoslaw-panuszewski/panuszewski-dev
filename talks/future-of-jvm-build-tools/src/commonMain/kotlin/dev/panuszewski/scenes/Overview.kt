@@ -2,7 +2,6 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +28,7 @@ import talks.future_of_jvm_build_tools.generated.resources.maven
 
 @Suppress("FunctionName")
 fun StoryboardBuilder.Overview() {
-    scene(5) {
+    scene(4) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -47,37 +46,27 @@ fun StoryboardBuilder.Overview() {
                 )
             }
 
-            val scale by transition.animateFloat(
-                transitionSpec = { tween(durationMillis = 1000) },
-                targetValueByState = { if (it.toState() >= 3) 0.5f else 1f }
-            )
-
-            val isVisible = transition.createChildTransition { it.toState() >= 1 }
-
             BuildToolChart(
-                drawAxesSinceState = 2,
-                moveItemsToTargetSinceState = 3
+                drawAxesSince = 2,
+                itemsVisibleSince = 1,
+                moveItemsToTargetSince = 3
             ) {
                 BuildToolItem(
                     resource = Res.drawable.gradle,
+                    slideDirection = FROM_LEFT,
                     initialX = -100.dp,
                     targetX = -200.dp,
                     targetY = -120.dp,
-                    scale = scale,
                     height = 138.dp,
-                    isVisible = isVisible,
-                    slideDirection = FROM_LEFT
                 )
 
                 BuildToolItem(
                     resource = Res.drawable.maven,
+                    slideDirection = FROM_RIGHT,
                     initialX = 100.dp,
                     targetX = -50.dp,
                     targetY = 1.dp,
-                    scale = scale,
                     height = 150.dp,
-                    isVisible = isVisible,
-                    slideDirection = FROM_RIGHT
                 )
             }
         }

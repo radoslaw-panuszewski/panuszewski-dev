@@ -18,13 +18,14 @@ import dev.panuszewski.template.drawAxes
 
 @Composable
 fun SceneScope<Int>.BuildToolChart(
-    drawAxesSinceState: Int,
-    moveItemsToTargetSinceState: Int,
+    drawAxesSince: Int,
+    itemsVisibleSince: Int? = null,
+    moveItemsToTargetSince: Int? = null,
     content: BuildToolChartContent,
 ) {
     val axisLength by transition.animateFloat(
         transitionSpec = { tween(durationMillis = 500) },
-        targetValueByState = { if (it.toState() >= drawAxesSinceState) 0.99f else 0f }
+        targetValueByState = { if (it.toState() >= drawAxesSince) 0.99f else 0f }
     )
 
     val textMeasurer = rememberTextMeasurer()
@@ -43,7 +44,8 @@ fun SceneScope<Int>.BuildToolChart(
             }
     ) {
         val chartContext = BuildToolChartContext(
-            moveItemsToTargetSinceState = moveItemsToTargetSinceState
+            itemsVisibleSinceState = itemsVisibleSince,
+            moveItemsToTargetSinceState = moveItemsToTargetSince
         )
         context(chartContext) { content.Content() }
     }
@@ -56,5 +58,6 @@ fun interface BuildToolChartContent {
 }
 
 data class BuildToolChartContext(
-    val moveItemsToTargetSinceState: Int,
+    val itemsVisibleSinceState: Int?,
+    val moveItemsToTargetSinceState: Int?,
 )
