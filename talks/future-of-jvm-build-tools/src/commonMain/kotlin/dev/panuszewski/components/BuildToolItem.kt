@@ -27,14 +27,13 @@ import org.jetbrains.compose.resources.DrawableResource
 @Composable
 context(sceneScope: SceneScope<Int>, boxScope: BoxScope, chartContext: BuildToolChartContext)
 fun BuildToolItem(
-    resource: DrawableResource,
     slideDirection: SlideDirection,
     initialX: Dp,
     targetX: Dp,
     targetY: Dp,
-    height: Dp,
     visibleSince: Int? = null,
     moveToTargetSince: Int? = null,
+    content: @Composable (Modifier) -> Unit,
 ) = with(boxScope) {
 
     val isVisibleSince = visibleSince ?: chartContext.itemsVisibleSinceState ?: 0
@@ -63,10 +62,7 @@ fun BuildToolItem(
             enter = slideDirection.enter,
             exit = slideDirection.exit
         ) {
-            ResourceImage(
-                resource = resource,
-                modifier = Modifier.height(height).scale(scale)
-            )
+            content(Modifier.scale(scale))
         }
     }
 }

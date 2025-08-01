@@ -1,8 +1,6 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,25 +8,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
-import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.BuildToolItem
 import dev.panuszewski.components.BuildToolChart
 import dev.panuszewski.components.SlideDirection.FROM_LEFT
 import dev.panuszewski.components.SlideDirection.FROM_RIGHT
+import dev.panuszewski.template.ResourceImage
 import talks.future_of_jvm_build_tools.generated.resources.Res
+import talks.future_of_jvm_build_tools.generated.resources.amper
 import talks.future_of_jvm_build_tools.generated.resources.gradle
 import talks.future_of_jvm_build_tools.generated.resources.maven
 
 @Suppress("FunctionName")
 fun StoryboardBuilder.Overview() {
-    scene(4) {
+    scene(6) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,22 +51,36 @@ fun StoryboardBuilder.Overview() {
                 moveItemsToTargetSince = 3
             ) {
                 BuildToolItem(
-                    resource = Res.drawable.gradle,
                     slideDirection = FROM_LEFT,
                     initialX = -100.dp,
                     targetX = -200.dp,
                     targetY = -120.dp,
-                    height = 138.dp,
-                )
+                ) {
+                    ResourceImage(Res.drawable.gradle, modifier = it.height(138.dp))
+                }
 
                 BuildToolItem(
-                    resource = Res.drawable.maven,
                     slideDirection = FROM_RIGHT,
                     initialX = 100.dp,
-                    targetX = -50.dp,
+                    targetX = -100.dp,
                     targetY = 1.dp,
-                    height = 150.dp,
-                )
+                ) {
+                    ResourceImage(Res.drawable.maven, modifier = it.height(150.dp))
+                }
+
+                BuildToolItem(
+                    slideDirection = FROM_RIGHT,
+                    visibleSince = 4,
+                    moveToTargetSince = 5,
+                    initialX = 300.dp,
+                    targetX = 200.dp,
+                    targetY = 120.dp,
+                ) {
+                    Column(modifier = it, horizontalAlignment = Alignment.CenterHorizontally) {
+                        ResourceImage(Res.drawable.amper, modifier = Modifier.height(120.dp))
+                        ProvideTextStyle(MaterialTheme.typography.h5) { Text("Amper", fontWeight = Bold) }
+                    }
+                }
             }
         }
     }
