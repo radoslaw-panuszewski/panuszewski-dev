@@ -11,7 +11,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,8 +20,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.Dp
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.ResourceImage
-import org.jetbrains.compose.resources.DrawableResource
 
 @Composable
 context(sceneScope: SceneScope<Int>, boxScope: BoxScope, chartContext: BuildToolChartContext)

@@ -18,8 +18,8 @@ import dev.panuszewski.template.drawAxes
 
 @Composable
 fun SceneScope<Int>.BuildToolChart(
-    drawAxesSince: Int,
     itemsVisibleSince: Int? = null,
+    drawAxesSince: Int,
     moveItemsToTargetSince: Int? = null,
     content: BuildToolChartContent,
 ) {

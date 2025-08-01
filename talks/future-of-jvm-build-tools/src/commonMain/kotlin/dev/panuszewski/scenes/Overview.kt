@@ -46,8 +46,8 @@ fun StoryboardBuilder.Overview() {
             }
 
             BuildToolChart(
-                drawAxesSince = 2,
                 itemsVisibleSince = 1,
+                drawAxesSince = 2,
                 moveItemsToTargetSince = 3
             ) {
                 BuildToolItem(
