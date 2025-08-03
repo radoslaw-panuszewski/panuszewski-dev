@@ -9,8 +9,8 @@ enum class Language {
 }
 
 fun String.highlight(
-    codeStyle: CodeStyle,
     language: Language,
+    codeStyle: CodeStyle,
     scope: CodeScope = CodeScope.File,
     identifierStyle: (String) -> SpanStyle? = { null },
 ): AnnotatedString {

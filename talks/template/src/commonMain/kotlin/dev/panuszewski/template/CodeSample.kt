@@ -1,5 +1,6 @@
 package dev.panuszewski.template
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -14,18 +15,19 @@ import dev.bnorm.storyboard.text.replaceAllByTag
 
 @Immutable
 class CodeSample private constructor(
-    private val base: Lazy<AnnotatedString>,
+    private val base: (CodeStyle) -> AnnotatedString,
     private val focus: TextTag?,
     private val replaced: Map<TextTag, AnnotatedString>,
     private val styled: Map<TextTag, SpanStyle>,
     private val scrollTag: TextTag?,
     val data: Any?,
 ) {
-    constructor(sample: AnnotatedString) : this(lazyOf(sample), null, emptyMap(), emptyMap(), null, null)
-    constructor(sample: Lazy<AnnotatedString>) : this(sample, null, emptyMap(), emptyMap(), null, null)
+    constructor(sample: AnnotatedString) : this({ sample }, null, emptyMap(), emptyMap(), null, null)
+    constructor(sample: (CodeStyle) -> AnnotatedString) : this(sample, null, emptyMap(), emptyMap(), null, null)
 
-    val string: AnnotatedString by lazy {
-        var str = base.value
+    @Composable
+    fun String(): AnnotatedString {
+        var str = base(LocalCodeStyle.current)
         for ((tag, style) in styled) {
             str = str.addStyleByTag(tag, tagged = style)
         }
@@ -39,17 +41,20 @@ class CodeSample private constructor(
         for ((tag, replacement) in replaced) {
             str = str.replaceAllByTag(tag, replacement)
         }
-        str
+        return str
     }
 
-    val scroll: Int by lazy {
-        if (scrollTag == null) return@lazy 0
+    @Composable
+    fun Scroll(): Int {
+        if (scrollTag == null) return 0
+
+        val string = String()
 
         val offset = string.getStringAnnotations(scrollTag.annotationStringTag, 0, string.length)
             .filter { it.item == scrollTag.id }
             .minOfOrNull { it.start } ?: 0
 
-        string.text.substring(0, offset).count { it == '\n' }
+        return string.text.substring(0, offset).count { it == '\n' }
     }
 
     companion object {
@@ -59,7 +64,7 @@ class CodeSample private constructor(
     }
 
     private fun copy(
-        base: Lazy<AnnotatedString> = this.base,
+        base: (CodeStyle) -> AnnotatedString = this.base,
         focus: TextTag? = this.focus,
         replaced: Map<TextTag, AnnotatedString> = this.replaced,
         styled: Map<TextTag, SpanStyle> = this.styled,
@@ -144,7 +149,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         scope: CodeScope = CodeScope.File,
         identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample(lazy { extractTags(this).toCode(language, codeStyle, scope, identifierType) })
+        return CodeSample({ givenCodeStyle ->
+            extractTags(this).toCode(
+                language,
+                givenCodeStyle,
+                scope,
+                identifierType
+            )
+        })
     }
 
     fun AnnotatedString.toCodeSample(
@@ -153,7 +165,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         scope: CodeScope = CodeScope.File,
         identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample(lazy { toCode(language, codeStyle, scope, identifierType) })
+        return CodeSample({ givenCodeStyle -> toCode(language, givenCodeStyle, scope, identifierType) })
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })

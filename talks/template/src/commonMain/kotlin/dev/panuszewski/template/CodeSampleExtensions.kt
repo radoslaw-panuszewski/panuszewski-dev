@@ -34,13 +34,14 @@ fun AnnotatedString.toCode(
 }
 
 fun String.toCode(
+    language: Language,
     codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
     scope: CodeScope = CodeScope.File,
     identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
 ): AnnotatedString {
     return highlight(
+        language = language,
         codeStyle = codeStyle,
-        language = Language.Kotlin,
         scope = scope,
         identifierStyle = { identifierType(codeStyle, it) },
     )

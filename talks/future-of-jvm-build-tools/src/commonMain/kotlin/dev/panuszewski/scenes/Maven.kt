@@ -19,7 +19,6 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.CodeSample
-import dev.panuszewski.template.INTELLIJ_LIGHT_CODE_STYLE
 import dev.panuszewski.template.ScrollableMagicCodeSample
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.coercedGet
@@ -37,24 +36,12 @@ fun StoryboardBuilder.Maven() = scene(
         ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
         Spacer(Modifier.height(16.dp))
 
-        Box(
-            Modifier
-                .width(500.dp)
-//                .run {
-//                    if (transition.currentState.toState() >= 1) {
-//                        border(
-//                            width = 1.dp,
-//                            color = MaterialTheme.colors.primary,
-//                            shape = RoundedCornerShape(8.dp)
-//                        )
-//                    } else this
-//                }
-        ) {
+        Box(Modifier.width(500.dp)) {
             transition.createChildTransition { CODE_SAMPLES.coercedGet(it.toState()) }
                 .ScrollableMagicCodeSample(
                     moveDurationMillis = 500,
                     fadeDurationMillis = 500,
-                    split = { it.string.splitByTags() }
+                    split = { it.splitByTags() }
                 )
         }
     }
@@ -118,7 +105,7 @@ private val CODE_SAMPLES = buildCodeSamples {
                 <plugins>
             ${buildExpanded}</build>
         </project>
-        """.trimIndent().toCodeSample(language = Language.Xml, codeStyle = INTELLIJ_LIGHT_CODE_STYLE)
+        """.trimIndent().toCodeSample(language = Language.Xml)
 
     val all = Foldable(
         folded = listOf(

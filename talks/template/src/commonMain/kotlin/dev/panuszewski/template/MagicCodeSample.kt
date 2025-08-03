@@ -50,10 +50,10 @@ fun Transition<CodeSample>.MagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    split: (CodeSample) -> List<AnnotatedString> = { it.string.toWords() }
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() }
 ) {
     MagicText(
-        transition = createChildTransition { split(it) },
+        transition = createChildTransition { codeSample -> split(codeSample.String()) },
         modifier = modifier,
         moveDurationMillis = moveDurationMillis,
         fadeDurationMillis = fadeDurationMillis,
@@ -67,7 +67,7 @@ fun Transition<CodeSample>.ScrollableMagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    split: (CodeSample) -> List<AnnotatedString> = { it.string.toWords() }
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() }
 ) {
     val state = rememberScrollState()
     animateScroll(state)
@@ -102,6 +102,6 @@ fun Transition<CodeSample>.animateScroll(
     //  - i bet it's the same problem as with the start animation!
     //  - something to do with SeekableTransitionState.snapTo()?
     val lineHeight = with(LocalDensity.current) { style.lineHeight.toPx() }
-    val scrollPosition by animateFloat(transitionSpec, label) { it.scroll * lineHeight }
+    val scrollPosition by animateFloat(transitionSpec, label) { it.Scroll() * lineHeight }
     verticalScrollState.dispatchRawDelta(scrollPosition - verticalScrollState.value)
 }

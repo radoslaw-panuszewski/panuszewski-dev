@@ -6,6 +6,8 @@ import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -15,7 +17,9 @@ import dev.bnorm.storyboard.SceneDecorator
 val DARK_THEME = SceneDecorator { content ->
     MaterialTheme(DARK_COLORS, Typography()) {
         Surface {
-            content()
+            CompositionLocalProvider(LocalCodeStyle provides INTELLIJ_DARK_CODE_STYLE) {
+                content()
+            }
         }
     }
 }
@@ -32,10 +36,14 @@ val DARK_COLORS = darkColors(
 val LIGHT_THEME = SceneDecorator { content ->
     MaterialTheme(LIGHT_COLORS, Typography()) {
         Surface {
-            content()
+            CompositionLocalProvider(LocalCodeStyle provides INTELLIJ_LIGHT_CODE_STYLE) {
+                content()
+            }
         }
     }
 }
+
+val LocalCodeStyle = compositionLocalOf { INTELLIJ_LIGHT_CODE_STYLE }
 
 val LIGHT_COLORS = lightColors(
     primary = Color(54, 161, 165),
