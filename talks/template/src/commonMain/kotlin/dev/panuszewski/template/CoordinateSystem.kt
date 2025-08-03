@@ -1,5 +1,6 @@
 package dev.panuszewski.template
 
+import androidx.compose.material.Colors
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -7,6 +8,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
@@ -14,7 +16,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, xLabel: String, yLabel: String) {
+fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, colors: Colors, xLabel: String, yLabel: String) {
     val xAxisY = size.height - 40.dp.toPx()
     val yAxisX = 40.dp.toPx()
     val strokeWidth = 2.dp.toPx()
@@ -22,7 +24,7 @@ fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, xLabel: St
 
     val endY = xAxisY - (xAxisY * axisLength)
     drawLine(
-        color = Color.Black,
+        color = colors.onBackground,
         start = Offset(yAxisX, xAxisY),
         end = Offset(yAxisX, endY),
         strokeWidth = strokeWidth
@@ -33,14 +35,14 @@ fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, xLabel: St
             start = Offset(yAxisX, endY),
             end = Offset(yAxisX, 0f),
             size = arrowSize,
-            color = Color.Black,
+            color = colors.onBackground,
             strokeWidth = strokeWidth
         )
     }
 
     val endX = yAxisX + ((size.width - yAxisX) * axisLength)
     drawLine(
-        color = Color.Black,
+        color = colors.onBackground,
         start = Offset(yAxisX, xAxisY),
         end = Offset(endX, xAxisY),
         strokeWidth = strokeWidth
@@ -51,13 +53,14 @@ fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, xLabel: St
             start = Offset(endX, xAxisY),
             end = Offset(size.width, xAxisY),
             size = arrowSize,
-            color = Color.Black,
+            color = colors.onBackground,
             strokeWidth = strokeWidth
         )
 
         drawText(
             textMeasurer = textMeasurer,
             text = xLabel,
+            style = TextStyle(color = colors.onBackground),
             topLeft = Offset(axisLength * (size.width - 80.dp.toPx()), xAxisY + 10.dp.toPx())
         )
 
@@ -65,6 +68,7 @@ fun DrawScope.drawAxes(axisLength: Float, textMeasurer: TextMeasurer, xLabel: St
             drawText(
                 textMeasurer = textMeasurer,
                 text = yLabel,
+                style = TextStyle(color = colors.onBackground),
                 topLeft = Offset(axisLength * (center.x + 150.dp.toPx()), center.y - 470.dp.toPx()),
             )
         }

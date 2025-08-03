@@ -15,7 +15,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     format = SceneFormat.Default,
     decorator = DARK_THEME,
 ) {
-//    beginning()
+    beginning()
     maven()
 }
 
