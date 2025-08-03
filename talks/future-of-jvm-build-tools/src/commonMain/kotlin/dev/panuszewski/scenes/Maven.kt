@@ -166,12 +166,6 @@ class Foldable(
         codeSample.reveal(expanded).hide(folded)
 
     context(codeSample: CodeSample)
-    fun expandAndFocus(scroll: Boolean = false): CodeSample {
-        val expandedCodeSample = codeSample.reveal(expanded).hide(folded)
-        return if (expanded.size == 1) {
-            expandedCodeSample.focus(expanded.first(), scroll)
-        } else {
-            expandedCodeSample
-        }
-    }
+    fun expandAndFocus(scroll: Boolean = false) =
+        codeSample.reveal(expanded).hide(folded).focus(expanded, scroll)
 }

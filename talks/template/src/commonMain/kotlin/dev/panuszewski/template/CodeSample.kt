@@ -16,22 +16,22 @@ import dev.bnorm.storyboard.text.replaceAllByTag
 @Immutable
 class CodeSample private constructor(
     private val base: (CodeStyle) -> AnnotatedString,
-    private val focus: TextTag?,
+    private val focus: List<TextTag>,
     private val replaced: Map<TextTag, AnnotatedString>,
     private val styled: Map<TextTag, SpanStyle>,
     private val scrollTag: TextTag?,
     val data: Any?,
 ) {
-    constructor(sample: AnnotatedString) : this({ sample }, null, emptyMap(), emptyMap(), null, null)
-    constructor(sample: (CodeStyle) -> AnnotatedString) : this(sample, null, emptyMap(), emptyMap(), null, null)
+    constructor(sample: AnnotatedString) : this({ sample }, emptyList(), emptyMap(), emptyMap(), null, null)
+    constructor(sample: (CodeStyle) -> AnnotatedString) : this(sample, emptyList(), emptyMap(), emptyMap(), null, null)
 
     @Composable
     fun String(): AnnotatedString {
         var str = base(LocalCodeStyle.current)
         for ((tag, style) in styled) {
-            str = str.addStyleByTag(tag, tagged = style)
+            str = str.addStyleByTag(listOf(tag), tagged = style)
         }
-        if (focus != null) {
+        if (focus.isNotEmpty()) {
             str = str.addStyleByTag(focus, untagged = UNFOCUSED_STYLE)
         }
         // TODO collapse first and then hide?
@@ -65,7 +65,7 @@ class CodeSample private constructor(
 
     private fun copy(
         base: (CodeStyle) -> AnnotatedString = this.base,
-        focus: TextTag? = this.focus,
+        focus: List<TextTag> = this.focus,
         replaced: Map<TextTag, AnnotatedString> = this.replaced,
         styled: Map<TextTag, SpanStyle> = this.styled,
         scrollTag: TextTag? = this.scrollTag,
@@ -93,11 +93,14 @@ class CodeSample private constructor(
         return copy(replaced = replaced - tags)
     }
 
+    fun focus(tags: List<TextTag>, scroll: Boolean = true): CodeSample =
+        copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag)
+
     fun focus(tag: TextTag, scroll: Boolean = true): CodeSample =
-        copy(focus = tag, scrollTag = if (scroll) tag else scrollTag)
+        focus(tags = listOf(tag), scroll = scroll)
 
     fun unfocus(unscroll: Boolean = true): CodeSample =
-        copy(focus = null, scrollTag = if (unscroll) null else scrollTag)
+        copy(focus = emptyList(), scrollTag = if (unscroll) null else scrollTag)
 
     fun styled(tag: TextTag, style: SpanStyle): CodeSample = copy(styled = styled + (tag to style))
     fun styled(vararg tags: TextTag, style: SpanStyle): CodeSample = styled(tags.asList(), style)
