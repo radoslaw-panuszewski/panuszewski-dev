@@ -81,9 +81,9 @@ private val CODE_SAMPLES = buildCodeSamples {
             ${repositoriesExpanded}</repositories>
             <dependencies>${dependenciesFolded}...${dependenciesFolded}${dependenciesExpanded}
                 <dependency>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                    <artifactId>kotlin-stdlib</artifactId>
-                    <version>2.2.0</version>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-core</artifactId>
+                    <version>3.5.4</version>
                 </dependency>
             ${dependenciesExpanded}</dependencies>
             <build>${buildFolded}...${buildFolded}${buildExpanded}
@@ -135,6 +135,7 @@ private val CODE_SAMPLES = buildCodeSamples {
     val properties = Foldable(propertiesFolded, propertiesExpanded)
     val repositories = Foldable(repositoriesFolded, repositoriesExpanded)
     val dependencies = Foldable(dependenciesFolded, dependenciesExpanded)
+    val build = Foldable(buildFolded, buildExpanded)
 
     codeSample
         .startWith { fold(all) }
@@ -142,8 +143,7 @@ private val CODE_SAMPLES = buildCodeSamples {
         .then { fold(coordinates).expandAndFocus(properties) }
         .then { fold(properties).expandAndFocus(repositories) }
         .then { fold(repositories).expandAndFocus(dependencies) }
-//        .then { reveal(repositoriesExpanded).hide(propertiesExpanded, repositoriesFolded) }
-//        .then { reveal(buildExpanded).hide(buildFolded).focus(buildExpanded) }
+        .then { fold(dependencies).expandAndFocus(build, scroll = true) }
 }
 
 fun CodeSample.fold(foldable: Foldable): CodeSample = foldable.fold()
