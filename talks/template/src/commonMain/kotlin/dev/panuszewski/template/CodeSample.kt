@@ -9,6 +9,7 @@ import dev.bnorm.storyboard.text.TextTagScope
 import dev.bnorm.storyboard.text.addStyleByTag
 import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.CodeStyle
+import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.replaceAllByTag
 
 @Immutable
@@ -138,19 +139,21 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
+        language: Language = Language.Kotlin,
         codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
         scope: CodeScope = CodeScope.File,
         identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample(lazy { extractTags(this).toCode(codeStyle, scope, identifierType) })
+        return CodeSample(lazy { extractTags(this).toCode(language, codeStyle, scope, identifierType) })
     }
 
     fun AnnotatedString.toCodeSample(
+        language: Language = Language.Kotlin,
         codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
         scope: CodeScope = CodeScope.File,
         identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample(lazy { toCode(codeStyle, scope, identifierType) })
+        return CodeSample(lazy { toCode(language, codeStyle, scope, identifierType) })
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })

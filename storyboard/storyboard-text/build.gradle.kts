@@ -47,3 +47,17 @@ val generateKotlinGrammarSource by tasks.registering(AntlrKotlinTask::class) {
     packageName = pkgName
     outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
 }
+
+val generateXmlGrammarSource by tasks.registering(AntlrKotlinTask::class) {
+    val pkgName = "dev.bnorm.storyboard.text.highlight.antlr.xml"
+    val outDir = "src/commonMain/kotlin/${pkgName.replace(".", "/")}"
+
+    inputs.dir(layout.projectDirectory.dir("antlr"))
+    outputs.dir(layout.projectDirectory.dir(outDir))
+
+    source = fileTree(layout.projectDirectory.dir("antlr/xml")) {
+        include("**/*.g4")
+    }
+    packageName = pkgName
+    outputDirectory = layout.projectDirectory.dir(outDir).asFile
+}

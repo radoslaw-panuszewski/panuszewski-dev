@@ -1,6 +1,11 @@
 package dev.panuszewski.template
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -15,6 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.easel.LocalStoryboard
+import dev.bnorm.storyboard.text.magic.DefaultDelayDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultFadeDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultMoveDurationMillis
 import dev.bnorm.storyboard.text.magic.MagicText
@@ -24,23 +30,44 @@ import dev.bnorm.storyboard.toDpSize
 @Composable
 fun Transition<AnnotatedString>.MagicText(
     modifier: Modifier = Modifier,
-    split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
+    moveDurationMillis: Int = DefaultMoveDurationMillis,
+    fadeDurationMillis: Int = DefaultFadeDurationMillis,
+    delayDurationMillis: Int = DefaultDelayDurationMillis,
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() }
 ) {
-    MagicText(createChildTransition { it.split() }, modifier)
+    MagicText(
+        transition = createChildTransition { split(it) },
+        modifier = modifier,
+        moveDurationMillis = moveDurationMillis,
+        fadeDurationMillis = fadeDurationMillis,
+        delayDurationMillis = delayDurationMillis
+    )
 }
 
 @Composable
 fun Transition<CodeSample>.MagicCodeSample(
     modifier: Modifier = Modifier,
-    split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
+    moveDurationMillis: Int = DefaultMoveDurationMillis,
+    fadeDurationMillis: Int = DefaultFadeDurationMillis,
+    delayDurationMillis: Int = DefaultDelayDurationMillis,
+    split: (CodeSample) -> List<AnnotatedString> = { it.string.toWords() }
 ) {
-    MagicText(createChildTransition { it.string.split() }, modifier)
+    MagicText(
+        transition = createChildTransition { split(it) },
+        modifier = modifier,
+        moveDurationMillis = moveDurationMillis,
+        fadeDurationMillis = fadeDurationMillis,
+        delayDurationMillis = delayDurationMillis
+    )
 }
 
 @Composable
 fun Transition<CodeSample>.ScrollableMagicCodeSample(
     modifier: Modifier = Modifier,
-    split: AnnotatedString.() -> List<AnnotatedString> = AnnotatedString::toWords
+    moveDurationMillis: Int = DefaultMoveDurationMillis,
+    fadeDurationMillis: Int = DefaultFadeDurationMillis,
+    delayDurationMillis: Int = DefaultDelayDurationMillis,
+    split: (CodeSample) -> List<AnnotatedString> = { it.string.toWords() }
 ) {
     val state = rememberScrollState()
     animateScroll(state)
@@ -52,7 +79,13 @@ fun Transition<CodeSample>.ScrollableMagicCodeSample(
             // Allow scrolling to the very bottom.
             .padding(bottom = LocalStoryboard.current?.format?.toDpSize()?.height ?: 0.dp)
     ) {
-        MagicCodeSample(modifier, split)
+        MagicCodeSample(
+            modifier = modifier,
+            moveDurationMillis = moveDurationMillis,
+            fadeDurationMillis = fadeDurationMillis,
+            delayDurationMillis = delayDurationMillis,
+            split = split
+        )
     }
 }
 

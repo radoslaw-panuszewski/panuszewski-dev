@@ -24,7 +24,6 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.easel.template.SceneEnter
-import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.bnorm.storyboard.easel.template.SceneSection
 
 fun StoryboardBuilder.SectionTitle(
@@ -35,7 +34,6 @@ fun StoryboardBuilder.SectionTitle(
     scene(
         stateCount = 1,
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
-        exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
         SectionTitle(
             showAsHeader = transition.createChildTransition {

@@ -38,9 +38,9 @@ val LIGHT_THEME = SceneDecorator { content ->
 }
 
 val LIGHT_COLORS = lightColors(
-    primary = Color(0xFF0E4A3E),
+    primary = Color(54, 161, 165),
     primaryVariant = Color(0xFF145F50),
-    secondary = Color(0xFF942DF3),
+    secondary = Color(148, 45, 243),
 )
 
 val Typography.code1: TextStyle

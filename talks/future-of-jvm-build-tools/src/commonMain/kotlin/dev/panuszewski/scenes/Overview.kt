@@ -31,7 +31,6 @@ import talks.future_of_jvm_build_tools.generated.resources.gradle
 import talks.future_of_jvm_build_tools.generated.resources.ideal_build_tool
 import talks.future_of_jvm_build_tools.generated.resources.maven
 
-@Suppress("FunctionName")
 fun StoryboardBuilder.Overview() {
     scene(
         stateCount = 7,

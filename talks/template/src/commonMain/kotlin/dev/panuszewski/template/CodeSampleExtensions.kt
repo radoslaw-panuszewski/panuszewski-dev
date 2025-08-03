@@ -11,14 +11,17 @@ import dev.bnorm.storyboard.text.highlight.highlight
 
 fun TextTagScope.tag() = tag("")
 
+fun CodeSample.startWith(transformer: CodeSample.() -> CodeSample) = transformer()
+
 fun AnnotatedString.toCode(
+    language: Language = Language.Kotlin,
     codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
     scope: CodeScope = CodeScope.File,
     identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
 ): AnnotatedString {
     val styled = text.highlight(
         codeStyle = codeStyle,
-        language = Language.Kotlin,
+        language = language,
         scope = scope,
         identifierStyle = { identifierType(codeStyle, it) }
     )
