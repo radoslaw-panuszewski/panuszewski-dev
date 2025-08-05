@@ -148,6 +148,7 @@ private val CODE_SAMPLES = buildCodeSamples {
         .then { fold(repositories).expand(dependencies).focus(focusableDependencies, scroll = false) }
         .then { fold(dependencies).expand(build).focus(focusableBuild, scroll = true) }
         .then { fold(build).unfocus() }
+        .then { focus(focusableProperties, focusableBuild, scroll = false) }
 }
 
 fun CodeSample.fold(foldable: Foldable): CodeSample = foldable.fold()

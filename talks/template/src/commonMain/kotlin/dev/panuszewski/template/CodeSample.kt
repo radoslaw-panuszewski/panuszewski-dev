@@ -96,6 +96,9 @@ class CodeSample private constructor(
     fun focus(tags: List<TextTag>, scroll: Boolean = true): CodeSample =
         copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag)
 
+    fun focus(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
+        focus(tags.asList(), scroll)
+
     fun focus(tag: TextTag, scroll: Boolean = true): CodeSample =
         focus(tags = listOf(tag), scroll = scroll)
 
