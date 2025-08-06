@@ -11,7 +11,7 @@ import dev.bnorm.storyboard.text.highlight.highlight
 
 fun TextTagScope.tag() = tag("")
 
-fun CodeSample.startWith(transformer: CodeSample.() -> CodeSample) = transformer()
+fun CodeSample.startWith(transformer: CodeSample.() -> CodeSample) = listOf(transformer())
 
 fun AnnotatedString.toCode(
     language: Language = Language.Kotlin,

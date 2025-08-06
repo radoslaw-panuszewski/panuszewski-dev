@@ -70,28 +70,28 @@ private val CODE_SAMPLES = buildCodeSamples {
     val focusableBuild by tag()
 
     val codeSample = """
-        <project>
-            ${focusableCoordinates}<groupId>${groupIdFolded}...${groupIdFolded}${groupIdExpanded}pl.allegro.tech.common${groupIdExpanded}</groupId>
+        <project>${focusableCoordinates}
+            <groupId>${groupIdFolded}...${groupIdFolded}${groupIdExpanded}pl.allegro.tech.common${groupIdExpanded}</groupId>
             <artifactId>${artifactIdFolded}...${artifactIdFolded}${artifactIdExpanded}andamio-starter-core${artifactIdExpanded}</artifactId>
-            <version>${versionFolded}...${versionFolded}${versionExpanded}1.0.0${versionExpanded}</version>${focusableCoordinates}
-            ${focusableProperties}<properties>${propertiesFolded}...${propertiesFolded}${propertiesExpanded}
+            <version>${versionFolded}...${versionFolded}${versionExpanded}1.0.0${versionExpanded}</version>${focusableCoordinates}${focusableProperties}
+            <properties>${propertiesFolded}...${propertiesFolded}${propertiesExpanded}
                 <kotlin.code.style>official</kotlin.code.style>
                 <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-            ${propertiesExpanded}</properties>${focusableProperties}
-            ${focusableRepositories}<repositories>${repositoriesFolded}...${repositoriesFolded}${repositoriesExpanded}
+            ${propertiesExpanded}</properties>${focusableProperties}${focusableRepositories}
+            <repositories>${repositoriesFolded}...${repositoriesFolded}${repositoriesExpanded}
                 <repository>
                     <id>mavenCentral</id>
                     <url>https://repo1.maven.org/maven2/</url>
                 </repository>
-            ${repositoriesExpanded}</repositories>${focusableRepositories}
-            ${focusableDependencies}<dependencies>${dependenciesFolded}...${dependenciesFolded}${dependenciesExpanded}
+            ${repositoriesExpanded}</repositories>${focusableRepositories}${focusableDependencies}
+            <dependencies>${dependenciesFolded}...${dependenciesFolded}${dependenciesExpanded}
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-core</artifactId>
                     <version>3.5.4</version>
                 </dependency>
-            ${dependenciesExpanded}</dependencies>${focusableDependencies}
-            ${focusableBuild}<build>${buildFolded}...${buildFolded}${buildExpanded}
+            ${dependenciesExpanded}</dependencies>${focusableDependencies}${focusableBuild}
+            <build>${buildFolded}...${buildFolded}${buildExpanded}
                 <plugins>
                     <plugin>
                         <groupId>org.jetbrains.kotlin</groupId>
@@ -149,6 +149,7 @@ private val CODE_SAMPLES = buildCodeSamples {
         .then { fold(dependencies).expand(build).focus(focusableBuild, scroll = true) }
         .then { fold(build).unfocus() }
         .then { focus(focusableProperties, focusableBuild, scroll = false) }
+        .then { hide(focusableProperties, focusableBuild).unfocus() }
 }
 
 fun CodeSample.fold(foldable: Foldable): CodeSample = foldable.fold()
