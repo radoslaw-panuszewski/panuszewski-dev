@@ -21,9 +21,9 @@ import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.panuszewski.components.BuildToolChart
 import dev.panuszewski.components.BuildToolItem
-import dev.panuszewski.components.SlideDirection.FROM_LEFT
-import dev.panuszewski.components.SlideDirection.FROM_RIGHT
 import dev.panuszewski.template.ResourceImage
+import dev.panuszewski.template.SlideDirection.FROM_LEFT
+import dev.panuszewski.template.SlideDirection.FROM_RIGHT
 import dev.panuszewski.template.code1
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.amper

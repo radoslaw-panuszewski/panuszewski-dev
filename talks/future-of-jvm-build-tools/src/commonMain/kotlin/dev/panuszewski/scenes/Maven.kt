@@ -1,11 +1,13 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -20,13 +22,14 @@ import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.ScrollableMagicCodeSample
+import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.coercedGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 
 fun StoryboardBuilder.Maven() = scene(
-    stateCount = CODE_SAMPLES.size
+    stateCount = BUILD_POM.size + CONSUMER_POM.size
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -34,20 +37,62 @@ fun StoryboardBuilder.Maven() = scene(
     ) {
         Spacer(Modifier.height(16.dp))
         ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(32.dp))
 
-        Box(Modifier.width(500.dp)) {
-            transition.createChildTransition { CODE_SAMPLES.coercedGet(it.toState()) }
-                .ScrollableMagicCodeSample(
+        Row(horizontalArrangement = Arrangement.spacedBy(-250.dp, Alignment.CenterHorizontally)) {
+
+            val buildPomTransition = transition.createChildTransition { BUILD_POM.coercedGet(it.toState()) }
+            val consumerPomTransition = transition.createChildTransition { CONSUMER_POM.coercedGet(it.toState() - BUILD_POM.size) }
+
+            val boxModifier = Modifier.width(500.dp).padding(8.dp)
+
+            Column(boxModifier) {
+                ProvideTextStyle(MaterialTheme.typography.h5) { Text("Build POM") }
+                Spacer(Modifier.height(16.dp))
+
+                buildPomTransition.ScrollableMagicCodeSample(
                     moveDurationMillis = 500,
                     fadeDurationMillis = 500,
-                    split = { it.splitByTags() }
+                    split = { it.splitByTags() },
                 )
+            }
+
+            transition.SlideFromRightAnimatedVisibility({ it.toState() >= BUILD_POM.size }) {
+                Column(boxModifier.padding(start = 150.dp)) {
+                    ProvideTextStyle(MaterialTheme.typography.h5) { Text("Consumer POM") }
+                    Spacer(Modifier.height(16.dp))
+
+                    consumerPomTransition.ScrollableMagicCodeSample(
+                        moveDurationMillis = 500,
+                        fadeDurationMillis = 500,
+                        split = { it.splitByTags() },
+                    )
+                }
+            }
         }
     }
 }
 
-private val CODE_SAMPLES = buildCodeSamples {
+private val CONSUMER_POM = buildCodeSamples {
+    val properties by tag()
+    val build by tag()
+
+    val codeSample = """
+        <project>
+            <groupId>...</groupId>
+            <artifactId>...</artifactId>
+            <version>...</version>${properties}
+            <properties>...</properties>${properties}
+            <repositories>...</repositories>
+            <dependencies>...</dependencies>${build}
+            <build>...</build>${build}
+        </project>
+        """.trimIndent().toCodeSample(language = Language.Xml)
+
+    codeSample.then { focus(properties, build, scroll = false) }.then { hide(properties, build).unfocus() }
+}
+
+private val BUILD_POM = buildCodeSamples {
     val groupIdFolded by tag()
     val groupIdExpanded by tag()
     val artifactIdFolded by tag()
@@ -112,27 +157,13 @@ private val CODE_SAMPLES = buildCodeSamples {
 
     val all = Foldable(
         folded = listOf(
-            groupIdFolded,
-            artifactIdFolded,
-            versionFolded,
-            propertiesFolded,
-            repositoriesFolded,
-            dependenciesFolded,
-            buildFolded
-        ),
-        expanded = listOf(
-            groupIdExpanded,
-            artifactIdExpanded,
-            versionExpanded,
-            propertiesExpanded,
-            repositoriesExpanded,
-            dependenciesExpanded,
-            buildExpanded
+            groupIdFolded, artifactIdFolded, versionFolded, propertiesFolded, repositoriesFolded, dependenciesFolded, buildFolded
+        ), expanded = listOf(
+            groupIdExpanded, artifactIdExpanded, versionExpanded, propertiesExpanded, repositoriesExpanded, dependenciesExpanded, buildExpanded
         )
     )
     val coordinates = Foldable(
-        folded = listOf(groupIdFolded, artifactIdFolded, versionFolded),
-        expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded)
+        folded = listOf(groupIdFolded, artifactIdFolded, versionFolded), expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded)
     )
 
     val properties = Foldable(propertiesFolded, propertiesExpanded)
@@ -148,8 +179,6 @@ private val CODE_SAMPLES = buildCodeSamples {
         .then { fold(repositories).expand(dependencies).focus(focusableDependencies, scroll = false) }
         .then { fold(dependencies).expand(build).focus(focusableBuild, scroll = true) }
         .then { fold(build).unfocus() }
-        .then { focus(focusableProperties, focusableBuild, scroll = false) }
-        .then { hide(focusableProperties, focusableBuild).unfocus() }
 }
 
 fun CodeSample.fold(foldable: Foldable): CodeSample = foldable.fold()
@@ -157,21 +186,13 @@ fun CodeSample.expand(foldable: Foldable): CodeSample = foldable.expand()
 fun CodeSample.expandAndFocus(foldable: Foldable, scroll: Boolean = false): CodeSample = foldable.expandAndFocus(scroll)
 
 class Foldable(
-    private val folded: List<TextTag>,
-    private val expanded: List<TextTag>
+    private val folded: List<TextTag>, private val expanded: List<TextTag>
 ) {
-    constructor(folded: TextTag, expanded: TextTag) :
-        this(listOf(folded), listOf(expanded))
+    constructor(folded: TextTag, expanded: TextTag) : this(listOf(folded), listOf(expanded))
 
-    context(codeSample: CodeSample)
-    fun fold(): CodeSample =
-        codeSample.reveal(folded).hide(expanded)
+    context(codeSample: CodeSample) fun fold(): CodeSample = codeSample.reveal(folded).hide(expanded)
 
-    context(codeSample: CodeSample)
-    fun expand(): CodeSample =
-        codeSample.reveal(expanded).hide(folded)
+    context(codeSample: CodeSample) fun expand(): CodeSample = codeSample.reveal(expanded).hide(folded)
 
-    context(codeSample: CodeSample)
-    fun expandAndFocus(scroll: Boolean = false) =
-        codeSample.reveal(expanded).hide(folded).focus(expanded, scroll)
+    context(codeSample: CodeSample) fun expandAndFocus(scroll: Boolean = false) = codeSample.reveal(expanded).hide(folded).focus(expanded, scroll)
 }
