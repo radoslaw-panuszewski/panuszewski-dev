@@ -28,6 +28,23 @@ import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.toDpSize
 
 @Composable
+fun Transition<String>.MagicText(
+    modifier: Modifier = Modifier,
+    moveDurationMillis: Int = DefaultMoveDurationMillis,
+    fadeDurationMillis: Int = DefaultFadeDurationMillis,
+    delayDurationMillis: Int = DefaultDelayDurationMillis
+) {
+    createChildTransition { AnnotatedString(it) }
+        .MagicText(
+            modifier = modifier,
+            moveDurationMillis = moveDurationMillis,
+            fadeDurationMillis = fadeDurationMillis,
+            delayDurationMillis = delayDurationMillis,
+            split = { it.toWords() }
+        )
+}
+
+@Composable
 fun Transition<AnnotatedString>.MagicText(
     modifier: Modifier = Modifier,
     moveDurationMillis: Int = DefaultMoveDurationMillis,

@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.TextTag
@@ -21,45 +24,78 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.CodeSample
+import dev.panuszewski.template.MagicText
 import dev.panuszewski.template.ScrollableMagicCodeSample
+import dev.panuszewski.template.SlideFromLeftAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.coercedGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 
+private val STATE_COUNT: Int get() = 1 + BUILD_POM.size + CONSUMER_POM.size
+
 fun StoryboardBuilder.Maven() = scene(
-    stateCount = BUILD_POM.size + CONSUMER_POM.size
+    stateCount = STATE_COUNT
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(16.dp))
-        ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
+        ProvideTextStyle(MaterialTheme.typography.h4) {
+            transition.createChildTransition {
+                when (it.toState()) {
+                    STATE_COUNT - 3, STATE_COUNT - 2 -> buildAnnotatedString {
+                        append("Maven ")
+                        withStyle(SpanStyle(MaterialTheme.colors.primary)) { append("3") }
+                    }
+                    STATE_COUNT - 1 -> buildAnnotatedString {
+                        append("Maven ")
+                        withStyle(SpanStyle(MaterialTheme.colors.secondary)) { append("4") }
+                    }
+                    else -> AnnotatedString("Maven")
+                }
+            }.MagicText()
+        }
         Spacer(Modifier.height(32.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(-250.dp, Alignment.CenterHorizontally)) {
 
-            val buildPomTransition = transition.createChildTransition { BUILD_POM.coercedGet(it.toState()) }
-            val consumerPomTransition = transition.createChildTransition { CONSUMER_POM.coercedGet(it.toState() - BUILD_POM.size) }
+            val buildPomTransition = transition.createChildTransition { BUILD_POM.coercedGet(it.toState() - 1) }
+            val consumerPomTransition = transition.createChildTransition { CONSUMER_POM.coercedGet(it.toState() - BUILD_POM.size - 1) }
+
+            val buildPomTitleTransition = transition.createChildTransition {
+                when {
+                    it.toState() >= STATE_COUNT - 3 -> "Build POM"
+                    else -> "POM"
+                }
+            }
+            val consumerPomTitleTransition = transition.createChildTransition {
+                when {
+                    it.toState() >= STATE_COUNT - 3 -> "Consumer POM"
+                    else -> "POM"
+                }
+            }
 
             val boxModifier = Modifier.width(500.dp).padding(8.dp)
 
-            Column(boxModifier) {
-                ProvideTextStyle(MaterialTheme.typography.h5) { Text("Build POM") }
-                Spacer(Modifier.height(16.dp))
+            transition.SlideFromLeftAnimatedVisibility({ it.toState() >= 1 }) {
+                Column(boxModifier) {
+                    ProvideTextStyle(MaterialTheme.typography.h5) { buildPomTitleTransition.MagicText() }
+                    Spacer(Modifier.height(16.dp))
 
-                buildPomTransition.ScrollableMagicCodeSample(
-                    moveDurationMillis = 500,
-                    fadeDurationMillis = 500,
-                    split = { it.splitByTags() },
-                )
+                    buildPomTransition.ScrollableMagicCodeSample(
+                        moveDurationMillis = 500,
+                        fadeDurationMillis = 500,
+                        split = { it.splitByTags() },
+                    )
+                }
             }
 
-            transition.SlideFromRightAnimatedVisibility({ it.toState() >= BUILD_POM.size }) {
+            transition.SlideFromRightAnimatedVisibility({ it.toState() >= BUILD_POM.size + 1 }) {
                 Column(boxModifier.padding(start = 150.dp)) {
-                    ProvideTextStyle(MaterialTheme.typography.h5) { Text("Consumer POM") }
+                    ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
                     consumerPomTransition.ScrollableMagicCodeSample(
@@ -89,7 +125,9 @@ private val CONSUMER_POM = buildCodeSamples {
         </project>
         """.trimIndent().toCodeSample(language = Language.Xml)
 
-    codeSample.then { focus(properties, build, scroll = false) }.then { hide(properties, build).unfocus() }
+    codeSample
+        .then { focus(properties, build, scroll = false) }
+        .then { hide(properties, build).unfocus() }
 }
 
 private val BUILD_POM = buildCodeSamples {
