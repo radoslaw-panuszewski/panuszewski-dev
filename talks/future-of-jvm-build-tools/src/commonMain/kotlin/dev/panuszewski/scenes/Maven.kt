@@ -19,17 +19,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.text.TextTag
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.CodeSample
+import dev.panuszewski.template.Foldable
 import dev.panuszewski.template.MagicText
 import dev.panuszewski.template.ScrollableMagicCodeSample
 import dev.panuszewski.template.SlideFromLeftAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.coercedGet
+import dev.panuszewski.template.expand
+import dev.panuszewski.template.fold
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 
@@ -194,11 +195,8 @@ private val BUILD_POM = buildCodeSamples {
         """.trimIndent().toCodeSample(language = Language.Xml)
 
     val all = Foldable(
-        folded = listOf(
-            groupIdFolded, artifactIdFolded, versionFolded, propertiesFolded, repositoriesFolded, dependenciesFolded, buildFolded
-        ), expanded = listOf(
-            groupIdExpanded, artifactIdExpanded, versionExpanded, propertiesExpanded, repositoriesExpanded, dependenciesExpanded, buildExpanded
-        )
+        folded = listOf(groupIdFolded, artifactIdFolded, versionFolded, propertiesFolded, repositoriesFolded, dependenciesFolded, buildFolded),
+        expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded, propertiesExpanded, repositoriesExpanded, dependenciesExpanded, buildExpanded)
     )
     val coordinates = Foldable(
         folded = listOf(groupIdFolded, artifactIdFolded, versionFolded), expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded)
@@ -219,18 +217,4 @@ private val BUILD_POM = buildCodeSamples {
         .then { fold(build).unfocus() }
 }
 
-fun CodeSample.fold(foldable: Foldable): CodeSample = foldable.fold()
-fun CodeSample.expand(foldable: Foldable): CodeSample = foldable.expand()
-fun CodeSample.expandAndFocus(foldable: Foldable, scroll: Boolean = false): CodeSample = foldable.expandAndFocus(scroll)
 
-class Foldable(
-    private val folded: List<TextTag>, private val expanded: List<TextTag>
-) {
-    constructor(folded: TextTag, expanded: TextTag) : this(listOf(folded), listOf(expanded))
-
-    context(codeSample: CodeSample) fun fold(): CodeSample = codeSample.reveal(folded).hide(expanded)
-
-    context(codeSample: CodeSample) fun expand(): CodeSample = codeSample.reveal(expanded).hide(folded)
-
-    context(codeSample: CodeSample) fun expandAndFocus(scroll: Boolean = false) = codeSample.reveal(expanded).hide(folded).focus(expanded, scroll)
-}
