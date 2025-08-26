@@ -4,13 +4,10 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.getValue
@@ -21,16 +18,13 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
-import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.MagicText
 import dev.panuszewski.template.animateTextStyle
-import dev.panuszewski.template.coercedGet
+import dev.panuszewski.template.safeGet
 
 val TITLE = listOf(
     buildAnnotatedString {
@@ -47,7 +41,7 @@ val TITLE = listOf(
 
 fun StoryboardBuilder.Title() {
     scene(2) {
-        val titleTransition = transition.createChildTransition { TITLE.coercedGet(it.toState()) }
+        val titleTransition = transition.createChildTransition { TITLE.safeGet(it.toState()) }
 
         val textStyle by transition.animateTextStyle({ tween(durationMillis = 500) }) {
             when (it.toState()) {
