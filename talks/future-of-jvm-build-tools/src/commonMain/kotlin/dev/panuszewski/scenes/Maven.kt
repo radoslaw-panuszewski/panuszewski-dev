@@ -20,6 +20,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.Foldable
@@ -86,11 +87,13 @@ fun StoryboardBuilder.Maven() = scene(
                     ProvideTextStyle(MaterialTheme.typography.h5) { buildPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
-                    buildPomTransition.ScrollableMagicCodeSample(
-                        moveDurationMillis = 500,
-                        fadeDurationMillis = 500,
-                        split = { it.splitByTags() },
-                    )
+                    ProvideTextStyle(MaterialTheme.typography.body2) {
+                        buildPomTransition.ScrollableMagicCodeSample(
+                            moveDurationMillis = 500,
+                            fadeDurationMillis = 500,
+                            split = { it.toWords() },
+                        )
+                    }
                 }
             }
 
@@ -131,6 +134,36 @@ private val CONSUMER_POM = buildCodeSamples {
         .then { hide(properties, build).unfocus() }
 }
 
+private val BUILD_POM_YAML = buildCodeSamples {
+    val properties by tag()
+    val build by tag()
+
+    val codeSample = """
+        id: pl.allegro.tech.common:andamio-starter-core:1.0.0
+        properties:
+          kotlin.code.style: official
+          kotlin.compiler.jvmTarget: 1.8
+        repositories:
+          - id: mavenCentral
+            url: https://repo1.maven.org/maven2/
+        dependencies:
+          - org.springframework.boot:spring-boot-starter-core:3.5.4@compile
+        build:
+          plugins:
+            - groupId: org.jetbrains.kotlin
+              artifactId: kotlin-maven-plugin
+              version: 2.2.0
+          extensions:
+            - groupId: org.apache.maven.extensions
+              artifactId: maven-build-cache-extension
+              version: 1.2.0
+        """.trimIndent().toCodeSample(language = Language.Yaml)
+
+    codeSample
+        .then { focus(properties, build, scroll = false) }
+        .then { hide(properties, build).unfocus() }
+}
+
 private val BUILD_POM = buildCodeSamples {
     val groupIdFolded by tag()
     val groupIdExpanded by tag()
@@ -153,8 +186,11 @@ private val BUILD_POM = buildCodeSamples {
     val focusableDependencies by tag()
     val focusableBuild by tag()
 
+    val xml by tag()
+    val yaml by tag()
+
     val codeSample = """
-        <project>${focusableCoordinates}
+        ${xml}<project>${focusableCoordinates}
             <groupId>${groupIdFolded}...${groupIdFolded}${groupIdExpanded}pl.allegro.tech.common${groupIdExpanded}</groupId>
             <artifactId>${artifactIdFolded}...${artifactIdFolded}${artifactIdExpanded}andamio-starter-core${artifactIdExpanded}</artifactId>
             <version>${versionFolded}...${versionFolded}${versionExpanded}1.0.0${versionExpanded}</version>${focusableCoordinates}${focusableProperties}
@@ -191,7 +227,24 @@ private val BUILD_POM = buildCodeSamples {
                     </extension>
                 </extensions>
             ${buildExpanded}</build>${focusableBuild}
-        </project>
+        </project>${xml}${yaml}id: pl.allegro.tech.common:andamio-starter-core:1.0.0
+        properties:
+          kotlin.code.style: official
+          kotlin.compiler.jvmTarget: 1.8
+        repositories:
+          - id: mavenCentral
+            url: https://repo1.maven.org/maven2/
+        dependencies:
+          - org.springframework.boot:spring-boot-starter-core:3.5.4@compile
+        build:
+          plugins:
+            - groupId: org.jetbrains.kotlin
+              artifactId: kotlin-maven-plugin
+              version: 2.2.0
+          extensions:
+            - groupId: org.apache.maven.extensions
+              artifactId: maven-build-cache-extension
+              version: 1.2.0${yaml}
         """.trimIndent().toCodeSample(language = Language.Xml)
 
     val all = Foldable(
@@ -208,13 +261,15 @@ private val BUILD_POM = buildCodeSamples {
     val build = Foldable(buildFolded, buildExpanded)
 
     codeSample
-        .startWith { fold(all) }
+        .startWith { fold(all).hide(yaml) }
         .then { expand(coordinates).focus(focusableCoordinates, scroll = false) }
         .then { fold(coordinates).expand(properties).focus(focusableProperties, scroll = false) }
         .then { fold(properties).expand(repositories).focus(focusableRepositories, scroll = false) }
         .then { fold(repositories).expand(dependencies).focus(focusableDependencies, scroll = false) }
         .then { fold(dependencies).expand(build).focus(focusableBuild, scroll = true) }
         .then { fold(build).unfocus() }
+        .then { expand(all) }
+        .then { hide(xml).reveal(yaml).changeLanguage(Language.Yaml) }
 }
 
 

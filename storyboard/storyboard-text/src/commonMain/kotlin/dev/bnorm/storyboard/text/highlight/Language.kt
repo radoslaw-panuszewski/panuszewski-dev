@@ -6,6 +6,7 @@ import androidx.compose.ui.text.SpanStyle
 enum class Language {
     Kotlin,
     Xml,
+    Yaml,
 }
 
 fun String.highlight(
@@ -17,5 +18,6 @@ fun String.highlight(
     return when (language) {
         Language.Kotlin -> highlightKotlin(this, codeStyle, scope, identifierStyle)
         Language.Xml -> highlightXml(this, codeStyle, scope, identifierStyle)
+        Language.Yaml -> highlightYaml(this, codeStyle, scope, identifierStyle)
     }
 }

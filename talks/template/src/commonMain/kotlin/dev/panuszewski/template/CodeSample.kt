@@ -9,25 +9,24 @@ import dev.bnorm.storyboard.text.TextTag
 import dev.bnorm.storyboard.text.TextTagScope
 import dev.bnorm.storyboard.text.addStyleByTag
 import dev.bnorm.storyboard.text.highlight.CodeScope
-import dev.bnorm.storyboard.text.highlight.CodeStyle
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.replaceAllByTag
 
 @Immutable
 class CodeSample private constructor(
-    private val base: (CodeStyle) -> AnnotatedString,
     private val focus: List<TextTag>,
     private val replaced: Map<TextTag, AnnotatedString>,
     private val styled: Map<TextTag, SpanStyle>,
     private val scrollTag: TextTag?,
     val data: Any?,
+    val text: AnnotatedString,
+    val language: Language
 ) {
-    constructor(sample: AnnotatedString) : this({ sample }, emptyList(), emptyMap(), emptyMap(), null, null)
-    constructor(sample: (CodeStyle) -> AnnotatedString) : this(sample, emptyList(), emptyMap(), emptyMap(), null, null)
+    constructor(text: AnnotatedString, language: Language) : this(emptyList(), emptyMap(), emptyMap(), null, null, text, language)
 
     @Composable
     fun String(): AnnotatedString {
-        var str = base(LocalCodeStyle.current)
+        var str = text.toCode(language, LocalCodeStyle.current, CodeScope.File, { _, _ -> null })
         for ((tag, style) in styled) {
             str = str.addStyleByTag(listOf(tag), tagged = style)
         }
@@ -64,13 +63,14 @@ class CodeSample private constructor(
     }
 
     private fun copy(
-        base: (CodeStyle) -> AnnotatedString = this.base,
         focus: List<TextTag> = this.focus,
         replaced: Map<TextTag, AnnotatedString> = this.replaced,
         styled: Map<TextTag, SpanStyle> = this.styled,
         scrollTag: TextTag? = this.scrollTag,
         data: Any? = this.data,
-    ): CodeSample = CodeSample(base, focus, replaced, styled, scrollTag, data)
+        text: AnnotatedString = this.text,
+        language: Language = this.language,
+    ): CodeSample = CodeSample(focus, replaced, styled, scrollTag, data, text, language)
 
     fun collapse(tag: TextTag): CodeSample = copy(replaced = replaced + (tag to ELLIPSIS))
     fun collapse(vararg tags: TextTag): CodeSample = collapse(tags.asList())
@@ -118,6 +118,8 @@ class CodeSample private constructor(
         if (this.data == data) return this
         return copy(data = data)
     }
+    
+    fun changeLanguage(language: Language): CodeSample = copy(language = language)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -125,7 +127,6 @@ class CodeSample private constructor(
 
         other as CodeSample
 
-        if (base != other.base) return false
         if (focus != other.focus) return false
         if (replaced != other.replaced) return false
         if (styled != other.styled) return false
@@ -135,7 +136,7 @@ class CodeSample private constructor(
     }
 
     override fun hashCode(): Int {
-        var result = base.hashCode()
+        var result = text.hashCode()
         result = 31 * result + (focus?.hashCode() ?: 0)
         result = 31 * result + replaced.hashCode()
         result = 31 * result + styled.hashCode()
@@ -151,27 +152,14 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
         language: Language = Language.Kotlin,
-        codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
-        scope: CodeScope = CodeScope.File,
-        identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample({ givenCodeStyle ->
-            extractTags(this).toCode(
-                language,
-                givenCodeStyle,
-                scope,
-                identifierType
-            )
-        })
+        return CodeSample(text = extractTags(this), language = language)
     }
 
     fun AnnotatedString.toCodeSample(
         language: Language = Language.Kotlin,
-        codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
-        scope: CodeScope = CodeScope.File,
-        identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
     ): CodeSample {
-        return CodeSample({ givenCodeStyle -> toCode(language, givenCodeStyle, scope, identifierType) })
+        return CodeSample(text = this, language = language)
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })

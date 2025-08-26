@@ -32,7 +32,7 @@ fun Transition<String>.MagicText(
     modifier: Modifier = Modifier,
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
-    delayDurationMillis: Int = DefaultDelayDurationMillis
+    delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
     createChildTransition { AnnotatedString(it) }
         .MagicText(
@@ -40,7 +40,7 @@ fun Transition<String>.MagicText(
             moveDurationMillis = moveDurationMillis,
             fadeDurationMillis = fadeDurationMillis,
             delayDurationMillis = delayDurationMillis,
-            split = { it.toWords() }
+            split = { it.toWords() },
         )
 }
 
@@ -50,14 +50,14 @@ fun Transition<AnnotatedString>.MagicText(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() }
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
 ) {
     MagicText(
         transition = createChildTransition { split(it) },
         modifier = modifier,
         moveDurationMillis = moveDurationMillis,
         fadeDurationMillis = fadeDurationMillis,
-        delayDurationMillis = delayDurationMillis
+        delayDurationMillis = delayDurationMillis,
     )
 }
 
@@ -67,7 +67,7 @@ fun Transition<CodeSample>.MagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() }
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
 ) {
     MagicText(
         transition = createChildTransition { codeSample -> split(codeSample.String()) },
@@ -84,7 +84,7 @@ fun Transition<CodeSample>.ScrollableMagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() }
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
 ) {
     val state = rememberScrollState()
     animateScroll(state)
@@ -101,7 +101,7 @@ fun Transition<CodeSample>.ScrollableMagicCodeSample(
             moveDurationMillis = moveDurationMillis,
             fadeDurationMillis = fadeDurationMillis,
             delayDurationMillis = delayDurationMillis,
-            split = split
+            split = split,
         )
     }
 }

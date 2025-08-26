@@ -61,3 +61,4 @@ val generateXmlGrammarSource by tasks.registering(AntlrKotlinTask::class) {
     packageName = pkgName
     outputDirectory = layout.projectDirectory.dir(outDir).asFile
 }
+

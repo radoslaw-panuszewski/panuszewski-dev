@@ -29,16 +29,16 @@ internal fun highlightXml(
                 // Style the opening tag
                 ctx.OPEN(0)?.let { addStyle(codeStyle.keyword, it.symbol) }
                 ctx.Name(0)?.let { addStyle(codeStyle.keyword, it.symbol) }
-                
+
                 // Style the closing tag if it exists
-                ctx.SLASH()?.let { 
+                ctx.SLASH()?.let {
                     addStyle(codeStyle.keyword, it.symbol)
                     ctx.Name(1)?.let { name -> addStyle(codeStyle.keyword, name.symbol) }
                 }
-                
+
                 // Style the self-closing tag if it exists
                 ctx.SLASH_CLOSE()?.let { addStyle(codeStyle.keyword, it.symbol) }
-                
+
                 // Style the closing brackets
                 ctx.CLOSE()?.forEach { addStyle(codeStyle.keyword, it.symbol) }
             }
@@ -46,10 +46,10 @@ internal fun highlightXml(
             override fun enterAttribute(ctx: XMLParser.AttributeContext) {
                 // Style attribute name
                 addStyle(codeStyle.property, ctx.Name().symbol)
-                
+
                 // Style equals sign
                 addStyle(codeStyle.keyword, ctx.EQUALS().symbol)
-                
+
                 // Style attribute value
                 addStyle(codeStyle.string, ctx.STRING().symbol)
             }
