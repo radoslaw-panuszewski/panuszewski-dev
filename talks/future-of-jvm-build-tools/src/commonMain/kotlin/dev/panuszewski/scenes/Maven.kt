@@ -11,12 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -35,7 +32,7 @@ import dev.panuszewski.template.fold
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 
-private val STATE_COUNT: Int get() = 1 + BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_YAML.size
+private val STATE_COUNT: Int get() = BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_YAML.size
 
 fun StoryboardBuilder.Maven() = scene(
     stateCount = STATE_COUNT
@@ -45,21 +42,7 @@ fun StoryboardBuilder.Maven() = scene(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(16.dp))
-        ProvideTextStyle(MaterialTheme.typography.h4) {
-            transition.createChildTransition {
-                when (it.toState()) {
-                    STATE_COUNT - 3, STATE_COUNT - 2 -> buildAnnotatedString {
-                        append("Maven ")
-                        withStyle(SpanStyle(MaterialTheme.colors.primary)) { append("3") }
-                    }
-                    STATE_COUNT - 1 -> buildAnnotatedString {
-                        append("Maven ")
-                        withStyle(SpanStyle(MaterialTheme.colors.secondary)) { append("4") }
-                    }
-                    else -> AnnotatedString("Maven")
-                }
-            }.MagicText()
-        }
+        ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
         Spacer(Modifier.height(32.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(-250.dp, Alignment.CenterHorizontally)) {
@@ -68,17 +51,13 @@ fun StoryboardBuilder.Maven() = scene(
             val consumerPomTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()) }
 
             val buildPomTitleTransition = transition.createChildTransition {
-                when {
-                    it.toState() >= STATE_COUNT - 3 -> "Build pom"
-                    else -> "pom.xml"
+                if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
+                    "Build pom"
+                } else {
+                    plan.getSample(BUILD_POM_SLOT, it.toState()).title.orEmpty()
                 }
             }
-            val consumerPomTitleTransition = transition.createChildTransition {
-                when {
-                    it.toState() >= STATE_COUNT - 3 -> "Consumer pom"
-                    else -> "pom.xml"
-                }
-            }
+            val consumerPomTitleTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()).title.orEmpty() }
 
             val boxModifier = Modifier.width(500.dp).padding(8.dp)
 
@@ -91,7 +70,6 @@ fun StoryboardBuilder.Maven() = scene(
                         buildPomTransition.ScrollableMagicCodeSample(
                             moveDurationMillis = 500,
                             fadeDurationMillis = 500,
-                            split = { it.toWords() },
                         )
                     }
                 }
@@ -106,7 +84,6 @@ fun StoryboardBuilder.Maven() = scene(
                         consumerPomTransition.ScrollableMagicCodeSample(
                             moveDurationMillis = 500,
                             fadeDurationMillis = 500,
-                            split = { it.splitByTags() },
                         )
                     }
                 }
@@ -129,11 +106,17 @@ private val CONSUMER_POM = buildCodeSamples {
             <dependencies>...</dependencies>${build}
             <build>...</build>${build}
         </project>
-        """.trimIndent().toCodeSample(language = Language.Xml)
+        """
+        .trimIndent()
+        .toCodeSample(
+            language = Language.Xml,
+            title = "pom.xml",
+            splitMethod = { it.splitByTags() }
+        )
 
     codeSample
         .then { focus(properties, build, scroll = false) }
-        .then { hide(properties, build).unfocus() }
+        .then { hide(properties, build).unfocus().changeTitle("Consumer pom") }
 }
 
 private val BUILD_POM_YAML = buildCodeSamples {
@@ -197,11 +180,17 @@ private val BUILD_POM_YAML = buildCodeSamples {
             - groupId: org.apache.maven.extensions
               artifactId: maven-build-cache-extension
               version: 1.2.0${yaml}
-        """.trimIndent().toCodeSample(language = Language.Xml)
+        """
+        .trimIndent()
+        .toCodeSample(
+            language = Language.Xml,
+            title = "pom.xml",
+            splitMethod = { it.toWords() }
+        )
 
     codeSample
         .startWith { hide(yaml) }
-        .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml) }
+        .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
 }
 
 private val BUILD_POM = buildCodeSamples {
@@ -265,7 +254,13 @@ private val BUILD_POM = buildCodeSamples {
                 </extensions>
             ${buildExpanded}</build>${focusableBuild}
         </project>
-        """.trimIndent().toCodeSample(language = Language.Xml)
+        """
+        .trimIndent()
+        .toCodeSample(
+            language = Language.Xml,
+            title = "pom.xml",
+            splitMethod = { it.splitByTags() }
+        )
 
     val all = Foldable(
         folded = listOf(groupIdFolded, artifactIdFolded, versionFolded, propertiesFolded, repositoriesFolded, dependenciesFolded, buildFolded),
@@ -282,6 +277,7 @@ private val BUILD_POM = buildCodeSamples {
 
     codeSample
         .startWith { fold(all) }
+        .then { this }
         .then { expand(coordinates).focus(focusableCoordinates, scroll = false) }
         .then { fold(coordinates).expand(properties).focus(focusableProperties, scroll = false) }
         .then { fold(properties).expand(repositories).focus(focusableRepositories, scroll = false) }

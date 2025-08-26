@@ -10,6 +10,7 @@ import dev.bnorm.storyboard.text.TextTagScope
 import dev.bnorm.storyboard.text.addStyleByTag
 import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.magic.toWords
 import dev.bnorm.storyboard.text.replaceAllByTag
 
 @Immutable
@@ -20,9 +21,15 @@ class CodeSample private constructor(
     private val scrollTag: TextTag?,
     val data: Any?,
     val text: AnnotatedString,
-    val language: Language
+    val language: Language,
+    val title: String?,
+    val splitMethod: (AnnotatedString) -> List<AnnotatedString>
 ) {
-    constructor(text: AnnotatedString, language: Language) : this(emptyList(), emptyMap(), emptyMap(), null, null, text, language)
+    constructor(text: AnnotatedString, language: Language, title: String? = null, splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() })
+            : this(emptyList(), emptyMap(), emptyMap(), null, null, text, language, title, splitMethod)
+
+    @Composable
+    fun Split() = splitMethod(String())
 
     @Composable
     fun String(): AnnotatedString {
@@ -70,7 +77,9 @@ class CodeSample private constructor(
         data: Any? = this.data,
         text: AnnotatedString = this.text,
         language: Language = this.language,
-    ): CodeSample = CodeSample(focus, replaced, styled, scrollTag, data, text, language)
+        title: String? = this.title,
+        splitMethod: (AnnotatedString) -> List<AnnotatedString> = this.splitMethod,
+    ): CodeSample = CodeSample(focus, replaced, styled, scrollTag, data, text, language, title, splitMethod)
 
     fun collapse(tag: TextTag): CodeSample = copy(replaced = replaced + (tag to ELLIPSIS))
     fun collapse(vararg tags: TextTag): CodeSample = collapse(tags.asList())
@@ -118,8 +127,10 @@ class CodeSample private constructor(
         if (this.data == data) return this
         return copy(data = data)
     }
-    
+
     fun changeLanguage(language: Language): CodeSample = copy(language = language)
+
+    fun changeTitle(title: String?): CodeSample = copy(title = title)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -152,14 +163,18 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
         language: Language = Language.Kotlin,
+        title: String? = null,
+        splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
     ): CodeSample {
-        return CodeSample(text = extractTags(this), language = language)
+        return CodeSample(extractTags(this), language, title, splitMethod)
     }
 
     fun AnnotatedString.toCodeSample(
         language: Language = Language.Kotlin,
+        title: String? = null,
+        splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
     ): CodeSample {
-        return CodeSample(text = this, language = language)
+        return CodeSample(this, language, title, splitMethod)
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })
