@@ -35,7 +35,7 @@ import dev.panuszewski.template.fold
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 
-private val STATE_COUNT: Int get() = 1 + BUILD_POM.size + CONSUMER_POM.size
+private val STATE_COUNT: Int get() = 1 + BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_YAML.size
 
 fun StoryboardBuilder.Maven() = scene(
     stateCount = STATE_COUNT
@@ -69,14 +69,14 @@ fun StoryboardBuilder.Maven() = scene(
 
             val buildPomTitleTransition = transition.createChildTransition {
                 when {
-                    it.toState() >= STATE_COUNT - 3 -> "Build POM"
-                    else -> "POM"
+                    it.toState() >= STATE_COUNT - 3 -> "Build pom"
+                    else -> "pom.xml"
                 }
             }
             val consumerPomTitleTransition = transition.createChildTransition {
                 when {
-                    it.toState() >= STATE_COUNT - 3 -> "Consumer POM"
-                    else -> "POM"
+                    it.toState() >= STATE_COUNT - 3 -> "Consumer pom"
+                    else -> "pom.xml"
                 }
             }
 
@@ -97,16 +97,18 @@ fun StoryboardBuilder.Maven() = scene(
                 }
             }
 
-            transition.SlideFromRightAnimatedVisibility({ it.toState() >= BUILD_POM.size + 1 }) {
+            transition.SlideFromRightAnimatedVisibility({ plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT }) {
                 Column(boxModifier.padding(start = 150.dp)) {
                     ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
-                    consumerPomTransition.ScrollableMagicCodeSample(
-                        moveDurationMillis = 500,
-                        fadeDurationMillis = 500,
-                        split = { it.splitByTags() },
-                    )
+                    ProvideTextStyle(MaterialTheme.typography.body2) {
+                        consumerPomTransition.ScrollableMagicCodeSample(
+                            moveDurationMillis = 500,
+                            fadeDurationMillis = 500,
+                            split = { it.splitByTags() },
+                        )
+                    }
                 }
             }
         }
@@ -135,10 +137,48 @@ private val CONSUMER_POM = buildCodeSamples {
 }
 
 private val BUILD_POM_YAML = buildCodeSamples {
-    val properties by tag()
-    val build by tag()
+    val xml by tag()
+    val yaml by tag()
 
     val codeSample = """
+        ${xml}<project>
+            <groupId>pl.allegro.tech.common</groupId>
+            <artifactId>andamio-starter-core</artifactId>
+            <version>1.0.0</version>
+            <properties>
+                <kotlin.code.style>official</kotlin.code.style>
+                <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>mavenCentral</id>
+                    <url>https://repo1.maven.org/maven2/</url>
+                </repository>
+            </repositories>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-core</artifactId>
+                    <version>3.5.4</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-plugin</artifactId>
+                        <version>2.2.0</version>
+                    </plugin>
+                <plugins>
+                <extensions>
+                    <extension>
+                        <groupId>org.apache.maven.extensions</groupId>
+                        <artifactId>maven-build-cache-extension</artifactId>
+                        <version>1.2.0</version>
+                    </extension>
+                </extensions>
+            </build>
+        </project>${xml}${yaml}
         id: pl.allegro.tech.common:andamio-starter-core:1.0.0
         properties:
           kotlin.code.style: official
@@ -156,12 +196,12 @@ private val BUILD_POM_YAML = buildCodeSamples {
           extensions:
             - groupId: org.apache.maven.extensions
               artifactId: maven-build-cache-extension
-              version: 1.2.0
-        """.trimIndent().toCodeSample(language = Language.Yaml)
+              version: 1.2.0${yaml}
+        """.trimIndent().toCodeSample(language = Language.Xml)
 
     codeSample
-        .then { focus(properties, build, scroll = false) }
-        .then { hide(properties, build).unfocus() }
+        .startWith { hide(yaml) }
+        .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml) }
 }
 
 private val BUILD_POM = buildCodeSamples {
@@ -248,7 +288,6 @@ private val BUILD_POM = buildCodeSamples {
         .then { fold(repositories).expand(dependencies).focus(focusableDependencies, scroll = false) }
         .then { fold(dependencies).expand(build).focus(focusableBuild, scroll = true) }
         .then { fold(build).unfocus() }
-        .then { expand(all) }
 }
 
 class CodeSamplesPlan {
@@ -285,83 +324,110 @@ class CodeSamplesPlan {
     }
 
     /**
-     * - for active slot, calling this method with subsequent states will return subsequent code samples.
-     * - for inactive slot, calling this method with subsequent states will return the same code sample.
+     * Helper method to calculate the active revelation index and remaining state for a given state.
+     * Returns a Pair of (activeRevelationIndex, remainingState).
      */
-    fun getSample(slotName: String, state: Int): CodeSample {
-        require(slotName in slots) { "Slot $slotName not registered" }
-        require(samples[slotName]!!.isNotEmpty()) { "No samples in slot $slotName" }
+    private fun calculateActiveRevelation(state: Int): Pair<Int, Int> {
+        require(revelations.isNotEmpty()) { "No revelations registered" }
 
-        // Find which revelation is active for the current state
         var remainingState = state
-        var activeRevelationIndex = 0
 
         // Find the active revelation based on the state
         for (i in revelations.indices) {
             val (_, samples) = revelations[i]
             if (remainingState < samples.size) {
-                activeRevelationIndex = i
-                break
+                return i to remainingState
             }
             remainingState -= samples.size
         }
 
-        // Get the active slot
-        val (activeSlot, _) = revelations[activeRevelationIndex]
+        // If we've gone through all revelations, return the last one
+        return revelations.lastIndex to 0
+    }
 
-        // If the requested slot is the active slot, return the appropriate sample
-        if (slotName == activeSlot) {
-            // Find the index of the sample in the slot's samples list
-            var sampleIndex = 0
+    /**
+     * Returns the active slot name for the given state.
+     * The active slot is the one that is currently revealing samples.
+     */
+    fun getActiveSlot(state: Int): String {
+        val (activeRevelationIndex, _) = calculateActiveRevelation(state)
+        return revelations[activeRevelationIndex].first
+    }
 
-            // Count samples in previous revelations for this slot
-            for (i in 0 until activeRevelationIndex) {
-                val (slot, slotSamples) = revelations[i]
-                if (slot == slotName) {
-                    sampleIndex += slotSamples.size
-                }
-            }
+    /**
+     * Get the sample index for the active slot at the given state and revelation index.
+     */
+    private fun getActiveSlotSampleIndex(slotName: String, activeRevelationIndex: Int, remainingState: Int): Int {
+        var sampleIndex = 0
 
-            // Add the remaining state to get the final index
-            sampleIndex += remainingState
-
-            return samples[slotName]!![sampleIndex]
-        } else {
-            // For inactive slots, find the last revealed sample before the current state
-            var lastRevealedIndex = -1
-            var samplesProcessed = 0
-
-            for (i in revelations.indices) {
-                val (slot, slotSamples) = revelations[i]
-
-                // If we've processed more samples than the current state, we're done
-                if (samplesProcessed > state) {
-                    break
-                }
-
-                // If this revelation is for the requested slot, update the last revealed index
-                if (slot == slotName) {
-                    // If this revelation would be partially revealed, calculate the exact index
-                    if (samplesProcessed + slotSamples.size > state) {
-                        val partialIndex = state - samplesProcessed
-                        lastRevealedIndex = lastRevealedIndex + partialIndex + 1
-                    } else {
-                        // Otherwise, all samples in this revelation are revealed
-                        lastRevealedIndex += slotSamples.size
-                    }
-                }
-
-                samplesProcessed += slotSamples.size
-            }
-
-            // If no samples have been revealed yet, return the first sample
-            return if (lastRevealedIndex <= 0) {
-                samples[slotName]!!.first()
-            } else {
-                // Otherwise, return the last revealed sample
-                samples[slotName]!![lastRevealedIndex.coerceAtMost(samples[slotName]!!.size - 1)]
+        // Count samples in previous revelations for this slot
+        for (i in 0 until activeRevelationIndex) {
+            val (slot, slotSamples) = revelations[i]
+            if (slot == slotName) {
+                sampleIndex += slotSamples.size
             }
         }
+
+        // Add the remaining state to get the final index
+        return sampleIndex + remainingState
+    }
+
+    /**
+     * Get the sample index for an inactive slot at the given state.
+     */
+    private fun getInactiveSlotSampleIndex(slotName: String, state: Int): Int {
+        var lastRevealedIndex = -1
+        var samplesProcessed = 0
+
+        for (i in revelations.indices) {
+            val (slot, slotSamples) = revelations[i]
+
+            // If we've processed more samples than the current state, we're done
+            if (samplesProcessed > state) {
+                break
+            }
+
+            // If this revelation is for the requested slot, update the last revealed index
+            if (slot == slotName) {
+                // If this revelation would be partially revealed, calculate the exact index
+                if (samplesProcessed + slotSamples.size > state) {
+                    val partialIndex = state - samplesProcessed
+                    lastRevealedIndex = lastRevealedIndex + partialIndex + 1
+                } else {
+                    // Otherwise, all samples in this revelation are revealed
+                    lastRevealedIndex += slotSamples.size
+                }
+            }
+
+            samplesProcessed += slotSamples.size
+        }
+
+        // If no samples have been revealed yet, return 0 (first sample)
+        return if (lastRevealedIndex <= 0) 0 else lastRevealedIndex.coerceAtMost(samples[slotName]!!.size - 1)
+    }
+
+    /**
+     * For an active slot, calling this method with subsequent states will return subsequent code samples.
+     * For an inactive slot, calling this method with subsequent states will return the same code sample.
+     */
+    fun getSample(slotName: String, state: Int): CodeSample {
+        require(slotName in slots) { "Slot $slotName not registered" }
+        require(samples[slotName]!!.isNotEmpty()) { "No samples in slot $slotName" }
+
+        // Get the active slot for the current state
+        val activeSlot = getActiveSlot(state)
+
+        // Calculate the active revelation index and remaining state
+        val (activeRevelationIndex, remainingState) = calculateActiveRevelation(state)
+
+        // Calculate the sample index based on whether the slot is active or inactive
+        val sampleIndex = if (slotName == activeSlot) {
+            getActiveSlotSampleIndex(slotName, activeRevelationIndex, remainingState)
+        } else {
+            getInactiveSlotSampleIndex(slotName, state)
+        }
+
+        return samples[slotName]!![sampleIndex]
     }
 }
 
