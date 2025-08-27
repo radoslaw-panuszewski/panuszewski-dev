@@ -40,7 +40,7 @@ fun MagicText(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
-    val words = remember(text) { text.toWords() }
+    val words = remember(text) { text.splitByWords() }
     val transition = updateTransition(words)
     MagicText(transition, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
@@ -55,7 +55,7 @@ fun MagicText(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
-    val worlds = transition.createChildTransition { remember(it) { it.toWords() } }
+    val worlds = transition.createChildTransition { remember(it) { it.splitByWords() } }
     MagicText(worlds, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
 

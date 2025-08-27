@@ -24,7 +24,7 @@ import dev.bnorm.storyboard.text.magic.DefaultDelayDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultFadeDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultMoveDurationMillis
 import dev.bnorm.storyboard.text.magic.MagicText
-import dev.bnorm.storyboard.text.magic.toWords
+import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.toDpSize
 
 @Composable
@@ -40,7 +40,7 @@ fun Transition<String>.MagicText(
             moveDurationMillis = moveDurationMillis,
             fadeDurationMillis = fadeDurationMillis,
             delayDurationMillis = delayDurationMillis,
-            split = { it.toWords() },
+            split = { it.splitByWords() },
         )
 }
 
@@ -50,7 +50,7 @@ fun Transition<AnnotatedString>.MagicText(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    split: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
 ) {
     MagicText(
         transition = createChildTransition { split(it) },

@@ -1,12 +1,14 @@
+@file:Suppress("WrapUnaryOperator")
+
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
@@ -17,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.bnorm.storyboard.text.magic.toWords
+import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.CodeSample
@@ -45,8 +47,7 @@ fun StoryboardBuilder.Maven() = scene(
         ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
         Spacer(Modifier.height(32.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(-250.dp, Alignment.CenterHorizontally)) {
-
+        Box {
             val buildPomTransition = transition.createChildTransition { plan.getSample(BUILD_POM_SLOT, it.toState()) }
             val consumerPomTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()) }
 
@@ -62,7 +63,7 @@ fun StoryboardBuilder.Maven() = scene(
             val boxModifier = Modifier.width(500.dp).padding(8.dp)
 
             transition.SlideFromLeftAnimatedVisibility({ it.toState() >= 1 }) {
-                Column(boxModifier) {
+                Column(boxModifier.align(Alignment.Center).offset(x = 0.dp)) {
                     ProvideTextStyle(MaterialTheme.typography.h5) { buildPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
@@ -76,7 +77,7 @@ fun StoryboardBuilder.Maven() = scene(
             }
 
             transition.SlideFromRightAnimatedVisibility({ plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT }) {
-                Column(boxModifier.padding(start = 150.dp)) {
+                Column(boxModifier.align(Alignment.Center).offset(x = 300.dp)) {
                     ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
@@ -185,7 +186,7 @@ private val BUILD_POM_YAML = buildCodeSamples {
         .toCodeSample(
             language = Language.Xml,
             title = "pom.xml",
-            splitMethod = { it.toWords() }
+            splitMethod = { it.splitByWords() }
         )
 
     codeSample

@@ -3,7 +3,7 @@ package dev.bnorm.storyboard.text.magic
 import androidx.compose.ui.text.AnnotatedString
 
 // Tokenize an AnnotatedString into a list of words.
-fun AnnotatedString.toWords(): List<AnnotatedString> {
+fun AnnotatedString.splitByWords(): List<AnnotatedString> {
     return buildList {
         var last = 0
         while (last < length) {

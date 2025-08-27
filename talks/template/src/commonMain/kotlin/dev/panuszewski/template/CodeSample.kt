@@ -10,7 +10,7 @@ import dev.bnorm.storyboard.text.TextTagScope
 import dev.bnorm.storyboard.text.addStyleByTag
 import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.bnorm.storyboard.text.magic.toWords
+import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.text.replaceAllByTag
 
 @Immutable
@@ -25,7 +25,7 @@ class CodeSample private constructor(
     val title: String?,
     val splitMethod: (AnnotatedString) -> List<AnnotatedString>
 ) {
-    constructor(text: AnnotatedString, language: Language, title: String? = null, splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() })
+    constructor(text: AnnotatedString, language: Language, title: String? = null, splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() })
             : this(emptyList(), emptyMap(), emptyMap(), null, null, text, language, title, splitMethod)
 
     @Composable
@@ -164,7 +164,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
         language: Language = Language.Kotlin,
         title: String? = null,
-        splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
+        splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
         return CodeSample(extractTags(this), language, title, splitMethod)
     }
@@ -172,7 +172,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun AnnotatedString.toCodeSample(
         language: Language = Language.Kotlin,
         title: String? = null,
-        splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.toWords() },
+        splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
         return CodeSample(this, language, title, splitMethod)
     }
