@@ -48,7 +48,7 @@ fun StoryboardBuilder.Overview() {
                     text = TITLE[1],
                     modifier = Modifier
                         .sharedBounds(
-                            sharedContentState = rememberSharedContentState("text/Present"),
+                            sharedContentState = rememberSharedContentState("text/Title"),
                             animatedVisibilityScope = contextOf<AnimatedVisibilityScope>(),
                         )
                 )

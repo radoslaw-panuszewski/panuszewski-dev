@@ -39,8 +39,8 @@ val TITLE = listOf(
     }
 )
 
-fun StoryboardBuilder.Title() {
-    scene(2) {
+fun StoryboardBuilder.Title(animateToPresent: Boolean) {
+    scene(if (animateToPresent) 2 else 1) {
         val titleTransition = transition.createChildTransition { TITLE.safeGet(it.toState()) }
 
         val textStyle by transition.animateTextStyle({ tween(durationMillis = 500) }) {
@@ -74,7 +74,7 @@ fun StoryboardBuilder.Title() {
                         .offset(y = -16.dp)
                         .padding(start = 64.dp)
                         .sharedBounds(
-                            sharedContentState = rememberSharedContentState("text/Present"),
+                            sharedContentState = rememberSharedContentState("text/Title"),
                             animatedVisibilityScope = contextOf<AnimatedVisibilityScope>(),
                         )
                 )
