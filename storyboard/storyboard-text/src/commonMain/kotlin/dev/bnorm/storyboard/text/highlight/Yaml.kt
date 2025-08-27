@@ -30,8 +30,10 @@ internal fun highlightYaml(
             }
 
             // Find the first colon that separates key and value
-            val colonIndex = line.indexOf(':')
-            if (colonIndex > 0) {
+            val colonIndex = line.indexOf(":")
+                .takeIf { it > 0 && (it == line.lastIndex || line[it + 1] == ' ') }
+
+            if (colonIndex != null) {
                 // Extract the key (trim to handle indentation)
                 val key = line.substring(0, colonIndex).trimStart()
 
@@ -40,7 +42,7 @@ internal fun highlightYaml(
 
                 // Calculate the start and end positions of the key in the original text
                 val keyStartPosition = currentPosition + line.indexOf(key.first()) +
-                        (if (key.startsWith("- ")) 2 else 0)
+                    (if (key.startsWith("- ")) 2 else 0)
                 val keyEndPosition = keyStartPosition + keyWithoutHyphen.length
 
                 // Apply property style to the key
