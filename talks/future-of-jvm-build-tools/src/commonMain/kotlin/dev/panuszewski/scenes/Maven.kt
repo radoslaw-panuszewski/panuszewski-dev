@@ -63,11 +63,11 @@ fun StoryboardBuilder.Maven() = scene(
             val boxModifier = Modifier.width(500.dp).padding(8.dp)
 
             transition.SlideFromLeftAnimatedVisibility({ it.toState() >= 1 }) {
-                Column(boxModifier.align(Alignment.Center).offset(x = 0.dp)) {
+                Column(boxModifier.align(Alignment.Center).offset(x = -50.dp)) {
                     ProvideTextStyle(MaterialTheme.typography.h5) { buildPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
-                    ProvideTextStyle(MaterialTheme.typography.body2) {
+                    ProvideTextStyle(MaterialTheme.typography.body1) {
                         buildPomTransition.ScrollableMagicCodeSample(
                             moveDurationMillis = 500,
                             fadeDurationMillis = 500,
@@ -81,7 +81,7 @@ fun StoryboardBuilder.Maven() = scene(
                     ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
                     Spacer(Modifier.height(16.dp))
 
-                    ProvideTextStyle(MaterialTheme.typography.body2) {
+                    ProvideTextStyle(MaterialTheme.typography.body1) {
                         consumerPomTransition.ScrollableMagicCodeSample(
                             moveDurationMillis = 500,
                             fadeDurationMillis = 500,
@@ -122,11 +122,19 @@ private val CONSUMER_POM = buildCodeSamples {
 
 private val BUILD_POM_YAML = buildCodeSamples {
     val xml by tag()
+    val xmlFolded by tag()
+    val xmlExpanded by tag()
     val yaml by tag()
 
     val codeSample = """
         ${xml}<project>
-            <groupId>pl.allegro.tech.common</groupId>
+            ${xmlFolded}<groupId>...</groupId>
+            <artifactId>...</artifactId>
+            <version>...</version>
+            <properties>...</properties>
+            <repositories>...</repositories>
+            <dependencies>...</dependencies>
+            <build>...</build>${xmlFolded}${xmlExpanded}<groupId>pl.allegro.tech.common</groupId>
             <artifactId>andamio-starter-core</artifactId>
             <version>1.0.0</version>
             <properties>
@@ -161,9 +169,8 @@ private val BUILD_POM_YAML = buildCodeSamples {
                         <version>1.2.0</version>
                     </extension>
                 </extensions>
-            </build>
-        </project>${xml}${yaml}
-        id: pl.allegro.tech.common:andamio-starter-core:1.0.0
+            </build>${xmlExpanded}
+        </project>${xml}${yaml}id: pl.allegro.tech.common:andamio-starter-core:1.0.0
         properties:
           kotlin.code.style: official
           kotlin.compiler.jvmTarget: 1.8
@@ -171,7 +178,7 @@ private val BUILD_POM_YAML = buildCodeSamples {
           - id: mavenCentral
             url: https://repo1.maven.org/maven2/
         dependencies:
-          - org.springframework.boot:spring-boot-starter-core:3.5.4@compile
+          - org.springframework.boot:spring-boot-starter-core:3.5.4
         build:
           plugins:
             - groupId: org.jetbrains.kotlin
@@ -190,7 +197,8 @@ private val BUILD_POM_YAML = buildCodeSamples {
         )
 
     codeSample
-        .startWith { hide(yaml) }
+        .startWith { hide(yaml, xmlExpanded) }
+        .then { reveal(xmlExpanded).hide(xmlFolded) }
         .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
 }
 
