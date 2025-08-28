@@ -188,8 +188,7 @@ private val BUILD_POM_YAML = buildCodeSamples {
         )
 
     codeSample
-        .startWith { hide(xmlExpanded, yaml, toml, hocon) }
-        .then { reveal(xmlExpanded).hide(xmlFolded) }
+        .startWith { reveal(xmlExpanded).hide(xmlFolded, yaml, toml, hocon) }
         .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
         .then { reveal(toml).hide(yaml).changeTitle("pom.toml") }
         .then { reveal(hocon).hide(toml).changeTitle("pom.hocon") }
@@ -272,20 +271,11 @@ private val BUILD_POM = buildCodeSamples {
         folded = listOf(groupIdFolded, artifactIdFolded, versionFolded), expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded)
     )
 
-    val properties = Foldable(propertiesFolded, propertiesExpanded)
-    val repositories = Foldable(repositoriesFolded, repositoriesExpanded)
-    val dependencies = Foldable(dependenciesFolded, dependenciesExpanded)
-    val build = Foldable(buildFolded, buildExpanded)
-
     codeSample
         .startWith { fold(all) }
         .then { this }
-        .then { expand(coordinates).focus(focusableCoordinates, scroll = false) }
-        .then { fold(coordinates).expand(properties).focus(focusableProperties, scroll = false) }
-        .then { fold(properties).expand(repositories).focus(focusableRepositories, scroll = false) }
-        .then { fold(repositories).expand(dependencies).focus(focusableDependencies, scroll = false) }
-        .then { fold(dependencies).expand(build).focus(focusableBuild, scroll = true) }
-        .then { fold(build).unfocus() }
+        .then { expand(all) }
+        .then { fold(all) }
 }
 
 class CodeSamplesPlan {

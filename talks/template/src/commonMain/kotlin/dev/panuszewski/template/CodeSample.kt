@@ -38,7 +38,7 @@ class CodeSample private constructor(
             str = str.addStyleByTag(listOf(tag), tagged = style)
         }
         if (focus.isNotEmpty()) {
-            str = str.addStyleByTag(focus, untagged = UNFOCUSED_STYLE)
+            str = str.addStyleByTag(focus, tagged = FOCUSED_STYLE, untagged = UNFOCUSED_STYLE)
         }
         // TODO collapse first and then hide?
         //  - will keep the collapses from being split,
@@ -64,6 +64,7 @@ class CodeSample private constructor(
     }
 
     companion object {
+        private val FOCUSED_STYLE = SpanStyle(color = Color(0xFFFF0404))
         private val UNFOCUSED_STYLE = SpanStyle(color = Color(0xFF555555))
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
         private val EMPTY = AnnotatedString("")
