@@ -160,33 +160,22 @@ private val BUILD_POM_YAML = buildCodeSamples {
           - org.springframework.boot:spring-boot-starter-core:3.5.4
         build:
           plugins:
-            - groupId: org.jetbrains.kotlin
-              artifactId: kotlin-maven-plugin
-              version: 2.2.0${yaml}${toml}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
+            - id: org.jetbrains.kotlin:kotlin-maven-plugin:2.2.0${yaml}${toml}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
         
         dependencies = [
             "org.springframework.boot:spring-boot-starter-core:3.5.4"
         ]
         
         [build]
-        
         [[build.plugins]]
-        groupId = "org.jetbrains.kotlin"
-        artifactId = "kotlin-maven-plugin"
-        version = "2.2.0"${toml}${hocon}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
+        id = "org.jetbrains.kotlin:kotlin-maven-plugin:2.2.0"${toml}${hocon}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
         dependencies = [
-          {
-            groupId = "org.springframework.boot"
-            artifactId = "spring-boot-starter-core"
-            version = "3.5.4"
-          }
+           "org.springframework.boot:spring-boot-starter-core:3.5.4"
         ]
         build {
           plugins = [
             {
-              groupId = "org.jetbrains.kotlin"
-              artifactId = "kotlin-maven-plugin"
-              version = "2.2.0"
+              id = "org.jetbrains.kotlin:kotlin-maven-plugin:2.2.0"
             }
           ]
         }${hocon}
