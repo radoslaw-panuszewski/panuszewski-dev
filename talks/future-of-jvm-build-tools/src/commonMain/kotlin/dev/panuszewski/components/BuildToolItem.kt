@@ -23,24 +23,25 @@ fun BuildToolItem(
     slideDirection: SlideDirection,
     initialX: Dp = 0.dp,
     initialY: Dp = 0.dp,
-    targetX: Dp,
-    targetY: Dp,
+    targetX: Dp = initialX,
+    targetY: Dp = initialY,
     visibleSince: Int? = null,
     moveToTargetSince: Int? = null,
     content: @Composable (Modifier) -> Unit,
 ) = with(boxScope) {
 
     val isVisibleSince = visibleSince ?: chartContext.itemsVisibleSinceState ?: 0
-    val moveAndScaleSince = moveToTargetSince ?: chartContext.moveItemsToTargetSinceState ?: 0
+    val moveSince = moveToTargetSince ?: chartContext.moveItemsToTargetSinceState ?: 0
+    val scaleSince = moveToTargetSince ?: chartContext.makeItemsSmallSince ?: 0
 
     val moveToTarget by sceneScope.transition.animateFloat(
         transitionSpec = { tween(durationMillis = 1000) },
-        targetValueByState = { if (it.toState() >= moveAndScaleSince) 1f else 0f }
+        targetValueByState = { if (it.toState() >= moveSince) 1f else 0f }
     )
 
     val scale by sceneScope.transition.animateFloat(
         transitionSpec = { tween(durationMillis = 1000) },
-        targetValueByState = { if (it.toState() >= moveAndScaleSince) 0.5f else 1f }
+        targetValueByState = { if (it.toState() >= scaleSince) 0.5f else 1f }
     )
 
     Box(

@@ -1,8 +1,7 @@
-@file:Suppress("WrapUnaryOperator")
-
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +36,8 @@ import dev.panuszewski.template.tag
 private val STATE_COUNT: Int get() = BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_YAML.size
 
 fun StoryboardBuilder.Maven() = scene(
-    stateCount = STATE_COUNT
+    stateCount = STATE_COUNT,
+    exitTransition = { fadeOut() }
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),

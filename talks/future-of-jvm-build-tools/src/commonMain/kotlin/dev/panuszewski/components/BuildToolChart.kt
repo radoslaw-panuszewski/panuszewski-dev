@@ -20,6 +20,7 @@ fun SceneScope<Int>.BuildToolChart(
     itemsVisibleSince: Int? = null,
     drawAxesSince: Int,
     moveItemsToTargetSince: Int? = null,
+    makeItemsSmallSince: Int? = moveItemsToTargetSince,
     content: BuildToolChartContent,
 ) {
     val axisLength by transition.animateFloat(
@@ -45,7 +46,8 @@ fun SceneScope<Int>.BuildToolChart(
     ) {
         val chartContext = BuildToolChartContext(
             itemsVisibleSinceState = itemsVisibleSince,
-            moveItemsToTargetSinceState = moveItemsToTargetSince
+            moveItemsToTargetSinceState = moveItemsToTargetSince,
+            makeItemsSmallSince = makeItemsSmallSince
         )
         context(chartContext) { content.Content() }
     }
@@ -60,4 +62,5 @@ fun interface BuildToolChartContent {
 data class BuildToolChartContext(
     val itemsVisibleSinceState: Int?,
     val moveItemsToTargetSinceState: Int?,
+    val makeItemsSmallSince: Int?
 )
