@@ -125,6 +125,9 @@ private val BUILD_POM_YAML = buildCodeSamples {
     val xmlFolded by tag()
     val xmlExpanded by tag()
     val yaml by tag()
+    val json by tag()
+    val toml by tag()
+    val hocon by tag()
 
     val codeSample = """
         ${xml}<project>
@@ -187,7 +190,97 @@ private val BUILD_POM_YAML = buildCodeSamples {
           extensions:
             - groupId: org.apache.maven.extensions
               artifactId: maven-build-cache-extension
-              version: 1.2.0${yaml}
+              version: 1.2.0${yaml}${json}{
+          id: "pl.allegro.tech.common:andamio-starter-core:1.0.0",
+          properties: {
+            "kotlin.code.style": "official",
+            "kotlin.compiler.jvmTarget": "1.8"
+          },
+          repositories: [
+            {
+              id: "mavenCentral",
+              url: "https://repo1.maven.org/maven2/"
+            }
+          ],
+          dependencies: [
+            {
+              groupId: "org.springframework.boot",
+              artifactId: "spring-boot-starter-core",
+              version: "3.5.4"
+            }
+          ],
+          build: {
+            plugins: [
+              {
+                groupId: "org.jetbrains.kotlin",
+                artifactId: "kotlin-maven-plugin",
+                version: "2.2.0"
+              }
+            ],
+            extensions: [
+              {
+                groupId: "org.apache.maven.extensions",
+                artifactId: "maven-build-cache-extension",
+                version: "1.2.0"
+              }
+            ]
+          }
+        }${json}${toml}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
+
+        [properties]
+        "kotlin.code.style" = "official"
+        "kotlin.compiler.jvmTarget" = "1.8"
+        
+        [[repositories]]
+        id = "mavenCentral"
+        url = "https://repo1.maven.org/maven2/"
+        
+        dependencies = ["org.springframework.boot:spring-boot-starter-core:3.5.4"]
+        
+        [build]
+        
+        [[build.plugins]]
+        groupId = "org.jetbrains.kotlin"
+        artifactId = "kotlin-maven-plugin"
+        version = "2.2.0"
+        
+        [[build.extensions]]
+        groupId = "org.apache.maven.extensions"
+        artifactId = "maven-build-cache-extension"
+        version = "1.2.0"${toml}${hocon}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
+        properties {
+          "kotlin.code.style" = "official"
+          "kotlin.compiler.jvmTarget" = "1.8"
+        }
+        repositories = [
+          {
+            id = "mavenCentral"
+            url = "https://repo1.maven.org/maven2/"
+          }
+        ]
+        dependencies = [
+          {
+            groupId = "org.springframework.boot"
+            artifactId = "spring-boot-starter-core"
+            version = "3.5.4"
+          }
+        ]
+        build {
+          plugins = [
+            {
+              groupId = "org.jetbrains.kotlin"
+              artifactId = "kotlin-maven-plugin"
+              version = "2.2.0"
+            }
+          ]
+          extensions = [
+            {
+              groupId = "org.apache.maven.extensions"
+              artifactId = "maven-build-cache-extension"
+              version = "1.2.0"
+            }
+          ]
+        }${hocon}
         """
         .trimIndent()
         .toCodeSample(
@@ -197,9 +290,12 @@ private val BUILD_POM_YAML = buildCodeSamples {
         )
 
     codeSample
-        .startWith { hide(yaml, xmlExpanded) }
+        .startWith { hide(xmlExpanded, yaml, json, toml, hocon) }
         .then { reveal(xmlExpanded).hide(xmlFolded) }
         .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
+        .then { reveal(json).hide(yaml).changeTitle("pom.json") }
+        .then { reveal(toml).hide(json).changeTitle("pom.toml") }
+        .then { reveal(hocon).hide(toml).changeTitle("pom.hocon") }
 }
 
 private val BUILD_POM = buildCodeSamples {
