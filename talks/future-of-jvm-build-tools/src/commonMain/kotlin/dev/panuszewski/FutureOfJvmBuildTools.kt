@@ -3,7 +3,6 @@ package dev.panuszewski
 import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
-import dev.panuszewski.scenes.Maven
 import dev.panuszewski.scenes.MavenTransitionOnChart
 import dev.panuszewski.template.LIGHT_THEME
 
@@ -21,7 +20,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
 
     section("Maven") {
 //        SectionTitle(animateToHeader = true)
-        Maven()
+//        Maven()
         MavenTransitionOnChart()
     }
 }

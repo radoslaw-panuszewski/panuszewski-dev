@@ -73,8 +73,6 @@ fun StoryboardBuilder.MavenTransitionOnChart() {
 
                 BuildToolItem(
                     slideDirection = FROM_RIGHT,
-                    visibleSince = 4,
-                    moveToTargetSince = 5,
                     initialX = 200.dp,
                     initialY = 120.dp,
                 ) {
@@ -86,8 +84,6 @@ fun StoryboardBuilder.MavenTransitionOnChart() {
 
                 BuildToolItem(
                     slideDirection = FROM_RIGHT,
-                    visibleSince = 6,
-                    moveToTargetSince = 0,
                     initialX = 380.dp,
                     initialY = -180.dp,
                 ) {
