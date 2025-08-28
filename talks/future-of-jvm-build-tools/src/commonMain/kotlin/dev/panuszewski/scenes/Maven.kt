@@ -45,7 +45,7 @@ fun StoryboardBuilder.Maven() = scene(
     ) {
         Spacer(Modifier.height(16.dp))
         ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
 
         Box {
             val buildPomTransition = transition.createChildTransition { plan.getSample(BUILD_POM_SLOT, it.toState()) }
@@ -125,7 +125,6 @@ private val BUILD_POM_YAML = buildCodeSamples {
     val xmlFolded by tag()
     val xmlExpanded by tag()
     val yaml by tag()
-    val json by tag()
     val toml by tag()
     val hocon by tag()
 
@@ -134,22 +133,10 @@ private val BUILD_POM_YAML = buildCodeSamples {
             ${xmlFolded}<groupId>...</groupId>
             <artifactId>...</artifactId>
             <version>...</version>
-            <properties>...</properties>
-            <repositories>...</repositories>
             <dependencies>...</dependencies>
             <build>...</build>${xmlFolded}${xmlExpanded}<groupId>pl.allegro.tech.common</groupId>
             <artifactId>andamio-starter-core</artifactId>
             <version>1.0.0</version>
-            <properties>
-                <kotlin.code.style>official</kotlin.code.style>
-                <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-            </properties>
-            <repositories>
-                <repository>
-                    <id>mavenCentral</id>
-                    <url>https://repo1.maven.org/maven2/</url>
-                </repository>
-            </repositories>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
@@ -165,99 +152,26 @@ private val BUILD_POM_YAML = buildCodeSamples {
                         <version>2.2.0</version>
                     </plugin>
                 <plugins>
-                <extensions>
-                    <extension>
-                        <groupId>org.apache.maven.extensions</groupId>
-                        <artifactId>maven-build-cache-extension</artifactId>
-                        <version>1.2.0</version>
-                    </extension>
-                </extensions>
             </build>${xmlExpanded}
         </project>${xml}${yaml}id: pl.allegro.tech.common:andamio-starter-core:1.0.0
-        properties:
-          kotlin.code.style: official
-          kotlin.compiler.jvmTarget: 1.8
-        repositories:
-          - id: mavenCentral
-            url: https://repo1.maven.org/maven2/
         dependencies:
           - org.springframework.boot:spring-boot-starter-core:3.5.4
         build:
           plugins:
             - groupId: org.jetbrains.kotlin
               artifactId: kotlin-maven-plugin
-              version: 2.2.0
-          extensions:
-            - groupId: org.apache.maven.extensions
-              artifactId: maven-build-cache-extension
-              version: 1.2.0${yaml}${json}{
-          id: "pl.allegro.tech.common:andamio-starter-core:1.0.0",
-          properties: {
-            "kotlin.code.style": "official",
-            "kotlin.compiler.jvmTarget": "1.8"
-          },
-          repositories: [
-            {
-              id: "mavenCentral",
-              url: "https://repo1.maven.org/maven2/"
-            }
-          ],
-          dependencies: [
-            {
-              groupId: "org.springframework.boot",
-              artifactId: "spring-boot-starter-core",
-              version: "3.5.4"
-            }
-          ],
-          build: {
-            plugins: [
-              {
-                groupId: "org.jetbrains.kotlin",
-                artifactId: "kotlin-maven-plugin",
-                version: "2.2.0"
-              }
-            ],
-            extensions: [
-              {
-                groupId: "org.apache.maven.extensions",
-                artifactId: "maven-build-cache-extension",
-                version: "1.2.0"
-              }
-            ]
-          }
-        }${json}${toml}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
-
-        [properties]
-        "kotlin.code.style" = "official"
-        "kotlin.compiler.jvmTarget" = "1.8"
+              version: 2.2.0${yaml}${toml}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
         
-        [[repositories]]
-        id = "mavenCentral"
-        url = "https://repo1.maven.org/maven2/"
-        
-        dependencies = ["org.springframework.boot:spring-boot-starter-core:3.5.4"]
+        dependencies = [
+            "org.springframework.boot:spring-boot-starter-core:3.5.4"
+        ]
         
         [build]
         
         [[build.plugins]]
         groupId = "org.jetbrains.kotlin"
         artifactId = "kotlin-maven-plugin"
-        version = "2.2.0"
-        
-        [[build.extensions]]
-        groupId = "org.apache.maven.extensions"
-        artifactId = "maven-build-cache-extension"
-        version = "1.2.0"${toml}${hocon}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
-        properties {
-          "kotlin.code.style" = "official"
-          "kotlin.compiler.jvmTarget" = "1.8"
-        }
-        repositories = [
-          {
-            id = "mavenCentral"
-            url = "https://repo1.maven.org/maven2/"
-          }
-        ]
+        version = "2.2.0"${toml}${hocon}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
         dependencies = [
           {
             groupId = "org.springframework.boot"
@@ -273,13 +187,6 @@ private val BUILD_POM_YAML = buildCodeSamples {
               version = "2.2.0"
             }
           ]
-          extensions = [
-            {
-              groupId = "org.apache.maven.extensions"
-              artifactId = "maven-build-cache-extension"
-              version = "1.2.0"
-            }
-          ]
         }${hocon}
         """
         .trimIndent()
@@ -290,11 +197,10 @@ private val BUILD_POM_YAML = buildCodeSamples {
         )
 
     codeSample
-        .startWith { hide(xmlExpanded, yaml, json, toml, hocon) }
+        .startWith { hide(xmlExpanded, yaml, toml, hocon) }
         .then { reveal(xmlExpanded).hide(xmlFolded) }
         .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
-        .then { reveal(json).hide(yaml).changeTitle("pom.json") }
-        .then { reveal(toml).hide(json).changeTitle("pom.toml") }
+        .then { reveal(toml).hide(yaml).changeTitle("pom.toml") }
         .then { reveal(hocon).hide(toml).changeTitle("pom.hocon") }
 }
 
