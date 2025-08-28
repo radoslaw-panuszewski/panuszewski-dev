@@ -52,7 +52,9 @@ fun StoryboardBuilder.Maven() = scene(
             val consumerPomTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()) }
 
             val buildPomTitleTransition = transition.createChildTransition {
-                if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
+                if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Published pom") {
+                    "Local pom"
+                } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
                     "Build pom"
                 } else {
                     plan.getSample(BUILD_POM_SLOT, it.toState()).title.orEmpty()
@@ -111,7 +113,7 @@ private val CONSUMER_POM = buildCodeSamples {
         .trimIndent()
         .toCodeSample(
             language = Language.Xml,
-            title = "pom.xml",
+            title = "Published pom",
             splitMethod = { it.splitByTags() }
         )
 
