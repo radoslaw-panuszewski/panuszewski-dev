@@ -128,7 +128,7 @@ fun StoryboardBuilder.Maven() = scene(
                             )
                         }
                     }
-                    stoneTransition.AnimatedVisibility(visible = { it in listOf(6, 9) }, enter = fadeIn(), exit = fadeOut()) {
+                    stoneTransition.AnimatedVisibility(visible = { it in listOf(6, 10) }, enter = fadeIn(), exit = fadeOut()) {
                         ProvideTextStyle(MaterialTheme.typography.h1) {
                             Text(text = "🗿", modifier = Modifier.offset(x = -100.dp, y = -100.dp))
                         }
@@ -170,6 +170,7 @@ private val CONSUMER_POM = buildCodeSamples {
         )
 
     codeSample
+        .then { this }
         .then { this }
         .then { focus(properties, build, scroll = false) }
         .then { hide(properties, build).unfocus().changeTitle("Consumer pom (4.0.0)") }
