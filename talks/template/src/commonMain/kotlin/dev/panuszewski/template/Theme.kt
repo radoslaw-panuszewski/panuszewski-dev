@@ -1,5 +1,6 @@
 package dev.panuszewski.template
 
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Typography
@@ -9,8 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString.Builder
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.SceneDecorator
 
@@ -84,3 +88,18 @@ val Typography.code3: TextStyle
 const val BULLET_1 = " • "
 const val BULLET_2 = " ◦ "
 const val BULLET_3 = " ‣ "
+
+@Composable
+fun <T : Any> Builder.withColor(color: Colors.() -> Color, block: Builder.() -> T) {
+    withStyle(SpanStyle(color = color(MaterialTheme.colors)), block)
+}
+
+@Composable
+fun <T : Any> Builder.withPrimaryColor(block: Builder.() -> T) {
+    withStyle(SpanStyle(color = MaterialTheme.colors.primary), block)
+}
+
+@Composable
+fun <T : Any> Builder.withSecondaryColor(block: Builder.() -> T) {
+    withStyle(SpanStyle(color = MaterialTheme.colors.secondary), block)
+}

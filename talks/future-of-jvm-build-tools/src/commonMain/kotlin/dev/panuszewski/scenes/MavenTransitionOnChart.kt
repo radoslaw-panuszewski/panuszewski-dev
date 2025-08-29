@@ -11,6 +11,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,6 +24,7 @@ import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideDirection.FROM_LEFT
 import dev.panuszewski.template.SlideDirection.FROM_RIGHT
 import dev.panuszewski.template.code1
+import dev.panuszewski.template.withPrimaryColor
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.amper
 import talks.future_of_jvm_build_tools.generated.resources.gradle
@@ -39,7 +41,10 @@ fun StoryboardBuilder.MavenTransitionOnChart() {
 
             ProvideTextStyle(MaterialTheme.typography.h4) {
                 Text(
-                    text = "Maven",
+                    text = buildAnnotatedString {
+                        append("Maven")
+                        withPrimaryColor { append(" 4") }
+                    },
                     modifier = Modifier
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState("text/Title"),

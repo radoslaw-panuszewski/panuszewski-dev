@@ -1,20 +1,29 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -32,64 +41,106 @@ import dev.panuszewski.template.expand
 import dev.panuszewski.template.fold
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
+import dev.panuszewski.template.withColor
+import dev.panuszewski.template.withPrimaryColor
 
-private val STATE_COUNT: Int get() = BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_YAML.size
+private val STATE_COUNT: Int get() = BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_ALTERNATIVE_SYNTAX.size
 
 fun StoryboardBuilder.Maven() = scene(
     stateCount = STATE_COUNT,
     exitTransition = { fadeOut() }
 ) {
+    val buildPomTransition = transition.createChildTransition { plan.getSample(BUILD_POM_SLOT, it.toState()) }
+    val consumerPomTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()) }
+
+    val buildPomTitleTransition = transition.createChildTransition {
+        if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Published pom") {
+            "Local pom"
+        } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
+            "Build pom"
+        } else {
+            plan.getSample(BUILD_POM_SLOT, it.toState()).title.orEmpty()
+        }
+    }
+    val consumerPomTitleTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()).title.orEmpty() }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(16.dp))
-        ProvideTextStyle(MaterialTheme.typography.h4) { Text("Maven") }
+        ProvideTextStyle(MaterialTheme.typography.h4) {
+            consumerPomTitleTransition.createChildTransition {
+                when {
+                    it == "Consumer pom" -> buildAnnotatedString {
+                        append("Maven")
+                        withPrimaryColor { append(" 4") }
+                    }
+                    else -> AnnotatedString("Maven")
+                }
+            }.MagicText()
+        }
         Spacer(Modifier.height(16.dp))
 
         Box {
-            val buildPomTransition = transition.createChildTransition { plan.getSample(BUILD_POM_SLOT, it.toState()) }
-            val consumerPomTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()) }
-
-            val buildPomTitleTransition = transition.createChildTransition {
-                if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Published pom") {
-                    "Local pom"
-                } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
-                    "Build pom"
-                } else {
-                    plan.getSample(BUILD_POM_SLOT, it.toState()).title.orEmpty()
-                }
-            }
-            val consumerPomTitleTransition = transition.createChildTransition { plan.getSample(CONSUMER_POM_SLOT, it.toState()).title.orEmpty() }
-
             val boxModifier = Modifier.width(500.dp).padding(8.dp)
+            val stoneTransition = transition.createChildTransition { it.toState() }
 
             transition.SlideFromLeftAnimatedVisibility({ it.toState() >= 1 }) {
-                Column(boxModifier.align(Alignment.Center).offset(x = -50.dp)) {
-                    ProvideTextStyle(MaterialTheme.typography.h5) { buildPomTitleTransition.MagicText() }
-                    Spacer(Modifier.height(16.dp))
+                Box(boxModifier.align(Alignment.Center).offset(x = -50.dp), contentAlignment = Alignment.Center) {
+                    Column(Modifier.fillMaxSize()) {
+                        ProvideTextStyle(MaterialTheme.typography.h5) {
+                            Row {
+                                buildPomTitleTransition.MagicText()
+                                buildPomTitleTransition.AnimatedVisibility({ it.startsWith("pom") && !it.endsWith("xml") }) {
+                                    Text(" ❤️")
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
 
-                    ProvideTextStyle(MaterialTheme.typography.body1) {
-                        buildPomTransition.ScrollableMagicCodeSample(
-                            moveDurationMillis = 500,
-                            fadeDurationMillis = 500,
-                        )
+                        ProvideTextStyle(MaterialTheme.typography.body1) {
+                            buildPomTransition.ScrollableMagicCodeSample(
+                                moveDurationMillis = 500,
+                                fadeDurationMillis = 500,
+                            )
+                        }
+                    }
+                    stoneTransition.AnimatedVisibility(visible = { it in listOf(6) }, enter = fadeIn(), exit = fadeOut()) {
+                        ProvideTextStyle(MaterialTheme.typography.h1) {
+                            Text(text = "🗿", modifier = Modifier.offset(x = -100.dp, y = -100.dp))
+                        }
                     }
                 }
             }
 
             transition.SlideFromRightAnimatedVisibility({ plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT }) {
-                Column(boxModifier.align(Alignment.Center).offset(x = 300.dp)) {
-                    ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
-                    Spacer(Modifier.height(16.dp))
+                Box(boxModifier.align(Alignment.Center).offset(x = 300.dp), contentAlignment = Alignment.Center) {
+                    Column(Modifier.fillMaxSize()) {
+                        ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
+                        Spacer(Modifier.height(16.dp))
 
-                    ProvideTextStyle(MaterialTheme.typography.body1) {
-                        consumerPomTransition.ScrollableMagicCodeSample(
-                            moveDurationMillis = 500,
-                            fadeDurationMillis = 500,
-                        )
+                        ProvideTextStyle(MaterialTheme.typography.body1) {
+                            consumerPomTransition.ScrollableMagicCodeSample(
+                                moveDurationMillis = 500,
+                                fadeDurationMillis = 500,
+                            )
+                        }
+                    }
+                    stoneTransition.AnimatedVisibility(visible = { it in listOf(6, 9) }, enter = fadeIn(), exit = fadeOut()) {
+                        ProvideTextStyle(MaterialTheme.typography.h1) {
+                            Text(text = "🗿", modifier = Modifier.offset(x = -100.dp, y = -100.dp))
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        ProvideTextStyle(MaterialTheme.typography.h1) {
+            transition.AnimatedVisibility({ it.toState() == 3 }, enter = fadeIn(), exit = fadeOut()) {
+                Text(text = "🤢")
             }
         }
     }
@@ -118,11 +169,13 @@ private val CONSUMER_POM = buildCodeSamples {
         )
 
     codeSample
+        .then { this }
         .then { focus(properties, build, scroll = false) }
         .then { hide(properties, build).unfocus().changeTitle("Consumer pom") }
+        .then { this }
 }
 
-private val BUILD_POM_YAML = buildCodeSamples {
+private val BUILD_POM_ALTERNATIVE_SYNTAX = buildCodeSamples {
     val xml by tag()
     val xmlFolded by tag()
     val xmlExpanded by tag()
@@ -267,14 +320,12 @@ private val BUILD_POM = buildCodeSamples {
         folded = listOf(groupIdFolded, artifactIdFolded, versionFolded, propertiesFolded, repositoriesFolded, dependenciesFolded, buildFolded),
         expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded, propertiesExpanded, repositoriesExpanded, dependenciesExpanded, buildExpanded)
     )
-    val coordinates = Foldable(
-        folded = listOf(groupIdFolded, artifactIdFolded, versionFolded), expanded = listOf(groupIdExpanded, artifactIdExpanded, versionExpanded)
-    )
 
     codeSample
         .startWith { fold(all) }
         .then { this }
         .then { expand(all) }
+        .then { this }
         .then { fold(all) }
 }
 
@@ -428,6 +479,6 @@ val plan = CodeSamplesPlan().apply {
 
     thenRevealInSlot(BUILD_POM_SLOT, BUILD_POM)
     thenRevealInSlot(CONSUMER_POM_SLOT, CONSUMER_POM)
-    thenRevealInSlot(BUILD_POM_SLOT, BUILD_POM_YAML)
+    thenRevealInSlot(BUILD_POM_SLOT, BUILD_POM_ALTERNATIVE_SYNTAX)
 }
 
