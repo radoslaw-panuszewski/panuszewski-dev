@@ -35,7 +35,6 @@ import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code2
-import dev.panuszewski.template.code3
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
@@ -133,7 +132,11 @@ fun StoryboardBuilder.Gradle() {
                 }
             }
 
-            stateTransition.AnimatedVisibility({ it in listOf(6, 7, 8, 9, 10) }, enter = fadeIn(), exit = fadeOut()) {
+            stateTransition.AnimatedVisibility(
+                { it in listOf(6, 7, 8, 9, 10) },
+                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+            ) {
                 ProvideTextStyle(MaterialTheme.typography.code2) {
                     stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - 6) }
                         .MagicCodeSample()
