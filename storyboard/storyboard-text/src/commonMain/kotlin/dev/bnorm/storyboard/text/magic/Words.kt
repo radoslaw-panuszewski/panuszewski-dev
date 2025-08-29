@@ -48,3 +48,6 @@ private fun AnnotatedString.split(): List<AnnotatedString> {
         if (offset < this@split.length) add(this@split.subSequence(offset, this@split.length))
     }
 }
+
+fun AnnotatedString.splitByChars(): List<AnnotatedString> =
+    text.toCharArray().map { AnnotatedString(it.toString()) }

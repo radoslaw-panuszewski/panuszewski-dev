@@ -19,7 +19,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.MagicText
+import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.safeGet
 
 val TITLE = listOf(
@@ -44,7 +44,7 @@ fun StoryboardBuilder.Title(animateToPresent: Boolean) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ProvideTextStyle(MaterialTheme.typography.h2) {
-                titleTransition.MagicText(
+                titleTransition.MagicAnnotatedString(
                     Modifier
                         .offset(y = -16.dp)
                         .padding(start = 64.dp)

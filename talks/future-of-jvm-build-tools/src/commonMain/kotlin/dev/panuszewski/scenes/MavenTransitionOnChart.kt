@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
+import dev.bnorm.storyboard.easel.template.SceneEnter
+import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.panuszewski.components.BuildToolChart
 import dev.panuszewski.components.BuildToolItem
 import dev.panuszewski.template.ResourceImage
@@ -32,7 +34,10 @@ import talks.future_of_jvm_build_tools.generated.resources.ideal_build_tool
 import talks.future_of_jvm_build_tools.generated.resources.maven
 
 fun StoryboardBuilder.MavenTransitionOnChart() {
-    scene(stateCount = 3) {
+    scene(
+        stateCount = 3,
+        exitTransition = SceneExit(alignment = Alignment.CenterEnd),
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

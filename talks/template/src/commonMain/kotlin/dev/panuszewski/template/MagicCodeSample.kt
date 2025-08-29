@@ -28,24 +28,25 @@ import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.toDpSize
 
 @Composable
-fun Transition<String>.MagicText(
+fun Transition<String>.MagicString(
     modifier: Modifier = Modifier,
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
+    split: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() }
 ) {
     createChildTransition { AnnotatedString(it) }
-        .MagicText(
+        .MagicAnnotatedString(
             modifier = modifier,
             moveDurationMillis = moveDurationMillis,
             fadeDurationMillis = fadeDurationMillis,
             delayDurationMillis = delayDurationMillis,
-            split = { it.splitByWords() },
+            split = split,
         )
 }
 
 @Composable
-fun Transition<AnnotatedString>.MagicText(
+fun Transition<AnnotatedString>.MagicAnnotatedString(
     modifier: Modifier = Modifier,
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,

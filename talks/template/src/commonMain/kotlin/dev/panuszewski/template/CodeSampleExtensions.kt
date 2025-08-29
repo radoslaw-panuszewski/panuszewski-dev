@@ -1,5 +1,6 @@
 package dev.panuszewski.template
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -34,12 +35,14 @@ fun AnnotatedString.toCode(
     }
 }
 
+@Composable
 fun String.toCode(
     language: Language,
-    codeStyle: CodeStyle = INTELLIJ_DARK_CODE_STYLE,
     scope: CodeScope = CodeScope.File,
     identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
 ): AnnotatedString {
+    val codeStyle = LocalCodeStyle.current
+
     return highlight(
         language = language,
         codeStyle = codeStyle,

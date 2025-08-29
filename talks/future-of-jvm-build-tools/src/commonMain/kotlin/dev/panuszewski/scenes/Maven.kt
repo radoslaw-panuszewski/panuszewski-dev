@@ -32,7 +32,8 @@ import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Foldable
-import dev.panuszewski.template.MagicText
+import dev.panuszewski.template.MagicAnnotatedString
+import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.ScrollableMagicCodeSample
 import dev.panuszewski.template.SlideFromLeftAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
@@ -56,8 +57,8 @@ fun StoryboardBuilder.Maven() = scene(
     val buildPomTitleTransition = transition.createChildTransition {
         if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Published pom") {
             "Local pom"
-        } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
-            "Build pom"
+        } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom (4.0.0)") {
+            "Build pom (4.1.0)"
         } else {
             plan.getSample(BUILD_POM_SLOT, it.toState()).title.orEmpty()
         }
@@ -72,13 +73,13 @@ fun StoryboardBuilder.Maven() = scene(
         ProvideTextStyle(MaterialTheme.typography.h4) {
             consumerPomTitleTransition.createChildTransition {
                 when {
-                    it == "Consumer pom" -> buildAnnotatedString {
+                    it == "Consumer pom (4.0.0)" -> buildAnnotatedString {
                         append("Maven")
                         withPrimaryColor { append(" 4") }
                     }
                     else -> AnnotatedString("Maven")
                 }
-            }.MagicText()
+            }.MagicAnnotatedString()
         }
         Spacer(Modifier.height(16.dp))
 
@@ -91,7 +92,7 @@ fun StoryboardBuilder.Maven() = scene(
                     Column(Modifier.fillMaxSize()) {
                         ProvideTextStyle(MaterialTheme.typography.h5) {
                             Row {
-                                buildPomTitleTransition.MagicText()
+                                buildPomTitleTransition.MagicString()
                                 buildPomTitleTransition.AnimatedVisibility({ it.startsWith("pom") && !it.endsWith("xml") }) {
                                     Text(" ❤️")
                                 }
@@ -117,7 +118,7 @@ fun StoryboardBuilder.Maven() = scene(
             transition.SlideFromRightAnimatedVisibility({ plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT }) {
                 Box(boxModifier.align(Alignment.Center).offset(x = 300.dp), contentAlignment = Alignment.Center) {
                     Column(Modifier.fillMaxSize()) {
-                        ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicText() }
+                        ProvideTextStyle(MaterialTheme.typography.h5) { consumerPomTitleTransition.MagicString() }
                         Spacer(Modifier.height(16.dp))
 
                         ProvideTextStyle(MaterialTheme.typography.body1) {
@@ -171,7 +172,7 @@ private val CONSUMER_POM = buildCodeSamples {
     codeSample
         .then { this }
         .then { focus(properties, build, scroll = false) }
-        .then { hide(properties, build).unfocus().changeTitle("Consumer pom") }
+        .then { hide(properties, build).unfocus().changeTitle("Consumer pom (4.0.0)") }
         .then { this }
 }
 
