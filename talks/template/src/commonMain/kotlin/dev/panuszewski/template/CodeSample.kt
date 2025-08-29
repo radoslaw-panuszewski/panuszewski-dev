@@ -64,7 +64,7 @@ class CodeSample private constructor(
     }
 
     companion object {
-        private val FOCUSED_STYLE = SpanStyle(color = Color(0xFFFF0404))
+        private val FOCUSED_STYLE = SpanStyle(color = Color(0xFFFF8A04))
         private val UNFOCUSED_STYLE = SpanStyle(color = Color(0xFF555555))
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
         private val EMPTY = AnnotatedString("")

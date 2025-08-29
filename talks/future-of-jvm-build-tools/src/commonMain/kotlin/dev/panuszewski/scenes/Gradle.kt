@@ -2,15 +2,14 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,11 +31,14 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.buildCodeSamples
+import dev.panuszewski.template.code2
+import dev.panuszewski.template.code3
 import dev.panuszewski.template.safeGet
+import dev.panuszewski.template.startWith
+import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 
 fun StoryboardBuilder.Gradle() {
@@ -47,14 +49,14 @@ fun StoryboardBuilder.Gradle() {
         ) {
             Spacer(Modifier.height(16.dp))
             ProvideTextStyle(MaterialTheme.typography.h4) { Text("Gradle") }
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(32.dp))
 
             val stateTransition = transition.createChildTransition { it.toState() }
             val phaseNameTextStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.background)
             val phaseDescriptionTextStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.background, fontSize = 12.sp)
 
-            val executionIsLong = transition.createChildTransition { it.toState() in listOf(6, 7, 8, 9) }
-            val configurationIsLong = transition.createChildTransition { it.toState() in listOf(11) }
+            val executionIsLong = transition.createChildTransition { it.toState() in listOf(12, 13, 14, 15) }
+            val configurationIsLong = transition.createChildTransition { it.toState() in listOf(17, 18) }
 
             val executionPhaseWeight by executionIsLong.animateFloat { if (it) 1.5f else 0.5f }
             val configurationPhaseWeight by configurationIsLong.animateFloat { if (it) 1.5f else 0.5f }
@@ -101,21 +103,21 @@ fun StoryboardBuilder.Gradle() {
             }
             Spacer(Modifier.height(32.dp))
 
-            stateTransition.AnimatedVisibility({ it in listOf(7, 8, 9) }, enter = EnterTransition.None, exit = fadeOut()) {
+            stateTransition.AnimatedVisibility({ it in listOf(13, 14, 15) }, enter = EnterTransition.None, exit = fadeOut()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     ProvideTextStyle(MaterialTheme.typography.h6) {
-                        stateTransition.AnimatedVisibility({ it >= 7 }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= 13 }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Build Cache is there since Gradle 3.5 👴🏼")
                         }
                         Spacer(Modifier.height(32.dp))
-                        stateTransition.AnimatedVisibility({ it >= 8 }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= 14 }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Just enable it in your gradle.properties!")
                         }
                     }
 
                     Spacer(Modifier.height(32.dp))
 
-                    stateTransition.AnimatedVisibility({ it >= 9 }, enter = slideInVertically(), exit = slideOutVertically()) {
+                    stateTransition.AnimatedVisibility({ it >= 15 }, enter = slideInVertically(), exit = slideOutVertically()) {
                         Column(
                             modifier = Modifier
                                 .border(
@@ -130,6 +132,51 @@ fun StoryboardBuilder.Gradle() {
                     }
                 }
             }
+
+            stateTransition.AnimatedVisibility({ it in listOf(6, 7, 8, 9, 10) }, enter = fadeIn(), exit = fadeOut()) {
+                ProvideTextStyle(MaterialTheme.typography.code2) {
+                    stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - 6) }
+                        .MagicCodeSample()
+                }
+            }
         }
     }
+}
+
+private val PHASE_SAMPLES = buildCodeSamples {
+    val first by tag()
+    val second by tag()
+    val third by tag()
+    val fourth by tag()
+
+    val codeSample = """
+        plugins {${third}
+            println("Even this place belongs to configuration phase")${third}
+            java
+        }${first}
+        
+        println("Hello from configuration phase!")${first}
+        
+        dependencies {${second}
+            println("It's still configuration phase ;)")${second}
+            implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
+        }
+
+        tasks {
+            register("sayHello") {
+                doLast {
+                    ${fourth}println("Finally, the execution phase!")${fourth}
+                }
+            }
+        }
+        """
+        .trimIndent()
+        .toCodeSample(language = Language.Kotlin)
+
+    codeSample
+        .startWith { hide(first, second, third, fourth) }
+        .then { reveal(first).focus(first) }
+        .then { reveal(second).focus(second).hide(first) }
+        .then { reveal(third).focus(third).hide(second) }
+        .then { reveal(fourth).focus(fourth).hide(third) }
 }
