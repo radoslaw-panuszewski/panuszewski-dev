@@ -1,6 +1,7 @@
 package dev.panuszewski.template
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -65,4 +66,18 @@ class Foldable(
     context(codeSample: CodeSample) fun expand(): CodeSample = codeSample.reveal(expanded).hide(folded)
 
     context(codeSample: CodeSample) fun expandAndFocus(scroll: Boolean = false) = codeSample.reveal(expanded).hide(folded).focus(expanded, scroll)
+}
+
+@Composable
+fun buildAndRememberCodeSamples(builder: CodeSamplesBuilder.() -> List<CodeSample>): List<CodeSample> {
+    val codeSamples = remember { buildCodeSamples(builder) }
+    codeSamples.precompose()
+    return codeSamples
+}
+
+@Composable
+fun List<CodeSample>.precompose() {
+    for (sample in this) {
+        sample.String()
+    }
 }
