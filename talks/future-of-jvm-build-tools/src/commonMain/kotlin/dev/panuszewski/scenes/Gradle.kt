@@ -48,18 +48,26 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 
 object Stages {
+    var lastState = 0
+        private set
+
+    val stateCount get() = lastState + 1
+
+    fun states(since: Int, count: Int): List<Int> {
+        val stateList = (since until since + count).toList()
+        lastState = stateList.last()
+        return stateList
+    }
+
     val PHASES_BAR_VISIBLE_SINCE = 1
     val CHARACTERIZING_PHASES = states(since = 2, count = 3)
-    val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = CHARACTERIZING_PHASES.last() + 2, count = 5)
-    val EXECUTION_IS_LONG = states(since = EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.last() + 2, count = 4)
-    val CONFIGURATION_IS_LONG = states(since = EXECUTION_IS_LONG.last() + 2, count = 2)
+    val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
+    val EXECUTION_IS_LONG = states(since = lastState + 2, count = 4)
+    val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 }
 
-fun states(since: Int, count: Int) =
-    (since until since + count).toList()
-
 fun StoryboardBuilder.Gradle() {
-    scene(100) {
+    scene(Stages.stateCount) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
