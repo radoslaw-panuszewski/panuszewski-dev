@@ -35,6 +35,8 @@ import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code2
+import dev.panuszewski.template.h4
+import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
@@ -47,7 +49,7 @@ fun StoryboardBuilder.Gradle() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(16.dp))
-            ProvideTextStyle(MaterialTheme.typography.h4) { Text("Gradle") }
+            h4 { Text("Gradle") }
             Spacer(Modifier.height(32.dp))
 
             val stateTransition = transition.createChildTransition { it.toState() }
@@ -75,8 +77,7 @@ fun StoryboardBuilder.Gradle() {
                             configurationIsLong.createChildTransition {
                                 if (it) "Configuraaaaaaaaaation"
                                 else "Configuration"
-                            }.MagicString(
-                                modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
+                            }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
                         }
                         stateTransition.AnimatedVisibility({ it == 3 }) {
                             ProvideTextStyle(phaseDescriptionTextStyle) {
@@ -89,8 +90,7 @@ fun StoryboardBuilder.Gradle() {
                             executionIsLong.createChildTransition {
                                 if (it) "Execuuuuuuuuuution"
                                 else "Execution"
-                            }.MagicString(
-                                modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
+                            }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
                         }
                         stateTransition.AnimatedVisibility({ it == 4 }) {
                             ProvideTextStyle(phaseDescriptionTextStyle) {
@@ -104,7 +104,7 @@ fun StoryboardBuilder.Gradle() {
 
             stateTransition.AnimatedVisibility({ it in listOf(13, 14, 15) }, enter = EnterTransition.None, exit = fadeOut()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    ProvideTextStyle(MaterialTheme.typography.h6) {
+                    h6 {
                         stateTransition.AnimatedVisibility({ it >= 13 }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Build Cache is there since Gradle 3.5 👴🏼")
                         }
@@ -137,7 +137,7 @@ fun StoryboardBuilder.Gradle() {
                 enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                 exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
             ) {
-                ProvideTextStyle(MaterialTheme.typography.code2) {
+                code2 {
                     stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - 6) }
                         .MagicCodeSample()
                 }
