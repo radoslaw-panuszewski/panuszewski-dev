@@ -50,6 +50,8 @@ import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
+import kotlin.math.max
+import kotlin.math.min
 
 object Stages {
     var lastState = 0
@@ -63,15 +65,19 @@ object Stages {
         return stateList
     }
 
-    val PREVIEW = states(since = 0, count = 100)
+    val PREVIEW = states(since = 1, count = 100)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 0)
-    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 4)
+    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 3)
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 
     val PHASES_BAR_VISIBLE_SINCE = (PREVIEW.lastOrNull() ?: 0) + 1
-    val EXECUTION_IS_LONG = EXPLAINING_BUILD_CACHE + SHOWING_THAT_BUILD_CACHE_IS_OLD
+    val EXECUTION_IS_LONG = run {
+        val startIndex = min(EXPLAINING_BUILD_CACHE.first(), SHOWING_THAT_BUILD_CACHE_IS_OLD.first()) - 1
+        val endIndex = max(EXPLAINING_BUILD_CACHE.last(), SHOWING_THAT_BUILD_CACHE_IS_OLD.last())
+        startIndex..endIndex
+    }
 }
 
 fun StoryboardBuilder.Gradle() {
@@ -137,18 +143,18 @@ fun StoryboardBuilder.Gradle() {
             stateTransition.AnimatedVisibility({ it in SHOWING_THAT_BUILD_CACHE_IS_OLD }, enter = EnterTransition.None, exit = fadeOut()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     h6 {
-                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[0] }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Build Cache is there since Gradle 3.5 👴🏼")
                         }
                         Spacer(Modifier.height(32.dp))
-                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[2] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Just enable it in your gradle.properties!")
                         }
                     }
 
                     Spacer(Modifier.height(32.dp))
 
-                    stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[3] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                    stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[2] }, enter = slideInVertically(), exit = slideOutVertically()) {
                         Column(
                             modifier = Modifier
                                 .border(
@@ -171,7 +177,7 @@ fun StoryboardBuilder.Gradle() {
                 }
             }
 
-            stateTransition.SlideFromBottomAnimatedVisibility({ it in PREVIEW.drop(1) }) {
+            stateTransition.SlideFromBottomAnimatedVisibility({ it in PREVIEW }) {
                 code2 {
                     stateTransition.createChildTransition { BUILD_CACHE_SAMPLES.safeGet(it - (PREVIEW.firstOrNull() ?: 0)) }
                         .MagicCodeSample()

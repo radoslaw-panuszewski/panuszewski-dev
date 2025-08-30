@@ -20,58 +20,78 @@ import androidx.compose.ui.Modifier
 fun <T> Transition<T>.SlideFromLeftAnimatedVisibility(
     visible: (T) -> Boolean,
     modifier: Modifier = Modifier,
-    enter: EnterTransition = SlideDirection.FROM_LEFT.enter,
-    exit: ExitTransition = SlideDirection.FROM_LEFT.exit,
+    fraction: Float = 0.5f,
     content: @Composable() AnimatedVisibilityScope.() -> Unit
-): Unit = AnimatedVisibility(visible, modifier, enter, exit, content)
+): Unit = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = SlideDirection.FROM_LEFT.enter(fraction),
+    exit = SlideDirection.FROM_LEFT.exit(fraction),
+    content = content
+)
 
 @Composable
 fun <T> Transition<T>.SlideFromRightAnimatedVisibility(
     visible: (T) -> Boolean,
     modifier: Modifier = Modifier,
-    enter: EnterTransition = SlideDirection.FROM_RIGHT.enter,
-    exit: ExitTransition = SlideDirection.FROM_RIGHT.exit,
+    fraction: Float = 0.5f,
     content: @Composable() AnimatedVisibilityScope.() -> Unit
-): Unit = AnimatedVisibility(visible, modifier, enter, exit, content)
+): Unit = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = SlideDirection.FROM_RIGHT.enter(fraction),
+    exit = SlideDirection.FROM_RIGHT.exit(fraction),
+    content = content
+)
 
 @Composable
 fun <T> Transition<T>.SlideFromTopAnimatedVisibility(
     visible: (T) -> Boolean,
     modifier: Modifier = Modifier,
-    enter: EnterTransition = SlideDirection.FROM_TOP.enter,
-    exit: ExitTransition = SlideDirection.FROM_TOP.exit,
+    fraction: Float = 0.5f,
     content: @Composable() AnimatedVisibilityScope.() -> Unit
-): Unit = AnimatedVisibility(visible, modifier, enter, exit, content)
+): Unit = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = SlideDirection.FROM_TOP.enter(fraction),
+    exit = SlideDirection.FROM_TOP.exit(fraction),
+    content = content
+)
 
 @Composable
 fun <T> Transition<T>.SlideFromBottomAnimatedVisibility(
     visible: (T) -> Boolean,
     modifier: Modifier = Modifier,
-    enter: EnterTransition = SlideDirection.FROM_BOTTOM.enter,
-    exit: ExitTransition = SlideDirection.FROM_BOTTOM.exit,
+    fraction: Float = 0.5f,
     content: @Composable() AnimatedVisibilityScope.() -> Unit
-): Unit = AnimatedVisibility(visible, modifier, enter, exit, content)
+): Unit = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = SlideDirection.FROM_BOTTOM.enter(fraction),
+    exit = SlideDirection.FROM_BOTTOM.exit(fraction),
+    content = content
+)
 
 enum class SlideDirection(
-    val enter: EnterTransition,
-    val exit: ExitTransition,
+    val enter: (Float) -> EnterTransition,
+    val exit: (Float) -> ExitTransition,
 ) {
     FROM_LEFT(
-        enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
-        exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
+        enter = { fraction -> slideInHorizontally(initialOffsetX = { -(it * fraction).toInt() }) + fadeIn() },
+        exit = { fraction -> slideOutHorizontally(targetOffsetX = { -(it * fraction).toInt() }) + fadeOut() },
     ),
     FROM_RIGHT(
-        enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
-        exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+        enter = { fraction -> slideInHorizontally(initialOffsetX = { (it * fraction).toInt() }) + fadeIn() },
+        exit = { fraction -> slideOutHorizontally(targetOffsetX = { (it * fraction).toInt() }) + fadeOut() },
     ),
     FROM_TOP(
-        enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-        exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+        enter = { fraction -> slideInVertically(initialOffsetY = { -(it * fraction).toInt() }) + fadeIn() },
+        exit = { fraction -> slideOutVertically(targetOffsetY = { -(it * fraction).toInt() }) + fadeOut() },
     ),
     FROM_BOTTOM(
-        enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-        exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+        enter = { fraction -> slideInVertically(initialOffsetY = { (it * fraction).toInt() }) + fadeIn() },
+        exit = { fraction -> slideOutVertically(targetOffsetY = { (it * fraction).toInt() }) + fadeOut() },
     );
 
-    val combined: ContentTransform get() = enter togetherWith exit
+    val combined: (Float) -> ContentTransform get() = { enter(it) togetherWith exit(it) }
 }

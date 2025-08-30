@@ -54,8 +54,8 @@ fun BuildToolItem(
     ) {
         sceneScope.transition.AnimatedVisibility(
             visible = { it.toState() >= isVisibleSince },
-            enter = slideDirection.enter,
-            exit = slideDirection.exit
+            enter = slideDirection.enter(1f),
+            exit = slideDirection.exit(1f)
         ) {
             content(Modifier.scale(scale))
         }
