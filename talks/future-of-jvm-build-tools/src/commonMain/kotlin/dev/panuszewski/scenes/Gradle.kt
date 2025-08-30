@@ -62,11 +62,11 @@ object Stages {
         return stateList
     }
 
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 2)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
     val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 1, count = 2)
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 2)
     val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 
@@ -180,9 +180,45 @@ private fun ShowingThatBuildCacheIsOld() {
 
 @Composable
 private fun ExplainingConfigExecutionDifference() {
+    val phaseSamples = buildCodeSamples {
+        val first by tag()
+        val second by tag()
+        val third by tag()
+        val fourth by tag()
+
+        """
+        plugins {${third}
+            println("Even this place belongs to configuration phase")${third}
+            java
+        }${first}
+        
+        println("Hello from configuration phase!")${first}
+        
+        dependencies {${second}
+            println("It's still configuration phase")${second}
+            implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
+        }
+    
+        tasks {
+            register("sayHello") {
+                doLast {
+                    ${fourth}println("Finally, the execution phase!")${fourth}
+                }
+            }
+        }
+        """
+            .trimIndent()
+            .toCodeSample(language = Language.Kotlin)
+            .startWith { hide(first, second, third, fourth) }
+            .then { reveal(first).focus(first) }
+            .then { reveal(second).focus(second).hide(first) }
+            .then { reveal(third).focus(third).hide(second) }
+            .then { reveal(fourth).focus(fourth).hide(third) }
+    }
+
     stateTransition.SlideFromBottomAnimatedVisibility({ it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE }) {
         code2 {
-            stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
+            stateTransition.createChildTransition { phaseSamples.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
                 .MagicCodeSample()
         }
     }
@@ -190,11 +226,30 @@ private fun ExplainingConfigExecutionDifference() {
 
 @Composable
 private fun ExplainingBuildCache() {
+    val buildCacheSamples = buildCodeSamples {
+        """
+        tasks {
+            register("printImportantMessage") {
+                outputs.file(layout.buildDirectory.file("message.txt"))
+                outputs.cacheIf { true }
+                doLast {
+                    val message = "Groovy should die" 
+                    println(message)
+                    outputs.files.singleFile.writeText(message)
+                }
+            }
+        }
+        """
+            .trimIndent()
+            .toCodeSample(language = Language.Kotlin)
+            .startWith { this }
+    }
+
     stateTransition.FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
         Column {
             stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
                 code2 {
-                    stateTransition.createChildTransition { BUILD_CACHE_SAMPLES.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
+                    stateTransition.createChildTransition { buildCacheSamples.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
                         .MagicCodeSample()
                 }
             }
@@ -213,59 +268,4 @@ private fun ExplainingBuildCache() {
             }
         }
     }
-}
-
-private val PHASE_SAMPLES = buildCodeSamples {
-    val first by tag()
-    val second by tag()
-    val third by tag()
-    val fourth by tag()
-
-    """
-    plugins {${third}
-        println("Even this place belongs to configuration phase")${third}
-        java
-    }${first}
-    
-    println("Hello from configuration phase!")${first}
-    
-    dependencies {${second}
-        println("It's still configuration phase")${second}
-        implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
-    }
-
-    tasks {
-        register("sayHello") {
-            doLast {
-                ${fourth}println("Finally, the execution phase!")${fourth}
-            }
-        }
-    }
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.Kotlin)
-        .startWith { hide(first, second, third, fourth) }
-        .then { reveal(first).focus(first) }
-        .then { reveal(second).focus(second).hide(first) }
-        .then { reveal(third).focus(third).hide(second) }
-        .then { reveal(fourth).focus(fourth).hide(third) }
-}
-
-val BUILD_CACHE_SAMPLES = buildCodeSamples {
-    """
-    tasks {
-        register("printImportantMessage") {
-            outputs.file(layout.buildDirectory.file("message.txt"))
-            outputs.cacheIf { true }
-            doLast {
-                val message = "Groovy should be destroyed" 
-                println(message)
-                outputs.files.singleFile.writeText(message)
-            }
-        }
-    }
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.Kotlin)
-        .startWith { this }
 }
