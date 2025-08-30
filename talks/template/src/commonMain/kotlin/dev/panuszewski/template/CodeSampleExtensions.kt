@@ -37,7 +37,7 @@ fun AnnotatedString.toCode(
 
 @Composable
 fun String.toCode(
-    language: Language,
+    language: Language = Language.Kotlin,
     scope: CodeScope = CodeScope.File,
     identifierType: (CodeStyle, String) -> SpanStyle? = { _, _ -> null },
 ): AnnotatedString {

@@ -72,6 +72,19 @@ fun <T> Transition<T>.SlideFromBottomAnimatedVisibility(
     content = content
 )
 
+@Composable
+fun <T> Transition<T>.FadeOutAnimatedVisibility(
+    visible: (T) -> Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable() AnimatedVisibilityScope.() -> Unit
+): Unit = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = EnterTransition.None,
+    exit = fadeOut(),
+    content = content
+)
+
 enum class SlideDirection(
     val enter: (Float) -> EnterTransition,
     val exit: (Float) -> ExitTransition,
