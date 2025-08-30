@@ -34,10 +34,14 @@ import dev.bnorm.storyboard.toState
 import dev.panuszewski.scenes.Stages.CHARACTERIZING_PHASES
 import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
+import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE_SINCE
+import dev.panuszewski.scenes.Stages.PREVIEW
+import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
+import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h4
@@ -55,15 +59,19 @@ object Stages {
 
     fun states(since: Int, count: Int): List<Int> {
         val stateList = (since until since + count).toList()
-        lastState = stateList.last()
+        stateList.lastOrNull()?.let { lastState = it }
         return stateList
     }
 
-    val PHASES_BAR_VISIBLE_SINCE = 1
-    val CHARACTERIZING_PHASES = states(since = 2, count = 3)
+    val PREVIEW = states(since = 0, count = 100)
+    val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
-    val EXECUTION_IS_LONG = states(since = lastState + 2, count = 4)
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 0)
+    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 4)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
+
+    val PHASES_BAR_VISIBLE_SINCE = (PREVIEW.lastOrNull() ?: 0) + 1
+    val EXECUTION_IS_LONG = EXPLAINING_BUILD_CACHE + SHOWING_THAT_BUILD_CACHE_IS_OLD
 }
 
 fun StoryboardBuilder.Gradle() {
@@ -126,21 +134,21 @@ fun StoryboardBuilder.Gradle() {
             }
             Spacer(Modifier.height(32.dp))
 
-            stateTransition.AnimatedVisibility({ it in EXECUTION_IS_LONG }, enter = EnterTransition.None, exit = fadeOut()) {
+            stateTransition.AnimatedVisibility({ it in SHOWING_THAT_BUILD_CACHE_IS_OLD }, enter = EnterTransition.None, exit = fadeOut()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     h6 {
-                        stateTransition.AnimatedVisibility({ it >= EXECUTION_IS_LONG[1] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Build Cache is there since Gradle 3.5 👴🏼")
                         }
                         Spacer(Modifier.height(32.dp))
-                        stateTransition.AnimatedVisibility({ it >= EXECUTION_IS_LONG[2] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[2] }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Just enable it in your gradle.properties!")
                         }
                     }
 
                     Spacer(Modifier.height(32.dp))
 
-                    stateTransition.AnimatedVisibility({ it >= EXECUTION_IS_LONG[3] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                    stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[3] }, enter = slideInVertically(), exit = slideOutVertically()) {
                         Column(
                             modifier = Modifier
                                 .border(
@@ -156,13 +164,16 @@ fun StoryboardBuilder.Gradle() {
                 }
             }
 
-            stateTransition.AnimatedVisibility(
-                { it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE },
-                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
-            ) {
+            stateTransition.SlideFromBottomAnimatedVisibility({ it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE }) {
                 code2 {
-                    stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE[0]) }
+                    stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
+                        .MagicCodeSample()
+                }
+            }
+
+            stateTransition.SlideFromBottomAnimatedVisibility({ it in PREVIEW.drop(1) }) {
+                code2 {
+                    stateTransition.createChildTransition { BUILD_CACHE_SAMPLES.safeGet(it - (PREVIEW.firstOrNull() ?: 0)) }
                         .MagicCodeSample()
                 }
             }
@@ -176,31 +187,29 @@ private val PHASE_SAMPLES = buildCodeSamples {
     val third by tag()
     val fourth by tag()
 
-    val codeSample = """
-        plugins {${third}
-            println("Even this place belongs to configuration phase")${third}
-            java
-        }${first}
-        
-        println("Hello from configuration phase!")${first}
-        
-        dependencies {${second}
-            println("It's still configuration phase ;)")${second}
-            implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
-        }
+    """
+    plugins {${third}
+        println("Even this place belongs to configuration phase")${third}
+        java
+    }${first}
+    
+    println("Hello from configuration phase!")${first}
+    
+    dependencies {${second}
+        println("It's still configuration phase ;)")${second}
+        implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
+    }
 
-        tasks {
-            register("sayHello") {
-                doLast {
-                    ${fourth}println("Finally, the execution phase!")${fourth}
-                }
+    tasks {
+        register("sayHello") {
+            doLast {
+                ${fourth}println("Finally, the execution phase!")${fourth}
             }
         }
-        """
+    }
+    """
         .trimIndent()
         .toCodeSample(language = Language.Kotlin)
-
-    codeSample
         .startWith { hide(first, second, third, fourth) }
         .then { reveal(first).focus(first) }
         .then { reveal(second).focus(second).hide(first) }
@@ -209,17 +218,20 @@ private val PHASE_SAMPLES = buildCodeSamples {
 }
 
 val BUILD_CACHE_SAMPLES = buildCodeSamples {
-    val codeSample = """
-        tasks {
-            register("printImportantMessage") {
-                outputs.file(layout.buildDirectory.file("message.txt"))
-                outputs.cacheIf { true }
-                doLast {
-                    val message = "Groovy should die" 
-                    println(message)
-                    outputs.files.singleFile.writeText(message)
-                }
+    """
+    tasks {
+        register("printImportantMessage") {
+            outputs.file(layout.buildDirectory.file("message.txt"))
+            outputs.cacheIf { true }
+            doLast {
+                val message = "Groovy should be destroyed" 
+                println(message)
+                outputs.files.singleFile.writeText(message)
             }
         }
-    """.trimIndent().toCodeSample(language = Language.Kotlin)
+    }
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.Kotlin)
+        .startWith { this }
 }

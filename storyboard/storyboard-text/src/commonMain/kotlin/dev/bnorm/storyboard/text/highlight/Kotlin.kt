@@ -36,7 +36,7 @@ internal fun highlightKotlin(
         withStyle(codeStyle.simple) { append(text) }
 
         val formatListener = object : KotlinParserBaseListener() {
-            private var multiDollars = 0
+            private var multiDollars = -1
 
             private var scopes = ArrayDeque<CodeScope>().apply {
                 addFirst(scope)
