@@ -42,6 +42,7 @@ import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h4
@@ -68,7 +69,7 @@ object Stages {
     val PREVIEW = states(since = 1, count = 100)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
-    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 3)
+    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
     val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 
@@ -140,21 +141,21 @@ fun StoryboardBuilder.Gradle() {
             }
             Spacer(Modifier.height(32.dp))
 
-            stateTransition.AnimatedVisibility({ it in SHOWING_THAT_BUILD_CACHE_IS_OLD }, enter = EnterTransition.None, exit = fadeOut()) {
+            if (transition.currentState.toState() in SHOWING_THAT_BUILD_CACHE_IS_OLD) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     h6 {
-                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[0] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[0] }) {
                             Text("Build Cache is there since Gradle 3.5 👴🏼")
                         }
                         Spacer(Modifier.height(32.dp))
-                        stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
                             Text("Just enable it in your gradle.properties!")
                         }
                     }
 
                     Spacer(Modifier.height(32.dp))
 
-                    stateTransition.AnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[2] }, enter = slideInVertically(), exit = slideOutVertically()) {
+                    stateTransition.SlideFromBottomAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
                         Column(
                             modifier = Modifier
                                 .border(
@@ -177,10 +178,12 @@ fun StoryboardBuilder.Gradle() {
                 }
             }
 
-            stateTransition.SlideFromBottomAnimatedVisibility({ it in PREVIEW }) {
-                code2 {
-                    stateTransition.createChildTransition { BUILD_CACHE_SAMPLES.safeGet(it - (PREVIEW.firstOrNull() ?: 0)) }
-                        .MagicCodeSample()
+            if (transition.currentState.toState() in PREVIEW) {
+                stateTransition.SlideFromBottomAnimatedVisibility({ it >= PREVIEW[0] }) {
+                    code2 {
+                        stateTransition.createChildTransition { BUILD_CACHE_SAMPLES.safeGet(it - (PREVIEW.firstOrNull() ?: 0)) }
+                            .MagicCodeSample()
+                    }
                 }
             }
         }
@@ -202,7 +205,7 @@ private val PHASE_SAMPLES = buildCodeSamples {
     println("Hello from configuration phase!")${first}
     
     dependencies {${second}
-        println("It's still configuration phase ;)")${second}
+        println("It's still configuration phase")${second}
         implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
     }
 
