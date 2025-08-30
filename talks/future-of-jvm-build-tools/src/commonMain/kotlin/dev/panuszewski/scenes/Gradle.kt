@@ -49,11 +49,14 @@ import dev.panuszewski.template.toCode
 
 object Stages {
     val PHASES_BAR_VISIBLE_SINCE = 1
-    val CHARACTERIZING_PHASES = listOf(2, 3, 4)
-    val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = listOf(6, 7, 8, 9, 10)
-    val EXECUTION_IS_LONG = listOf(12, 13, 14, 15)
-    val CONFIGURATION_IS_LONG = listOf(17, 18)
+    val CHARACTERIZING_PHASES = states(since = 2, count = 3)
+    val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = CHARACTERIZING_PHASES.last() + 2, count = 5)
+    val EXECUTION_IS_LONG = states(since = EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.last() + 2, count = 4)
+    val CONFIGURATION_IS_LONG = states(since = EXECUTION_IS_LONG.last() + 2, count = 2)
 }
+
+fun states(since: Int, count: Int) =
+    (since until since + count).toList()
 
 fun StoryboardBuilder.Gradle() {
     scene(100) {
