@@ -31,6 +31,11 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.scenes.Stages.CHARACTERIZING_PHASES
+import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
+import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
+import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
+import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE_SINCE
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.buildCodeSamples
@@ -41,6 +46,14 @@ import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
+
+object Stages {
+    val PHASES_BAR_VISIBLE_SINCE = 1
+    val CHARACTERIZING_PHASES = listOf(2, 3, 4)
+    val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = listOf(6, 7, 8, 9, 10)
+    val EXECUTION_IS_LONG = listOf(12, 13, 14, 15)
+    val CONFIGURATION_IS_LONG = listOf(17, 18)
+}
 
 fun StoryboardBuilder.Gradle() {
     scene(100) {
@@ -56,17 +69,17 @@ fun StoryboardBuilder.Gradle() {
             val phaseNameTextStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.background)
             val phaseDescriptionTextStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.background, fontSize = 12.sp)
 
-            val executionIsLong = transition.createChildTransition { it.toState() in listOf(12, 13, 14, 15) }
-            val configurationIsLong = transition.createChildTransition { it.toState() in listOf(17, 18) }
+            val executionIsLong = stateTransition.createChildTransition { it in EXECUTION_IS_LONG }
+            val configurationIsLong = stateTransition.createChildTransition { it in CONFIGURATION_IS_LONG }
 
             val executionPhaseWeight by executionIsLong.animateFloat { if (it) 1.5f else 0.5f }
             val configurationPhaseWeight by configurationIsLong.animateFloat { if (it) 1.5f else 0.5f }
 
-            stateTransition.AnimatedVisibility({ it >= 1 }) {
+            stateTransition.AnimatedVisibility({ it >= PHASES_BAR_VISIBLE_SINCE }) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 100.dp)) {
                     Column(Modifier.background(color = MaterialTheme.colors.primary)) {
                         ProvideTextStyle(phaseNameTextStyle) { Text("Initialization", Modifier.padding(16.dp)) }
-                        stateTransition.AnimatedVisibility({ it == 2 }) {
+                        stateTransition.AnimatedVisibility({ it == CHARACTERIZING_PHASES[0] }) {
                             ProvideTextStyle(phaseDescriptionTextStyle) {
                                 Text(text = "Figure out the project structure", modifier = Modifier.padding(16.dp))
                             }
@@ -79,7 +92,7 @@ fun StoryboardBuilder.Gradle() {
                                 else "Configuration"
                             }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
                         }
-                        stateTransition.AnimatedVisibility({ it == 3 }) {
+                        stateTransition.AnimatedVisibility({ it == CHARACTERIZING_PHASES[1] }) {
                             ProvideTextStyle(phaseDescriptionTextStyle) {
                                 Text(text = "Figure out the task graph", modifier = Modifier.padding(16.dp))
                             }
@@ -92,7 +105,7 @@ fun StoryboardBuilder.Gradle() {
                                 else "Execution"
                             }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
                         }
-                        stateTransition.AnimatedVisibility({ it == 4 }) {
+                        stateTransition.AnimatedVisibility({ it == CHARACTERIZING_PHASES[2] }) {
                             ProvideTextStyle(phaseDescriptionTextStyle) {
                                 Text(text = "Execute the tasks! 🚀", modifier = Modifier.padding(16.dp))
                             }
@@ -102,21 +115,21 @@ fun StoryboardBuilder.Gradle() {
             }
             Spacer(Modifier.height(32.dp))
 
-            stateTransition.AnimatedVisibility({ it in listOf(13, 14, 15) }, enter = EnterTransition.None, exit = fadeOut()) {
+            stateTransition.AnimatedVisibility({ it in EXECUTION_IS_LONG }, enter = EnterTransition.None, exit = fadeOut()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     h6 {
-                        stateTransition.AnimatedVisibility({ it >= 13 }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= EXECUTION_IS_LONG[1] }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Build Cache is there since Gradle 3.5 👴🏼")
                         }
                         Spacer(Modifier.height(32.dp))
-                        stateTransition.AnimatedVisibility({ it >= 14 }, enter = slideInVertically(), exit = slideOutVertically()) {
+                        stateTransition.AnimatedVisibility({ it >= EXECUTION_IS_LONG[2] }, enter = slideInVertically(), exit = slideOutVertically()) {
                             Text("Just enable it in your gradle.properties!")
                         }
                     }
 
                     Spacer(Modifier.height(32.dp))
 
-                    stateTransition.AnimatedVisibility({ it >= 15 }, enter = slideInVertically(), exit = slideOutVertically()) {
+                    stateTransition.AnimatedVisibility({ it >= EXECUTION_IS_LONG[3] }, enter = slideInVertically(), exit = slideOutVertically()) {
                         Column(
                             modifier = Modifier
                                 .border(
@@ -133,12 +146,12 @@ fun StoryboardBuilder.Gradle() {
             }
 
             stateTransition.AnimatedVisibility(
-                { it in listOf(6, 7, 8, 9, 10) },
+                { it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE },
                 enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                 exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
             ) {
                 code2 {
-                    stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - 6) }
+                    stateTransition.createChildTransition { PHASE_SAMPLES.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE[0]) }
                         .MagicCodeSample()
                 }
             }
@@ -182,4 +195,20 @@ private val PHASE_SAMPLES = buildCodeSamples {
         .then { reveal(second).focus(second).hide(first) }
         .then { reveal(third).focus(third).hide(second) }
         .then { reveal(fourth).focus(fourth).hide(third) }
+}
+
+val BUILD_CACHE_SAMPLES = buildCodeSamples {
+    val codeSample = """
+        tasks {
+            register("printImportantMessage") {
+                outputs.file(layout.buildDirectory.file("message.txt"))
+                outputs.cacheIf { true }
+                doLast {
+                    val message = "Groovy should die" 
+                    println(message)
+                    outputs.files.singleFile.writeText(message)
+                }
+            }
+        }
+    """.trimIndent().toCodeSample(language = Language.Kotlin)
 }
