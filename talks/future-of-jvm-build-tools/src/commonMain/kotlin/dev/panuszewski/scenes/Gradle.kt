@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -63,11 +65,11 @@ object Stages {
         return stateList
     }
 
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 2)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
     val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 1, count = 2)
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 2)
     val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 
@@ -247,23 +249,61 @@ private fun ExplainingBuildCache() {
 
     stateTransition.FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
         Column {
+//            stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
+//                code2 {
+//                    stateTransition.createChildTransition { buildCacheSamples.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
+//                        .MagicCodeSample()
+//                }
+//            }
             stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
-                code2 {
-                    stateTransition.createChildTransition { buildCacheSamples.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
-                        .MagicCodeSample()
-                }
-            }
-            stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
-                Box(
+                Column(
                     modifier = Modifier
                         .border(
                             color = Color.Black,
                             width = 1.dp,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .padding(16.dp)
+                        .width(300.dp)
                 ) {
-                    Text("./gradlew assemble".toCode())
+                    // Title bar with MacOS buttons
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.LightGray.copy(alpha = 0.3f))
+                            .padding(vertical = 8.dp, horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Close button (red)
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .size(12.dp)
+                                .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
+                        )
+                        // Minimize button (yellow)
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .size(12.dp)
+                                .background(Color(0xFFFFBD44), shape = RoundedCornerShape(50))
+                        )
+                        // Maximize button (green)
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(Color(0xFF00CA4E), shape = RoundedCornerShape(50))
+                        )
+                    }
+
+                    // Content area
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Black.copy(alpha = 0.05f))
+                            .padding(16.dp)
+                    ) {
+                        Text("./gradlew assemble".toCode())
+                    }
                 }
             }
         }
