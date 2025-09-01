@@ -76,13 +76,13 @@ object Stages {
         return stateList
     }
 
+    val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 100)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
     val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 12)
     val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
     val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
-    val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 
     val PHASES_BAR_VISIBLE_SINCE = 1
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first()..EXECUTION_BECOMES_SHORT.first()
@@ -103,8 +103,9 @@ fun StoryboardBuilder.Gradle() {
             PhasesBar()
             Spacer(Modifier.height(32.dp))
             ExplainingConfigExecutionDifference()
-            ShowingThatBuildCacheIsOld()
             ExplainingBuildCache()
+            ShowingThatBuildCacheIsOld()
+            ExplainingConfigurationCache()
         }
     }
 }
@@ -379,6 +380,17 @@ private fun ExplainingBuildCache() {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ExplainingConfigurationCache() {
+    stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            stateTransition.SlideFromTopAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[1] }) {
+                h6 { Text("Configuration Cache!") }
             }
         }
     }
