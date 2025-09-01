@@ -79,7 +79,7 @@ object Stages {
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 11)
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 12)
     val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
     val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
@@ -275,96 +275,104 @@ private fun ExplainingBuildCache() {
             "> Task :printMessage FROM-CACHE",
         )
         val terminalTextsToDisplay = terminalTexts
-            .take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[1]))
+            .take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[2]))
 
-        Row {
-            stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
-                code3 {
-                    stateTransition.createChildTransition {
-                        val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[1]))
-                        if (texts.contains("")) {
-                            buildCacheSamples[1]
-                        } else {
-                            buildCacheSamples[0]
-                        }
-                    }
-                        .MagicCodeSample()
-                }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            stateTransition.SlideFromTopAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
+                h6 { Text("Build Cache!") }
             }
 
-            Spacer(Modifier.width(32.dp))
+            Spacer(Modifier.height(32.dp))
 
-            stateTransition.SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
-                Column(
-                    modifier = Modifier
-                        .border(
-                            color = Color.Black,
-                            width = 1.dp,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .width(350.dp)
-                        .height(275.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFF1F0EE))
-                            .padding(vertical = 6.dp, horizontal = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 6.dp)
-                                .size(10.dp)
-                                .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
-                        )
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 6.dp)
-                                .size(10.dp)
-                                .background(Color(0xFFFFBD44), shape = RoundedCornerShape(50))
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .background(Color(0xFF00CA4E), shape = RoundedCornerShape(50))
-                        )
+            Row {
+                stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
+                    code3 {
+                        stateTransition.createChildTransition {
+                            val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[2]))
+                            if (texts.contains("")) {
+                                buildCacheSamples[1]
+                            } else {
+                                buildCacheSamples[0]
+                            }
+                        }
+                            .MagicCodeSample()
                     }
+                }
 
-                    Divider(Modifier.background(Color(0xFFA6A7A6)))
+                Spacer(Modifier.width(32.dp))
 
-                    Box(
+                stateTransition.SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[2] }) {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFFEFFFE))
-                            .padding(16.dp)
+                            .border(
+                                color = Color.Black,
+                                width = 1.dp,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .width(350.dp)
+                            .height(275.dp)
                     ) {
-
-                        val columnState = rememberLazyListState()
-
-                        LaunchedEffect(terminalTextsToDisplay.size) {
-                            columnState.animateScrollToItem(max(0, terminalTextsToDisplay.lastIndex))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFFF1F0EE))
+                                .padding(vertical = 6.dp, horizontal = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 6.dp)
+                                    .size(10.dp)
+                                    .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 6.dp)
+                                    .size(10.dp)
+                                    .background(Color(0xFFFFBD44), shape = RoundedCornerShape(50))
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .background(Color(0xFF00CA4E), shape = RoundedCornerShape(50))
+                            )
                         }
 
-                        LazyColumn(
-                            state = columnState,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        Divider(Modifier.background(Color(0xFFA6A7A6)))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFFFEFFFE))
+                                .padding(16.dp)
                         ) {
-                            for (text in terminalTextsToDisplay.filter { it.isNotBlank() }) {
-                                if (text.startsWith("$")) {
-                                    item {
-                                        var displayedText by remember { mutableStateOf("") }
-                                        LaunchedEffect(Unit) {
-                                            for (i in 0..text.length) {
-                                                displayedText = text.take(i)
-                                                delay(10)
+
+                            val columnState = rememberLazyListState()
+
+                            LaunchedEffect(terminalTextsToDisplay.size) {
+                                columnState.animateScrollToItem(max(0, terminalTextsToDisplay.lastIndex))
+                            }
+
+                            LazyColumn(
+                                state = columnState,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                for (text in terminalTextsToDisplay.filter { it.isNotBlank() }) {
+                                    if (text.startsWith("$")) {
+                                        item {
+                                            var displayedText by remember { mutableStateOf("") }
+                                            LaunchedEffect(Unit) {
+                                                for (i in 0..text.length) {
+                                                    displayedText = text.take(i)
+                                                    delay(10)
+                                                }
                                             }
+                                            code3 { Text(displayedText) }
                                         }
-                                        code3 { Text(displayedText) }
-                                    }
-                                } else {
-                                    item {
-                                        code3 { Text(text, color = Color(53, 140, 142)) }
+                                    } else {
+                                        item {
+                                            code3 { Text(text, color = Color(53, 140, 142)) }
+                                        }
                                     }
                                 }
                             }
