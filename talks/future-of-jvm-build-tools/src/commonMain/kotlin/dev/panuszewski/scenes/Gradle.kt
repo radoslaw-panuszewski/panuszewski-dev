@@ -17,13 +17,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,12 +52,16 @@ import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code2
+import dev.panuszewski.template.code3
 import dev.panuszewski.template.h4
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
+import kotlinx.coroutines.delay
+import kotlin.math.max
+import kotlin.math.min
 
 object Stages {
     var lastState = 0
@@ -65,7 +75,7 @@ object Stages {
         return stateList
     }
 
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 2)
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 10)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
@@ -248,6 +258,14 @@ private fun ExplainingBuildCache() {
     }
 
     stateTransition.FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
+        val terminalTexts = listOf(
+            "$ ./gradlew assemble",
+            """
+            > Task :printImportantMessage
+            Groovy should die
+            """.trimIndent()
+        )
+
         Column {
 //            stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
 //                code2 {
@@ -263,46 +281,62 @@ private fun ExplainingBuildCache() {
                             width = 1.dp,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .width(300.dp)
+                        .width(400.dp)
+                        .height(200.dp)
                 ) {
-                    // Title bar with MacOS buttons
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.LightGray.copy(alpha = 0.3f))
-                            .padding(vertical = 8.dp, horizontal = 12.dp),
+                            .background(Color(0xFFF1F0EE))
+                            .padding(vertical = 6.dp, horizontal = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Close button (red)
                         Box(
                             modifier = Modifier
                                 .padding(end = 6.dp)
-                                .size(12.dp)
+                                .size(10.dp)
                                 .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
                         )
-                        // Minimize button (yellow)
                         Box(
                             modifier = Modifier
                                 .padding(end = 6.dp)
-                                .size(12.dp)
+                                .size(10.dp)
                                 .background(Color(0xFFFFBD44), shape = RoundedCornerShape(50))
                         )
-                        // Maximize button (green)
                         Box(
                             modifier = Modifier
-                                .size(12.dp)
+                                .size(10.dp)
                                 .background(Color(0xFF00CA4E), shape = RoundedCornerShape(50))
                         )
                     }
 
-                    // Content area
+                    Divider(Modifier.background(Color(0xFFA6A7A6)))
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.Black.copy(alpha = 0.05f))
+                            .background(Color(0xFFFEFFFE))
                             .padding(16.dp)
                     ) {
-                        Text("./gradlew assemble".toCode())
+                        Column {
+                            code3 {
+                                for (text in terminalTexts.take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE.first()))) {
+                                    if (text.startsWith("$")) {
+                                        var displayedText by remember { mutableStateOf("") }
+                                        LaunchedEffect(Unit) {
+                                            for (i in 0..text.length) {
+                                                displayedText = text.take(i)
+                                                delay(10)
+                                            }
+                                        }
+                                        Text(displayedText)
+                                    } else {
+                                        Text(text)
+                                    }
+                                    Spacer(Modifier.height(16.dp))
+                                }
+                            }
+                        }
                     }
                 }
             }
