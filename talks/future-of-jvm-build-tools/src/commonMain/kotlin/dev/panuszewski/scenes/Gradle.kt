@@ -322,11 +322,9 @@ fun ExplainingConfigurationCache() {
 
         """
         tasks {
-            register("doSomething") {
+            register<PrintMessageTask>("printMessage") {
                 ${configuring}println("Configuring the task...")${configuring}
-                doLast {
-                    ${executing}println("Executing the task...")${executing}
-                }
+                outputFile = file("output.txt")
             }
         }
         """
@@ -334,7 +332,6 @@ fun ExplainingConfigurationCache() {
             .toCodeSample(language = Language.Kotlin)
             .startWith { this }
             .then { focus(configuring) }
-            .then { unfocus() }
     }
 
     stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
@@ -378,10 +375,12 @@ fun ExplainingConfigurationCache() {
 
                 stateTransition.SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
                     val terminalTexts = listOf(
-                        "$ ./gradlew doSomething",
-                        "Configuring the task...\n\n> Task :doSomething\nExecuting the task...",
-                        "$ ./gradlew doSomething",
-                        "Reusing configuration cache.\n\n> Task :doSomething\nExecuting the task..."
+                        "$ ./gradlew printMessage",
+                        "Configuring the task...\n\n> Task :printMessage\nGroovy should die",
+                        "$ ./gradlew printMessage",
+                        "Configuring the task...\n\n> Task :printMessage UP-TO-DATE",
+                        "$ ./gradlew printMessage --configuration-cache",
+                        "Reusing configuration cache.\n\n> Task :printMessage UP-TO-DATE",
                     )
                     val terminalTextsToDisplay = terminalTexts.take(max(0, stateTransition.currentState - afterCodeSamples))
                     Terminal(terminalTextsToDisplay)

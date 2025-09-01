@@ -39,7 +39,7 @@ fun Terminal(textsToDisplay: List<String>) {
                 width = 1.dp,
                 shape = RoundedCornerShape(8.dp)
             )
-            .width(350.dp)
+            .width(400.dp)
             .height(275.dp)
     ) {
         Row(
