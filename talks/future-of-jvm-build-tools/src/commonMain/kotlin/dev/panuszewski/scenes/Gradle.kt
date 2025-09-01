@@ -344,14 +344,19 @@ fun ExplainingConfigurationCache() {
 
             Spacer(Modifier.height(32.dp))
 
-            stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[2] }) {
+            stateTransition.SlideFromBottomAnimatedVisibility({ it == CONFIGURATION_IS_LONG[2] }) {
+                val inputs = listOf(
+                    "Gradle configs",
+                    "Files read at config time",
+                    "System props read at config time",
+                    "Env variables read at config time",
+                )
+
                 HorizontalTree(
-                    roots = listOf("Input 1", "Input 2", "Input 3"),
+                    roots = inputs,
                     getChildren = {
-                        when (it) {
-                            "Input 1" -> listOf("Configuration")
-                            "Input 2" -> listOf("Configuration")
-                            "Input 3" -> listOf("Configuration")
+                        when {
+                            it in inputs -> listOf("Configuration")
                             else -> emptyList()
                         }
                     },
@@ -361,6 +366,11 @@ fun ExplainingConfigurationCache() {
                         Text(modifier = Modifier.padding(8.dp), text = it)
                     }
                 }
+            }
+
+            stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
+                stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
+                    .MagicCodeSample()
             }
         }
     }
