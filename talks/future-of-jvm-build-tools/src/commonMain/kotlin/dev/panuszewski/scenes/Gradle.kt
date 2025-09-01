@@ -47,7 +47,10 @@ import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE_SINCE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
+import dev.panuszewski.template.Connected
+import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeOutAnimatedVisibility
+import dev.panuszewski.template.HorizontalTree
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
@@ -342,9 +345,22 @@ fun ExplainingConfigurationCache() {
             Spacer(Modifier.height(32.dp))
 
             stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[2] }) {
-                code3 {
-                    stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[2]) }
-                        .MagicCodeSample()
+                HorizontalTree(
+                    root = "Root",
+                    getChildren = {
+                        when (it) {
+                            "Root" -> listOf("Input 1", "Input 2", "Input 3")
+                            "Input 1" -> listOf("Configuration")
+                            "Input 2" -> listOf("Configuration")
+                            "Input 3" -> listOf("Configuration")
+                            else -> emptyList()
+                        }
+                    },
+                    connection = { _, parentRect, _, childRect -> Connection(parentRect, childRect) }
+                ) {
+                    Box(Modifier.padding(8.dp).border(1.dp, Color.Black, RoundedCornerShape(8.dp))) {
+                        Text(it)
+                    }
                 }
             }
         }

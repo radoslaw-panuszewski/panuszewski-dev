@@ -20,6 +20,7 @@ kotlin {
             dependencies {
                 implementation(compose.material)
                 implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
             }
         }
 

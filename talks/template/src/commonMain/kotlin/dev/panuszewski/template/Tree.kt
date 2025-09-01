@@ -25,12 +25,21 @@ private class TreeNode<T>(
 ) {
     var parent: TreeNode<T>? = null
     var curve: Placeable? = null
+    
+    // Additional parents for nodes with multiple parents
+    val additionalParents: MutableList<TreeNode<T>> = mutableListOf()
+    val additionalCurves: MutableList<Placeable?> = mutableListOf()
 
     lateinit var placeable: Placeable
     var x = 0
     var y = 0
 
     var minHeight = 0
+    
+    // Helper function to get all parents (primary + additional)
+    fun getAllParents(): List<TreeNode<T>> {
+        return listOfNotNull(parent) + additionalParents
+    }
 }
 
 @Composable
@@ -70,10 +79,44 @@ fun <T> HorizontalTree(
     content: @Composable (node: T) -> Unit,
 ) {
     SubcomposeLayout(modifier) { constraints ->
-        fun collect(sink: MutableList<TreeNode<T>>, value: T, depth: Int): TreeNode<T> {
-            val children = getChildren(value).map { collect(sink, it, depth + 1) }
+        // Map to store unique nodes by their value
+        val uniqueNodes = mutableMapOf<T, TreeNode<T>>()
+        
+        fun collect(sink: MutableList<TreeNode<T>>, value: T, depth: Int, parentNode: TreeNode<T>? = null): TreeNode<T> {
+            // Check if we've already seen this node value
+            val existingNode = uniqueNodes[value]
+            
+            if (existingNode != null) {
+                // If this node already exists and has a parent, add the new parent as an additional parent
+                if (parentNode != null) {
+                    if (existingNode.parent == null) {
+                        existingNode.parent = parentNode
+                    } else if (existingNode.parent != parentNode) {
+                        existingNode.additionalParents.add(parentNode)
+                    }
+                }
+                return existingNode
+            }
+            
+            // Process children first to ensure all nodes at this level are properly connected
+            val children = getChildren(value).map { collect(sink, it, depth + 1, null) }
+            
+            // Create a new node
             val node = TreeNode(value, depth, children)
-            for (child in children) child.parent = node
+            uniqueNodes[value] = node
+            
+            // Set parent-child relationships
+            if (parentNode != null) {
+                node.parent = parentNode
+            }
+            
+            for (child in children) {
+                if (child.parent == null) {
+                    child.parent = node
+                } else if (child.parent != node) {
+                    child.additionalParents.add(node)
+                }
+            }
 
             sink.add(node)
             return node
@@ -185,11 +228,23 @@ fun <T> HorizontalTree(
 
         alignChildren(listOf(root), 0, height)
 
+        // Create a list of all parent-child connections
+        val connections = mutableListOf<Pair<TreeNode<T>, TreeNode<T>>>()
+        for (child in nodes) {
+            // Add primary parent connection if it exists
+            child.parent?.let { parent ->
+                connections.add(parent to child)
+            }
+            
+            // Add additional parent connections
+            for (additionalParent in child.additionalParents) {
+                connections.add(additionalParent to child)
+            }
+        }
+        
         subcompose(TreeSubSlot.CONNECTION) {
-            // Only the last node should not have a parent.
-            for (child in nodes) {
-                val parent = child.parent ?: break
-
+            // Draw connections for all parent-child pairs
+            for ((parent, child) in connections) {
                 val offset = Offset(parent.x.toFloat(), minOf(parent.y, child.y).toFloat())
                 val parentRect = Rect(
                     left = parent.x.toFloat(),
@@ -206,24 +261,43 @@ fun <T> HorizontalTree(
                 connection(parent.value, parentRect.translate(-offset), child.value, childRect.translate(-offset))
             }
         }.forEachIndexed { index, measurable ->
-            val child = nodes[index]
-            val parent = child.parent!!
-
+            val (parent, child) = connections[index]
+            
             val xStart = parent.x
             val xEnd = child.x + child.placeable.width
             val yStart = minOf(parent.y, child.y)
             val yEnd = maxOf(parent.y + parent.placeable.height, child.y + child.placeable.height)
             val constraints = Constraints.fixed(width = abs(xEnd - xStart), height = abs(yEnd - yStart))
-            nodes[index].curve = measurable.measure(constraints)
+            
+            // Store the curve in the appropriate place
+            if (child.parent == parent) {
+                child.curve = measurable.measure(constraints)
+            } else {
+                // This is an additional parent, store the curve in additionalCurves
+                child.additionalCurves.add(measurable.measure(constraints))
+            }
         }
 
         layout(minWidth, maxOf(height, constraints.minHeight)) {
             for (node in nodes) {
                 node.placeable.place(x = node.x, y = node.y)
 
-                val parent = node.parent ?: continue
-                val curve = node.curve ?: continue
-                curve.place(x = parent.x, y = minOf(parent.y, node.y))
+                // Place curve for primary parent
+                val parent = node.parent
+                val curve = node.curve
+                if (parent != null && curve != null) {
+                    curve.place(x = parent.x, y = minOf(parent.y, node.y))
+                }
+                
+                // Place curves for additional parents
+                for (i in node.additionalParents.indices) {
+                    val additionalParent = node.additionalParents[i]
+                    val additionalCurve = if (i < node.additionalCurves.size) node.additionalCurves[i] else null
+                    
+                    if (additionalCurve != null) {
+                        additionalCurve.place(x = additionalParent.x, y = minOf(additionalParent.y, node.y))
+                    }
+                }
             }
         }
     }
