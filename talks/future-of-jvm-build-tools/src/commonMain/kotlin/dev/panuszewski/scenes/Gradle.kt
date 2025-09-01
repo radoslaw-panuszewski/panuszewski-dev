@@ -39,6 +39,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.components.Terminal
 import dev.panuszewski.scenes.Stages.CHARACTERIZING_PHASES
 import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
@@ -303,82 +304,7 @@ private fun ExplainingBuildCache() {
                 Spacer(Modifier.width(32.dp))
 
                 stateTransition.SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[2] }) {
-                    Column(
-                        modifier = Modifier
-                            .border(
-                                color = Color.Black,
-                                width = 1.dp,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .width(350.dp)
-                            .height(275.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF1F0EE))
-                                .padding(vertical = 6.dp, horizontal = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 6.dp)
-                                    .size(10.dp)
-                                    .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 6.dp)
-                                    .size(10.dp)
-                                    .background(Color(0xFFFFBD44), shape = RoundedCornerShape(50))
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(10.dp)
-                                    .background(Color(0xFF00CA4E), shape = RoundedCornerShape(50))
-                            )
-                        }
-
-                        Divider(Modifier.background(Color(0xFFA6A7A6)))
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFFEFFFE))
-                                .padding(16.dp)
-                        ) {
-
-                            val columnState = rememberLazyListState()
-
-                            LaunchedEffect(terminalTextsToDisplay.size) {
-                                columnState.animateScrollToItem(max(0, terminalTextsToDisplay.lastIndex))
-                            }
-
-                            LazyColumn(
-                                state = columnState,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                for (text in terminalTextsToDisplay.filter { it.isNotBlank() }) {
-                                    if (text.startsWith("$")) {
-                                        item {
-                                            var displayedText by remember { mutableStateOf("") }
-                                            LaunchedEffect(Unit) {
-                                                for (i in 0..text.length) {
-                                                    displayedText = text.take(i)
-                                                    delay(10)
-                                                }
-                                            }
-                                            code3 { Text(displayedText) }
-                                        }
-                                    } else {
-                                        item {
-                                            code3 { Text(text, color = Color(53, 140, 142)) }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    Terminal(terminalTextsToDisplay)
                 }
             }
         }
