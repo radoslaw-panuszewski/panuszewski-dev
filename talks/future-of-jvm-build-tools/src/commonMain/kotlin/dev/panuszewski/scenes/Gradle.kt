@@ -334,6 +334,7 @@ fun ExplainingConfigurationCache() {
             .toCodeSample(language = Language.Kotlin)
             .startWith { this }
             .then { focus(configuring) }
+            .then { unfocus() }
     }
 
     stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
@@ -354,12 +355,7 @@ fun ExplainingConfigurationCache() {
 
                 HorizontalTree(
                     roots = inputs,
-                    getChildren = {
-                        when {
-                            it in inputs -> listOf("Configuration")
-                            else -> emptyList()
-                        }
-                    },
+                    getChildren = { if (it in inputs) listOf("Configuration") else emptyList() },
                     connection = { _, parentRect, _, childRect -> Connection(parentRect, childRect) }
                 ) {
                     Box(Modifier.border(1.dp, Color.Black, RoundedCornerShape(8.dp))) {
@@ -368,9 +364,28 @@ fun ExplainingConfigurationCache() {
                 }
             }
 
-            stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
-                stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
-                    .MagicCodeSample()
+            Row {
+                stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
+                    code3 {
+                        stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
+                            .MagicCodeSample()
+                    }
+                }
+
+                Spacer(Modifier.width(32.dp))
+
+                val afterCodeSamples = CONFIGURATION_IS_LONG[4] + codeSamples.size
+
+                stateTransition.SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
+                    val terminalTexts = listOf(
+                        "$ ./gradlew doSomething",
+                        "Configuring the task...\n\n> Task :doSomething\nExecuting the task...",
+                        "$ ./gradlew doSomething",
+                        "Reusing configuration cache.\n\n> Task :doSomething\nExecuting the task..."
+                    )
+                    val terminalTextsToDisplay = terminalTexts.take(max(0, stateTransition.currentState - afterCodeSamples))
+                    Terminal(terminalTextsToDisplay)
+                }
             }
         }
     }
