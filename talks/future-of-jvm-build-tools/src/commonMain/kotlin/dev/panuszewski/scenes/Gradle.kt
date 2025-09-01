@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -29,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,14 +46,13 @@ import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE_SINCE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
+import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
-import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.buildAndRememberCodeSamples
-import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.code3
 import dev.panuszewski.template.h4
@@ -62,7 +63,6 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import kotlinx.coroutines.delay
 import kotlin.math.max
-import kotlin.math.min
 
 object Stages {
     var lastState = 0
@@ -76,11 +76,11 @@ object Stages {
         return stateList
     }
 
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 2, count = 10)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
-    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 1, count = 2)
+    val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 11)
+    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
     val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 2)
 
@@ -240,9 +240,11 @@ private fun ExplainingConfigExecutionDifference() {
 @Composable
 private fun ExplainingBuildCache() {
     val buildCacheSamples = buildAndRememberCodeSamples {
+        val cacheable by tag()
+
         """
-        @CacheableTask
-        abstract class PrintMessageTask : DefaultTask() {
+        ${cacheable}@CacheableTask
+        ${cacheable}abstract class PrintMessageTask : DefaultTask() {
         
             @OutputFile
             val outputFile = project.objects.fileProperty()
@@ -256,7 +258,8 @@ private fun ExplainingBuildCache() {
         """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { this }
+            .startWith { hide(cacheable) }
+            .then { reveal(cacheable).focus(cacheable) }
     }
 
     stateTransition.FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
@@ -266,13 +269,25 @@ private fun ExplainingBuildCache() {
             "$ ./gradlew printMessage",
             "> Task :printMessage UP-TO-DATE",
             "$ ./gradlew clean printMessage",
+            "> Task :printMessage\nGroovy should die",
+            "",
+            "$ ./gradlew clean printMessage",
             "> Task :printMessage FROM-CACHE",
         )
+        val terminalTextsToDisplay = terminalTexts
+            .take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[1]))
 
         Row {
             stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
                 code3 {
-                    stateTransition.createChildTransition { buildCacheSamples.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
+                    stateTransition.createChildTransition {
+                        val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[1]))
+                        if (texts.contains("")) {
+                            buildCacheSamples[1]
+                        } else {
+                            buildCacheSamples[0]
+                        }
+                    }
                         .MagicCodeSample()
                 }
             }
@@ -288,7 +303,7 @@ private fun ExplainingBuildCache() {
                             shape = RoundedCornerShape(8.dp)
                         )
                         .width(350.dp)
-                        .height(300.dp)
+                        .height(275.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -324,10 +339,20 @@ private fun ExplainingBuildCache() {
                             .background(Color(0xFFFEFFFE))
                             .padding(16.dp)
                     ) {
-                        Column {
-                            code3 {
-                                for (text in terminalTexts.take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[1]))) {
-                                    if (text.startsWith("$")) {
+
+                        val columnState = rememberLazyListState()
+
+                        LaunchedEffect(terminalTextsToDisplay.size) {
+                            columnState.animateScrollToItem(max(0, terminalTextsToDisplay.lastIndex))
+                        }
+
+                        LazyColumn(
+                            state = columnState,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            for (text in terminalTextsToDisplay.filter { it.isNotBlank() }) {
+                                if (text.startsWith("$")) {
+                                    item {
                                         var displayedText by remember { mutableStateOf("") }
                                         LaunchedEffect(Unit) {
                                             for (i in 0..text.length) {
@@ -335,11 +360,12 @@ private fun ExplainingBuildCache() {
                                                 delay(10)
                                             }
                                         }
-                                        Text(displayedText)
-                                    } else {
-                                        Text(text, color = Color(53, 140, 142))
+                                        code3 { Text(displayedText) }
                                     }
-                                    Spacer(Modifier.height(16.dp))
+                                } else {
+                                    item {
+                                        code3 { Text(text, color = Color(53, 140, 142)) }
+                                    }
                                 }
                             }
                         }
