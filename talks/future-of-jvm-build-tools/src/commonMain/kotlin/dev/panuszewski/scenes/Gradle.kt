@@ -313,10 +313,39 @@ private fun ExplainingBuildCache() {
 
 @Composable
 fun ExplainingConfigurationCache() {
+    val codeSamples = buildAndRememberCodeSamples {
+        val configuring by tag()
+        val executing by tag()
+
+        """
+        tasks {
+            register("doSomething") {
+                ${configuring}println("Configuring the task...")${configuring}
+                doLast {
+                    ${executing}println("Executing the task...")${executing}
+                }
+            }
+        }
+        """
+            .trimIndent()
+            .toCodeSample(language = Language.Kotlin)
+            .startWith { this }
+            .then { focus(configuring) }
+    }
+
     stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             stateTransition.SlideFromTopAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[1] }) {
                 h6 { Text("Configuration Cache!") }
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[2] }) {
+                code3 {
+                    stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[2]) }
+                        .MagicCodeSample()
+                }
             }
         }
     }

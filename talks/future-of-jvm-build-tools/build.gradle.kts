@@ -13,12 +13,10 @@ kotlin {
 }
 
 tasks {
-    register("killGroovy") {
-        outputs.file(layout.buildDirectory.file("out.txt"))
-        outputs.cacheIf { true }
+    register("printMessage") {
+        println("Configuring the task...")
         doLast {
-            println("Bang!")
-            outputs.files.singleFile.writeText("Bang!")
+            println("Executing the task...")
         }
     }
 }
