@@ -42,9 +42,46 @@ private class TreeNode<T>(
     }
 }
 
+/**
+ * Overloaded version of HorizontalTree that accepts a single root node.
+ * This function is provided for backward compatibility.
+ */
 @Composable
 fun <T> HorizontalTree(
     root: T,
+    getChildren: (node: T) -> Collection<T>,
+    modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(64.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    horizontalMinimumSpacing: Dp = 0.dp,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
+    verticalMinimumSpacing: Dp = 0.dp,
+    connection: @Composable (parent: T, parentRect: Rect, child: T, childRect: Rect) -> Unit = { _, _, _, _ -> },
+    content: @Composable (node: T) -> Unit,
+) {
+    HorizontalTree(
+        roots = listOf(root),
+        getChildren = getChildren,
+        modifier = modifier,
+        horizontalArrangement = horizontalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        horizontalMinimumSpacing = horizontalMinimumSpacing,
+        verticalArrangement = verticalArrangement,
+        verticalAlignment = verticalAlignment,
+        verticalMinimumSpacing = verticalMinimumSpacing,
+        connection = connection,
+        content = content
+    )
+}
+
+/**
+ * A horizontal tree layout that supports multiple root nodes.
+ * Root nodes are displayed at the left side of the tree.
+ */
+@Composable
+fun <T> HorizontalTree(
+    roots: Collection<T>,
     getChildren: (node: T) -> Collection<T>,
     modifier: Modifier = Modifier,
 
@@ -123,7 +160,18 @@ fun <T> HorizontalTree(
         }
 
         val nodes = mutableListOf<TreeNode<T>>()
-        val root = collect(nodes, root, 0)
+        val rootNodes = mutableListOf<TreeNode<T>>()
+        
+        // Process each root node
+        for (rootValue in roots) {
+            val rootNode = collect(nodes, rootValue, 0)
+            rootNodes.add(rootNode)
+        }
+        
+        // If no roots were provided, return an empty layout
+        if (rootNodes.isEmpty()) {
+            return@SubcomposeLayout layout(constraints.minWidth, constraints.minHeight) {}
+        }
 
         val byDepth = Array<MutableList<TreeNode<T>>>(nodes.maxOf { it.depth } + 1) { mutableListOf() }
         for (node in nodes) {
@@ -220,13 +268,36 @@ fun <T> HorizontalTree(
             }
         }
 
-        var height = heightUp(root)
+        // Calculate total height including spacing between root nodes
+        var totalHeight = 0
+        
+        // First calculate the height of each root node
+        for (rootNode in rootNodes) {
+            heightUp(rootNode)
+        }
+        
+        // Then calculate total height with consistent spacing
+        if (rootNodes.isNotEmpty()) {
+            // Sum up the heights of all root nodes
+            val rootNodesHeight = rootNodes.sumOf { it.minHeight }
+            
+            // Add spacing between root nodes (spacing * (number of nodes - 1))
+            val spacingBetweenRoots = if (rootNodes.size > 1) ySpacing * (rootNodes.size - 1) else 0
+            
+            // Total height is the sum of root node heights plus spacing between them
+            totalHeight = rootNodesHeight + spacingBetweenRoots
+        }
+        
+        // Apply height adjustments if needed
         if (verticalArrangement.spacing.value <= 0f) {
-            height = maxOf(height, constraints.minHeight)
-            heightDown(root, height)
+            totalHeight = maxOf(totalHeight, constraints.minHeight)
+            for (rootNode in rootNodes) {
+                heightDown(rootNode, rootNode.minHeight)
+            }
         }
 
-        alignChildren(listOf(root), 0, height)
+        // Align all root nodes and their children
+        alignChildren(rootNodes, 0, totalHeight)
         
         // Post-processing step to center nodes with multiple parents vertically
         for (node in nodes) {
@@ -301,7 +372,7 @@ fun <T> HorizontalTree(
             }
         }
 
-        layout(minWidth, maxOf(height, constraints.minHeight)) {
+        layout(minWidth, maxOf(totalHeight, constraints.minHeight)) {
             for (node in nodes) {
                 node.placeable.place(x = node.x, y = node.y)
 
