@@ -227,6 +227,29 @@ fun <T> HorizontalTree(
         }
 
         alignChildren(listOf(root), 0, height)
+        
+        // Post-processing step to center nodes with multiple parents vertically
+        for (node in nodes) {
+            val allParents = node.getAllParents()
+            if (allParents.size > 1) {
+                // Sort parents by their y position
+                val sortedParents = allParents.sortedBy { it.y }
+                
+                // Find the middle parent (or the average of the two middle parents if even number)
+                val middleParentY = if (sortedParents.size % 2 == 1) {
+                    // Odd number of parents - use the middle one
+                    sortedParents[sortedParents.size / 2].y
+                } else {
+                    // Even number of parents - use the average of the two middle ones
+                    val middle1 = sortedParents[sortedParents.size / 2 - 1].y
+                    val middle2 = sortedParents[sortedParents.size / 2].y
+                    (middle1 + middle2) / 2
+                }
+                
+                // Center the node vertically with the middle parent
+                node.y = middleParentY
+            }
+        }
 
         // Create a list of all parent-child connections
         val connections = mutableListOf<Pair<TreeNode<T>, TreeNode<T>>>()
