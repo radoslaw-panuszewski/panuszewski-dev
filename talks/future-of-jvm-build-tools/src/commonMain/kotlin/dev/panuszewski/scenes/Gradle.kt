@@ -48,6 +48,7 @@ import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.buildCodeSamples
@@ -240,15 +241,16 @@ private fun ExplainingConfigExecutionDifference() {
 private fun ExplainingBuildCache() {
     val buildCacheSamples = buildAndRememberCodeSamples {
         """
-        tasks {
-            register("printImportantMessage") {
-                outputs.file(layout.buildDirectory.file("message.txt"))
-                outputs.cacheIf { true }
-                doLast {
-                    val message = "Groovy should die" 
-                    println(message)
-                    outputs.files.singleFile.writeText(message)
-                }
+        @CacheableTask
+        abstract class PrintMessageTask : DefaultTask() {
+        
+            @OutputFile
+            val outputFile = project.objects.fileProperty()
+        
+            @TaskAction
+            fun execute() {
+                println("Groovy should die")
+                outputFile.get().asFile.writeText("Job done")
             }
         }
         """
@@ -259,21 +261,25 @@ private fun ExplainingBuildCache() {
 
     stateTransition.FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
         val terminalTexts = listOf(
-            "$ ./gradlew assemble",
-            """
-            > Task :printImportantMessage
-            Groovy should die
-            """.trimIndent()
+            "$ ./gradlew printMessage",
+            "> Task :printMessage\nGroovy should die",
+            "$ ./gradlew printMessage",
+            "> Task :printMessage UP-TO-DATE",
+            "$ ./gradlew clean printMessage",
+            "> Task :printMessage FROM-CACHE",
         )
 
-        Column {
-//            stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
-//                code2 {
-//                    stateTransition.createChildTransition { buildCacheSamples.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
-//                        .MagicCodeSample()
-//                }
-//            }
+        Row {
             stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
+                code3 {
+                    stateTransition.createChildTransition { buildCacheSamples.safeGet(it - EXPLAINING_BUILD_CACHE.first()) }
+                        .MagicCodeSample()
+                }
+            }
+
+            Spacer(Modifier.width(32.dp))
+
+            stateTransition.SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
                 Column(
                     modifier = Modifier
                         .border(
@@ -281,8 +287,8 @@ private fun ExplainingBuildCache() {
                             width = 1.dp,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .width(400.dp)
-                        .height(200.dp)
+                        .width(350.dp)
+                        .height(300.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -320,7 +326,7 @@ private fun ExplainingBuildCache() {
                     ) {
                         Column {
                             code3 {
-                                for (text in terminalTexts.take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE.first()))) {
+                                for (text in terminalTexts.take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[1]))) {
                                     if (text.startsWith("$")) {
                                         var displayedText by remember { mutableStateOf("") }
                                         LaunchedEffect(Unit) {
@@ -331,7 +337,7 @@ private fun ExplainingBuildCache() {
                                         }
                                         Text(displayedText)
                                     } else {
-                                        Text(text)
+                                        Text(text, color = Color(53, 140, 142))
                                     }
                                     Spacer(Modifier.height(16.dp))
                                 }
