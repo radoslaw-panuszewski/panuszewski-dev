@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,9 +33,9 @@ import kotlinx.coroutines.delay
 import kotlin.math.max
 
 @Composable
-fun Terminal(textsToDisplay: List<String>) {
+fun Terminal(textsToDisplay: List<String>, modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .border(
                 color = Color.Black,
                 width = 1.dp,
@@ -74,7 +76,7 @@ fun Terminal(textsToDisplay: List<String>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFFEFFFE))
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
         ) {
 
             val columnState = rememberLazyListState()
@@ -83,11 +85,9 @@ fun Terminal(textsToDisplay: List<String>) {
                 columnState.animateScrollToItem(max(0, textsToDisplay.lastIndex))
             }
 
-            LazyColumn(
-                state = columnState,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            LazyColumn(state = columnState, modifier = Modifier.padding(bottom = 16.dp)) {
                 for (text in textsToDisplay.filter { it.isNotBlank() }) {
+
                     if (text.startsWith("$")) {
                         item {
                             var displayedText by remember { mutableStateOf("") }
@@ -97,10 +97,12 @@ fun Terminal(textsToDisplay: List<String>) {
                                     delay(10)
                                 }
                             }
+                            Spacer(Modifier.height(16.dp))
                             code3 { Text(displayedText) }
                         }
                     } else {
                         item {
+                            Spacer(Modifier.height(16.dp))
                             code3 { Text(text, color = Color(53, 140, 142)) }
                         }
                     }

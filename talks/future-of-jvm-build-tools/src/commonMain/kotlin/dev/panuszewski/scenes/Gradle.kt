@@ -11,28 +11,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
@@ -47,7 +41,6 @@ import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE_SINCE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
-import dev.panuszewski.template.Connected
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
@@ -65,7 +58,8 @@ import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
-import kotlinx.coroutines.delay
+import dev.panuszewski.template.withPrimaryColor
+import dev.panuszewski.template.withSecondaryColor
 import kotlin.math.max
 
 object Stages {
@@ -80,13 +74,13 @@ object Stages {
         return stateList
     }
 
-    val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 100)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
     val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 12)
     val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
     val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
+    val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 21)
 
     val PHASES_BAR_VISIBLE_SINCE = 1
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first()..EXECUTION_BECOMES_SHORT.first()
@@ -102,7 +96,15 @@ fun StoryboardBuilder.Gradle() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(16.dp))
-            h4 { Text("Gradle") }
+            h4 {
+                stateTransition.createChildTransition {
+                    when {
+                        it in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
+                        it in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+                        else -> "Gradle"
+                    }
+                }.MagicString(split = { it.splitByChars() })
+            }
             Spacer(Modifier.height(32.dp))
             PhasesBar()
             Spacer(Modifier.height(32.dp))
@@ -283,15 +285,11 @@ private fun ExplainingBuildCache() {
             .take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[2]))
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            stateTransition.SlideFromTopAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[0] }) {
-                h6 { Text("Build Cache!") }
-            }
-
             Spacer(Modifier.height(32.dp))
 
             Row {
                 stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
-                    code3 {
+                    code2 {
                         stateTransition.createChildTransition {
                             val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[2]))
                             if (texts.contains("")) {
@@ -332,16 +330,24 @@ fun ExplainingConfigurationCache() {
             .toCodeSample(language = Language.Kotlin)
             .startWith { this }
             .then { focus(configuring) }
+            .then { unfocus() }
     }
+
+    val afterCodeSamples = CONFIGURATION_IS_LONG[4] + codeSamples.size
+
+    val terminalTexts = listOf(
+        "$ ./gradlew printMessage",
+        "Configuring the task...\n\n> Task :printMessage\nGroovy should die",
+        "$ ./gradlew printMessage",
+        "Configuring the task...\n\n> Task :printMessage UP-TO-DATE",
+        "$ ./gradlew printMessage --configuration-cache",
+        "Reusing configuration cache. ❤️\n\n> Task :printMessage UP-TO-DATE",
+    )
+    val terminalTextsToDisplay = terminalTexts.take(max(0, stateTransition.currentState - afterCodeSamples))
+    val afterTerminal = afterCodeSamples + terminalTexts.size + 1
 
     stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            stateTransition.SlideFromTopAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[1] }) {
-                h6 { Text("Configuration Cache!") }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
             stateTransition.SlideFromBottomAnimatedVisibility({ it == CONFIGURATION_IS_LONG[2] }) {
                 val inputs = listOf(
                     "Gradle configs",
@@ -361,29 +367,86 @@ fun ExplainingConfigurationCache() {
                 }
             }
 
-            Row {
-                stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
-                    code3 {
-                        stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
-                            .MagicCodeSample()
+            stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[4] until afterTerminal }) {
+                Row {
+                    Spacer(Modifier.width(32.dp))
+
+                    stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
+                        code2 {
+                            stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
+                                .MagicCodeSample()
+                        }
+                    }
+
+                    Spacer(Modifier.width(32.dp))
+
+                    stateTransition.SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
+                        Terminal(terminalTextsToDisplay, Modifier.fillMaxWidth().fillMaxHeight().padding(bottom = 32.dp, end = 32.dp))
                     }
                 }
+            }
 
-                Spacer(Modifier.width(32.dp))
+            stateTransition.FadeOutAnimatedVisibility({ it in afterTerminal..(afterTerminal + 2) }) {
 
-                val afterCodeSamples = CONFIGURATION_IS_LONG[4] + codeSamples.size
+                Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal }) {
+                        h6 {
+                            Text(buildAnnotatedString {
+                                append("It can really save you ")
+                                withPrimaryColor { append("a lot of") }
+                                append(" time!")
+                            })
+                        }
+                    }
 
-                stateTransition.SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
-                    val terminalTexts = listOf(
-                        "$ ./gradlew printMessage",
-                        "Configuring the task...\n\n> Task :printMessage\nGroovy should die",
-                        "$ ./gradlew printMessage",
-                        "Configuring the task...\n\n> Task :printMessage UP-TO-DATE",
-                        "$ ./gradlew printMessage --configuration-cache",
-                        "Reusing configuration cache.\n\n> Task :printMessage UP-TO-DATE",
-                    )
-                    val terminalTextsToDisplay = terminalTexts.take(max(0, stateTransition.currentState - afterCodeSamples))
-                    Terminal(terminalTextsToDisplay)
+                    stateTransition.SlideFromBottomAnimatedVisibility({ it > afterTerminal + 1 }) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("30 s")
+                                Box(Modifier.background(MaterialTheme.colors.primaryVariant).width(100.dp).height(150.dp))
+                                Text("CC off")
+                            }
+
+                            Spacer(Modifier.width(64.dp))
+
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("200 ms")
+                                Box(Modifier.background(MaterialTheme.colors.primary).width(100.dp).height(10.dp))
+                                Text("CC on")
+                            }
+                        }
+                    }
+                }
+            }
+
+            stateTransition.FadeOutAnimatedVisibility({ it >= afterTerminal + 3 }) {
+
+                Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal + 3 }) {
+                        h6 { Text("Introduced in Gradle 6.6, made stable in 8.1") }
+                    }
+
+                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal + 4 }) {
+                        h6 { Text("Preferred mode in 9.0 (still not default, though)") }
+                    }
+
+                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal + 5 }) {
+                        h6 { Text("Enable it now!") }
+                    }
+
+                    stateTransition.SlideFromBottomAnimatedVisibility({ it > afterTerminal + 5 }) {
+                        Box(
+                            modifier = Modifier
+                                .border(
+                                    color = Color.Black,
+                                    width = 1.dp,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(16.dp)
+                        ) {
+                            Text("org.gradle.configuration-cache=true".toCode(language = Language.Properties))
+                        }
+                    }
                 }
             }
         }

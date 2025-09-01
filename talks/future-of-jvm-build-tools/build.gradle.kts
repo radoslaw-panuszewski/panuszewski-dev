@@ -12,11 +12,3 @@ kotlin {
     }
 }
 
-tasks {
-    register("printMessage") {
-        println("Configuring the task...")
-        doLast {
-            println("Executing the task...")
-        }
-    }
-}
