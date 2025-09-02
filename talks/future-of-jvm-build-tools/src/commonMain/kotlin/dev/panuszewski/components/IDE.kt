@@ -65,64 +65,49 @@ data class FileTreeNode(
 fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
     val rootNodes = mutableListOf<FileTreeNode>()
     val pathMap = mutableMapOf<String, FileTreeNode>()
-
-    // First, collect all folders
+    
+    // Collect all folders for parent-child relationship lookups
     val folders = files.filter { it.isFolder }
-
-    // Sort files to ensure folders come before their contents
-    val sortedFiles = files.sortedBy { it.path }
-
-    // First, process all folders to build the folder structure
-    for (folder in folders) {
-        val node = FileTreeNode(folder.name, folder.path, true, folder)
-        pathMap[folder.path] = node
-
-        // Find parent folder if it exists
-        val parentPath = findParentFolder(folder.path, folders)
-        if (parentPath != null) {
-            val parentNode = pathMap[parentPath]
-            if (parentNode != null) {
-                parentNode.children.add(node)
+    
+    // Process all files in the original order they're provided
+    for (file in files) {
+        // Create a node for this file/folder
+        val isFolder = file.isFolder
+        
+        // Determine the node name for files - include unmatched path parts if any
+        val nodeName = if (!isFolder) {
+            val parentPath = findParentFolder(file.path, folders)
+            if (parentPath != null) {
+                // Extract the part of the path that doesn't match the parent folder
+                val unmatchedPath = file.path.substring(parentPath.length + 1) // +1 to skip the slash
+                if (unmatchedPath.contains("/")) {
+                    // If there are unmatched path parts, include them in the node name
+                    unmatchedPath
+                } else {
+                    // Otherwise, just use the file name
+                    file.name
+                }
             } else {
-                // This should not happen if we process folders in order
-                rootNodes.add(node)
+                // No parent folder, use the file path as the node name
+                file.path
             }
         } else {
-            // No parent folder, add to root
-            rootNodes.add(node)
+            // For folders, use the name as is
+            file.name
         }
-    }
-
-    // Then process all non-folder files
-    for (file in sortedFiles.filter { !it.isFolder }) {
-        // Find parent folder
-        val parentPath = findParentFolder(file.path, folders)
-
-        // Determine the node name - include unmatched path parts if any
-        val nodeName = if (parentPath != null) {
-            // Extract the part of the path that doesn't match the parent folder
-            val unmatchedPath = file.path.substring(parentPath.length + 1) // +1 to skip the slash
-            if (unmatchedPath.contains("/")) {
-                // If there are unmatched path parts, include them in the node name
-                unmatchedPath
-            } else {
-                // Otherwise, just use the file name
-                file.name
-            }
-        } else {
-            // No parent folder, use the file path as the node name
-            file.path
-        }
-
-        val node = FileTreeNode(nodeName, file.path, false, file)
+        
+        val node = FileTreeNode(nodeName, file.path, isFolder, file)
         pathMap[file.path] = node
-
+        
+        // Find parent folder if it exists
+        val parentPath = findParentFolder(file.path, folders)
         if (parentPath != null) {
             val parentNode = pathMap[parentPath]
             if (parentNode != null) {
                 parentNode.children.add(node)
             } else {
-                // Parent folder not found in pathMap, add to root
+                // Parent folder not found in pathMap yet, add to root
+                // This can happen if we process a child before its parent
                 rootNodes.add(node)
             }
         } else {
@@ -130,7 +115,7 @@ fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
             rootNodes.add(node)
         }
     }
-
+    
     return rootNodes
 }
 
@@ -365,9 +350,7 @@ private fun FileTreeItem(
 
     // Render children if expanded
     if (node.isFolder && isExpanded) {
-        node.children.sortedWith(
-            compareBy<FileTreeNode> { !it.isFolder }.thenBy { it.name.lowercase() }
-        ).forEach { childNode ->
+        node.children.forEach { childNode ->
             FileTreeItem(
                 node = childNode,
                 depth = depth + 1,
