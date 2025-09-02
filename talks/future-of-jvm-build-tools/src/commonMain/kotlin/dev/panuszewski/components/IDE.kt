@@ -3,8 +3,6 @@ package dev.panuszewski.components
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -34,113 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.template.body2
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.toCode
-
-// Data structures for representing files and their content
-data class ProjectFile(
-    val name: String,
-    val path: String,
-    val isFolder: Boolean = false,
-    val content: String = "",
-    val language: Language = Language.Kotlin,
-    val children: List<ProjectFile> = emptyList()
-)
-
-// Represents a node in the file tree
-data class FileTreeNode(
-    val name: String,
-    val path: String,
-    val isFolder: Boolean,
-    val file: ProjectFile,
-    val children: MutableList<FileTreeNode> = mutableListOf()
-)
-
-// Converts a flat list of ProjectFiles to a hierarchical tree structure
-fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
-    val rootNodes = mutableListOf<FileTreeNode>()
-    val pathMap = mutableMapOf<String, FileTreeNode>()
-    
-    // Collect all folders for parent-child relationship lookups
-    val folders = files.filter { it.isFolder }
-    
-    // Process all files in the original order they're provided
-    for (file in files) {
-        // Create a node for this file/folder
-        val isFolder = file.isFolder
-        
-        // Determine the node name for files - include unmatched path parts if any
-        val nodeName = if (!isFolder) {
-            val parentPath = findParentFolder(file.path, folders)
-            if (parentPath != null) {
-                // Extract the part of the path that doesn't match the parent folder
-                val unmatchedPath = file.path.substring(parentPath.length + 1) // +1 to skip the slash
-                if (unmatchedPath.contains("/")) {
-                    // If there are unmatched path parts, include them in the node name
-                    unmatchedPath
-                } else {
-                    // Otherwise, just use the file name
-                    file.name
-                }
-            } else {
-                // No parent folder, use the file path as the node name
-                file.path
-            }
-        } else {
-            // For folders, use the name as is
-            file.name
-        }
-        
-        val node = FileTreeNode(nodeName, file.path, isFolder, file)
-        pathMap[file.path] = node
-        
-        // Find parent folder if it exists
-        val parentPath = findParentFolder(file.path, folders)
-        if (parentPath != null) {
-            val parentNode = pathMap[parentPath]
-            if (parentNode != null) {
-                parentNode.children.add(node)
-            } else {
-                // Parent folder not found in pathMap yet, add to root
-                // This can happen if we process a child before its parent
-                rootNodes.add(node)
-            }
-        } else {
-            // No parent folder, add to root
-            rootNodes.add(node)
-        }
-    }
-    
-    return rootNodes
-}
-
-// Find the parent folder for a given path
-private fun findParentFolder(path: String, folders: List<ProjectFile>): String? {
-    // If the path doesn't contain a slash, it's a root item
-    if (!path.contains("/")) {
-        return null
-    }
-
-    // Get the directory part of the path
-    val lastSlashIndex = path.lastIndexOf('/')
-    val parentPath = path.substring(0, lastSlashIndex)
-
-    // Check if this exact path exists as a folder
-    if (folders.any { it.path == parentPath }) {
-        return parentPath
-    }
-
-    // Find the longest matching folder path
-    return folders
-        .filter { path.startsWith(it.path + "/") }
-        .maxByOrNull { it.path.length }
-        ?.path
-}
 
 @Composable
 fun IDE(
@@ -176,7 +73,7 @@ fun IDE(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(end = 6.dp)
+                    .padding(start = 10.dp, end = 6.dp)
                     .width(10.dp)
                     .height(10.dp)
                     .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
@@ -196,8 +93,6 @@ fun IDE(
             )
 
             Spacer(modifier = Modifier.width(16.dp))
-
-            Text("IntelliJ IDEA", fontWeight = FontWeight.Bold)
         }
 
         Divider(Modifier.background(Color(0xFFA6A7A6)))
@@ -211,7 +106,7 @@ fun IDE(
             // Project files panel (left)
             Box(
                 modifier = Modifier
-                    .width(320.dp)
+                    .width(275.dp)
                     .fillMaxHeight()
                     .background(Color(0xFFF3F3F3))
                     .border(width = 1.dp, color = Color(0xFFDDDDDD))
@@ -333,19 +228,20 @@ private fun FileTreeItem(
         Spacer(modifier = Modifier.width(8.dp))
 
         // File/folder name with different styling based on type
-        Text(
-            text = node.name,
-            fontWeight = when {
-                isSelected -> FontWeight.Bold
-                node.isFolder -> FontWeight.Medium
-                else -> FontWeight.Normal
-            },
-            color = when {
-                isSelected -> Color(0xFF2C5BB7)
-                node.isFolder -> Color(0xFF6F5502)
-                else -> Color.Black
-            }
-        )
+        body2 {
+            Text(
+                text = node.name,
+                fontWeight = when {
+                    node.isFolder -> FontWeight.Medium
+                    else -> FontWeight.Normal
+                },
+                color = when {
+                    isSelected -> Color(0xFF2C5BB7)
+                    node.isFolder -> Color(0xFF6F5502)
+                    else -> Color.Black
+                }
+            )
+        }
     }
 
     // Render children if expanded
@@ -376,4 +272,104 @@ private fun CodePanel(file: ProjectFile) {
             Text(annotatedString)
         }
     }
+}
+
+// Data structures for representing files and their content
+data class ProjectFile(
+    val name: String,
+    val path: String,
+    val isFolder: Boolean = false,
+    val content: String = "",
+    val language: Language = Language.Kotlin,
+    val children: List<ProjectFile> = emptyList()
+)
+
+// Represents a node in the file tree
+data class FileTreeNode(
+    val name: String,
+    val path: String,
+    val isFolder: Boolean,
+    val file: ProjectFile,
+    val children: MutableList<FileTreeNode> = mutableListOf()
+)
+
+// Converts a flat list of ProjectFiles to a hierarchical tree structure
+fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
+    val rootNodes = mutableListOf<FileTreeNode>()
+    val pathMap = mutableMapOf<String, FileTreeNode>()
+
+    // Collect all folders for parent-child relationship lookups
+    val folders = files.filter { it.isFolder }
+
+    // Process all files in the original order they're provided
+    for (file in files) {
+        // Create a node for this file/folder
+        val isFolder = file.isFolder
+
+        // Determine the node name for files - include unmatched path parts if any
+        val nodeName = if (!isFolder) {
+            val parentPath = findParentFolder(file.path, folders)
+            if (parentPath != null) {
+                // Extract the part of the path that doesn't match the parent folder
+                val unmatchedPath = file.path.substring(parentPath.length + 1) // +1 to skip the slash
+                if (unmatchedPath.contains("/")) {
+                    // If there are unmatched path parts, include them in the node name
+                    unmatchedPath
+                } else {
+                    // Otherwise, just use the file name
+                    file.name
+                }
+            } else {
+                // No parent folder, use the file path as the node name
+                file.path
+            }
+        } else {
+            // For folders, use the name as is
+            file.name
+        }
+
+        val node = FileTreeNode(nodeName, file.path, isFolder, file)
+        pathMap[file.path] = node
+
+        // Find parent folder if it exists
+        val parentPath = findParentFolder(file.path, folders)
+        if (parentPath != null) {
+            val parentNode = pathMap[parentPath]
+            if (parentNode != null) {
+                parentNode.children.add(node)
+            } else {
+                // Parent folder not found in pathMap yet, add to root
+                // This can happen if we process a child before its parent
+                rootNodes.add(node)
+            }
+        } else {
+            // No parent folder, add to root
+            rootNodes.add(node)
+        }
+    }
+
+    return rootNodes
+}
+
+// Find the parent folder for a given path
+private fun findParentFolder(path: String, folders: List<ProjectFile>): String? {
+    // If the path doesn't contain a slash, it's a root item
+    if (!path.contains("/")) {
+        return null
+    }
+
+    // Get the directory part of the path
+    val lastSlashIndex = path.lastIndexOf('/')
+    val parentPath = path.substring(0, lastSlashIndex)
+
+    // Check if this exact path exists as a folder
+    if (folders.any { it.path == parentPath }) {
+        return parentPath
+    }
+
+    // Find the longest matching folder path
+    return folders
+        .filter { path.startsWith(it.path + "/") }
+        .maxByOrNull { it.path.length }
+        ?.path
 }
