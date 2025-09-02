@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.code2
+import dev.panuszewski.template.toCode
 
 // Data structures for representing files and their content
 data class ProjectFile(
@@ -144,10 +145,7 @@ fun IDE(
                 if (currentOpenFile != null && previousOpenFile != null) {
                     AnimatedContent(
                         targetState = currentOpenFile!!,
-                        transitionSpec = {
-                            slideInHorizontally { width -> width } + fadeIn() togetherWith
-                                    slideOutHorizontally { width -> -width } + fadeOut()
-                        }
+                        transitionSpec = { fadeIn() togetherWith fadeOut() }
                     ) { file ->
                         CodePanel(file = file)
                     }
@@ -205,9 +203,7 @@ private fun FileItem(
 
 @Composable
 private fun CodePanel(file: ProjectFile) {
-    val annotatedString = buildAnnotatedString {
-        append(file.content)
-    }
+    val annotatedString = file.content.toCode(file.language)
 
     Box(
         modifier = Modifier
