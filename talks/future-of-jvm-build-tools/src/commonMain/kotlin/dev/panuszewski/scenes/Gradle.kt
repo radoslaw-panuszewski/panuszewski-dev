@@ -381,7 +381,7 @@ fun ExplainingConfigurationCache() {
                     Spacer(Modifier.width(32.dp))
 
                     stateTransition.SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
-                        Terminal(terminalTextsToDisplay, Modifier.fillMaxWidth().fillMaxHeight().padding(bottom = 32.dp, end = 32.dp))
+                        Terminal(terminalTextsToDisplay)
                     }
                 }
             }
