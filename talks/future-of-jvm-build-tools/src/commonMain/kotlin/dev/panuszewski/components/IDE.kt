@@ -1,6 +1,7 @@
 package dev.panuszewski.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -35,6 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.template.CodeSample
+import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.toCode
@@ -261,7 +264,6 @@ private fun FileTreeItem(
 
 @Composable
 private fun CodePanel(file: ProjectFile) {
-    val annotatedString = file.content.toCode(file.language)
 
     Box(
         modifier = Modifier
@@ -269,7 +271,7 @@ private fun CodePanel(file: ProjectFile) {
             .background(Color.White)
     ) {
         code2 {
-            Text(annotatedString)
+            file.content?.MagicCodeSample()
         }
     }
 }
@@ -279,7 +281,7 @@ data class ProjectFile(
     val name: String,
     val path: String,
     val isFolder: Boolean = false,
-    val content: String = "",
+    val content: Transition<CodeSample>? = null,
     val language: Language = Language.Kotlin,
     val children: List<ProjectFile> = emptyList()
 )

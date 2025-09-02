@@ -89,51 +89,54 @@ object Stages {
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
 }
 
-lateinit var stateTransition: Transition<Int>
-
 fun StoryboardBuilder.Gradle() {
     scene(Stages.stateCount) {
-        stateTransition = transition.createChildTransition { it.toState() }
+        val stateTransition = transition.createChildTransition { it.toState() }
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(16.dp))
-            h4 {
-                stateTransition.createChildTransition {
-                    when {
-                        it in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
-                        it in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
-                        else -> "Gradle"
-                    }
-                }.MagicString(split = { it.splitByChars() })
-            }
-            PhasesBar()
-            ExplainingConfigExecutionDifference()
-            ExplainingBuildCache()
-            ShowingThatBuildCacheIsOld()
+            stateTransition.Title()
+            stateTransition.PhasesBar()
+            stateTransition.ExplainingConfigExecutionDifference()
+            stateTransition.ExplainingBuildCache()
+            stateTransition.ShowingThatBuildCacheIsOld()
             // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
-            ExplainingConfigurationCache()
-            ImperativeVsDeclarative()
+            stateTransition.ExplainingConfigurationCache()
+            stateTransition.ImperativeVsDeclarative()
         }
     }
 }
 
 @Composable
-private fun PhasesBar() {
+private fun Transition<Int>.Title() {
+    Spacer(Modifier.height(16.dp))
+    h4 {
+        createChildTransition {
+            when {
+                it in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
+                it in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+                else -> "Gradle"
+            }
+        }.MagicString(split = { it.splitByChars() })
+    }
+}
+
+@Composable
+private fun Transition<Int>.PhasesBar() {
     val phaseNameTextStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.background)
     val phaseDescriptionTextStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.background, fontSize = 12.sp)
-    val executionIsLong = stateTransition.createChildTransition { it in EXECUTION_IS_LONG }
-    val configurationIsLong = stateTransition.createChildTransition { it in CONFIGURATION_IS_LONG }
+    val executionIsLong = createChildTransition { it in EXECUTION_IS_LONG }
+    val configurationIsLong = createChildTransition { it in CONFIGURATION_IS_LONG }
     val executionPhaseWeight by executionIsLong.animateFloat { if (it) 1.5f else 0.5f }
     val configurationPhaseWeight by configurationIsLong.animateFloat { if (it) 1.5f else 0.5f }
 
-    stateTransition.AnimatedVisibility({ it in PHASES_BAR_VISIBLE }) {
+    AnimatedVisibility({ it in PHASES_BAR_VISIBLE }) {
         Spacer(Modifier.height(32.dp))
         Row(Modifier.fillMaxWidth().padding(horizontal = 100.dp)) {
             Column(Modifier.background(color = MaterialTheme.colors.primary)) {
                 ProvideTextStyle(phaseNameTextStyle) { Text("Initialization", Modifier.padding(16.dp)) }
-                stateTransition.AnimatedVisibility({ it == CHARACTERIZING_PHASES[0] }) {
+                AnimatedVisibility({ it == CHARACTERIZING_PHASES[0] }) {
                     ProvideTextStyle(phaseDescriptionTextStyle) {
                         Text(text = "Figure out the project structure", modifier = Modifier.padding(16.dp))
                     }
@@ -146,7 +149,7 @@ private fun PhasesBar() {
                         else "Configuration"
                     }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
                 }
-                stateTransition.AnimatedVisibility({ it == CHARACTERIZING_PHASES[1] }) {
+                AnimatedVisibility({ it == CHARACTERIZING_PHASES[1] }) {
                     ProvideTextStyle(phaseDescriptionTextStyle) {
                         Text(text = "Figure out the task graph", modifier = Modifier.padding(16.dp))
                     }
@@ -159,7 +162,7 @@ private fun PhasesBar() {
                         else "Execution"
                     }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
                 }
-                stateTransition.AnimatedVisibility({ it == CHARACTERIZING_PHASES[2] }) {
+                AnimatedVisibility({ it == CHARACTERIZING_PHASES[2] }) {
                     ProvideTextStyle(phaseDescriptionTextStyle) {
                         Text(text = "Execute the tasks! 🚀", modifier = Modifier.padding(16.dp))
                     }
@@ -171,22 +174,22 @@ private fun PhasesBar() {
 }
 
 @Composable
-private fun ShowingThatBuildCacheIsOld() {
-    stateTransition.FadeOutAnimatedVisibility({ it in SHOWING_THAT_BUILD_CACHE_IS_OLD }) {
+private fun Transition<Int>.ShowingThatBuildCacheIsOld() {
+    FadeOutAnimatedVisibility({ it in SHOWING_THAT_BUILD_CACHE_IS_OLD }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             h6 {
-                stateTransition.SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[0] }) {
+                SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[0] }) {
                     Text("Build Cache is there since Gradle 3.5 👴🏼")
                 }
                 Spacer(Modifier.height(32.dp))
-                stateTransition.SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
+                SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
                     Text("Just enable it in your gradle.properties!")
                 }
             }
 
             Spacer(Modifier.height(32.dp))
 
-            stateTransition.SlideFromBottomAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
+            SlideFromBottomAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
                 Box(
                     modifier = Modifier
                         .border(
@@ -204,7 +207,7 @@ private fun ShowingThatBuildCacheIsOld() {
 }
 
 @Composable
-private fun ExplainingConfigExecutionDifference() {
+private fun Transition<Int>.ExplainingConfigExecutionDifference() {
     val phaseSamples = buildAndRememberCodeSamples {
         val first by tag()
         val second by tag()
@@ -241,16 +244,16 @@ private fun ExplainingConfigExecutionDifference() {
             .then { reveal(fourth).focus(fourth).hide(third) }
     }
 
-    stateTransition.SlideFromBottomAnimatedVisibility({ it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE }) {
+    SlideFromBottomAnimatedVisibility({ it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE }) {
         code2 {
-            stateTransition.createChildTransition { phaseSamples.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
+            createChildTransition { phaseSamples.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
                 .MagicCodeSample()
         }
     }
 }
 
 @Composable
-private fun ExplainingBuildCache() {
+private fun Transition<Int>.ExplainingBuildCache() {
     val buildCacheSamples = buildAndRememberCodeSamples {
         val cacheable by tag()
 
@@ -274,7 +277,7 @@ private fun ExplainingBuildCache() {
             .then { reveal(cacheable).focus(cacheable) }
     }
 
-    stateTransition.FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
+    FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
         val terminalTexts = listOf(
             "$ ./gradlew printMessage",
             "> Task :printMessage\nGroovy should die",
@@ -287,15 +290,15 @@ private fun ExplainingBuildCache() {
             "> Task :printMessage FROM-CACHE",
         )
         val terminalTextsToDisplay = terminalTexts
-            .take(max(0, stateTransition.currentState - EXPLAINING_BUILD_CACHE[2]))
+            .take(max(0, currentState - EXPLAINING_BUILD_CACHE[2]))
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(Modifier.height(32.dp))
 
             Row {
-                stateTransition.SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
+                SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
                     code2 {
-                        stateTransition.createChildTransition {
+                        createChildTransition {
                             val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[2]))
                             if (texts.contains("")) {
                                 buildCacheSamples[1]
@@ -309,7 +312,7 @@ private fun ExplainingBuildCache() {
 
                 Spacer(Modifier.width(32.dp))
 
-                stateTransition.SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[2] }) {
+                SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[2] }) {
                     Terminal(terminalTextsToDisplay)
                 }
             }
@@ -318,7 +321,7 @@ private fun ExplainingBuildCache() {
 }
 
 @Composable
-fun ExplainingConfigurationCache() {
+fun Transition<Int>.ExplainingConfigurationCache() {
     val codeSamples = buildAndRememberCodeSamples {
         val configuring by tag()
         val executing by tag()
@@ -348,12 +351,12 @@ fun ExplainingConfigurationCache() {
         "$ ./gradlew printMessage --configuration-cache",
         "Reusing configuration cache. ❤️\n\n> Task :printMessage UP-TO-DATE",
     )
-    val terminalTextsToDisplay = terminalTexts.take(max(0, stateTransition.currentState - afterCodeSamples))
+    val terminalTextsToDisplay = terminalTexts.take(max(0, currentState - afterCodeSamples))
     val afterTerminal = afterCodeSamples + terminalTexts.size + 1
 
-    stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
+    FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            stateTransition.SlideFromBottomAnimatedVisibility({ it == CONFIGURATION_IS_LONG[2] }) {
+            SlideFromBottomAnimatedVisibility({ it == CONFIGURATION_IS_LONG[2] }) {
                 val inputs = listOf(
                     "Gradle configs",
                     "Files read at config time",
@@ -372,29 +375,29 @@ fun ExplainingConfigurationCache() {
                 }
             }
 
-            stateTransition.FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[4] until afterTerminal }) {
+            FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[4] until afterTerminal }) {
                 Row {
                     Spacer(Modifier.width(32.dp))
 
-                    stateTransition.SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
+                    SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
                         code2 {
-                            stateTransition.createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
+                            createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
                                 .MagicCodeSample()
                         }
                     }
 
                     Spacer(Modifier.width(32.dp))
 
-                    stateTransition.SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
+                    SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
                         Terminal(terminalTextsToDisplay)
                     }
                 }
             }
 
-            stateTransition.FadeOutAnimatedVisibility({ it in afterTerminal..(afterTerminal + 2) }) {
+            FadeOutAnimatedVisibility({ it in afterTerminal..(afterTerminal + 2) }) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal }) {
+                    SlideFromTopAnimatedVisibility({ it > afterTerminal }) {
                         h6 {
                             Text(buildAnnotatedString {
                                 append("It can really save you ")
@@ -404,7 +407,7 @@ fun ExplainingConfigurationCache() {
                         }
                     }
 
-                    stateTransition.SlideFromBottomAnimatedVisibility({ it > afterTerminal + 1 }) {
+                    SlideFromBottomAnimatedVisibility({ it > afterTerminal + 1 }) {
                         Row(verticalAlignment = Alignment.Bottom) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("30 s")
@@ -424,22 +427,22 @@ fun ExplainingConfigurationCache() {
                 }
             }
 
-            stateTransition.FadeOutAnimatedVisibility({ it >= afterTerminal + 3 }) {
+            FadeOutAnimatedVisibility({ it >= afterTerminal + 3 }) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal + 3 }) {
+                    SlideFromTopAnimatedVisibility({ it > afterTerminal + 3 }) {
                         h6 { Text("Introduced in Gradle 6.6, made stable in 8.1") }
                     }
 
-                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal + 4 }) {
+                    SlideFromTopAnimatedVisibility({ it > afterTerminal + 4 }) {
                         h6 { Text("Preferred mode in 9.0 (still not default, though)") }
                     }
 
-                    stateTransition.SlideFromTopAnimatedVisibility({ it > afterTerminal + 5 }) {
+                    SlideFromTopAnimatedVisibility({ it > afterTerminal + 5 }) {
                         h6 { Text("Enable it now!") }
                     }
 
-                    stateTransition.SlideFromBottomAnimatedVisibility({ it > afterTerminal + 5 }) {
+                    SlideFromBottomAnimatedVisibility({ it > afterTerminal + 5 }) {
                         Box(
                             modifier = Modifier
                                 .border(
@@ -459,12 +462,18 @@ fun ExplainingConfigurationCache() {
 }
 
 @Composable
-fun ImperativeVsDeclarative() {
-    stateTransition.FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
+fun Transition<Int>.ImperativeVsDeclarative() {
+    FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
         val codeSamples = buildAndRememberCodeSamples {
+            val filter by tag()
+
             """
-            subprojects
-                .filter { it.name.endsWith("-library") }
+            plugins {
+                java
+            }
+                
+            subprojects${filter}
+                .filter { it.name.endsWith("-library") }${filter}
                 .forEach {
                     apply(plugin = "java-library")
                     apply(plugin = "maven-publish")
@@ -476,61 +485,15 @@ fun ImperativeVsDeclarative() {
             """
                 .trimIndent()
                 .toCodeSample(language = Language.Kotlin)
-                .startWith { this }
+                .startWith { hide(filter) }
+                .then { reveal(filter).focus(filter) }
         }
 
         val files = listOf(
             ProjectFile(
                 name = "build.gradle.kts",
                 path = "build.gradle.kts",
-                content = """
-                        plugins {
-                            kotlin("jvm") version "1.9.0"
-                        }
-                        
-                        repositories {
-                            mavenCentral()
-                        }
-                        
-                        dependencies {
-                            implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                            testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
-                        }
-                    """.trimIndent(),
-                language = Language.Kotlin
-            ),
-            ProjectFile(
-                name = "buildSrc",
-                path = "buildSrc",
-                isFolder = true
-            ),
-            ProjectFile(
-                name = "build.gradle.kts",
-                path = "buildSrc/build.gradle.kts",
-                content = """
-                        plugins {
-                            `kotlin-dsl`
-                        }
-                        
-                        repositories {
-                            mavenCentral()
-                        }
-                    """.trimIndent(),
-                language = Language.Kotlin
-            ),
-            ProjectFile(
-                name = "src/main/kotlin",
-                path = "buildSrc/src/main/kotlin",
-                isFolder = true
-            ),
-            ProjectFile(
-                name = "some-convention.gradle.kts",
-                path = "buildSrc/src/main/kotlin/some-convention.gradle.kts",
-                content = """
-                        plugins {
-                            kotlin("jvm")
-                        }
-                    """.trimIndent(),
+                content = createChildTransition { codeSamples.safeGet(it) },
                 language = Language.Kotlin
             ),
         )
