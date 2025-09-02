@@ -489,8 +489,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
             """
                 .trimIndent()
                 .toCodeSample(language = Language.Kotlin)
-                .startWith { hide(filter) }
-                .then { reveal(filter).focus(filter) }
+                .startWith { this }
         }
 
         val appBuildGradleKts = buildAndRememberCodeSamples {
@@ -563,8 +562,15 @@ fun Transition<Int>.ImperativeVsDeclarative() {
             )
         )
 
+        val openFile = when (currentState) {
+            IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
+            IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
+            else -> "build.gradle.kts"
+        }
+
         IDE(
             files = files,
+            openFilePath = openFile,
             modifier = Modifier.padding(32.dp)
         )
     }

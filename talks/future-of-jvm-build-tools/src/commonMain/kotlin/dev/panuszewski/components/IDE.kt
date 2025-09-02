@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,32 +23,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.code2
-import dev.panuszewski.template.toCode
 
 @Composable
 fun IDE(
     files: List<ProjectFile>,
-    initialOpenFile: ProjectFile? = null,
+    openFilePath: String,
     modifier: Modifier = Modifier
 ) {
-    var currentOpenFile by remember { mutableStateOf(initialOpenFile ?: files.firstOrNull { !it.isFolder }) }
-    var previousOpenFile by remember { mutableStateOf<ProjectFile?>(null) }
+    val currentOpenFile = files.find { it.path == openFilePath }
 
     // Build the file tree
     val fileTree = remember(files) { buildFileTree(files) }
@@ -125,12 +118,6 @@ fun IDE(
                                 depth = 0,
                                 expandedFolders = expandedFolders,
                                 currentOpenFile = currentOpenFile,
-                                onFileSelected = { file ->
-                                    if (!file.isFolder && file != currentOpenFile) {
-                                        previousOpenFile = currentOpenFile
-                                        currentOpenFile = file
-                                    }
-                                }
                             )
                         }
                     }
@@ -143,15 +130,13 @@ fun IDE(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                if (currentOpenFile != null && previousOpenFile != null) {
+                if (currentOpenFile != null) {
                     AnimatedContent(
-                        targetState = currentOpenFile!!,
+                        targetState = currentOpenFile,
                         transitionSpec = { fadeIn() togetherWith fadeOut() }
                     ) { file ->
                         CodePanel(file = file)
                     }
-                } else if (currentOpenFile != null) {
-                    CodePanel(file = currentOpenFile!!)
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -171,7 +156,6 @@ private fun FileTreeItem(
     depth: Int,
     expandedFolders: MutableMap<String, Boolean>,
     currentOpenFile: ProjectFile?,
-    onFileSelected: (ProjectFile) -> Unit
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
@@ -181,15 +165,6 @@ private fun FileTreeItem(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (isSelected) Color(0xFFD2E4FF) else Color.Transparent)
-            .clickable {
-                if (node.isFolder) {
-                    // Toggle folder expansion
-                    expandedFolders[node.path] = !(expandedFolders[node.path] ?: true)
-                } else {
-                    // Select file
-                    onFileSelected(node.file)
-                }
-            }
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -239,7 +214,6 @@ private fun FileTreeItem(
                 depth = depth + 1,
                 expandedFolders = expandedFolders,
                 currentOpenFile = currentOpenFile,
-                onFileSelected = onFileSelected
             )
         }
     }
