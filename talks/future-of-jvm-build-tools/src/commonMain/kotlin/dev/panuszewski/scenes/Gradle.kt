@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,13 +32,16 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.components.IDE
+import dev.panuszewski.components.ProjectFile
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.scenes.Stages.CHARACTERIZING_PHASES
 import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
-import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE_SINCE
+import dev.panuszewski.scenes.Stages.IMPERATIVE_VS_DECLARATIVE
+import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeOutAnimatedVisibility
@@ -51,7 +53,6 @@ import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.code2
-import dev.panuszewski.template.code3
 import dev.panuszewski.template.h4
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
@@ -59,7 +60,6 @@ import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withPrimaryColor
-import dev.panuszewski.template.withSecondaryColor
 import kotlin.math.max
 
 object Stages {
@@ -74,16 +74,19 @@ object Stages {
         return stateList
     }
 
+    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState, count = 100)
+    val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
     val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 12)
     val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
-    val EXECUTION_BECOMES_SHORT = states(since = lastState, count = 1)
-    val CONFIGURATION_IS_LONG = states(since = lastState + 2, count = 21)
+    val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
+    val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
+    val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
 
-    val PHASES_BAR_VISIBLE_SINCE = 1
-    val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first()..EXECUTION_BECOMES_SHORT.first()
+    val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
+    val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
 }
 
 lateinit var stateTransition: Transition<Int>
@@ -105,13 +108,13 @@ fun StoryboardBuilder.Gradle() {
                     }
                 }.MagicString(split = { it.splitByChars() })
             }
-            Spacer(Modifier.height(32.dp))
             PhasesBar()
-            Spacer(Modifier.height(32.dp))
             ExplainingConfigExecutionDifference()
             ExplainingBuildCache()
             ShowingThatBuildCacheIsOld()
+            // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             ExplainingConfigurationCache()
+            ImperativeVsDeclarative()
         }
     }
 }
@@ -125,7 +128,8 @@ private fun PhasesBar() {
     val executionPhaseWeight by executionIsLong.animateFloat { if (it) 1.5f else 0.5f }
     val configurationPhaseWeight by configurationIsLong.animateFloat { if (it) 1.5f else 0.5f }
 
-    stateTransition.AnimatedVisibility({ it >= PHASES_BAR_VISIBLE_SINCE }) {
+    stateTransition.AnimatedVisibility({ it in PHASES_BAR_VISIBLE }) {
+        Spacer(Modifier.height(32.dp))
         Row(Modifier.fillMaxWidth().padding(horizontal = 100.dp)) {
             Column(Modifier.background(color = MaterialTheme.colors.primary)) {
                 ProvideTextStyle(phaseNameTextStyle) { Text("Initialization", Modifier.padding(16.dp)) }
@@ -162,6 +166,7 @@ private fun PhasesBar() {
                 }
             }
         }
+        Spacer(Modifier.height(32.dp))
     }
 }
 
@@ -450,5 +455,97 @@ fun ExplainingConfigurationCache() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ImperativeVsDeclarative() {
+    stateTransition.FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
+        val codeSamples = buildAndRememberCodeSamples {
+            """
+            subprojects
+                .filter { it.name.endsWith("-library") }
+                .forEach {
+                    apply(plugin = "java-library")
+                    apply(plugin = "maven-publish")
+            
+                    publishing.publications.create<MavenPublication>("library") {
+                        from(components["java"])
+                    }
+                }    
+            """
+                .trimIndent()
+                .toCodeSample(language = Language.Kotlin)
+                .startWith { this }
+        }
+
+        val files = listOf(
+            ProjectFile(
+                name = "build.gradle.kts",
+                path = "build.gradle.kts",
+                content = """
+                        plugins {
+                            kotlin("jvm") version "1.9.0"
+                        }
+                        
+                        repositories {
+                            mavenCentral()
+                        }
+                        
+                        dependencies {
+                            implementation("org.jetbrains.kotlin:kotlin-stdlib")
+                            testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+                        }
+                    """.trimIndent(),
+                language = Language.Kotlin
+            ),
+            ProjectFile(
+                name = "src",
+                path = "src",
+                isFolder = true
+            ),
+            ProjectFile(
+                name = "Main.kt",
+                path = "src/main/kotlin/com/example/Main.kt",
+                content = """
+                        package com.example
+                        
+                        fun main() {
+                            println("Hello, Gradle!")
+                        }
+                        
+                        class GradleDemo {
+                            fun runTask() {
+                                println("Running Gradle task...")
+                            }
+                        }
+                    """.trimIndent(),
+                language = Language.Kotlin
+            ),
+            ProjectFile(
+                name = "GradleTest.kt",
+                path = "src/test/kotlin/com/example/GradleTest.kt",
+                content = """
+                        package com.example
+                        
+                        import org.junit.jupiter.api.Test
+                        import org.junit.jupiter.api.Assertions.assertEquals
+                        
+                        class GradleTest {
+                            @Test
+                            fun testGradleDemo() {
+                                val demo = GradleDemo()
+                                // Test implementation
+                            }
+                        }
+                    """.trimIndent(),
+                language = Language.Kotlin
+            )
+        )
+
+        IDE(
+            files = files,
+            modifier = Modifier.padding(32.dp)
+        )
     }
 }
