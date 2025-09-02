@@ -196,23 +196,7 @@ private fun FileTreeItem(
         // Indentation based on depth
         Spacer(modifier = Modifier.width((depth * 16).dp))
 
-        // Folder expansion indicator
-        if (node.isFolder) {
-            Box(
-                modifier = Modifier
-                    .size(16.dp)
-                    .padding(2.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (isExpanded) "▼" else "▶",
-                    color = Color.Gray,
-                    fontSize = 10.sp
-                )
-            }
-        } else {
-            Spacer(modifier = Modifier.width(16.dp))
-        }
+        Spacer(modifier = Modifier.width(16.dp))
 
         // File/folder icon
         Box(
@@ -279,7 +263,7 @@ private fun CodePanel(file: ProjectFile) {
 // Data structures for representing files and their content
 data class ProjectFile(
     val name: String,
-    val path: String,
+    val path: String = name,
     val isFolder: Boolean = false,
     val content: Transition<CodeSample>? = null,
     val language: Language = Language.Kotlin,

@@ -464,7 +464,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 @Composable
 fun Transition<Int>.ImperativeVsDeclarative() {
     FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
-        val codeSamples = buildAndRememberCodeSamples {
+        val rootBuildGradleKts = buildAndRememberCodeSamples {
             val filter by tag()
 
             """
@@ -478,8 +478,12 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                     apply(plugin = "java-library")
                     apply(plugin = "maven-publish")
             
-                    publishing.publications.create<MavenPublication>("library") {
-                        from(components["java"])
+                    publishing {
+                        publications {
+                            create<MavenPublication>("library") {
+                                from(components["java"])
+                            }
+                        }
                     }
                 }    
             """
@@ -489,13 +493,74 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                 .then { reveal(filter).focus(filter) }
         }
 
+        val appBuildGradleKts = buildAndRememberCodeSamples {
+            """
+            plugins {
+                application
+            }
+                
+            applicaiton {
+                mainClass = "com.example.AppKt"
+            }
+            """
+                .trimIndent()
+                .toCodeSample(language = Language.Kotlin)
+                .startWith { this }
+        }
+
+        val libraryBuildGradleKts = buildAndRememberCodeSamples {
+            """
+            plugins {
+                `java-library`
+                `maven-publish`
+            }
+                
+            publishing {
+                publications {
+                    create<MavenPublication>("library") {
+                        from(components["java"])
+                    }
+                }
+            }
+            """
+                .trimIndent()
+                .toCodeSample(language = Language.Kotlin)
+                .startWith { this }
+        }
+
         val files = listOf(
             ProjectFile(
                 name = "build.gradle.kts",
-                path = "build.gradle.kts",
-                content = createChildTransition { codeSamples.safeGet(it) },
+                content = createChildTransition { rootBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
                 language = Language.Kotlin
             ),
+            ProjectFile(
+                name = "app",
+                isFolder = true
+            ),
+            ProjectFile(
+                name = "first-library",
+                isFolder = true
+            ),
+            ProjectFile(
+                name = "second-library",
+                isFolder = true
+            ),
+            ProjectFile(
+                name = "build.gradle.kts",
+                path = "app/build.gradle.kts",
+                content = createChildTransition { appBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
+            ),
+            ProjectFile(
+                name = "build.gradle.kts",
+                path = "first-library/build.gradle.kts",
+                content = createChildTransition { libraryBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
+            ),
+            ProjectFile(
+                name = "build.gradle.kts",
+                path = "second-library/build.gradle.kts",
+                content = createChildTransition { libraryBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
+            )
         )
 
         IDE(
