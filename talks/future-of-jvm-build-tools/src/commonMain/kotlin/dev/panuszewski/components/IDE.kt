@@ -27,6 +27,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.toCode
@@ -50,6 +52,111 @@ data class ProjectFile(
     val children: List<ProjectFile> = emptyList()
 )
 
+// Represents a node in the file tree
+data class FileTreeNode(
+    val name: String,
+    val path: String,
+    val isFolder: Boolean,
+    val file: ProjectFile,
+    val children: MutableList<FileTreeNode> = mutableListOf()
+)
+
+// Converts a flat list of ProjectFiles to a hierarchical tree structure
+fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
+    val rootNodes = mutableListOf<FileTreeNode>()
+    val pathMap = mutableMapOf<String, FileTreeNode>()
+
+    // First, collect all folders
+    val folders = files.filter { it.isFolder }
+
+    // Sort files to ensure folders come before their contents
+    val sortedFiles = files.sortedBy { it.path }
+
+    // First, process all folders to build the folder structure
+    for (folder in folders) {
+        val node = FileTreeNode(folder.name, folder.path, true, folder)
+        pathMap[folder.path] = node
+
+        // Find parent folder if it exists
+        val parentPath = findParentFolder(folder.path, folders)
+        if (parentPath != null) {
+            val parentNode = pathMap[parentPath]
+            if (parentNode != null) {
+                parentNode.children.add(node)
+            } else {
+                // This should not happen if we process folders in order
+                rootNodes.add(node)
+            }
+        } else {
+            // No parent folder, add to root
+            rootNodes.add(node)
+        }
+    }
+
+    // Then process all non-folder files
+    for (file in sortedFiles.filter { !it.isFolder }) {
+        // Find parent folder
+        val parentPath = findParentFolder(file.path, folders)
+
+        // Determine the node name - include unmatched path parts if any
+        val nodeName = if (parentPath != null) {
+            // Extract the part of the path that doesn't match the parent folder
+            val unmatchedPath = file.path.substring(parentPath.length + 1) // +1 to skip the slash
+            if (unmatchedPath.contains("/")) {
+                // If there are unmatched path parts, include them in the node name
+                unmatchedPath
+            } else {
+                // Otherwise, just use the file name
+                file.name
+            }
+        } else {
+            // No parent folder, use the file path as the node name
+            file.path
+        }
+
+        val node = FileTreeNode(nodeName, file.path, false, file)
+        pathMap[file.path] = node
+
+        if (parentPath != null) {
+            val parentNode = pathMap[parentPath]
+            if (parentNode != null) {
+                parentNode.children.add(node)
+            } else {
+                // Parent folder not found in pathMap, add to root
+                rootNodes.add(node)
+            }
+        } else {
+            // No parent folder, add to root
+            rootNodes.add(node)
+        }
+    }
+
+    return rootNodes
+}
+
+// Find the parent folder for a given path
+private fun findParentFolder(path: String, folders: List<ProjectFile>): String? {
+    // If the path doesn't contain a slash, it's a root item
+    if (!path.contains("/")) {
+        return null
+    }
+
+    // Get the directory part of the path
+    val lastSlashIndex = path.lastIndexOf('/')
+    val parentPath = path.substring(0, lastSlashIndex)
+
+    // Check if this exact path exists as a folder
+    if (folders.any { it.path == parentPath }) {
+        return parentPath
+    }
+
+    // Find the longest matching folder path
+    return folders
+        .filter { path.startsWith(it.path + "/") }
+        .maxByOrNull { it.path.length }
+        ?.path
+}
+
 @Composable
 fun IDE(
     files: List<ProjectFile>,
@@ -58,6 +165,12 @@ fun IDE(
 ) {
     var currentOpenFile by remember { mutableStateOf(initialOpenFile ?: files.firstOrNull { !it.isFolder }) }
     var previousOpenFile by remember { mutableStateOf<ProjectFile?>(null) }
+
+    // Build the file tree
+    val fileTree = remember(files) { buildFileTree(files) }
+
+    // Track expanded state of folders
+    val expandedFolders = remember { mutableStateMapOf<String, Boolean>() }
 
     Column(
         modifier = modifier
@@ -99,7 +212,7 @@ fun IDE(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Text("IDE", fontWeight = FontWeight.Bold)
+            Text("IntelliJ IDEA", fontWeight = FontWeight.Bold)
         }
 
         Divider(Modifier.background(Color(0xFFA6A7A6)))
@@ -113,7 +226,7 @@ fun IDE(
             // Project files panel (left)
             Box(
                 modifier = Modifier
-                    .width(200.dp)
+                    .width(320.dp)
                     .fillMaxHeight()
                     .background(Color(0xFFF3F3F3))
                     .border(width = 1.dp, color = Color(0xFFDDDDDD))
@@ -121,17 +234,22 @@ fun IDE(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(files) { file ->
-                        FileItem(
-                            file = file,
-                            isSelected = file == currentOpenFile,
-                            onClick = {
-                                if (!file.isFolder && file != currentOpenFile) {
-                                    previousOpenFile = currentOpenFile
-                                    currentOpenFile = file
+                    // Render the file tree
+                    fileTree.forEach { node ->
+                        item {
+                            FileTreeItem(
+                                node = node,
+                                depth = 0,
+                                expandedFolders = expandedFolders,
+                                currentOpenFile = currentOpenFile,
+                                onFileSelected = { file ->
+                                    if (!file.isFolder && file != currentOpenFile) {
+                                        previousOpenFile = currentOpenFile
+                                        currentOpenFile = file
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
@@ -165,27 +283,62 @@ fun IDE(
 }
 
 @Composable
-private fun FileItem(
-    file: ProjectFile,
-    isSelected: Boolean,
-    onClick: () -> Unit
+private fun FileTreeItem(
+    node: FileTreeNode,
+    depth: Int,
+    expandedFolders: MutableMap<String, Boolean>,
+    currentOpenFile: ProjectFile?,
+    onFileSelected: (ProjectFile) -> Unit
 ) {
+    val isExpanded = expandedFolders[node.path] ?: true
+    val isSelected = node.file == currentOpenFile
+
+    // Render this node
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (isSelected) Color(0xFFD2E4FF) else Color.Transparent)
-            .clickable(onClick = onClick)
-            .padding(vertical = 4.dp, horizontal = 8.dp),
+            .clickable {
+                if (node.isFolder) {
+                    // Toggle folder expansion
+                    expandedFolders[node.path] = !(expandedFolders[node.path] ?: true)
+                } else {
+                    // Select file
+                    onFileSelected(node.file)
+                }
+            }
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Simple colored box instead of icon
+        // Indentation based on depth
+        Spacer(modifier = Modifier.width((depth * 16).dp))
+
+        // Folder expansion indicator
+        if (node.isFolder) {
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .padding(2.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (isExpanded) "▼" else "▶",
+                    color = Color.Gray,
+                    fontSize = 10.sp
+                )
+            }
+        } else {
+            Spacer(modifier = Modifier.width(16.dp))
+        }
+
+        // File/folder icon
         Box(
             modifier = Modifier
                 .size(16.dp)
                 .background(
                     color = when {
-                        file.isFolder -> Color(0xFFFFC107) // Folder color
-                        file.language == Language.Kotlin -> Color(0xFF2196F3) // Kotlin file color
+                        node.isFolder -> Color(0xFFFFC107) // Folder color
+                        node.file.language == Language.Kotlin -> Color(0xFF2196F3) // Kotlin file color
                         else -> Color(0xFF9E9E9E) // Other file color
                     },
                     shape = RoundedCornerShape(2.dp)
@@ -194,12 +347,38 @@ private fun FileItem(
 
         Spacer(modifier = Modifier.width(8.dp))
 
+        // File/folder name with different styling based on type
         Text(
-            text = file.name,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            text = node.name,
+            fontWeight = when {
+                isSelected -> FontWeight.Bold
+                node.isFolder -> FontWeight.Medium
+                else -> FontWeight.Normal
+            },
+            color = when {
+                isSelected -> Color(0xFF2C5BB7)
+                node.isFolder -> Color(0xFF6F5502)
+                else -> Color.Black
+            }
         )
     }
+
+    // Render children if expanded
+    if (node.isFolder && isExpanded) {
+        node.children.sortedWith(
+            compareBy<FileTreeNode> { !it.isFolder }.thenBy { it.name.lowercase() }
+        ).forEach { childNode ->
+            FileTreeItem(
+                node = childNode,
+                depth = depth + 1,
+                expandedFolders = expandedFolders,
+                currentOpenFile = currentOpenFile,
+                onFileSelected = onFileSelected
+            )
+        }
+    }
 }
+
 
 @Composable
 private fun CodePanel(file: ProjectFile) {

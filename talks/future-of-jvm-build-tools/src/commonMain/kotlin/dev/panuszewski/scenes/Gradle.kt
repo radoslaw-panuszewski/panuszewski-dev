@@ -500,47 +500,39 @@ fun ImperativeVsDeclarative() {
                 language = Language.Kotlin
             ),
             ProjectFile(
-                name = "src",
-                path = "src",
+                name = "buildSrc",
+                path = "buildSrc",
                 isFolder = true
             ),
             ProjectFile(
-                name = "Main.kt",
-                path = "src/main/kotlin/com/example/Main.kt",
+                name = "build.gradle.kts",
+                path = "buildSrc/build.gradle.kts",
                 content = """
-                        package com.example
-                        
-                        fun main() {
-                            println("Hello, Gradle!")
+                        plugins {
+                            `kotlin-dsl`
                         }
                         
-                        class GradleDemo {
-                            fun runTask() {
-                                println("Running Gradle task...")
-                            }
+                        repositories {
+                            mavenCentral()
                         }
                     """.trimIndent(),
                 language = Language.Kotlin
             ),
             ProjectFile(
-                name = "GradleTest.kt",
-                path = "src/test/kotlin/com/example/GradleTest.kt",
+                name = "src/main/kotlin",
+                path = "buildSrc/src/main/kotlin",
+                isFolder = true
+            ),
+            ProjectFile(
+                name = "some-convention.gradle.kts",
+                path = "buildSrc/src/main/kotlin/some-convention.gradle.kts",
                 content = """
-                        package com.example
-                        
-                        import org.junit.jupiter.api.Test
-                        import org.junit.jupiter.api.Assertions.assertEquals
-                        
-                        class GradleTest {
-                            @Test
-                            fun testGradleDemo() {
-                                val demo = GradleDemo()
-                                // Test implementation
-                            }
+                        plugins {
+                            kotlin("jvm")
                         }
                     """.trimIndent(),
                 language = Language.Kotlin
-            )
+            ),
         )
 
         IDE(
