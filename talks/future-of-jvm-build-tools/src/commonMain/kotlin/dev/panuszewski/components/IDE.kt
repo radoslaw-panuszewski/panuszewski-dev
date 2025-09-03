@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -176,6 +178,8 @@ fun IDE(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
+                            .clip(RectangleShape)
+
                     ) {
                         if (leftPaneFile != null) {
                             Column {
@@ -232,6 +236,7 @@ fun IDE(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
+                            .clip(RectangleShape)
                     ) {
                         if (rightPaneFile != null) {
                             Column {
@@ -279,7 +284,7 @@ fun IDE(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .clip(RectangleShape)
                 ) {
                     if (currentOpenFile != null) {
                         Box(
@@ -295,7 +300,7 @@ fun IDE(
                                 targetState = currentOpenFile,
                                 transitionSpec = { fadeIn() togetherWith fadeOut() }
                             ) { file ->
-                                CodePanel(file = file)
+                                CodePanel(file = file, modifier = Modifier.padding(16.dp))
                             }
                         }
                     } else {
@@ -381,10 +386,8 @@ private fun FileTreeItem(
     }
 }
 
-
 @Composable
 private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
-
     Box(
         modifier = modifier
             .fillMaxSize()
