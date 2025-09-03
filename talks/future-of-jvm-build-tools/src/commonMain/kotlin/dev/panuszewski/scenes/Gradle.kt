@@ -75,6 +75,7 @@ object Stages {
         return stateList
     }
 
+    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState + 1, count = 100)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
@@ -84,7 +85,6 @@ object Stages {
     val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
     val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
-    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState + 1, count = 100)
 
     val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
@@ -555,11 +555,13 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                 name = "build.gradle.kts",
                 path = "app/build.gradle.kts",
                 content = createChildTransition { appBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
+                isLeftPane = currentState >= IMPERATIVE_VS_DECLARATIVE[1]
             ),
             ProjectFile(
                 name = "build.gradle.kts",
                 path = "first-library/build.gradle.kts",
                 content = createChildTransition { libraryBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
+                isRightPane = currentState >= IMPERATIVE_VS_DECLARATIVE[2]
             ),
             ProjectFile(
                 name = "build.gradle.kts",

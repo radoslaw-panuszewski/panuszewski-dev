@@ -2,6 +2,9 @@ package dev.panuszewski.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -44,11 +47,44 @@ fun IDE(
 ) {
     val currentOpenFile = files.find { it.path == openFilePath }
 
+    // Find files in left and right panes
+    val leftPaneFile = files.find { it.isLeftPane }
+    val rightPaneFile = files.find { it.isRightPane }
+
+    // Determine the current mode
+    val isSplitPaneMode = leftPaneFile != null || rightPaneFile != null
+    val isBothPanesMode = leftPaneFile != null && rightPaneFile != null
+
     // Build the file tree
     val fileTree = remember(files) { buildFileTree(files) }
 
     // Track expanded state of folders
     val expandedFolders = remember { mutableStateMapOf<String, Boolean>() }
+
+    // Animation states
+    val leftPanelWidth = animateDpAsState(
+        targetValue = when {
+            isSplitPaneMode -> 0.dp // Hide left panel when both panes are active
+            else -> 275.dp
+        },
+        animationSpec = tween(durationMillis = 300),
+        label = "leftPanelWidth"
+    )
+
+    // Determine if the file is moving to left or right pane
+    val isMovingToLeftPane = currentOpenFile != null && currentOpenFile.isLeftPane
+    val isMovingToRightPane = currentOpenFile != null && currentOpenFile.isRightPane
+
+    // Animation for code panel position
+    val codePanelOffset = animateFloatAsState(
+        targetValue = when {
+            isMovingToLeftPane -> -0.25f // Move to left
+            isMovingToRightPane -> 0.25f // Move to right
+            else -> 0f // Center
+        },
+        animationSpec = tween(durationMillis = 300),
+        label = "codePanelOffset"
+    )
 
     Column(
         modifier = modifier
@@ -99,50 +135,159 @@ fun IDE(
                 .fillMaxSize()
                 .background(Color(0xFFFEFFFE))
         ) {
-            // Project files panel (left)
-            Box(
-                modifier = Modifier
-                    .width(275.dp)
-                    .fillMaxHeight()
-                    .background(Color(0xFFF3F3F3))
-                    .border(width = 1.dp, color = Color(0xFFDDDDDD))
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+            // Project files panel (left) - animated width based on mode
+            if (leftPanelWidth.value > 0.dp) {
+                Box(
+                    modifier = Modifier
+                        .width(leftPanelWidth.value)
+                        .fillMaxHeight()
+                        .background(Color(0xFFF3F3F3))
+                        .border(width = 1.dp, color = Color(0xFFDDDDDD))
                 ) {
-                    // Render the file tree
-                    fileTree.forEach { node ->
-                        item {
-                            FileTreeItem(
-                                node = node,
-                                depth = 0,
-                                expandedFolders = expandedFolders,
-                                currentOpenFile = currentOpenFile,
-                            )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // Render the file tree
+                        fileTree.forEach { node ->
+                            item {
+                                FileTreeItem(
+                                    node = node,
+                                    depth = 0,
+                                    expandedFolders = expandedFolders,
+                                    currentOpenFile = currentOpenFile,
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            // Code display panel (center)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                if (currentOpenFile != null) {
-                    AnimatedContent(
-                        targetState = currentOpenFile,
-                        transitionSpec = { fadeIn() togetherWith fadeOut() }
-                    ) { file ->
-                        CodePanel(file = file)
-                    }
-                } else {
+            // Code display area
+            if (isSplitPaneMode) {
+                // Split-pane mode
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    // Left pane
                     Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(8.dp)
                     ) {
-                        Text("No file selected")
+                        if (leftPaneFile != null) {
+                            Column {
+                                // Tab for left pane
+                                Text(
+                                    text = leftPaneFile.name,
+                                    modifier = Modifier
+                                        .background(Color(0xFFE2E2E2))
+                                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                                        .border(
+                                            width = 1.dp,
+                                            color = Color(0xFFDDDDDD),
+                                            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
+                                        ),
+                                    fontWeight = FontWeight.Medium
+                                )
+
+                                // File content
+                                AnimatedContent(
+                                    targetState = leftPaneFile,
+                                    transitionSpec = { fadeIn() togetherWith fadeOut() }
+                                ) { file ->
+                                    CodePanel(file = file)
+                                }
+                            }
+                        } else {
+                            // Gray out the empty pane
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color(0xFFEEEEEE)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("No file in left pane", color = Color.Gray)
+                            }
+                        }
+                    }
+
+                    // Right pane
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(8.dp)
+                    ) {
+                        if (rightPaneFile != null) {
+                            Column {
+                                // Tab for right pane
+                                Text(
+                                    text = rightPaneFile.name,
+                                    modifier = Modifier
+                                        .background(Color(0xFFE2E2E2))
+                                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                                        .border(
+                                            width = 1.dp,
+                                            color = Color(0xFFDDDDDD),
+                                            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
+                                        ),
+                                    fontWeight = FontWeight.Medium
+                                )
+
+                                // File content
+                                AnimatedContent(
+                                    targetState = rightPaneFile,
+                                    transitionSpec = { fadeIn() togetherWith fadeOut() }
+                                ) { file ->
+                                    CodePanel(file = file)
+                                }
+                            }
+                        } else {
+                            // Gray out the empty pane
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color(0xFFEEEEEE)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("No file in right pane", color = Color.Gray)
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Normal mode - single code panel with animation
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    if (currentOpenFile != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                // Apply offset animation when transitioning to split-pane mode
+                                .padding(
+                                    start = (16.dp * (1 + codePanelOffset.value)).coerceAtLeast(0.dp),
+                                    end = (16.dp * (1 - codePanelOffset.value)).coerceAtLeast(0.dp)
+                                )
+                        ) {
+                            AnimatedContent(
+                                targetState = currentOpenFile,
+                                transitionSpec = { fadeIn() togetherWith fadeOut() }
+                            ) { file ->
+                                CodePanel(file = file)
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No file selected")
+                        }
                     }
                 }
             }
@@ -241,7 +386,9 @@ data class ProjectFile(
     val isFolder: Boolean = false,
     val content: Transition<CodeSample>? = null,
     val language: Language = Language.Kotlin,
-    val children: List<ProjectFile> = emptyList()
+    val children: List<ProjectFile> = emptyList(),
+    val isLeftPane: Boolean = false,
+    val isRightPane: Boolean = false
 )
 
 // Represents a node in the file tree
@@ -332,4 +479,66 @@ private fun findParentFolder(path: String, folders: List<ProjectFile>): String? 
         .filter { path.startsWith(it.path + "/") }
         .maxByOrNull { it.path.length }
         ?.path
+}
+
+/**
+ * Moves a file to a split pane according to the following rules:
+ * 1. Only the currently open file can be moved to a split pane
+ * 2. If one pane is already open, the other pane can be filled with any file
+ *
+ * @param files The list of project files
+ * @param fileToMove The file to move to a pane
+ * @param targetPane The target pane ("left" or "right")
+ * @param currentOpenFile The currently open file
+ * @return A new list of project files with the file moved to the specified pane
+ */
+fun moveFileToPane(
+    files: List<ProjectFile>,
+    fileToMove: ProjectFile,
+    targetPane: String,
+    currentOpenFile: ProjectFile?
+): List<ProjectFile> {
+    // Check if the file is allowed to be moved
+    val leftPaneFile = files.find { it.isLeftPane }
+    val rightPaneFile = files.find { it.isRightPane }
+
+    // Rule 1: Only the currently open file can be moved to a split pane if no panes are open
+    if (leftPaneFile == null && rightPaneFile == null && fileToMove != currentOpenFile) {
+        return files
+    }
+
+    // Rule 2: If one pane is already open, the other pane can be filled with any file
+    val isOnePane = (leftPaneFile != null && rightPaneFile == null) ||
+            (leftPaneFile == null && rightPaneFile != null)
+
+    if (!isOnePane && fileToMove != currentOpenFile) {
+        return files
+    }
+
+    // Create a new list with the file moved to the specified pane
+    return files.map { file ->
+        when {
+            // This is the file we want to move
+            file.path == fileToMove.path -> {
+                // Clear existing pane assignments and set the new one
+                val isLeftPane = targetPane == "left"
+                val isRightPane = targetPane == "right"
+
+                file.copy(
+                    isLeftPane = isLeftPane,
+                    isRightPane = isRightPane
+                )
+            }
+            // Clear the target pane if another file is already there
+            (targetPane == "left" && file.isLeftPane) ||
+                    (targetPane == "right" && file.isRightPane) -> {
+                file.copy(
+                    isLeftPane = if (targetPane == "left") false else file.isLeftPane,
+                    isRightPane = if (targetPane == "right") false else file.isRightPane
+                )
+            }
+            // Leave other files unchanged
+            else -> file
+        }
+    }
 }
