@@ -41,9 +41,10 @@ import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
-import dev.panuszewski.scenes.Stages.IMPERATIVE_VS_DECLARATIVE
+import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
+import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
@@ -75,7 +76,7 @@ object Stages {
         return stateList
     }
 
-    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState + 1, count = 100)
+    val CONVENTION_PLUGINS = states(since = lastState + 1, count = 100)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
@@ -104,7 +105,7 @@ fun StoryboardBuilder.Gradle() {
             stateTransition.ShowingThatBuildCacheIsOld()
             // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
-            stateTransition.ImperativeVsDeclarative()
+            stateTransition.ConventionPlugins()
         }
     }
 }
@@ -468,119 +469,143 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 }
 
 @Composable
-fun Transition<Int>.ImperativeVsDeclarative() {
-    SlideFromBottomAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
-        val rootBuildGradleKts = buildAndRememberCodeSamples {
-            val filter by tag()
+fun Transition<Int>.ConventionPlugins() {
+    SlideFromBottomAnimatedVisibility({ it in CONVENTION_PLUGINS }) {
+        val javaLibraryBuildGradleKts = buildAndRememberCodeSamples {
+            val commonPlugins by tag()
+            val commonPublication by tag()
 
             """
             plugins {
-                java
+                ${commonPlugins}`java-library`
+                `maven-publish`${commonPlugins}
             }
-                
-            subprojects${filter}
-                .filter { it.name.endsWith("-library") }${filter}
-                .forEach {
-                    apply(plugin = "java-library")
-                    apply(plugin = "maven-publish")
             
-                    publishing {
-                        publications {
-                            create<MavenPublication>("library") {
-                                from(components["java"])
-                            }
-                        }
-                    }
-                }    
-            """
-                .trimIndent()
-                .toCodeSample(language = Language.Kotlin)
-                .startWith { this }
-        }
-
-        val appBuildGradleKts = buildAndRememberCodeSamples {
-            """
-            plugins {
-                application
+            dependencies {
+                implementation(libs.guava)
             }
                 
-            applicaiton {
-                mainClass = "com.example.AppKt"
-            }
-            """
-                .trimIndent()
-                .toCodeSample(language = Language.Kotlin)
-                .startWith { this }
-        }
-
-        val libraryBuildGradleKts = buildAndRememberCodeSamples {
-            """
-            plugins {
-                `java-library`
-                `maven-publish`
-            }
-                
-            publishing {
+            ${commonPublication}publishing {
                 publications {
                     create<MavenPublication>("library") {
                         from(components["java"])
                     }
                 }
-            }
+            }${commonPublication}
             """
                 .trimIndent()
                 .toCodeSample(language = Language.Kotlin)
                 .startWith { this }
+                .then { focus(commonPlugins, commonPublication) }
         }
 
-        val files = listOf(
-            ProjectFile(
+        val kotlinLibraryBuildGradleKts = buildAndRememberCodeSamples {
+            val plugins by tag()
+            val publication by tag()
+            val convention by tag()
+
+            """
+            plugins {${plugins}
+                `java-library`
+                `maven-publish`${plugins}${convention}
+                id("library-convention")${convention}
+                alias(libs.plugins.kotlin.jvm)
+            }
+            
+            dependencies {
+                runtimeOnly(libs.kotlin.reflect)        
+            }
+                
+            ${publication}publishing {
+                publications {
+                    create<MavenPublication>("library") {
+                        from(components["java"])
+                    }
+                }
+            }${publication}
+            """
+                .trimIndent()
+                .toCodeSample(language = Language.Kotlin)
+                .startWith { hide(convention) }
+                .then { focus(plugins, publication) }
+                .then { hide(publication) }
+                .then { hide(plugins).unfocus() }
+                .then { reveal(convention).focus(convention) }
+                .then { unfocus() }
+        }
+
+        val libraryConventionGradleKts = buildAndRememberCodeSamples {
+            val todo by tag()
+            val plugins by tag()
+            val publication by tag()
+
+            """
+            ${plugins}plugins {
+                `java-library`
+                `maven-publish`
+            }
+            
+            ${plugins}${publication}publications {
+                create<MavenPublication>("library") {
+                    from(components["java"])
+                }
+            }${publication}${todo}// todo${todo}
+            """
+                .trimIndent()
+                .toCodeSample(language = Language.Kotlin)
+                .startWith { hide(plugins, publication) }
+                .then { reveal(publication).hide(todo) }
+                .then { reveal(plugins) }
+        }
+
+        val files = buildList {
+            addDirectory("java-library")
+            addDirectory("kotlin-library")
+            addFile(
                 name = "build.gradle.kts",
-                content = createChildTransition { rootBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
-                language = Language.Kotlin
-            ),
-            ProjectFile(
-                name = "app",
-                isFolder = true
-            ),
-            ProjectFile(
-                name = "first-library",
-                isFolder = true
-            ),
-            ProjectFile(
-                name = "second-library",
-                isFolder = true
-            ),
-            ProjectFile(
-                name = "build.gradle.kts",
-                path = "app/build.gradle.kts",
-                content = createChildTransition { appBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
-            ),
-            ProjectFile(
-                name = "build.gradle.kts",
-                path = "first-library/build.gradle.kts",
-                content = createChildTransition { libraryBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
-            ),
-            ProjectFile(
-                name = "build.gradle.kts",
-                path = "second-library/build.gradle.kts",
-                content = createChildTransition { libraryBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
+                path = "java-library/build.gradle.kts",
+                content = createChildTransition { javaLibraryBuildGradleKts.safeGet(it - CONVENTION_PLUGINS[3]) },
             )
-        )
+            addFile(
+                name = "build.gradle.kts",
+                path = "kotlin-library/build.gradle.kts",
+                content = createChildTransition {
+                    when {
+                        it <= CONVENTION_PLUGINS[3] -> kotlinLibraryBuildGradleKts[0]
+                        it in CONVENTION_PLUGINS[4]..CONVENTION_PLUGINS[8] -> kotlinLibraryBuildGradleKts[1]
+                        it == CONVENTION_PLUGINS[9] -> kotlinLibraryBuildGradleKts[2]
+                        it == CONVENTION_PLUGINS[10] -> kotlinLibraryBuildGradleKts[3]
+                        it == CONVENTION_PLUGINS[11] -> kotlinLibraryBuildGradleKts[4]
+                        else -> kotlinLibraryBuildGradleKts[5]
+                    }
+                },
+            )
+            if (currentState >= CONVENTION_PLUGINS[6]) {
+                addDirectory("buildSrc")
+                addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
+                addFile(
+                    name = "library-convention.gradle.kts",
+                    path = "buildSrc/src/main/kotlin/library-convention.gradle.kts",
+                    content = createChildTransition { libraryConventionGradleKts.safeGet(it - CONVENTION_PLUGINS[8]) },
+                )
+            }
+        }
 
         val selectedFile = when (currentState) {
-            IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
-            IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
+            CONVENTION_PLUGINS[1] -> "java-library/build.gradle.kts"
+            CONVENTION_PLUGINS[2] -> "kotlin-library/build.gradle.kts"
+            CONVENTION_PLUGINS[7] -> "buildSrc/src/main/kotlin/library-convention.gradle.kts"
             else -> null
         }
 
         val leftPaneFile = when {
-            currentState >= IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
+            currentState >= CONVENTION_PLUGINS[7] -> "buildSrc/src/main/kotlin/library-convention.gradle.kts"
+            currentState >= CONVENTION_PLUGINS[1] -> "java-library/build.gradle.kts"
             else -> null
         }
 
         val rightPaneFile = when {
-            currentState >= IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
+            currentState >= CONVENTION_PLUGINS[2] -> "kotlin-library/build.gradle.kts"
             else -> null
         }
 
@@ -589,8 +614,18 @@ fun Transition<Int>.ImperativeVsDeclarative() {
             selectedFile = selectedFile,
             leftPaneFile = leftPaneFile,
             rightPaneFile = rightPaneFile,
-            fileTreeHidden = currentState > IMPERATIVE_VS_DECLARATIVE[2],
+            fileTreeHidden = currentState in CONVENTION_PLUGINS[3]..CONVENTION_PLUGINS[4] || currentState >= CONVENTION_PLUGINS[8],
             modifier = Modifier.padding(32.dp)
         )
     }
+}
+
+private fun MutableList<ProjectFile>.addFile(name: String, path: String, content: Transition<CodeSample>) {
+    val file = ProjectFile(name = name, path = path, content = content)
+    add(file)
+}
+
+private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = name) {
+    val file = ProjectFile(name = name, path = path, isDirectory = true)
+    add(file)
 }

@@ -201,6 +201,12 @@ internal fun highlightKotlin(
                 ctx.AT_POST_WS()?.let { addStyle(codeStyle.label, it.symbol) }
             }
 
+            override fun enterSimpleIdentifier(ctx: KotlinParser.SimpleIdentifierContext) {
+                if (ctx.text.contains("`")) {
+                    addStyle(codeStyle.property, ctx)
+                }
+            }
+
             override fun visitTerminal(node: TerminalNode) {
                 val symbol = node.symbol
                 when (symbol.type) {

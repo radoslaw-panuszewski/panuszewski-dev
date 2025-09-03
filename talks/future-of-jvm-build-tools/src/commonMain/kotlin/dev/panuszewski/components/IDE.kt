@@ -405,7 +405,7 @@ private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
 data class ProjectFile(
     val name: String,
     val path: String = name,
-    val isFolder: Boolean = false,
+    val isDirectory: Boolean = false,
     val content: Transition<CodeSample>? = null,
     val language: Language = Language.Kotlin,
     val children: List<ProjectFile> = emptyList(),
@@ -426,12 +426,12 @@ fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
     val pathMap = mutableMapOf<String, FileTreeNode>()
 
     // Collect all folders for parent-child relationship lookups
-    val folders = files.filter { it.isFolder }
+    val folders = files.filter { it.isDirectory }
 
     // Process all files in the original order they're provided
     for (file in files) {
         // Create a node for this file/folder
-        val isFolder = file.isFolder
+        val isFolder = file.isDirectory
 
         // Determine the node name for files - include unmatched path parts if any
         val nodeName = if (!isFolder) {
