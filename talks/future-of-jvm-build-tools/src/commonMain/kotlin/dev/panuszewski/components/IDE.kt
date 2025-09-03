@@ -38,11 +38,13 @@ import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.code2
+import dev.panuszewski.template.code3
 
 @Composable
 fun IDE(
     files: List<ProjectFile>,
     openFilePath: String,
+    fileTreeHidden: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val currentOpenFile = files.find { it.path == openFilePath }
@@ -64,7 +66,7 @@ fun IDE(
     // Animation states
     val leftPanelWidth = animateDpAsState(
         targetValue = when {
-            isSplitPaneMode -> 0.dp // Hide left panel when both panes are active
+            fileTreeHidden -> 0.dp // Hide left panel when both panes are active
             else -> 275.dp
         },
         animationSpec = tween(durationMillis = 300),
@@ -174,30 +176,33 @@ fun IDE(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .padding(8.dp)
                     ) {
                         if (leftPaneFile != null) {
                             Column {
                                 // Tab for left pane
-                                Text(
-                                    text = leftPaneFile.name,
+                                Box(
                                     modifier = Modifier
-                                        .background(Color(0xFFE2E2E2))
-                                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                                        .border(
-                                            width = 1.dp,
-                                            color = Color(0xFFDDDDDD),
-                                            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
-                                        ),
-                                    fontWeight = FontWeight.Medium
-                                )
+                                        .background(color = Color(0xFFF2F2F2))
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    code3 {
+                                        Text(
+                                            text = leftPaneFile.path,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                            color = Color(0xFF2C2C2C)
+                                        )
+                                    }
+                                }
+
+                                Divider()
 
                                 // File content
                                 AnimatedContent(
                                     targetState = leftPaneFile,
                                     transitionSpec = { fadeIn() togetherWith fadeOut() }
                                 ) { file ->
-                                    CodePanel(file = file)
+                                    CodePanel(file = file, modifier = Modifier.padding(16.dp))
                                 }
                             }
                         } else {
@@ -213,35 +218,47 @@ fun IDE(
                         }
                     }
 
+                    // Vertical separator
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(1.dp)
+                            .background(Color(0xFFCCCCCC))
+                            .padding(vertical = 8.dp)
+                    )
+
                     // Right pane
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .padding(8.dp)
                     ) {
                         if (rightPaneFile != null) {
                             Column {
                                 // Tab for right pane
-                                Text(
-                                    text = rightPaneFile.name,
+                                Box(
                                     modifier = Modifier
-                                        .background(Color(0xFFE2E2E2))
-                                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                                        .border(
-                                            width = 1.dp,
-                                            color = Color(0xFFDDDDDD),
-                                            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
-                                        ),
-                                    fontWeight = FontWeight.Medium
-                                )
+                                        .background(color = Color(0xFFF2F2F2))
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    code3 {
+                                        Text(
+                                            text = rightPaneFile.path,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                            color = Color(0xFF2C2C2C)
+                                        )
+                                    }
+                                }
+
+                                Divider()
 
                                 // File content
                                 AnimatedContent(
                                     targetState = rightPaneFile,
                                     transitionSpec = { fadeIn() togetherWith fadeOut() }
                                 ) { file ->
-                                    CodePanel(file = file)
+                                    CodePanel(file = file, modifier = Modifier.padding(16.dp))
                                 }
                             }
                         } else {
@@ -366,10 +383,10 @@ private fun FileTreeItem(
 
 
 @Composable
-private fun CodePanel(file: ProjectFile) {
+private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
     ) {

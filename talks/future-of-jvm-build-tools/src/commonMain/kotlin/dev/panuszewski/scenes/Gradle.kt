@@ -579,6 +579,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         IDE(
             files = files,
             openFilePath = openFile,
+            fileTreeHidden = currentState in listOf(IMPERATIVE_VS_DECLARATIVE[1], IMPERATIVE_VS_DECLARATIVE[2]),
             modifier = Modifier.padding(32.dp)
         )
     }
