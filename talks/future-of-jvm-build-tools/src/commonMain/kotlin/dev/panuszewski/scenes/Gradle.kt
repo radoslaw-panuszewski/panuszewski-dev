@@ -573,13 +573,13 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         val openFile = when (currentState) {
             IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
             IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
-            else -> "app/build.gradle.kts"
+            else -> null
         }
 
         IDE(
             files = files,
             openFilePath = openFile,
-            fileTreeHidden = currentState in listOf(IMPERATIVE_VS_DECLARATIVE[1], IMPERATIVE_VS_DECLARATIVE[2]),
+            fileTreeHidden = currentState > IMPERATIVE_VS_DECLARATIVE[2],
             modifier = Modifier.padding(32.dp)
         )
     }

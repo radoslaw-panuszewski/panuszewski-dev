@@ -45,7 +45,7 @@ import dev.panuszewski.template.code3
 @Composable
 fun IDE(
     files: List<ProjectFile>,
-    openFilePath: String,
+    openFilePath: String? = null,
     fileTreeHidden: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -186,7 +186,7 @@ fun IDE(
                                 // Tab for left pane
                                 Box(
                                     modifier = Modifier
-                                        .background(color = Color(0xFFF2F2F2))
+                                        .background(if (leftPaneFile == currentOpenFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -243,7 +243,7 @@ fun IDE(
                                 // Tab for right pane
                                 Box(
                                     modifier = Modifier
-                                        .background(color = Color(0xFFF2F2F2))
+                                        .background(if (rightPaneFile == currentOpenFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.Center
                                 ) {
