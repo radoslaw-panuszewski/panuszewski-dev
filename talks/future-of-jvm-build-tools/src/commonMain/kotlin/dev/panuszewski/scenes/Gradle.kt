@@ -555,13 +555,11 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                 name = "build.gradle.kts",
                 path = "app/build.gradle.kts",
                 content = createChildTransition { appBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
-                isLeftPane = currentState >= IMPERATIVE_VS_DECLARATIVE[1]
             ),
             ProjectFile(
                 name = "build.gradle.kts",
                 path = "first-library/build.gradle.kts",
                 content = createChildTransition { libraryBuildGradleKts.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) },
-                isRightPane = currentState >= IMPERATIVE_VS_DECLARATIVE[2]
             ),
             ProjectFile(
                 name = "build.gradle.kts",
@@ -570,15 +568,27 @@ fun Transition<Int>.ImperativeVsDeclarative() {
             )
         )
 
-        val openFile = when (currentState) {
+        val selectedFile = when (currentState) {
             IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
             IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
             else -> null
         }
 
+        val leftPaneFile = when {
+            currentState >= IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
+            else -> null
+        }
+
+        val rightPaneFile = when {
+            currentState >= IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
+            else -> null
+        }
+
         IDE(
             files = files,
-            openFilePath = openFile,
+            selectedFile = selectedFile,
+            leftPaneFile = leftPaneFile,
+            rightPaneFile = rightPaneFile,
             fileTreeHidden = currentState > IMPERATIVE_VS_DECLARATIVE[2],
             modifier = Modifier.padding(32.dp)
         )

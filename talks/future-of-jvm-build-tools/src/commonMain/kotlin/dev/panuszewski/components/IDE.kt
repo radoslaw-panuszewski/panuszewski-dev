@@ -45,15 +45,17 @@ import dev.panuszewski.template.code3
 @Composable
 fun IDE(
     files: List<ProjectFile>,
-    openFilePath: String? = null,
+    selectedFile: String? = null,
+    leftPaneFile: String? = null,
+    rightPaneFile: String? = null,
     fileTreeHidden: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val currentOpenFile = files.find { it.path == openFilePath }
+    val selectedFile = files.find { it.path == selectedFile }
 
     // Find files in left and right panes
-    val leftPaneFile = files.find { it.isLeftPane }
-    val rightPaneFile = files.find { it.isRightPane }
+    val leftPaneFile = files.find { it.path == leftPaneFile }
+    val rightPaneFile = files.find { it.path == rightPaneFile }
 
     // Determine the current mode
     val isSplitPaneMode = leftPaneFile != null || rightPaneFile != null
@@ -76,8 +78,8 @@ fun IDE(
     )
 
     // Determine if the file is moving to left or right pane
-    val isMovingToLeftPane = currentOpenFile != null && currentOpenFile.isLeftPane
-    val isMovingToRightPane = currentOpenFile != null && currentOpenFile.isRightPane
+    val isMovingToLeftPane = selectedFile != null && selectedFile == leftPaneFile
+    val isMovingToRightPane = selectedFile != null && selectedFile == rightPaneFile
 
     // Animation for code panel position
     val codePanelOffset = animateFloatAsState(
@@ -158,7 +160,7 @@ fun IDE(
                                     node = node,
                                     depth = 0,
                                     expandedFolders = expandedFolders,
-                                    currentOpenFile = currentOpenFile,
+                                    currentOpenFile = selectedFile,
                                 )
                             }
                         }
@@ -186,7 +188,7 @@ fun IDE(
                                 // Tab for left pane
                                 Box(
                                     modifier = Modifier
-                                        .background(if (leftPaneFile == currentOpenFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
+                                        .background(if (leftPaneFile == selectedFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -243,7 +245,7 @@ fun IDE(
                                 // Tab for right pane
                                 Box(
                                     modifier = Modifier
-                                        .background(if (rightPaneFile == currentOpenFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
+                                        .background(if (rightPaneFile == selectedFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -286,7 +288,7 @@ fun IDE(
                         .fillMaxSize()
                         .clip(RectangleShape)
                 ) {
-                    if (currentOpenFile != null) {
+                    if (selectedFile != null) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -297,7 +299,7 @@ fun IDE(
                                 )
                         ) {
                             AnimatedContent(
-                                targetState = currentOpenFile,
+                                targetState = selectedFile,
                                 transitionSpec = { fadeIn() togetherWith fadeOut() }
                             ) { file ->
                                 CodePanel(file = file, modifier = Modifier.padding(16.dp))
@@ -407,8 +409,6 @@ data class ProjectFile(
     val content: Transition<CodeSample>? = null,
     val language: Language = Language.Kotlin,
     val children: List<ProjectFile> = emptyList(),
-    val isLeftPane: Boolean = false,
-    val isRightPane: Boolean = false
 )
 
 // Represents a node in the file tree
@@ -499,66 +499,4 @@ private fun findParentFolder(path: String, folders: List<ProjectFile>): String? 
         .filter { path.startsWith(it.path + "/") }
         .maxByOrNull { it.path.length }
         ?.path
-}
-
-/**
- * Moves a file to a split pane according to the following rules:
- * 1. Only the currently open file can be moved to a split pane
- * 2. If one pane is already open, the other pane can be filled with any file
- *
- * @param files The list of project files
- * @param fileToMove The file to move to a pane
- * @param targetPane The target pane ("left" or "right")
- * @param currentOpenFile The currently open file
- * @return A new list of project files with the file moved to the specified pane
- */
-fun moveFileToPane(
-    files: List<ProjectFile>,
-    fileToMove: ProjectFile,
-    targetPane: String,
-    currentOpenFile: ProjectFile?
-): List<ProjectFile> {
-    // Check if the file is allowed to be moved
-    val leftPaneFile = files.find { it.isLeftPane }
-    val rightPaneFile = files.find { it.isRightPane }
-
-    // Rule 1: Only the currently open file can be moved to a split pane if no panes are open
-    if (leftPaneFile == null && rightPaneFile == null && fileToMove != currentOpenFile) {
-        return files
-    }
-
-    // Rule 2: If one pane is already open, the other pane can be filled with any file
-    val isOnePane = (leftPaneFile != null && rightPaneFile == null) ||
-            (leftPaneFile == null && rightPaneFile != null)
-
-    if (!isOnePane && fileToMove != currentOpenFile) {
-        return files
-    }
-
-    // Create a new list with the file moved to the specified pane
-    return files.map { file ->
-        when {
-            // This is the file we want to move
-            file.path == fileToMove.path -> {
-                // Clear existing pane assignments and set the new one
-                val isLeftPane = targetPane == "left"
-                val isRightPane = targetPane == "right"
-
-                file.copy(
-                    isLeftPane = isLeftPane,
-                    isRightPane = isRightPane
-                )
-            }
-            // Clear the target pane if another file is already there
-            (targetPane == "left" && file.isLeftPane) ||
-                    (targetPane == "right" && file.isRightPane) -> {
-                file.copy(
-                    isLeftPane = if (targetPane == "left") false else file.isLeftPane,
-                    isRightPane = if (targetPane == "right") false else file.isRightPane
-                )
-            }
-            // Leave other files unchanged
-            else -> file
-        }
-    }
 }
