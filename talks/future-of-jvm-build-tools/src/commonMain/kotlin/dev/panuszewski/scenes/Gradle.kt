@@ -74,9 +74,8 @@ object Stages {
         return stateList
     }
 
-    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState, count = 100)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
-    val CHARACTERIZING_PHASES = states(since = lastState + 2, count = 3)
+    val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
     val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
     val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 12)
@@ -84,13 +83,14 @@ object Stages {
     val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
     val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
+    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState + 1, count = 100)
 
     val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
 }
 
 fun StoryboardBuilder.Gradle() {
-    scene(Stages.stateCount) {
+    scene(stateCount = Stages.stateCount) {
         val stateTransition = transition.createChildTransition { it.toState() }
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -131,8 +131,11 @@ private fun Transition<Int>.PhasesBar() {
     val executionPhaseWeight by executionIsLong.animateFloat { if (it) 1.5f else 0.5f }
     val configurationPhaseWeight by configurationIsLong.animateFloat { if (it) 1.5f else 0.5f }
 
-    AnimatedVisibility({ it in PHASES_BAR_VISIBLE }) {
+    if (currentState in (PHASES_BAR_VISIBLE.first - 1)..PHASES_BAR_VISIBLE.last) {
         Spacer(Modifier.height(32.dp))
+    }
+
+    AnimatedVisibility({ it in PHASES_BAR_VISIBLE }) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 100.dp)) {
             Column(Modifier.background(color = MaterialTheme.colors.primary)) {
                 ProvideTextStyle(phaseNameTextStyle) { Text("Initialization", Modifier.padding(16.dp)) }
@@ -169,6 +172,8 @@ private fun Transition<Int>.PhasesBar() {
                 }
             }
         }
+    }
+    if (currentState in PHASES_BAR_VISIBLE) {
         Spacer(Modifier.height(32.dp))
     }
 }
@@ -411,7 +416,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                         Row(verticalAlignment = Alignment.Bottom) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("30 s")
-                                Box(Modifier.background(MaterialTheme.colors.primaryVariant).width(100.dp).height(150.dp))
+                                Box(Modifier.background(Color.Gray).width(100.dp).height(150.dp))
                                 Text("CC off")
                             }
 
@@ -463,7 +468,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 
 @Composable
 fun Transition<Int>.ImperativeVsDeclarative() {
-    FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
+    SlideFromBottomAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
         val rootBuildGradleKts = buildAndRememberCodeSamples {
             val filter by tag()
 
