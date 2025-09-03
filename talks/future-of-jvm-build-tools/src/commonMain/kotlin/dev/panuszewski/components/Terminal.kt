@@ -85,11 +85,13 @@ fun Terminal(textsToDisplay: List<String>, modifier: Modifier = Modifier) {
                 columnState.animateScrollToItem(max(0, textsToDisplay.lastIndex))
             }
 
-            LazyColumn(state = columnState, modifier = Modifier.padding(bottom = 16.dp)) {
-                for (text in textsToDisplay.filter { it.isNotBlank() }) {
+            val texts = textsToDisplay.filter { it.isNotBlank() }
 
-                    if (text.startsWith("$")) {
-                        item {
+            LazyColumn(state = columnState, modifier = Modifier.padding(bottom = 16.dp)) {
+                for ((index, text) in texts.withIndex()) {
+
+                    item {
+                        if (text.startsWith("$")) {
                             var displayedText by remember { mutableStateOf("") }
                             LaunchedEffect(Unit) {
                                 for (i in 0..text.length) {
@@ -99,11 +101,13 @@ fun Terminal(textsToDisplay: List<String>, modifier: Modifier = Modifier) {
                             }
                             Spacer(Modifier.height(16.dp))
                             code3 { Text(displayedText) }
-                        }
-                    } else {
-                        item {
+                        } else {
                             Spacer(Modifier.height(16.dp))
                             code3 { Text(text, color = Color(53, 140, 142)) }
+                        }
+
+                        if (index == texts.lastIndex) {
+                            Spacer(Modifier.height(50.dp))
                         }
                     }
                 }

@@ -274,7 +274,7 @@ private fun Transition<Int>.ExplainingBuildCache() {
         
             @TaskAction
             fun execute() {
-                println("Groovy should die")
+                println("Executing the task...")
                 outputFile.get().asFile.writeText("Job done")
             }
         }
@@ -288,21 +288,19 @@ private fun Transition<Int>.ExplainingBuildCache() {
     FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
         val terminalTexts = listOf(
             "$ ./gradlew printMessage",
-            "> Task :printMessage\nGroovy should die",
+            "> Task :printMessage\nExecuting the task...",
             "$ ./gradlew printMessage",
             "> Task :printMessage UP-TO-DATE",
             "$ ./gradlew clean printMessage",
-            "> Task :printMessage\nGroovy should die",
+            "> Task :printMessage\nExecuting the task... 😞",
             "",
             "$ ./gradlew clean printMessage",
-            "> Task :printMessage FROM-CACHE",
+            "> Task :printMessage FROM-CACHE ❤️",
         )
         val terminalTextsToDisplay = terminalTexts
             .take(max(0, currentState - EXPLAINING_BUILD_CACHE[2]))
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(Modifier.height(32.dp))
-
             Row {
                 SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
                     code2 {
@@ -353,9 +351,9 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 
     val terminalTexts = listOf(
         "$ ./gradlew printMessage",
-        "Configuring the task...\n\n> Task :printMessage\nGroovy should die",
+        "Configuring the task...\n\n> Task :printMessage\nExecuting the task...",
         "$ ./gradlew printMessage",
-        "Configuring the task...\n\n> Task :printMessage UP-TO-DATE",
+        "Configuring the task... 😞\n\n> Task :printMessage UP-TO-DATE",
         "$ ./gradlew printMessage --configuration-cache",
         "Reusing configuration cache. ❤️\n\n> Task :printMessage UP-TO-DATE",
     )
@@ -573,7 +571,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         val openFile = when (currentState) {
             IMPERATIVE_VS_DECLARATIVE[1] -> "app/build.gradle.kts"
             IMPERATIVE_VS_DECLARATIVE[2] -> "first-library/build.gradle.kts"
-            else -> "build.gradle.kts"
+            else -> "app/build.gradle.kts"
         }
 
         IDE(
