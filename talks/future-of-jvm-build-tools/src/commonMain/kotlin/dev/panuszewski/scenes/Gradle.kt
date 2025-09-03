@@ -1,5 +1,6 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
@@ -112,13 +113,15 @@ fun StoryboardBuilder.Gradle() {
 private fun Transition<Int>.Title() {
     Spacer(Modifier.height(16.dp))
     h4 {
-        createChildTransition {
-            when {
-                it in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
-                it in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+        AnimatedContent(
+            targetState = when (currentState) {
+                in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
+                in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
                 else -> "Gradle"
-            }
-        }.MagicString(split = { it.splitByChars() })
+            },
+        ) { text ->
+            Text(text)
+        }
     }
 }
 
