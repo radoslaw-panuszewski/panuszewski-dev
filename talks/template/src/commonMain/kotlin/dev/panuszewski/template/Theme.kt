@@ -90,6 +90,11 @@ const val BULLET_2 = " ◦ "
 const val BULLET_3 = " ‣ "
 
 @Composable
+fun <T : Any> Builder.withColor(color: Color, block: Builder.() -> T) {
+    withStyle(SpanStyle(color = color), block)
+}
+
+@Composable
 fun <T : Any> Builder.withColor(color: Colors.() -> Color, block: Builder.() -> T) {
     withStyle(SpanStyle(color = color(MaterialTheme.colors)), block)
 }

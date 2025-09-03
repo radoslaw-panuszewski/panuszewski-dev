@@ -60,7 +60,7 @@ import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
-import dev.panuszewski.template.withPrimaryColor
+import dev.panuszewski.template.withColor
 import kotlin.math.max
 
 object Stages {
@@ -407,7 +407,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                         h6 {
                             Text(buildAnnotatedString {
                                 append("It can really save you ")
-                                withPrimaryColor { append("a lot of") }
+                                withColor(Color(0xFFFF8A04)) { append("a lot of") }
                                 append(" time!")
                             })
                         }
@@ -417,7 +417,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                         Row(verticalAlignment = Alignment.Bottom) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("30 s")
-                                Box(Modifier.background(Color.Gray).width(100.dp).height(150.dp))
+                                Box(Modifier.background(MaterialTheme.colors.primary).width(100.dp).height(150.dp))
                                 Text("CC off")
                             }
 
@@ -425,7 +425,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("200 ms")
-                                Box(Modifier.background(MaterialTheme.colors.primary).width(100.dp).height(10.dp))
+                                Box(Modifier.background(Color(0xFFFF8A04)).width(100.dp).height(10.dp))
                                 Text("CC on")
                             }
                         }
