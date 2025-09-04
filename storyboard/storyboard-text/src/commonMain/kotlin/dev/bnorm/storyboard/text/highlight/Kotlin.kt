@@ -102,15 +102,23 @@ internal fun highlightKotlin(
             }
 
             override fun enterVariableDeclaration(ctx: KotlinParser.VariableDeclarationContext) {
-                if (scopes.first() == CodeScope.Function) return // Local scope
-                addStyle(codeStyle.property, ctx.simpleIdentifier())
+//                if (scopes.first() == CodeScope.Function) return // Local scope
+//                addStyle(codeStyle.property, ctx.simpleIdentifier())
             }
 
             override fun enterPrimaryExpression(ctx: KotlinParser.PrimaryExpressionContext) {
                 // Expression without a qualifier.
+                val text = ctx.text
+
                 ctx.simpleIdentifier()?.let {
                     val style = identifierStyle(it.text)
                     if (style != null) addStyle(style, it)
+                }
+            }
+
+            override fun enterPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext) {
+                if (ctx.text.startsWith("libs.")) {
+                    addStyle(codeStyle.property, ctx)
                 }
             }
 

@@ -73,6 +73,19 @@ fun <T> Transition<T>.SlideFromBottomAnimatedVisibility(
 )
 
 @Composable
+fun <T> Transition<T>.FadeInOutAnimatedVisibility(
+    visible: (T) -> Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable() AnimatedVisibilityScope.() -> Unit
+): Unit = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = fadeIn(),
+    exit = fadeOut(),
+    content = content
+)
+
+@Composable
 fun <T> Transition<T>.FadeOutAnimatedVisibility(
     visible: (T) -> Boolean,
     modifier: Modifier = Modifier,

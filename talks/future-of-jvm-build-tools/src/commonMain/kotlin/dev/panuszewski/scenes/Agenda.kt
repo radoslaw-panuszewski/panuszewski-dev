@@ -71,7 +71,7 @@ fun StoryboardBuilder.Agenda() {
                         append(" - a new player joins the party!")
                     })
                     Text(buildAnnotatedString {
-                        append("5. Summing up")
+                        append("5. Wrapping up")
                     })
                 }
             }

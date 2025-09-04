@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -42,10 +44,12 @@ import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
+import dev.panuszewski.scenes.Stages.IMPERATIVE_VS_DECLARATIVE
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Connection
+import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
 import dev.panuszewski.template.MagicCodeSample
@@ -76,7 +80,7 @@ object Stages {
         return stateList
     }
 
-    val CONVENTION_PLUGINS = states(since = lastState + 1, count = 100)
+    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState + 1, count = 100)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
@@ -86,6 +90,7 @@ object Stages {
     val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
     val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
+    val CONVENTION_PLUGINS = states(since = lastState + 1, count = 13)
 
     val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
@@ -106,6 +111,7 @@ fun StoryboardBuilder.Gradle() {
             // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
+            stateTransition.ImperativeVsDeclarative()
         }
     }
 }
@@ -263,7 +269,7 @@ private fun Transition<Int>.ExplainingConfigExecutionDifference() {
 
 @Composable
 private fun Transition<Int>.ExplainingBuildCache() {
-    val buildCacheSamples = buildAndRememberCodeSamples {
+    val codeSamples = buildAndRememberCodeSamples {
         val cacheable by tag()
 
         """
@@ -308,9 +314,9 @@ private fun Transition<Int>.ExplainingBuildCache() {
                         createChildTransition {
                             val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[2]))
                             if (texts.contains("")) {
-                                buildCacheSamples[1]
+                                codeSamples[1]
                             } else {
-                                buildCacheSamples[0]
+                                codeSamples[0]
                             }
                         }
                             .MagicCodeSample()
@@ -528,8 +534,7 @@ fun Transition<Int>.ConventionPlugins() {
                 .toCodeSample(language = Language.Kotlin)
                 .startWith { hide(convention) }
                 .then { focus(plugins, publication) }
-                .then { hide(publication) }
-                .then { hide(plugins).unfocus() }
+                .then { hide(publication, plugins).unfocus() }
                 .then { reveal(convention).focus(convention) }
                 .then { unfocus() }
         }
@@ -549,13 +554,15 @@ fun Transition<Int>.ConventionPlugins() {
                 create<MavenPublication>("library") {
                     from(components["java"])
                 }
-            }${publication}${todo}// todo${todo}
+            }
+            
+            ${publication}${todo}// todo${todo}
             """
                 .trimIndent()
                 .toCodeSample(language = Language.Kotlin)
                 .startWith { hide(plugins, publication) }
-                .then { reveal(publication).hide(todo) }
-                .then { reveal(plugins) }
+                .then { reveal(plugins, publication) }
+                .then { hide(todo) }
         }
 
         val files = buildList {
@@ -575,8 +582,7 @@ fun Transition<Int>.ConventionPlugins() {
                         it in CONVENTION_PLUGINS[4]..CONVENTION_PLUGINS[8] -> kotlinLibraryBuildGradleKts[1]
                         it == CONVENTION_PLUGINS[9] -> kotlinLibraryBuildGradleKts[2]
                         it == CONVENTION_PLUGINS[10] -> kotlinLibraryBuildGradleKts[3]
-                        it == CONVENTION_PLUGINS[11] -> kotlinLibraryBuildGradleKts[4]
-                        else -> kotlinLibraryBuildGradleKts[5]
+                        else -> kotlinLibraryBuildGradleKts[4]
                     }
                 },
             )
@@ -620,7 +626,7 @@ fun Transition<Int>.ConventionPlugins() {
     }
 }
 
-private fun MutableList<ProjectFile>.addFile(name: String, path: String, content: Transition<CodeSample>) {
+private fun MutableList<ProjectFile>.addFile(name: String, path: String = name, content: Transition<CodeSample>) {
     val file = ProjectFile(name = name, path = path, content = content)
     add(file)
 }
@@ -628,4 +634,77 @@ private fun MutableList<ProjectFile>.addFile(name: String, path: String, content
 private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = name) {
     val file = ProjectFile(name = name, path = path, isDirectory = true)
     add(file)
+}
+
+@Composable
+fun Transition<Int>.ImperativeVsDeclarative() {
+    val codeSamples = buildAndRememberCodeSamples {
+        val one by tag()
+        val two by tag()
+        val three by tag()
+        val four by tag()
+        val five by tag()
+        val six by tag()
+        val seven by tag()
+        val eight by tag()
+        val nine by tag()
+        val ten by tag()
+        val eleven by tag()
+        val twelve by tag()
+
+        """
+            ${two}for (project in allprojects) {
+                ${two}${one}project.apply(plugin = "java")${one}${four}
+                
+                if (System.getenv("CI") == "true") {
+                    apply(plugin = "maven-publish")
+                }${four}${five}
+                
+                project.dependencies {${six}
+                    ${seven}when (LocalDateTime.now().dayOfWeek) {${eight}
+                        MONDAY -> implementation(libs.micronaut)
+                    ${eight}${nine}    TUESDAY -> implementation(libs.quarkus)
+                    ${nine}${ten}    else -> implementation(libs.spring.boot)
+                    ${ten}}${seven}${eleven}
+                
+                    if (masochistModeEnabled()) {
+                        implementation(libs.groovy)
+                    }${eleven}
+                ${six}}${five}
+            ${three}}${three}
+            """
+            .trimIndent()
+            .toCodeSample(language = Language.Kotlin)
+            .startWith { hide(two, three, four, five, six, seven, eight, nine, ten, eleven, twelve) }
+            .then { reveal(two, three) }
+            .then { reveal(four) }
+            .then { reveal(five) }
+            .then { reveal(six, seven) }
+            .then { reveal(eight, nine, ten) }
+            .then { reveal(eleven) }
+            .then { reveal(twelve) }
+    }
+
+    FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            SlideFromBottomAnimatedVisibility({ it >= IMPERATIVE_VS_DECLARATIVE[0] }) {
+                IDE(
+                    files = buildList {
+                        addFile(
+                            name = "build.gradle.kts",
+                            content = createChildTransition { codeSamples.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) }
+                        )
+                    },
+                    selectedFile = "build.gradle.kts",
+                    modifier = Modifier.padding(32.dp)
+                )
+            }
+
+            FadeInOutAnimatedVisibility({ it == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.lastIndex }) {
+                ProvideTextStyle(MaterialTheme.typography.h1) {
+                    Text(text = "😬")
+                }
+            }
+        }
+    }
 }

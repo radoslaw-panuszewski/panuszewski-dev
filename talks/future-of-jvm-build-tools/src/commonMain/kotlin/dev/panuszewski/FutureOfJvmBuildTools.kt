@@ -5,10 +5,12 @@ import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
 import dev.panuszewski.scenes.Agenda
 import dev.panuszewski.scenes.Gradle
+import dev.panuszewski.scenes.GradleTransitionOnChart
 import dev.panuszewski.scenes.Maven
 import dev.panuszewski.scenes.MavenTransitionOnChart
 import dev.panuszewski.scenes.Overview
 import dev.panuszewski.scenes.Title
+import dev.panuszewski.scenes.WrappingUp
 import dev.panuszewski.template.LIGHT_THEME
 import dev.panuszewski.template.SectionTitle
 
@@ -17,6 +19,8 @@ val FutureOfJvmBuildTools = Storyboard.build(
     format = SceneFormat.Default,
     decorator = LIGHT_THEME,
 ) {
+    // TODO hook na początku!
+
 //    section("The Future of JVM Build Tools") {
 //        Title(animateToPresent = false)
 //        Agenda()
@@ -33,6 +37,16 @@ val FutureOfJvmBuildTools = Storyboard.build(
     section("Gradle") {
         SectionTitle(animateToHeader = true)
         Gradle()
+        GradleTransitionOnChart()
+    }
+
+//    section("Wrapping up!") {
+//        SectionTitle(animateToHeader = true)
+//        WrappingUp()
+//    }
+
+    section("Thank You!") {
+        SectionTitle()
     }
 }
 
