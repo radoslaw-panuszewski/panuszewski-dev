@@ -5,8 +5,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -639,68 +637,106 @@ private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = n
 @Composable
 fun Transition<Int>.ImperativeVsDeclarative() {
     val codeSamples = buildAndRememberCodeSamples {
-        val one by tag()
-        val two by tag()
-        val three by tag()
-        val four by tag()
-        val five by tag()
-        val six by tag()
-        val seven by tag()
-        val eight by tag()
-        val nine by tag()
-        val ten by tag()
-        val eleven by tag()
-        val twelve by tag()
+        val pluginsBlock by tag()
+        val mavenPublishDeclarative by tag()
+        val mavenPublishImperative by tag()
+        val topIfCi by tag()
+        val bottomIfCi by tag()
+        val topWhen by tag()
+        val bottomWhen by tag()
+        val monday by tag()
+        val quarkus by tag()
+        val micronaut by tag()
+        val masochistIfTop by tag()
+        val masochistIfBottom by tag()
 
         """
-            ${two}for (project in allprojects) {
-                ${two}${one}project.apply(plugin = "java")${one}${four}
-                
-                if (System.getenv("CI") == "true") {
-                    apply(plugin = "maven-publish")
-                }${four}${five}
-                
-                project.dependencies {${six}
-                    ${seven}when (LocalDateTime.now().dayOfWeek) {${eight}
-                        MONDAY -> implementation(libs.micronaut)
-                    ${eight}${nine}    TUESDAY -> implementation(libs.quarkus)
-                    ${nine}${ten}    else -> implementation(libs.spring.boot)
-                    ${ten}}${seven}${eleven}
-                
-                    if (masochistModeEnabled()) {
-                        implementation(libs.groovy)
-                    }${eleven}
-                ${six}}${five}
-            ${three}}${three}
-            """
+        ${pluginsBlock}plugins {
+            `java`${mavenPublishDeclarative}
+            `maven-publish`${mavenPublishDeclarative}
+        }${pluginsBlock}${mavenPublishImperative}
+        
+        ${topIfCi}if (System.getenv("CI") == "true") {
+            ${topIfCi}apply(plugin = "maven-publish")${bottomIfCi}
+        }${bottomIfCi}${mavenPublishImperative}
+        
+        dependencies {
+            ${topWhen}when (LocalDateTime.now().dayOfWeek) {
+                ${topWhen}${monday}MONDAY -> ${monday}implementation(libs.spring.boot)${quarkus}
+                TUESDAY -> implementation(libs.quarkus)${quarkus}${micronaut}
+                else -> implementation(libs.micronaut)${micronaut}${bottomWhen}
+            }${bottomWhen}
+            ${masochistIfTop}
+            if (masochistModeEnabled()) {
+                ${masochistIfTop}implementation(libs.groovy)${masochistIfBottom}
+            }${masochistIfBottom}
+        }
+        """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { hide(two, three, four, five, six, seven, eight, nine, ten, eleven, twelve) }
-            .then { reveal(two, three) }
-            .then { reveal(four) }
-            .then { reveal(five) }
-            .then { reveal(six, seven) }
-            .then { reveal(eight, nine, ten) }
-            .then { reveal(eleven) }
-            .then { reveal(twelve) }
+            .startWith { hide(mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, quarkus, micronaut, masochistIfTop, masochistIfBottom) }
+            .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
+            .then { reveal(topIfCi, bottomIfCi) }
+            .then { reveal(topWhen, bottomWhen, monday) }
+            .then { reveal(quarkus, micronaut) }
+            .then { reveal(masochistIfTop, masochistIfBottom) }
+    }
+
+    val myConvention = buildAndRememberCodeSamples {
+        """
+        // TODO
+        """
+            .trimIndent()
+            .toCodeSample(language = Language.Kotlin)
+            .startWith { this }
     }
 
     FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             SlideFromBottomAnimatedVisibility({ it >= IMPERATIVE_VS_DECLARATIVE[0] }) {
+                val files = buildList {
+                    addFile(
+                        name = "build.gradle.kts",
+                        content = createChildTransition { codeSamples.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) }
+                    )
+                    addDirectory("buildSrc")
+                    addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
+                    addFile(
+                        name = "my-convention.gradle.kts",
+                        path = "buildSrc/src/main/kotlin/my-convention.gradle.kts",
+                        content = createChildTransition { myConvention.safeGet(it - (IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1)) }
+                    )
+                }
+
+                val selectedFile = when {
+                    currentState <= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1 -> "build.gradle.kts"
+                    currentState == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/my-convention.gradle.kts"
+                    else -> null
+                }
+
+                val leftPaneFile = when {
+                    currentState >= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "build.gradle.kts"
+                    else -> null
+                }
+
+                val rightPaneFile = when {
+                    currentState >= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/my-convention.gradle.kts"
+                    else -> null
+                }
+
+                val fileTreeHidden = currentState > IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2
+
                 IDE(
-                    files = buildList {
-                        addFile(
-                            name = "build.gradle.kts",
-                            content = createChildTransition { codeSamples.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) }
-                        )
-                    },
-                    selectedFile = "build.gradle.kts",
+                    files = files,
+                    selectedFile = selectedFile,
+                    leftPaneFile = leftPaneFile,
+                    rightPaneFile = rightPaneFile,
+                    fileTreeHidden = fileTreeHidden,
                     modifier = Modifier.padding(32.dp)
                 )
             }
 
-            FadeInOutAnimatedVisibility({ it == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.lastIndex }) {
+            FadeInOutAnimatedVisibility({ it == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size }) {
                 ProvideTextStyle(MaterialTheme.typography.h1) {
                     Text(text = "😬")
                 }
