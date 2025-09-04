@@ -645,8 +645,8 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         val topWhen by tag()
         val bottomWhen by tag()
         val monday by tag()
-        val quarkus by tag()
-        val micronaut by tag()
+        val postgres by tag()
+        val cassandra by tag()
         val masochistIfTop by tag()
         val masochistIfBottom by tag()
 
@@ -661,10 +661,12 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         }${bottomIfCi}${mavenPublishImperative}
         
         dependencies {
-            ${topWhen}when (LocalDateTime.now().dayOfWeek) {
-                ${topWhen}${monday}MONDAY -> ${monday}implementation(libs.spring.boot)${quarkus}
-                TUESDAY -> implementation(libs.quarkus)${quarkus}${micronaut}
-                else -> implementation(libs.micronaut)${micronaut}${bottomWhen}
+            implementation(libs.spring.boot)
+            ${topWhen}
+            when (today()) {
+                ${topWhen}${monday}MONDAY -> ${monday}implementation(libs.mongodb)${postgres}
+                TUESDAY -> implementation(libs.postgres)${postgres}${cassandra}
+                else -> implementation(libs.cassandra)${cassandra}${bottomWhen}
             }${bottomWhen}
             ${masochistIfTop}
             if (masochistModeEnabled()) {
@@ -674,15 +676,15 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { hide(mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, quarkus, micronaut, masochistIfTop, masochistIfBottom) }
+            .startWith { hide(mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom) }
             .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
             .then { reveal(topIfCi, bottomIfCi) }
             .then { reveal(topWhen, bottomWhen, monday) }
-            .then { reveal(quarkus, micronaut) }
+            .then { reveal(postgres, cassandra) }
             .then { reveal(masochistIfTop, masochistIfBottom) }
     }
 
-    val myConvention = buildAndRememberCodeSamples {
+    val wtfApp = buildAndRememberCodeSamples {
         """
         // TODO
         """
@@ -702,15 +704,15 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                     addDirectory("buildSrc")
                     addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
                     addFile(
-                        name = "my-convention.gradle.kts",
-                        path = "buildSrc/src/main/kotlin/my-convention.gradle.kts",
-                        content = createChildTransition { myConvention.safeGet(it - (IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1)) }
+                        name = "wtf-app.gradle.kts",
+                        path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
+                        content = createChildTransition { wtfApp.safeGet(it - (IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1)) }
                     )
                 }
 
                 val selectedFile = when {
                     currentState <= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1 -> "build.gradle.kts"
-                    currentState == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/my-convention.gradle.kts"
+                    currentState == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
                     else -> null
                 }
 
@@ -720,7 +722,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                 }
 
                 val rightPaneFile = when {
-                    currentState >= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/my-convention.gradle.kts"
+                    currentState >= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
                     else -> null
                 }
 
