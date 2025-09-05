@@ -16,6 +16,8 @@ import dev.bnorm.storyboard.text.replaceAllByTag
 @Immutable
 class CodeSample private constructor(
     private val focus: List<TextTag>,
+    private val focusedStyle: SpanStyle? = FOCUSED_STYLE,
+    private val unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE,
     private val replaced: Map<TextTag, AnnotatedString>,
     private val styled: Map<TextTag, SpanStyle>,
     private val scrollTag: TextTag?,
@@ -26,7 +28,7 @@ class CodeSample private constructor(
     val splitMethod: (AnnotatedString) -> List<AnnotatedString>
 ) {
     constructor(text: AnnotatedString, language: Language, title: String? = null, splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() })
-            : this(emptyList(), emptyMap(), emptyMap(), null, null, text, language, title, splitMethod)
+            : this(emptyList(), FOCUSED_STYLE, UNFOCUSED_STYLE, emptyMap(), emptyMap(), null, null, text, language, title, splitMethod)
 
     @Composable
     fun Split() = splitMethod(String())
@@ -38,7 +40,7 @@ class CodeSample private constructor(
             str = str.addStyleByTag(listOf(tag), tagged = style)
         }
         if (focus.isNotEmpty()) {
-            str = str.addStyleByTag(focus, tagged = FOCUSED_STYLE, untagged = UNFOCUSED_STYLE)
+            str = str.addStyleByTag(focus, tagged = focusedStyle, untagged = unfocusedStyle)
         }
         // TODO collapse first and then hide?
         //  - will keep the collapses from being split,
@@ -72,6 +74,8 @@ class CodeSample private constructor(
 
     private fun copy(
         focus: List<TextTag> = this.focus,
+        focusedStyle: SpanStyle? = this.focusedStyle,
+        unfocusedStyle: SpanStyle? = this.unfocusedStyle,
         replaced: Map<TextTag, AnnotatedString> = this.replaced,
         styled: Map<TextTag, SpanStyle> = this.styled,
         scrollTag: TextTag? = this.scrollTag,
@@ -80,7 +84,7 @@ class CodeSample private constructor(
         language: Language = this.language,
         title: String? = this.title,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = this.splitMethod,
-    ): CodeSample = CodeSample(focus, replaced, styled, scrollTag, data, text, language, title, splitMethod)
+    ): CodeSample = CodeSample(focus, focusedStyle, unfocusedStyle, replaced, styled, scrollTag, data, text, language, title, splitMethod)
 
     fun collapse(tag: TextTag): CodeSample = copy(replaced = replaced + (tag to ELLIPSIS))
     fun collapse(vararg tags: TextTag): CodeSample = collapse(tags.asList())
@@ -103,14 +107,14 @@ class CodeSample private constructor(
         return copy(replaced = replaced - tags)
     }
 
-    fun focus(tags: List<TextTag>, scroll: Boolean = true): CodeSample =
-        copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag)
+    fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+        copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag, focusedStyle = focusedStyle, unfocusedStyle = unfocusedStyle)
 
-    fun focus(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
-        focus(tags.asList(), scroll)
+    fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+        focus(tags.asList(), scroll, focusedStyle, unfocusedStyle)
 
-    fun focus(tag: TextTag, scroll: Boolean = true): CodeSample =
-        focus(tags = listOf(tag), scroll = scroll)
+    fun focus(tag: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+        focus(listOf(tag), scroll, focusedStyle, unfocusedStyle)
 
     fun unfocus(unscroll: Boolean = true): CodeSample =
         copy(focus = emptyList(), scrollTag = if (unscroll) null else scrollTag)

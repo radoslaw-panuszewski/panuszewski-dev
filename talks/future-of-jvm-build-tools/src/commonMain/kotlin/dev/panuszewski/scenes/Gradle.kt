@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -636,7 +637,7 @@ private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = n
 
 @Composable
 fun Transition<Int>.ImperativeVsDeclarative() {
-    val codeSamples = buildAndRememberCodeSamples {
+    val buildGradleKts = buildAndRememberCodeSamples {
         val pluginsBlock by tag()
         val mavenPublishDeclarative by tag()
         val mavenPublishImperative by tag()
@@ -649,49 +650,101 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         val cassandra by tag()
         val masochistIfTop by tag()
         val masochistIfBottom by tag()
+        val javaPlugin by tag()
+        val wtfAppPlugin by tag()
+        val randomDatabase by tag()
+        val groovy by tag()
 
         """
-        ${pluginsBlock}plugins {
-            `java`${mavenPublishDeclarative}
+        ${pluginsBlock}plugins {${javaPlugin}
+            `java`${javaPlugin}${mavenPublishDeclarative}
             `maven-publish`${mavenPublishDeclarative}
-        }${pluginsBlock}${mavenPublishImperative}
+        }
         
-        ${topIfCi}if (System.getenv("CI") == "true") {
+        ${pluginsBlock}${mavenPublishImperative}${topIfCi}if (System.getenv("CI") == "true") {
             ${topIfCi}apply(plugin = "maven-publish")${bottomIfCi}
-        }${bottomIfCi}${mavenPublishImperative}
+        }${bottomIfCi}
         
-        dependencies {
-            implementation(libs.spring.boot)
+        ${mavenPublishImperative}${wtfAppPlugin}plugins {
+            `wtf-app`
+        }
+        
+        ${wtfAppPlugin}dependencies {
+            implementation(libs.spring.boot)${randomDatabase}
             ${topWhen}
             when (today()) {
                 ${topWhen}${monday}MONDAY -> ${monday}implementation(libs.mongodb)${postgres}
                 TUESDAY -> implementation(libs.postgres)${postgres}${cassandra}
                 else -> implementation(libs.cassandra)${cassandra}${bottomWhen}
-            }${bottomWhen}
+            }${bottomWhen}${randomDatabase}${groovy}
             ${masochistIfTop}
             if (masochistModeEnabled()) {
                 ${masochistIfTop}implementation(libs.groovy)${masochistIfBottom}
-            }${masochistIfBottom}
+            }${masochistIfBottom}${groovy}
         }
         """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { hide(mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom) }
+            .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom) }
             .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
             .then { reveal(topIfCi, bottomIfCi) }
             .then { reveal(topWhen, bottomWhen, monday) }
             .then { reveal(postgres, cassandra) }
             .then { reveal(masochistIfTop, masochistIfBottom) }
+            .then { focus(mavenPublishImperative, randomDatabase, groovy) }
+            .then { hide(mavenPublishImperative, randomDatabase, groovy).unfocus() }
+            .then { this }
+            .then { focus(pluginsBlock) }
+            .then { hide(pluginsBlock).unfocus() }
+            .then { reveal(wtfAppPlugin).focus(wtfAppPlugin) }
+            .then { unfocus() }
     }
 
     val wtfApp = buildAndRememberCodeSamples {
+        val todo by tag()
+        val imperativeCode by tag()
+        val javaPlugin by tag()
+        val implementation1 by tag()
+        val implementation2 by tag()
+        val implementation3 by tag()
+        val implementation4 by tag()
+
         """
-        // TODO
+        ${javaPlugin}plugins {
+            `java`
+        }
+        
+        ${javaPlugin}${imperativeCode}if (System.getenv("CI") == "true") {
+            apply(plugin = "maven-publish")
+        }
+        
+        dependencies {
+            when (today()) {
+                MONDAY -> ${implementation1}implementation${implementation1}(libs.mongodb)
+                TUESDAY -> ${implementation2}implementation${implementation2}(libs.postgres)
+                else -> ${implementation3}implementation${implementation3}(libs.cassandra)
+            }
+            if (masochistModeEnabled()) {
+                ${implementation4}implementation${implementation4}(libs.groovy)
+            }
+        }
+        
+        ${imperativeCode}${todo}// TODO${todo}
         """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { this }
+            .startWith { hide(javaPlugin, imperativeCode) }
+            .then { this }
+            .then { reveal(imperativeCode) }
+            .then { focus(implementation1, implementation2, implementation3, implementation4, focusedStyle = SpanStyle(Color.Red), unfocusedStyle = null).hide(todo) }
+            .then { this }
+            .then { reveal(javaPlugin).unfocus() }
     }
+
+    val buildGradleKtsBeforeSplitPane = buildGradleKts.take(buildGradleKts.size - 7)
+    val buildGradleKtsOnSplitPane = buildGradleKts.takeLast(buildGradleKtsBeforeSplitPane.size + 2)
+    val splitPaneEnabledSince = IMPERATIVE_VS_DECLARATIVE[0] + buildGradleKtsBeforeSplitPane.size + 2
+    val fileTreeHiddenSince = splitPaneEnabledSince + 1
 
     FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -699,46 +752,50 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                 val files = buildList {
                     addFile(
                         name = "build.gradle.kts",
-                        content = createChildTransition { codeSamples.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0]) }
+                        content = createChildTransition {
+                            if (it < fileTreeHiddenSince) {
+                                buildGradleKtsBeforeSplitPane.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0])
+                            } else {
+                                buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
+                            }
+                        }
                     )
                     addDirectory("buildSrc")
                     addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
                     addFile(
                         name = "wtf-app.gradle.kts",
                         path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
-                        content = createChildTransition { wtfApp.safeGet(it - (IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1)) }
+                        content = createChildTransition { wtfApp.safeGet(it - fileTreeHiddenSince) }
                     )
                 }
 
                 val selectedFile = when {
-                    currentState <= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 1 -> "build.gradle.kts"
-                    currentState == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                    currentState < splitPaneEnabledSince -> "build.gradle.kts"
+                    currentState == splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
                     else -> null
                 }
 
                 val leftPaneFile = when {
-                    currentState >= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "build.gradle.kts"
+                    currentState >= splitPaneEnabledSince -> "build.gradle.kts"
                     else -> null
                 }
 
                 val rightPaneFile = when {
-                    currentState >= IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2 -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                    currentState >= splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
                     else -> null
                 }
-
-                val fileTreeHidden = currentState > IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size + 2
 
                 IDE(
                     files = files,
                     selectedFile = selectedFile,
                     leftPaneFile = leftPaneFile,
                     rightPaneFile = rightPaneFile,
-                    fileTreeHidden = fileTreeHidden,
+                    fileTreeHidden = currentState >= fileTreeHiddenSince,
                     modifier = Modifier.padding(32.dp)
                 )
             }
 
-            FadeInOutAnimatedVisibility({ it == IMPERATIVE_VS_DECLARATIVE[0] + codeSamples.size }) {
+            FadeInOutAnimatedVisibility({ it == IMPERATIVE_VS_DECLARATIVE[0] + buildGradleKtsBeforeSplitPane.size }) {
                 ProvideTextStyle(MaterialTheme.typography.h1) {
                     Text(text = "😬")
                 }
