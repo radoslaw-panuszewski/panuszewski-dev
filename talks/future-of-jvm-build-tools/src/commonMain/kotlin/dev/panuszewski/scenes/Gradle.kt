@@ -44,6 +44,7 @@ import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
+import dev.panuszewski.scenes.Stages.DECLARATIVE_GRADLE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONVENTION_PLUGINS
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
@@ -58,12 +59,9 @@ import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Text
-import dev.panuszewski.template.body1
 import dev.panuszewski.template.buildAndRememberCodeSamples
-import dev.panuszewski.template.code1
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h4
-import dev.panuszewski.template.h5
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
@@ -71,7 +69,6 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
-import dev.panuszewski.template.withSecondaryColor
 import kotlin.math.max
 
 object Stages {
@@ -87,7 +84,7 @@ object Stages {
     }
 
     val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
-    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 100)
+    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 24)
     val DECLARATIVE_GRADLE = states(since = lastState + 1, count = 20)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
@@ -132,6 +129,7 @@ private fun Transition<Int>.Title() {
                 in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
                 in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
                 in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
+                in DECLARATIVE_GRADLE -> "Declarative Gradle"
                 else -> "Gradle"
             },
         ) { text ->
@@ -612,21 +610,26 @@ fun Transition<Int>.ConventionPlugins() {
 
     val grimacingEmojiVisible = CONVENTION_PLUGINS[0] + buildGradleKtsBeforeSplitPane.size
     val ideIsShrinkedSince = grimacingEmojiVisible + 2
-    val ideIsBackToNormal = EXPLAINING_CONVENTION_PLUGINS[4]
+    val ideIsBackToNormalSince = EXPLAINING_CONVENTION_PLUGINS[4]
 
-    val splitPaneEnabledSince = ideIsBackToNormal + 1
+    val splitPaneEnabledSince = ideIsBackToNormalSince + 1
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
 
-    val smallIdeSince = ideIsShrinkedSince + 100
-    val noIdeaEmojiVisible = smallIdeSince + 2
-    val ideHiddenSince = noIdeaEmojiVisible + 2
+    val ideIsShrinkedAgainSince = fileTreeRevealedSince + 1
+
+    val ideBackToNormalAgainSince = ideIsShrinkedAgainSince + 3
+    val noIdeaEmojiVisible = ideBackToNormalAgainSince + 2
+    val ideIsShrinked3Since = noIdeaEmojiVisible + 2
+    val ideHiddenSince = ideIsShrinked3Since + 2
 
     val ideTopPadding by animateDp {
         when {
-            it >= ideIsBackToNormal -> 32.dp
-            it >= smallIdeSince -> 150.dp
+            it >= ideIsShrinked3Since -> 275.dp
+            it >= ideBackToNormalAgainSince -> 150.dp
+            it >= ideIsShrinkedAgainSince -> 275.dp
+            it >= ideIsBackToNormalSince -> 32.dp
             it >= ideIsShrinkedSince -> 275.dp
             else -> 32.dp
         }
@@ -635,7 +638,7 @@ fun Transition<Int>.ConventionPlugins() {
     FadeOutAnimatedVisibility({ it in CONVENTION_PLUGINS }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
 
-            FadeOutAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[0] <= it && it < ideIsBackToNormal }) {
+            FadeOutAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[0] <= it && it < ideIsBackToNormalSince }) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
                     verticalArrangement = Arrangement.spacedBy(32.dp),
@@ -665,7 +668,38 @@ fun Transition<Int>.ConventionPlugins() {
                             Text {
                                 append("Or share some ")
                                 withPrimaryColor { append("common defaults") }
-                                append(" (like JVM version)")
+                                append(" (like the JVM version)")
+                            }
+                        }
+                    }
+                }
+            }
+
+            FadeOutAnimatedVisibility({ ideIsShrinkedAgainSince <= it && it < ideHiddenSince }) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SlideFromTopAnimatedVisibility({ ideIsShrinkedAgainSince + 1 <= it }) {
+                        h6 { Text { append("It's cool, but... is it enough?") } }
+                    }
+
+                    SlideFromTopAnimatedVisibility({ ideIsShrinkedAgainSince + 2 <= it }) {
+                        h6 {
+                            Text {
+                                append("This approach encourages declarativity, but ")
+                                withPrimaryColor { append("does not enforce it") }
+                            }
+                        }
+                    }
+
+                    SlideFromTopAnimatedVisibility({ ideIsShrinked3Since + 1 <= it }) {
+                        h6 {
+                            Text {
+                                append("Also, conventions often ")
+                                withPrimaryColor { append("mix") }
+                                append(" build logic with shared defaults")
                             }
                         }
                     }
@@ -680,18 +714,20 @@ fun Transition<Int>.ConventionPlugins() {
                             content = createChildTransition {
                                 when {
                                     it < fileTreeHiddenSince -> buildGradleKtsBeforeSplitPane.safeGet(it - CONVENTION_PLUGINS[0])
-                                    it < smallIdeSince -> buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
-                                    else -> buildGradleKtsInSmallIde.safeGet(it - smallIdeSince)
+                                    it < ideBackToNormalAgainSince -> buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
+                                    else -> buildGradleKtsInSmallIde.safeGet(it - ideBackToNormalAgainSince)
                                 }
                             }
                         )
-                        addDirectory("buildSrc")
-                        addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
-                        addFile(
-                            name = "wtf-app.gradle.kts",
-                            path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
-                            content = createChildTransition { wtfApp.safeGet(it - fileTreeHiddenSince) }
-                        )
+                        if (currentState >= ideIsBackToNormalSince + 1) {
+                            addDirectory("buildSrc")
+                            addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
+                            addFile(
+                                name = "wtf-app.gradle.kts",
+                                path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
+                                content = createChildTransition { wtfApp.safeGet(it - fileTreeHiddenSince) }
+                            )
+                        }
                     }
 
                     val selectedFile = when {
