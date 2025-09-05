@@ -44,7 +44,8 @@ import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
-import dev.panuszewski.scenes.Stages.IMPERATIVE_VS_DECLARATIVE
+import dev.panuszewski.scenes.Stages.DECLARATIVE_GRADLE
+import dev.panuszewski.scenes.Stages.EXPLAINING_CONVENTION_PLUGINS
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.CodeSample
@@ -66,6 +67,7 @@ import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withColor
+import dev.panuszewski.template.withPrimaryColor
 import kotlin.math.max
 
 object Stages {
@@ -80,7 +82,9 @@ object Stages {
         return stateList
     }
 
-    val IMPERATIVE_VS_DECLARATIVE = states(since = lastState + 1, count = 100)
+    val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 19)
+    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 20)
+    val DECLARATIVE_GRADLE = states(since = lastState + 1, count = 20)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
@@ -90,10 +94,10 @@ object Stages {
     val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
     val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
-    val CONVENTION_PLUGINS = states(since = lastState + 1, count = 13)
 
     val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
+    val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVENTION_PLUGINS + DECLARATIVE_GRADLE
 }
 
 fun StoryboardBuilder.Gradle() {
@@ -111,7 +115,6 @@ fun StoryboardBuilder.Gradle() {
             // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
-            stateTransition.ImperativeVsDeclarative()
         }
     }
 }
@@ -124,6 +127,7 @@ private fun Transition<Int>.Title() {
             targetState = when (currentState) {
                 in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
                 in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+                in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
                 else -> "Gradle"
             },
         ) { text ->
@@ -474,158 +478,6 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     }
 }
 
-@Composable
-fun Transition<Int>.ConventionPlugins() {
-    SlideFromBottomAnimatedVisibility({ it in CONVENTION_PLUGINS }) {
-        val javaLibraryBuildGradleKts = buildAndRememberCodeSamples {
-            val commonPlugins by tag()
-            val commonPublication by tag()
-
-            """
-            plugins {
-                ${commonPlugins}`java-library`
-                `maven-publish`${commonPlugins}
-            }
-            
-            dependencies {
-                implementation(libs.guava)
-            }
-                
-            ${commonPublication}publishing {
-                publications {
-                    create<MavenPublication>("library") {
-                        from(components["java"])
-                    }
-                }
-            }${commonPublication}
-            """
-                .trimIndent()
-                .toCodeSample(language = Language.Kotlin)
-                .startWith { this }
-                .then { focus(commonPlugins, commonPublication) }
-        }
-
-        val kotlinLibraryBuildGradleKts = buildAndRememberCodeSamples {
-            val plugins by tag()
-            val publication by tag()
-            val convention by tag()
-
-            """
-            plugins {${plugins}
-                `java-library`
-                `maven-publish`${plugins}${convention}
-                id("library-convention")${convention}
-                alias(libs.plugins.kotlin.jvm)
-            }
-            
-            dependencies {
-                runtimeOnly(libs.kotlin.reflect)        
-            }
-                
-            ${publication}publishing {
-                publications {
-                    create<MavenPublication>("library") {
-                        from(components["java"])
-                    }
-                }
-            }${publication}
-            """
-                .trimIndent()
-                .toCodeSample(language = Language.Kotlin)
-                .startWith { hide(convention) }
-                .then { focus(plugins, publication) }
-                .then { hide(publication, plugins).unfocus() }
-                .then { reveal(convention).focus(convention) }
-                .then { unfocus() }
-        }
-
-        val libraryConventionGradleKts = buildAndRememberCodeSamples {
-            val todo by tag()
-            val plugins by tag()
-            val publication by tag()
-
-            """
-            ${plugins}plugins {
-                `java-library`
-                `maven-publish`
-            }
-            
-            ${plugins}${publication}publications {
-                create<MavenPublication>("library") {
-                    from(components["java"])
-                }
-            }
-            
-            ${publication}${todo}// todo${todo}
-            """
-                .trimIndent()
-                .toCodeSample(language = Language.Kotlin)
-                .startWith { hide(plugins, publication) }
-                .then { reveal(plugins, publication) }
-                .then { hide(todo) }
-        }
-
-        val files = buildList {
-            addDirectory("java-library")
-            addDirectory("kotlin-library")
-            addFile(
-                name = "build.gradle.kts",
-                path = "java-library/build.gradle.kts",
-                content = createChildTransition { javaLibraryBuildGradleKts.safeGet(it - CONVENTION_PLUGINS[3]) },
-            )
-            addFile(
-                name = "build.gradle.kts",
-                path = "kotlin-library/build.gradle.kts",
-                content = createChildTransition {
-                    when {
-                        it <= CONVENTION_PLUGINS[3] -> kotlinLibraryBuildGradleKts[0]
-                        it in CONVENTION_PLUGINS[4]..CONVENTION_PLUGINS[8] -> kotlinLibraryBuildGradleKts[1]
-                        it == CONVENTION_PLUGINS[9] -> kotlinLibraryBuildGradleKts[2]
-                        it == CONVENTION_PLUGINS[10] -> kotlinLibraryBuildGradleKts[3]
-                        else -> kotlinLibraryBuildGradleKts[4]
-                    }
-                },
-            )
-            if (currentState >= CONVENTION_PLUGINS[6]) {
-                addDirectory("buildSrc")
-                addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
-                addFile(
-                    name = "library-convention.gradle.kts",
-                    path = "buildSrc/src/main/kotlin/library-convention.gradle.kts",
-                    content = createChildTransition { libraryConventionGradleKts.safeGet(it - CONVENTION_PLUGINS[8]) },
-                )
-            }
-        }
-
-        val selectedFile = when (currentState) {
-            CONVENTION_PLUGINS[1] -> "java-library/build.gradle.kts"
-            CONVENTION_PLUGINS[2] -> "kotlin-library/build.gradle.kts"
-            CONVENTION_PLUGINS[7] -> "buildSrc/src/main/kotlin/library-convention.gradle.kts"
-            else -> null
-        }
-
-        val leftPaneFile = when {
-            currentState >= CONVENTION_PLUGINS[7] -> "buildSrc/src/main/kotlin/library-convention.gradle.kts"
-            currentState >= CONVENTION_PLUGINS[1] -> "java-library/build.gradle.kts"
-            else -> null
-        }
-
-        val rightPaneFile = when {
-            currentState >= CONVENTION_PLUGINS[2] -> "kotlin-library/build.gradle.kts"
-            else -> null
-        }
-
-        IDE(
-            files = files,
-            selectedFile = selectedFile,
-            leftPaneFile = leftPaneFile,
-            rightPaneFile = rightPaneFile,
-            fileTreeHidden = currentState in CONVENTION_PLUGINS[3]..CONVENTION_PLUGINS[4] || currentState >= CONVENTION_PLUGINS[8],
-            modifier = Modifier.padding(32.dp)
-        )
-    }
-}
-
 private fun MutableList<ProjectFile>.addFile(name: String, path: String = name, content: Transition<CodeSample>) {
     val file = ProjectFile(name = name, path = path, content = content)
     add(file)
@@ -637,7 +489,7 @@ private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = n
 }
 
 @Composable
-fun Transition<Int>.ImperativeVsDeclarative() {
+fun Transition<Int>.ConventionPlugins() {
     val buildGradleKts = buildAndRememberCodeSamples {
         val pluginsBlock by tag()
         val mavenPublishDeclarative by tag()
@@ -743,67 +595,104 @@ fun Transition<Int>.ImperativeVsDeclarative() {
 
     val buildGradleKtsBeforeSplitPane = buildGradleKts.take(buildGradleKts.size - 7)
     val buildGradleKtsOnSplitPane = buildGradleKts.takeLast(buildGradleKtsBeforeSplitPane.size + 2)
-    val splitPaneEnabledSince = IMPERATIVE_VS_DECLARATIVE[0] + buildGradleKtsBeforeSplitPane.size + 2
+    val emojiVisible = CONVENTION_PLUGINS[0] + buildGradleKtsBeforeSplitPane.size
+    val splitPaneEnabledSince = emojiVisible + 2
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
-    val ideTopPadding by animateDp { if (it >= fileTreeRevealedSince + 1) 275.dp else 32.dp }
+    val ideIsShrinkedSince = fileTreeRevealedSince + 1
+    val ideTopPadding by animateDp {
+        when {
+            it >= EXPLAINING_CONVENTION_PLUGINS[3] -> 150.dp
+            it >= ideIsShrinkedSince -> 275.dp
+            else -> 32.dp
+        }
+    }
 
-    FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            SlideFromBottomAnimatedVisibility({ it >= IMPERATIVE_VS_DECLARATIVE[0] }) {
-                val files = buildList {
-                    addFile(
-                        name = "build.gradle.kts",
-                        content = createChildTransition {
-                            if (it < fileTreeHiddenSince) {
-                                buildGradleKtsBeforeSplitPane.safeGet(it - IMPERATIVE_VS_DECLARATIVE[0])
-                            } else {
-                                buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
-                            }
+    FadeOutAnimatedVisibility({ it in CONVENTION_PLUGINS }) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+
+            FadeOutAnimatedVisibility({ it in EXPLAINING_CONVENTION_PLUGINS.drop(1) }) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SlideFromTopAnimatedVisibility({ it >= EXPLAINING_CONVENTION_PLUGINS[1] }) {
+                        h6 {
+                            Text(buildAnnotatedString {
+                                append("A ")
+                                withPrimaryColor { append("recommended") }
+                                append(" approach since a long time")
+                            })
                         }
-                    )
-                    addDirectory("buildSrc")
-                    addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
-                    addFile(
-                        name = "wtf-app.gradle.kts",
-                        path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
-                        content = createChildTransition { wtfApp.safeGet(it - fileTreeHiddenSince) }
-                    )
+                    }
+                    SlideFromTopAnimatedVisibility({ it >= EXPLAINING_CONVENTION_PLUGINS[2] }) {
+                        h6 {
+                            Text(buildAnnotatedString {
+                                append("Encourages declarativeness, though")
+                                withColor(Color(0xFFFF8A04)) { append(" does not enforce it") }
+                            })
+                        }
+                    }
                 }
-
-                val selectedFile = when {
-                    currentState < splitPaneEnabledSince -> "build.gradle.kts"
-                    currentState == splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
-                    currentState >= splitPaneClosedSince -> "build.gradle.kts"
-                    else -> null
-                }
-
-                val leftPaneFile = when {
-                    currentState >= splitPaneClosedSince -> null
-                    currentState >= splitPaneEnabledSince -> "build.gradle.kts"
-                    else -> null
-                }
-
-                val rightPaneFile = when {
-                    currentState >= splitPaneClosedSince -> null
-                    currentState >= splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
-                    else -> null
-                }
-
-                IDE(
-                    files = files,
-                    selectedFile = selectedFile,
-                    leftPaneFile = leftPaneFile,
-                    rightPaneFile = rightPaneFile,
-                    fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
-                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
-                )
             }
 
-            FadeInOutAnimatedVisibility({ it == IMPERATIVE_VS_DECLARATIVE[0] + buildGradleKtsBeforeSplitPane.size }) {
-                ProvideTextStyle(MaterialTheme.typography.h1) {
-                    Text(text = "😬")
+            Box(contentAlignment = Alignment.Center) {
+                SlideFromBottomAnimatedVisibility({ it >= CONVENTION_PLUGINS[0] }) {
+                    val files = buildList {
+                        addFile(
+                            name = "build.gradle.kts",
+                            content = createChildTransition {
+                                if (it < fileTreeHiddenSince) {
+                                    buildGradleKtsBeforeSplitPane.safeGet(it - CONVENTION_PLUGINS[0])
+                                } else {
+                                    buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
+                                }
+                            }
+                        )
+                        addDirectory("buildSrc")
+                        addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
+                        addFile(
+                            name = "wtf-app.gradle.kts",
+                            path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
+                            content = createChildTransition { wtfApp.safeGet(it - fileTreeHiddenSince) }
+                        )
+                    }
+
+                    val selectedFile = when {
+                        currentState < splitPaneEnabledSince -> "build.gradle.kts"
+                        currentState == splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                        currentState >= splitPaneClosedSince -> "build.gradle.kts"
+                        else -> null
+                    }
+
+                    val leftPaneFile = when {
+                        currentState >= splitPaneClosedSince -> null
+                        currentState >= splitPaneEnabledSince -> "build.gradle.kts"
+                        else -> null
+                    }
+
+                    val rightPaneFile = when {
+                        currentState >= splitPaneClosedSince -> null
+                        currentState >= splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                        else -> null
+                    }
+
+                    IDE(
+                        files = files,
+                        selectedFile = selectedFile,
+                        leftPaneFile = leftPaneFile,
+                        rightPaneFile = rightPaneFile,
+                        fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
+                        modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
+                    )
+                }
+
+                FadeInOutAnimatedVisibility({ it == emojiVisible }) {
+                    ProvideTextStyle(MaterialTheme.typography.h1) {
+                        Text(text = "😬", modifier = Modifier.align(Alignment.Center))
+                    }
                 }
             }
         }
