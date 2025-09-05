@@ -1,12 +1,15 @@
 package dev.panuszewski.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -67,14 +70,20 @@ fun IDE(
     // Track expanded state of folders
     val expandedFolders = remember { mutableStateMapOf<String, Boolean>() }
 
-    // Animation states
     val leftPanelWidth = animateDpAsState(
         targetValue = when {
-            fileTreeHidden -> 0.dp // Hide left panel when both panes are active
+            fileTreeHidden -> 0.dp
             else -> 275.dp
         },
         animationSpec = tween(durationMillis = 300),
-        label = "leftPanelWidth"
+    )
+
+    val leftPanelAlfa = animateFloatAsState(
+        targetValue = when {
+            fileTreeHidden -> 0f
+            else -> 1f
+        },
+        animationSpec = tween(durationMillis = 300),
     )
 
     // Determine if the file is moving to left or right pane
@@ -142,7 +151,7 @@ fun IDE(
                 .background(Color(0xFFFEFFFE))
         ) {
             // Project files panel (left) - animated width based on mode
-            if (leftPanelWidth.value > 0.dp) {
+            AnimatedVisibility(visible = !fileTreeHidden, enter = fadeIn(), exit = fadeOut()) {
                 Box(
                     modifier = Modifier
                         .width(leftPanelWidth.value)
