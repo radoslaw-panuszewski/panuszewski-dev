@@ -57,9 +57,13 @@ import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
+import dev.panuszewski.template.Text
+import dev.panuszewski.template.body1
 import dev.panuszewski.template.buildAndRememberCodeSamples
+import dev.panuszewski.template.code1
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h4
+import dev.panuszewski.template.h5
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
@@ -67,6 +71,7 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
+import dev.panuszewski.template.withSecondaryColor
 import kotlin.math.max
 
 object Stages {
@@ -81,8 +86,8 @@ object Stages {
         return stateList
     }
 
-    val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 19)
-    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 20)
+    val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
+    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 100)
     val DECLARATIVE_GRADLE = states(since = lastState + 1, count = 20)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
@@ -606,16 +611,21 @@ fun Transition<Int>.ConventionPlugins() {
     val buildGradleKtsInSmallIde = buildGradleKts.takeLast(4)
 
     val grimacingEmojiVisible = CONVENTION_PLUGINS[0] + buildGradleKtsBeforeSplitPane.size
-    val splitPaneEnabledSince = grimacingEmojiVisible + 2
+    val ideIsShrinkedSince = grimacingEmojiVisible + 2
+    val ideIsBackToNormal = EXPLAINING_CONVENTION_PLUGINS[4]
+
+    val splitPaneEnabledSince = ideIsBackToNormal + 1
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
-    val ideIsShrinkedSince = fileTreeRevealedSince + 1
-    val smallIdeSince = EXPLAINING_CONVENTION_PLUGINS[3]
+
+    val smallIdeSince = ideIsShrinkedSince + 100
     val noIdeaEmojiVisible = smallIdeSince + 2
+    val ideHiddenSince = noIdeaEmojiVisible + 2
 
     val ideTopPadding by animateDp {
         when {
+            it >= ideIsBackToNormal -> 32.dp
             it >= smallIdeSince -> 150.dp
             it >= ideIsShrinkedSince -> 275.dp
             else -> 32.dp
@@ -625,34 +635,45 @@ fun Transition<Int>.ConventionPlugins() {
     FadeOutAnimatedVisibility({ it in CONVENTION_PLUGINS }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
 
-            FadeOutAnimatedVisibility({ it in EXPLAINING_CONVENTION_PLUGINS.drop(1) }) {
+            FadeOutAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[0] <= it && it < ideIsBackToNormal }) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= EXPLAINING_CONVENTION_PLUGINS[1] }) {
+                    SlideFromTopAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[1] <= it }) {
                         h6 {
-                            Text(buildAnnotatedString {
-                                append("This is the ")
-                                withPrimaryColor { append("recommended") }
-                                append(" approach from a long time")
-                            })
+                            Text {
+                                append("A ")
+                                withPrimaryColor { append("convention plugin") }
+                                append(" is just a Gradle plugin local to your project")
+                            }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= EXPLAINING_CONVENTION_PLUGINS[2] }) {
+
+                    SlideFromTopAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[2] <= it }) {
                         h6 {
-                            Text(buildAnnotatedString {
-                                append("Encourages declarativeness, though")
-                                withColor(Color(0xFFFF8A04)) { append(" does not enforce it") }
-                            })
+                            Text {
+                                append("It can be used to encapsulate an ")
+                                withPrimaryColor { append("imperative build logic") }
+                            }
+                        }
+                    }
+
+                    SlideFromTopAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[3] <= it }) {
+                        h6 {
+                            Text {
+                                append("Or share some ")
+                                withPrimaryColor { append("common defaults") }
+                                append(" (like JVM version)")
+                            }
                         }
                     }
                 }
             }
 
             Box(contentAlignment = Alignment.Center) {
-                SlideFromBottomAnimatedVisibility({ it >= CONVENTION_PLUGINS[0] }) {
+                SlideFromBottomAnimatedVisibility({ CONVENTION_PLUGINS[0] <= it && it < ideHiddenSince }) {
                     val files = buildList {
                         addFile(
                             name = "build.gradle.kts",

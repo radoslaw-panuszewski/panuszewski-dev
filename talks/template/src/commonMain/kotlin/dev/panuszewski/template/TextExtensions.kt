@@ -2,7 +2,16 @@ package dev.panuszewski.template
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.AnnotatedString
+
+@Composable
+fun Text(content: @Composable AnnotatedString.Builder.() -> Unit) {
+    val builder = AnnotatedString.Builder()
+    builder.content()
+    Text(builder.toAnnotatedString())
+}
 
 @Composable
 fun h1(content: @Composable () -> Unit) {
