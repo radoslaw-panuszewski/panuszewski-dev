@@ -3,6 +3,7 @@ package dev.panuszewski.scenes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.background
@@ -736,6 +737,8 @@ fun Transition<Int>.ImperativeVsDeclarative() {
             .then { focus(implementation1, implementation2, implementation3, implementation4, focusedStyle = SpanStyle(Color.Red), unfocusedStyle = null).hide(todo) }
             .then { this }
             .then { reveal(javaPlugin).unfocus() }
+            .then { focus(todo) }
+            .then { unfocus() }
     }
 
     val buildGradleKtsBeforeSplitPane = buildGradleKts.take(buildGradleKts.size - 7)
@@ -744,6 +747,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
+    val ideTopPadding by animateDp { if (it >= fileTreeRevealedSince + 1) 275.dp else 32.dp }
 
     FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -793,7 +797,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                     leftPaneFile = leftPaneFile,
                     rightPaneFile = rightPaneFile,
                     fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
-                    modifier = Modifier.padding(32.dp)
+                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
                 )
             }
 
