@@ -658,18 +658,15 @@ fun Transition<Int>.ImperativeVsDeclarative() {
         """
         ${pluginsBlock}plugins {${javaPlugin}
             `java`${javaPlugin}${mavenPublishDeclarative}
-            `maven-publish`${mavenPublishDeclarative}
+            `maven-publish`${mavenPublishDeclarative}${wtfAppPlugin}
+            `wtf-app`${wtfAppPlugin}
         }
         
         ${pluginsBlock}${mavenPublishImperative}${topIfCi}if (System.getenv("CI") == "true") {
             ${topIfCi}apply(plugin = "maven-publish")${bottomIfCi}
         }${bottomIfCi}
         
-        ${mavenPublishImperative}${wtfAppPlugin}plugins {
-            `wtf-app`
-        }
-        
-        ${wtfAppPlugin}dependencies {
+        ${mavenPublishImperative}dependencies {
             implementation(libs.spring.boot)${randomDatabase}
             ${topWhen}
             when (today()) {
@@ -694,8 +691,8 @@ fun Transition<Int>.ImperativeVsDeclarative() {
             .then { focus(mavenPublishImperative, randomDatabase, groovy) }
             .then { hide(mavenPublishImperative, randomDatabase, groovy).unfocus() }
             .then { this }
-            .then { focus(pluginsBlock) }
-            .then { hide(pluginsBlock).unfocus() }
+            .then { focus(javaPlugin) }
+            .then { hide(javaPlugin).unfocus() }
             .then { reveal(wtfAppPlugin).focus(wtfAppPlugin) }
             .then { unfocus() }
     }
@@ -745,6 +742,8 @@ fun Transition<Int>.ImperativeVsDeclarative() {
     val buildGradleKtsOnSplitPane = buildGradleKts.takeLast(buildGradleKtsBeforeSplitPane.size + 2)
     val splitPaneEnabledSince = IMPERATIVE_VS_DECLARATIVE[0] + buildGradleKtsBeforeSplitPane.size + 2
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
+    val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
+    val fileTreeRevealedSince = splitPaneClosedSince
 
     FadeOutAnimatedVisibility({ it in IMPERATIVE_VS_DECLARATIVE }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -772,15 +771,18 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                 val selectedFile = when {
                     currentState < splitPaneEnabledSince -> "build.gradle.kts"
                     currentState == splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                    currentState >= splitPaneClosedSince -> "build.gradle.kts"
                     else -> null
                 }
 
                 val leftPaneFile = when {
+                    currentState >= splitPaneClosedSince -> null
                     currentState >= splitPaneEnabledSince -> "build.gradle.kts"
                     else -> null
                 }
 
                 val rightPaneFile = when {
+                    currentState >= splitPaneClosedSince -> null
                     currentState >= splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
                     else -> null
                 }
@@ -790,7 +792,7 @@ fun Transition<Int>.ImperativeVsDeclarative() {
                     selectedFile = selectedFile,
                     leftPaneFile = leftPaneFile,
                     rightPaneFile = rightPaneFile,
-                    fileTreeHidden = currentState >= fileTreeHiddenSince,
+                    fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
                     modifier = Modifier.padding(32.dp)
                 )
             }
