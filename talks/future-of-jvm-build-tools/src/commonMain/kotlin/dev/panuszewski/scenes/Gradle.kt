@@ -44,7 +44,6 @@ import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
-import dev.panuszewski.scenes.Stages.DECLARATIVE_GRADLE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONVENTION_PLUGINS
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
@@ -492,6 +491,7 @@ private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = n
 fun Transition<Int>.ConventionPlugins() {
     val buildGradleKts = buildAndRememberCodeSamples {
         val pluginsBlock by tag()
+        val pluginsBlockNewline by tag()
         val mavenPublishDeclarative by tag()
         val mavenPublishImperative by tag()
         val topIfCi by tag()
@@ -507,19 +507,24 @@ fun Transition<Int>.ConventionPlugins() {
         val wtfAppPlugin by tag()
         val randomDatabase by tag()
         val groovy by tag()
+        val someImperativeCode by tag()
 
         """
         ${pluginsBlock}plugins {${javaPlugin}
             `java`${javaPlugin}${mavenPublishDeclarative}
             `maven-publish`${mavenPublishDeclarative}${wtfAppPlugin}
-            `wtf-app`${wtfAppPlugin}
-        }
+            `wtf-app`${wtfAppPlugin}${pluginsBlockNewline}
+        ${pluginsBlockNewline}}
         
         ${pluginsBlock}${mavenPublishImperative}${topIfCi}if (System.getenv("CI") == "true") {
             ${topIfCi}apply(plugin = "maven-publish")${bottomIfCi}
         }${bottomIfCi}
         
-        ${mavenPublishImperative}dependencies {
+        ${mavenPublishImperative}${someImperativeCode}for (project in subprojects) {
+            apply(plugin = "kotlin")
+        }
+        
+        ${someImperativeCode}dependencies {
             implementation(libs.spring.boot)${randomDatabase}
             ${topWhen}
             when (today()) {
@@ -535,7 +540,7 @@ fun Transition<Int>.ConventionPlugins() {
         """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom) }
+            .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
             .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
             .then { reveal(topIfCi, bottomIfCi) }
             .then { reveal(topWhen, bottomWhen, monday) }
@@ -545,8 +550,11 @@ fun Transition<Int>.ConventionPlugins() {
             .then { hide(mavenPublishImperative, randomDatabase, groovy).unfocus() }
             .then { this }
             .then { focus(javaPlugin) }
-            .then { hide(javaPlugin).unfocus() }
-            .then { reveal(wtfAppPlugin).focus(wtfAppPlugin) }
+            .then { hide(javaPlugin, pluginsBlockNewline).unfocus() }
+            .then { reveal(wtfAppPlugin, pluginsBlockNewline).focus(wtfAppPlugin) }
+            .then { unfocus() }
+            .then { reveal(someImperativeCode).focus(someImperativeCode) }
+            .then { this }
             .then { unfocus() }
     }
 
@@ -593,17 +601,22 @@ fun Transition<Int>.ConventionPlugins() {
             .then { unfocus() }
     }
 
-    val buildGradleKtsBeforeSplitPane = buildGradleKts.take(buildGradleKts.size - 7)
-    val buildGradleKtsOnSplitPane = buildGradleKts.takeLast(buildGradleKtsBeforeSplitPane.size + 2)
-    val emojiVisible = CONVENTION_PLUGINS[0] + buildGradleKtsBeforeSplitPane.size
-    val splitPaneEnabledSince = emojiVisible + 2
+    val buildGradleKtsBeforeSplitPane = buildGradleKts.take(6)
+    val buildGradleKtsOnSplitPane = buildGradleKts.drop(buildGradleKtsBeforeSplitPane.size - 1).take(8)
+    val buildGradleKtsInSmallIde = buildGradleKts.takeLast(4)
+
+    val grimacingEmojiVisible = CONVENTION_PLUGINS[0] + buildGradleKtsBeforeSplitPane.size
+    val splitPaneEnabledSince = grimacingEmojiVisible + 2
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
     val ideIsShrinkedSince = fileTreeRevealedSince + 1
+    val smallIdeSince = EXPLAINING_CONVENTION_PLUGINS[3]
+    val noIdeaEmojiVisible = smallIdeSince + 2
+
     val ideTopPadding by animateDp {
         when {
-            it >= EXPLAINING_CONVENTION_PLUGINS[3] -> 150.dp
+            it >= smallIdeSince -> 150.dp
             it >= ideIsShrinkedSince -> 275.dp
             else -> 32.dp
         }
@@ -621,9 +634,9 @@ fun Transition<Int>.ConventionPlugins() {
                     SlideFromTopAnimatedVisibility({ it >= EXPLAINING_CONVENTION_PLUGINS[1] }) {
                         h6 {
                             Text(buildAnnotatedString {
-                                append("A ")
+                                append("This is the ")
                                 withPrimaryColor { append("recommended") }
-                                append(" approach since a long time")
+                                append(" approach from a long time")
                             })
                         }
                     }
@@ -644,10 +657,10 @@ fun Transition<Int>.ConventionPlugins() {
                         addFile(
                             name = "build.gradle.kts",
                             content = createChildTransition {
-                                if (it < fileTreeHiddenSince) {
-                                    buildGradleKtsBeforeSplitPane.safeGet(it - CONVENTION_PLUGINS[0])
-                                } else {
-                                    buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
+                                when {
+                                    it < fileTreeHiddenSince -> buildGradleKtsBeforeSplitPane.safeGet(it - CONVENTION_PLUGINS[0])
+                                    it < smallIdeSince -> buildGradleKtsOnSplitPane.safeGet(it - fileTreeHiddenSince)
+                                    else -> buildGradleKtsInSmallIde.safeGet(it - smallIdeSince)
                                 }
                             }
                         )
@@ -689,9 +702,17 @@ fun Transition<Int>.ConventionPlugins() {
                     )
                 }
 
-                FadeInOutAnimatedVisibility({ it == emojiVisible }) {
+                FadeInOutAnimatedVisibility({ it == grimacingEmojiVisible }) {
                     ProvideTextStyle(MaterialTheme.typography.h1) {
-                        Text(text = "😬", modifier = Modifier.align(Alignment.Center))
+                        Text(text = "😬")
+                    }
+                }
+
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                    FadeInOutAnimatedVisibility({ it == noIdeaEmojiVisible }) {
+                        ProvideTextStyle(MaterialTheme.typography.h5) {
+                            Text(text = """¯\_(ツ)_/¯""", modifier = Modifier.padding(top = 64.dp, end = 230.dp))
+                        }
                     }
                 }
             }
