@@ -1083,6 +1083,7 @@ fun Transition<Int>.DeclarativeGradle() {
                     IDE(
                         files = files,
                         selectedFile = "build.gradle.kts",
+                        enlargedFile = if (currentState >= DECLARATIVE_GRADLE[2]) "build.gradle.kts" else null,
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
                     )
 

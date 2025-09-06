@@ -25,13 +25,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.lerp
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.AnnotatedString
@@ -52,9 +60,11 @@ fun IDE(
     leftPaneFile: String? = null,
     rightPaneFile: String? = null,
     fileTreeHidden: Boolean = false,
+    enlargedFile: String? = null,
     modifier: Modifier = Modifier
 ) {
     val selectedFile = files.find { it.path == selectedFile }
+    val enlargedFile = files.find { it.path == enlargedFile }
 
     // Find files in left and right panes
     val leftPaneFile = files.find { it.path == leftPaneFile }
@@ -74,14 +84,6 @@ fun IDE(
         targetValue = when {
             fileTreeHidden -> 0.dp
             else -> 275.dp
-        },
-        animationSpec = tween(durationMillis = 300),
-    )
-
-    val leftPanelAlfa = animateFloatAsState(
-        targetValue = when {
-            fileTreeHidden -> 0f
-            else -> 1f
         },
         animationSpec = tween(durationMillis = 300),
     )
@@ -171,6 +173,7 @@ fun IDE(
                                     depth = 0,
                                     expandedFolders = expandedFolders,
                                     currentOpenFile = selectedFile,
+                                    enlargedFile = enlargedFile
                                 )
                             }
                         }
@@ -335,9 +338,14 @@ private fun FileTreeItem(
     depth: Int,
     expandedFolders: MutableMap<String, Boolean>,
     currentOpenFile: ProjectFile?,
+    enlargedFile: ProjectFile?,
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
+    val isEnlarged = node.file == enlargedFile
+
+    val iconSize by animateDpAsState(targetValue = if (isEnlarged) 20.dp else 16.dp)
+    val spacerWidth by animateDpAsState(targetValue = if (isEnlarged) 12.dp else 8.dp)
 
     // Render this node
     Row(
@@ -355,7 +363,7 @@ private fun FileTreeItem(
         // File/folder icon
         Box(
             modifier = Modifier
-                .size(16.dp)
+                .size(iconSize)
                 .background(
                     color = when {
                         node.isFolder -> Color(0xFFFFC107) // Folder color
@@ -366,10 +374,20 @@ private fun FileTreeItem(
                 )
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(spacerWidth))
 
         // File/folder name with different styling based on type
-        body2 {
+        val progress by animateFloatAsState(
+            targetValue = if (isEnlarged) 1f else 0f,
+            label = "textStyleAnimation"
+        )
+        val textStyle = lerp(
+            MaterialTheme.typography.body2,
+            MaterialTheme.typography.h6,
+            progress
+        )
+
+        ProvideTextStyle(textStyle) {
             Text(
                 text = node.name,
                 fontWeight = when {
@@ -393,6 +411,7 @@ private fun FileTreeItem(
                 depth = depth + 1,
                 expandedFolders = expandedFolders,
                 currentOpenFile = currentOpenFile,
+                enlargedFile = enlargedFile,
             )
         }
     }
