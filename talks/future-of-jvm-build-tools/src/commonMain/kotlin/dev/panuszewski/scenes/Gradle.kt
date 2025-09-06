@@ -942,11 +942,12 @@ fun Transition<Int>.DeclarativeGradle() {
             .then { reveal(declarative).hide(normal) }
     }
 
-    val ideShrinkedSince = DECLARATIVE_GRADLE[6]
-    val ideBackToNormalSince = DECLARATIVE_GRADLE[14]
-
     val buildGradleKtsBeforeShrink = buildGradleKts.take(5)
     val buildGradleKtsAfterShrink = buildGradleKts.drop(4)
+
+    val ideShrinkedSince = DECLARATIVE_GRADLE[6]
+    val ideBackToNormalSince = DECLARATIVE_GRADLE[14]
+    val migratedToDeclarative = ideBackToNormalSince + buildGradleKtsAfterShrink.size
 
     val ideTopPadding by animateDp {
         when {
@@ -1073,17 +1074,24 @@ fun Transition<Int>.DeclarativeGradle() {
             SlideFromBottomAnimatedVisibility({ it in DECLARATIVE_GRADLE.drop(1) }) {
                 Box(contentAlignment = Alignment.Center) {
                     val files = buildList {
-                        addFile(name = "build.gradle.kts", content = createChildTransition {
-                            when {
-                                it >= ideBackToNormalSince -> buildGradleKtsAfterShrink.safeGet(it - ideBackToNormalSince)
-                                else -> buildGradleKtsBeforeShrink.safeGet(it - DECLARATIVE_GRADLE[1])
-                            }
-                        })
+                        addFile(
+                            name = if (currentState >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+                            path = if (currentState >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+                            content = createChildTransition {
+                                when {
+                                    it >= ideBackToNormalSince -> buildGradleKtsAfterShrink.safeGet(it - ideBackToNormalSince)
+                                    else -> buildGradleKtsBeforeShrink.safeGet(it - DECLARATIVE_GRADLE[1])
+                                }
+                            })
                     }
                     IDE(
                         files = files,
-                        selectedFile = "build.gradle.kts",
-                        enlargedFile = if (currentState >= DECLARATIVE_GRADLE[2]) "build.gradle.kts" else null,
+                        selectedFile = if (currentState >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+                        enlargedFile = when {
+                            currentState >= migratedToDeclarative + 1 -> "build.gradle.dcl"
+                            currentState >= migratedToDeclarative -> "build.gradle.kts"
+                            else -> null
+                        },
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
                     )
 

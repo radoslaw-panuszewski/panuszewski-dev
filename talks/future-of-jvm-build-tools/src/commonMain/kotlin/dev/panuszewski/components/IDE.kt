@@ -31,27 +31,26 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.lerp
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.magic.MagicText
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.MagicCodeSample
-import dev.panuszewski.template.body2
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.code3
+import dev.panuszewski.template.withColor
 
 @Composable
 fun IDE(
@@ -351,7 +350,13 @@ private fun FileTreeItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (isSelected) Color(0xFFD2E4FF) else Color.Transparent)
+            .background(
+                when {
+                    isEnlarged -> Color.Transparent
+                    isSelected -> Color(0xFFD2E4FF)
+                    else -> Color.Transparent
+                }
+            )
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -388,18 +393,31 @@ private fun FileTreeItem(
         )
 
         ProvideTextStyle(textStyle) {
-            Text(
-                text = node.name,
+            val textStyle = TextStyle(
                 fontWeight = when {
                     node.isFolder -> FontWeight.Medium
                     else -> FontWeight.Normal
                 },
                 color = when {
+                    isEnlarged -> Color.Black
                     isSelected -> Color(0xFF2C5BB7)
                     node.isFolder -> Color(0xFF6F5502)
                     else -> Color.Black
                 }
             )
+            ProvideTextStyle(textStyle) {
+                MagicText(text = buildAnnotatedString {
+                    val beforeExtension = node.name.substringBeforeLast(".")
+                    val afterExtension = node.name.substringAfterLast(".")
+                    append(beforeExtension)
+                    append(".")
+                    if (afterExtension == "dcl") {
+                        withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                    } else {
+                        append(afterExtension)
+                    }
+                })
+            }
         }
     }
 
