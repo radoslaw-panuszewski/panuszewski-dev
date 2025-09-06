@@ -6,6 +6,13 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,6 +46,8 @@ import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.ProjectFile
 import dev.panuszewski.components.Terminal
+import dev.panuszewski.scenes.Hat.BASEBALL_CAP
+import dev.panuszewski.scenes.Hat.TOP_HAT
 import dev.panuszewski.scenes.Stages.CHARACTERIZING_PHASES
 import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
@@ -50,6 +60,7 @@ import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Connection
+import dev.panuszewski.template.DARK_COLORS
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
@@ -59,8 +70,10 @@ import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Text
+import dev.panuszewski.template.body1
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.code2
+import dev.panuszewski.template.h1
 import dev.panuszewski.template.h4
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
@@ -83,9 +96,9 @@ object Stages {
         return stateList
     }
 
+    val DECLARATIVE_GRADLE = states(since = lastState + 1, count = 100)
     val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
     val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 24)
-    val DECLARATIVE_GRADLE = states(since = lastState + 1, count = 20)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
@@ -98,7 +111,7 @@ object Stages {
 
     val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
-    val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVENTION_PLUGINS + DECLARATIVE_GRADLE
+    val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVENTION_PLUGINS
 }
 
 fun StoryboardBuilder.Gradle() {
@@ -116,6 +129,7 @@ fun StoryboardBuilder.Gradle() {
             // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
+            stateTransition.DeclarativeGradle()
         }
     }
 }
@@ -776,3 +790,106 @@ fun Transition<Int>.ConventionPlugins() {
         }
     }
 }
+
+@Composable
+fun Transition<Int>.DeclarativeGradle() {
+    FadeOutAnimatedVisibility({ it in DECLARATIVE_GRADLE }) {
+        Row(horizontalArrangement = Arrangement.spacedBy(64.dp)) {
+            val appDeveloperHat = when {
+                currentState >= DECLARATIVE_GRADLE[7] -> BASEBALL_CAP
+                currentState >= DECLARATIVE_GRADLE[6] -> TOP_HAT
+                currentState >= DECLARATIVE_GRADLE[5] -> BASEBALL_CAP
+                currentState >= DECLARATIVE_GRADLE[4] -> TOP_HAT
+                else -> BASEBALL_CAP
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                GuyChangingHats(name = "App Developer", hat = appDeveloperHat)
+
+                Spacer(Modifier.height(32.dp))
+                Column(
+                    modifier = Modifier.width(400.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[1] }) {
+                        body1 {
+                            Text {
+                                append("Ships new ")
+                                withPrimaryColor { append("features") }
+                            }
+                        }
+                    }
+                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[2] }) {
+                        body1 {
+                            Text {
+                                append("Interested in: ")
+                                withPrimaryColor { append("JDK version, dependencies") }
+                            }
+                        }
+                    }
+                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[3] }) {
+                        body1 { Text("Often changes hats") }
+                    }
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                GuyChangingHats(name = "Build Engineer", hat = TOP_HAT)
+
+                Spacer(Modifier.height(32.dp))
+                Column(
+                    modifier = Modifier.width(400.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[1] }) {
+                        body1 {
+                            Text {
+                                append("Maintains the ")
+                                withPrimaryColor { append("build") }
+                            }
+                        }
+                    }
+                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[2] }) {
+                        body1 {
+                            Text {
+                                append("Interested in: ")
+                                withPrimaryColor { append("plugins, tasks, configurations") }
+                            }
+                        }
+                    }
+                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[3] }) {
+                        body1 { Text("Seen in the wild mostly in large codebases") }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun GuyChangingHats(name: String, hat: Hat) {
+    Column(verticalArrangement = Arrangement.spacedBy(50.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(contentAlignment = Alignment.Center) {
+            h1 { Text("😁", Modifier.offset(y = 50.dp)) }
+
+            AnimatedContent(
+                targetState = hat,
+                contentAlignment = Alignment.Center,
+                transitionSpec = { slideInVertically() togetherWith slideOutVertically() }
+            ) { state ->
+                h1 {
+                    when (state) {
+                        BASEBALL_CAP -> Text("🧢", Modifier.offset(x = -10.dp, y = 10.dp))
+                        TOP_HAT -> Text("🎩", Modifier.offset(x = -2.dp, y = -10.dp)) // TODO military helmet
+                    }
+                }
+            }
+        }
+
+        h6 { Text(name) }
+    }
+}
+
+enum class Hat { BASEBALL_CAP, TOP_HAT }
