@@ -2,6 +2,7 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -11,6 +12,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -70,6 +73,7 @@ import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Text
 import dev.panuszewski.template.body1
+import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
@@ -918,7 +922,7 @@ fun Transition<Int>.DeclarativeGradle() {
 
     val ideTopPadding by animateDp {
         when {
-            it >= DECLARATIVE_GRADLE[6] -> 150.dp
+            it >= DECLARATIVE_GRADLE[6] -> 300.dp
             else -> 32.dp
         }
     }
@@ -926,28 +930,50 @@ fun Transition<Int>.DeclarativeGradle() {
     FadeOutAnimatedVisibility({ it in DECLARATIVE_GRADLE }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
 
+            val textStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
+
             Column(
-                verticalArrangement = Arrangement.spacedBy(32.dp),
+                verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(top = 32.dp)
             ) {
-                SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[7] }) {
-                    Row {
-                        h6 {
-                            Text {
-                                withPrimaryColor { append("Software Definition") }
-                                append(" - what needs to be built?")
+                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it }) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colors.primary)
+                            .padding(8.dp)
+                            .animateContentSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ProvideTextStyle(textStyle) {
+                            h6 { Text { append("Software Definition") } }
+
+                            SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
+                                body2 { Text { append("What needs to be built?") } }
                             }
                         }
                     }
                 }
 
-                SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[8] }) {
-                    Row {
-                        h6 {
-                            Text {
-                                withPrimaryColor { append("Build Logic") }
-                                append(" - how to build it?")
+                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[9] <= it }) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colors.secondary)
+                            .padding(8.dp)
+                            .animateContentSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ProvideTextStyle(textStyle) {
+                            h6 {
+                                Text { append("Build Logic") }
+
+                                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[10] <= it }) {
+                                    body2 { Text { append("How to build it?") } }
+                                }
                             }
                         }
                     }
