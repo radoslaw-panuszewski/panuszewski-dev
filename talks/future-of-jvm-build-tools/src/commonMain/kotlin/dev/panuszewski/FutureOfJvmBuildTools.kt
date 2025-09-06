@@ -4,6 +4,7 @@ import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
 import dev.panuszewski.scenes.Agenda
+import dev.panuszewski.scenes.Amper
 import dev.panuszewski.scenes.Gradle
 import dev.panuszewski.scenes.GradleTransitionOnChart
 import dev.panuszewski.scenes.Maven
@@ -34,10 +35,15 @@ val FutureOfJvmBuildTools = Storyboard.build(
 //        MavenTransitionOnChart()
 //    }
 
-    section("Gradle") {
+//    section("Gradle") {
+//        SectionTitle(animateToHeader = true)
+//        Gradle()
+//        GradleTransitionOnChart()
+//    }
+    
+    section("Amper") {
         SectionTitle(animateToHeader = true)
-        Gradle()
-        GradleTransitionOnChart()
+        Amper()
     }
 
 //    section("Wrapping up!") {
