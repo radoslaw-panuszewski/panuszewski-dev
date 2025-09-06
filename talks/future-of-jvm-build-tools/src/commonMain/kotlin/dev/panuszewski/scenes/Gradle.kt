@@ -2,11 +2,14 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -75,6 +78,7 @@ import dev.panuszewski.template.Text
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
+import dev.panuszewski.template.code1
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
 import dev.panuszewski.template.h4
@@ -938,26 +942,76 @@ fun Transition<Int>.DeclarativeGradle() {
                 modifier = Modifier.fillMaxWidth().padding(top = 32.dp)
             ) {
                 SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it }) {
-                    Column(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colors.primary)
-                            .padding(8.dp)
-                            .animateContentSize(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        ProvideTextStyle(textStyle) {
-                            h6 { Text { append("Software Definition") } }
 
-                            SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
-                                body2 { Text { append("What needs to be built?") } }
+                    val softwareTypes = when {
+                        currentState >= DECLARATIVE_GRADLE[11] -> listOf("javaLibrary", "javaApplication", "kotlinApplication")
+                        currentState >= DECLARATIVE_GRADLE[10] -> listOf("javaLibrary", "javaApplication")
+                        currentState >= DECLARATIVE_GRADLE[9] -> listOf("javaLibrary")
+                        else -> listOf()
+                    }
+
+                    SharedTransitionLayout {
+                        AnimatedContent(
+                            transitionSpec = { fadeIn() togetherWith fadeOut() },
+                            targetState = softwareTypes
+                        ) { st ->
+                            HorizontalTree(
+                                root = "Software Definition",
+                                getChildren = {
+                                    if (it == "Software Definition") st
+                                    else emptyList()
+                                }
+                            ) { name ->
+                                Column(
+                                    modifier = Modifier
+                                        .sharedElement(
+                                            rememberSharedContentState(name),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colors.primary)
+                                        .padding(8.dp)
+                                        .animateContentSize(),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    ProvideTextStyle(textStyle) {
+                                        if (name == "Software Definition") {
+                                            h6 { Text(name) }
+
+                                            SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
+                                                body2 { Text { append("What needs to be built?") } }
+                                            }
+                                        } else {
+                                            code2 { Text(name) }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+
+//                    Column(
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(8.dp))
+//                            .background(MaterialTheme.colors.primary)
+//                            .padding(8.dp)
+//                            .animateContentSize(),
+//                        verticalArrangement = Arrangement.spacedBy(16.dp),
+//                        horizontalAlignment = Alignment.CenterHorizontally
+//                    ) {
+
+//                        ProvideTextStyle(textStyle) {
+//                            h6 { Text { append("Software Definition") } }
+//
+//                    SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
+//                        body2 { Text { append("What needs to be built?") } }
+//                    }
+//                        }
+//                    }
                 }
 
-                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[9] <= it }) {
+                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[12] <= it }) {
                     Column(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
