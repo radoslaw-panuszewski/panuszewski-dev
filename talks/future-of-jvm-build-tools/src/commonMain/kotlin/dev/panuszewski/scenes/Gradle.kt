@@ -15,7 +15,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -87,7 +85,6 @@ import dev.panuszewski.template.Text
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
-import dev.panuszewski.template.code1
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
 import dev.panuszewski.template.h4
@@ -899,43 +896,62 @@ fun Transition<Int>.DeclarativeGradle() {
         val appDeveloper1 by tag()
         val appDeveloper2 by tag()
         val appDeveloper3 by tag()
+        val appDeveloper4 by tag()
         val buildEngineer1 by tag()
         val buildEngineer2 by tag()
+        val normal by tag()
+        val declarative by tag()
 
         """
-        ${buildEngineer1}plugins {
+        ${normal}${buildEngineer1}plugins {
             ${appDeveloper1}`application`
             alias(libs.plugins.kotlin.jvm)${appDeveloper1}
-            alias(libs.plugins.ktlint)
-            alias(libs.plugins.integration.test)
         }${buildEngineer1}
         
         kotlin {
             ${appDeveloper2}jvmToolchain(24)${appDeveloper2}
         }
         
-        ${appDeveloper3}dependencies {
-            implementation(libs.spring.boot.web)
-        }${appDeveloper3}
+        application {
+            ${appDeveloper3}mainClass = "com.example.AppKt"${appDeveloper3}
+        }
         
-        ${buildEngineer2}tasks {
-            register("mySpecialTask") {
-                // ...
+        dependencies {
+            ${appDeveloper4}implementation(libs.spring.boot.web)${appDeveloper4}
+        }
+        
+        ${buildEngineer2}tasks.register("mySpecialTask") {
+            // ...
+        }${buildEngineer2}${normal}${declarative}kotlinJvmApplication {
+            javaVersion = 24
+        
+            mainClass = "com.example.AppKt"
+                    
+            dependencies {
+                implementation(libs.spring.boot.web)
             }
-        }${buildEngineer2}
+        } ${declarative}
         """
             .trimIndent()
             .toCodeSample(language = Language.Kotlin)
-            .startWith { this }
-            .then { focus(appDeveloper1, appDeveloper2, appDeveloper3) }
+            .startWith { hide(declarative) }
+            .then { focus(appDeveloper1, appDeveloper2, appDeveloper3, appDeveloper4) }
             .then { unfocus() }
             .then { focus(buildEngineer1, buildEngineer2) }
             .then { unfocus() }
+            .then { reveal(declarative).hide(normal) }
     }
+
+    val ideShrinkedSince = DECLARATIVE_GRADLE[6]
+    val ideBackToNormalSince = DECLARATIVE_GRADLE[14]
+
+    val buildGradleKtsBeforeShrink = buildGradleKts.take(5)
+    val buildGradleKtsAfterShrink = buildGradleKts.drop(4)
 
     val ideTopPadding by animateDp {
         when {
-            it >= DECLARATIVE_GRADLE[6] -> 300.dp
+            it >= ideBackToNormalSince -> 32.dp
+            it >= ideShrinkedSince -> 300.dp
             else -> 32.dp
         }
     }
@@ -950,11 +966,11 @@ fun Transition<Int>.DeclarativeGradle() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(top = 32.dp)
             ) {
-                FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it }) {
+                FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it && it < ideBackToNormalSince }) {
 
                     val softwareTypes = when {
-                        currentState >= DECLARATIVE_GRADLE[13] -> listOf("javaLibrary { ... }", "kotlinApplication { ... }", "...")
-                        currentState >= DECLARATIVE_GRADLE[12] -> listOf("javaLibrary { ... }", "kotlinApplication { ... }")
+                        currentState >= DECLARATIVE_GRADLE[13] -> listOf("javaLibrary { ... }", "kotlinJvmApplication { ... }", "...")
+                        currentState >= DECLARATIVE_GRADLE[12] -> listOf("javaLibrary { ... }", "kotlinJvmApplication { ... }")
                         currentState >= DECLARATIVE_GRADLE[11] -> listOf("javaLibrary { ... }")
                         else -> listOf()
                     }
@@ -1031,7 +1047,7 @@ fun Transition<Int>.DeclarativeGradle() {
 
                 }
 
-                FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[9] <= it }) {
+                FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[9] <= it && it < ideBackToNormalSince }) {
                     Column(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -1057,7 +1073,12 @@ fun Transition<Int>.DeclarativeGradle() {
             SlideFromBottomAnimatedVisibility({ it in DECLARATIVE_GRADLE.drop(1) }) {
                 Box(contentAlignment = Alignment.Center) {
                     val files = buildList {
-                        addFile(name = "build.gradle.kts", content = createChildTransition { buildGradleKts.safeGet(it - DECLARATIVE_GRADLE[1]) })
+                        addFile(name = "build.gradle.kts", content = createChildTransition {
+                            when {
+                                it >= ideBackToNormalSince -> buildGradleKtsAfterShrink.safeGet(it - ideBackToNormalSince)
+                                else -> buildGradleKtsBeforeShrink.safeGet(it - DECLARATIVE_GRADLE[1])
+                            }
+                        })
                     }
                     IDE(
                         files = files,
