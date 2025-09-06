@@ -34,11 +34,20 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -937,16 +946,16 @@ fun Transition<Int>.DeclarativeGradle() {
             val textStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(top = 32.dp)
             ) {
-                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it }) {
+                FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it }) {
 
                     val softwareTypes = when {
-                        currentState >= DECLARATIVE_GRADLE[11] -> listOf("javaLibrary", "javaApplication", "kotlinApplication")
-                        currentState >= DECLARATIVE_GRADLE[10] -> listOf("javaLibrary", "javaApplication")
-                        currentState >= DECLARATIVE_GRADLE[9] -> listOf("javaLibrary")
+                        currentState >= DECLARATIVE_GRADLE[13] -> listOf("javaLibrary { ... }", "kotlinApplication { ... }", "...")
+                        currentState >= DECLARATIVE_GRADLE[12] -> listOf("javaLibrary { ... }", "kotlinApplication { ... }")
+                        currentState >= DECLARATIVE_GRADLE[11] -> listOf("javaLibrary { ... }")
                         else -> listOf()
                     }
 
@@ -955,63 +964,74 @@ fun Transition<Int>.DeclarativeGradle() {
                             transitionSpec = { fadeIn() togetherWith fadeOut() },
                             targetState = softwareTypes
                         ) { st ->
-                            HorizontalTree(
-                                root = "Software Definition",
-                                getChildren = {
-                                    if (it == "Software Definition") st
-                                    else emptyList()
-                                }
-                            ) { name ->
-                                Column(
-                                    modifier = Modifier
-                                        .sharedElement(
-                                            rememberSharedContentState(name),
-                                            animatedVisibilityScope = this@AnimatedContent
-                                        )
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(MaterialTheme.colors.primary)
-                                        .padding(8.dp)
-                                        .animateContentSize(),
-                                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    ProvideTextStyle(textStyle) {
-                                        if (name == "Software Definition") {
-                                            h6 { Text(name) }
 
-                                            SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
-                                                body2 { Text { append("What needs to be built?") } }
+                            var offset by remember { mutableStateOf(Offset.Zero) }
+                            val placements = remember { mutableStateMapOf<String, Rect>() }
+
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxWidth().height(120.dp)
+                            ) {
+                                HorizontalTree(
+                                    root = "Software Definition",
+                                    getChildren = {
+                                        if (it == "Software Definition") st
+                                        else emptyList()
+                                    },
+                                    modifier = Modifier.onPlaced { offset = it.positionInParent() }
+                                ) { name ->
+                                    val isRoot = name == "Software Definition"
+
+                                    Box(
+                                        modifier = Modifier
+                                            .sharedElement(
+                                                rememberSharedContentState(name),
+                                                animatedVisibilityScope = this@AnimatedContent
+                                            )
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isRoot) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant)
+                                            .animateContentSize()
+                                            .onPlaced { placements[name] = it.boundsInParent() },
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(8.dp),
+                                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            ProvideTextStyle(textStyle) {
+                                                if (isRoot) {
+                                                    h6 { Text(name) }
+
+                                                    SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
+                                                        body2 { Text { append("What needs to be built?") } }
+                                                    }
+                                                } else {
+                                                    code2 { Text(name) }
+                                                }
                                             }
-                                        } else {
-                                            code2 { Text(name) }
                                         }
                                     }
+                                }
+
+                                val parentRect = placements["Software Definition"] ?: Rect.Zero
+
+                                for ((childName, childRect) in placements.filterKeys { it != "Software Definition" }) {
+                                    Connection(
+                                        parentRect = parentRect.translate(offset),
+                                        childRect = childRect.translate(offset),
+                                        modifier = Modifier.sharedElement(
+                                            rememberSharedContentState("connection:$childName"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
                                 }
                             }
                         }
                     }
 
-//                    Column(
-//                        modifier = Modifier
-//                            .clip(RoundedCornerShape(8.dp))
-//                            .background(MaterialTheme.colors.primary)
-//                            .padding(8.dp)
-//                            .animateContentSize(),
-//                        verticalArrangement = Arrangement.spacedBy(16.dp),
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-
-//                        ProvideTextStyle(textStyle) {
-//                            h6 { Text { append("Software Definition") } }
-//
-//                    SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[8] <= it }) {
-//                        body2 { Text { append("What needs to be built?") } }
-//                    }
-//                        }
-//                    }
                 }
 
-                SlideFromTopAnimatedVisibility({ DECLARATIVE_GRADLE[12] <= it }) {
+                FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[9] <= it }) {
                     Column(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
