@@ -36,10 +36,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.CodeSample
+import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.code2
@@ -405,7 +407,7 @@ private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
             .background(Color.White)
     ) {
         code2 {
-            file.content?.MagicCodeSample()
+            file.content?.MagicCodeSample() ?: file.staticContent?.MagicAnnotatedString()
         }
     }
 }
@@ -416,6 +418,7 @@ data class ProjectFile(
     val path: String = name,
     val isDirectory: Boolean = false,
     val content: Transition<CodeSample>? = null,
+    val staticContent: Transition<AnnotatedString>? = null,
     val language: Language = Language.Kotlin,
     val children: List<ProjectFile> = emptyList(),
 )

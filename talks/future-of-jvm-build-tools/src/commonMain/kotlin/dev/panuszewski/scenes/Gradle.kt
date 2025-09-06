@@ -6,11 +6,7 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
@@ -26,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -34,7 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
@@ -54,13 +53,13 @@ import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
 import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
 import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
+import dev.panuszewski.scenes.Stages.APP_DEVELOPER_AND_BUILD_ENGINEER
 import dev.panuszewski.scenes.Stages.DECLARATIVE_GRADLE
 import dev.panuszewski.scenes.Stages.EXPLAINING_CONVENTION_PLUGINS
 import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
 import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Connection
-import dev.panuszewski.template.DARK_COLORS
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
@@ -96,7 +95,8 @@ object Stages {
         return stateList
     }
 
-    val DECLARATIVE_GRADLE = states(since = lastState + 1, count = 100)
+    val DECLARATIVE_GRADLE = states(lastState + 1, count = 100)
+    val APP_DEVELOPER_AND_BUILD_ENGINEER = states(lastState + 1, count = 6)
     val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
     val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 24)
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
@@ -129,6 +129,7 @@ fun StoryboardBuilder.Gradle() {
             // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
+            stateTransition.AppDeveloperAndBuildEngineer()
             stateTransition.DeclarativeGradle()
         }
     }
@@ -494,8 +495,13 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     }
 }
 
-private fun MutableList<ProjectFile>.addFile(name: String, path: String = name, content: Transition<CodeSample>) {
-    val file = ProjectFile(name = name, path = path, content = content)
+private fun MutableList<ProjectFile>.addFile(
+    name: String,
+    path: String = name,
+    content: Transition<CodeSample>? = null,
+    staticContent: Transition<AnnotatedString>? = null
+) {
+    val file = ProjectFile(name = name, path = path, content = content, staticContent = staticContent)
     add(file)
 }
 
@@ -792,27 +798,27 @@ fun Transition<Int>.ConventionPlugins() {
 }
 
 @Composable
-fun Transition<Int>.DeclarativeGradle() {
-    FadeOutAnimatedVisibility({ it in DECLARATIVE_GRADLE }) {
+fun Transition<Int>.AppDeveloperAndBuildEngineer() {
+    SlideFromTopAnimatedVisibility({ it in APP_DEVELOPER_AND_BUILD_ENGINEER }) {
         Row(horizontalArrangement = Arrangement.spacedBy(64.dp)) {
             val appDeveloperHat = when {
-                currentState >= DECLARATIVE_GRADLE[7] -> BASEBALL_CAP
-                currentState >= DECLARATIVE_GRADLE[6] -> TOP_HAT
-                currentState >= DECLARATIVE_GRADLE[5] -> BASEBALL_CAP
-                currentState >= DECLARATIVE_GRADLE[4] -> TOP_HAT
+                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[5] -> BASEBALL_CAP
+                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] -> TOP_HAT
                 else -> BASEBALL_CAP
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 GuyChangingHats(name = "App Developer", hat = appDeveloperHat)
 
-                Spacer(Modifier.height(32.dp))
                 Column(
                     modifier = Modifier.width(400.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[1] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[1] }) {
                         body1 {
                             Text {
                                 append("Ships new ")
@@ -820,7 +826,7 @@ fun Transition<Int>.DeclarativeGradle() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[2] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
                         body1 {
                             Text {
                                 append("Interested in: ")
@@ -828,22 +834,24 @@ fun Transition<Int>.DeclarativeGradle() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[3] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
                         body1 { Text("Often changes hats") }
                     }
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 GuyChangingHats(name = "Build Engineer", hat = TOP_HAT)
 
-                Spacer(Modifier.height(32.dp))
                 Column(
                     modifier = Modifier.width(400.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[1] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[1] }) {
                         body1 {
                             Text {
                                 append("Maintains the ")
@@ -851,7 +859,7 @@ fun Transition<Int>.DeclarativeGradle() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[2] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
                         body1 {
                             Text {
                                 append("Interested in: ")
@@ -859,7 +867,7 @@ fun Transition<Int>.DeclarativeGradle() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[3] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
                         body1 { Text("Seen in the wild mostly in large codebases") }
                     }
                 }
@@ -869,8 +877,126 @@ fun Transition<Int>.DeclarativeGradle() {
 }
 
 @Composable
-fun GuyChangingHats(name: String, hat: Hat) {
-    Column(verticalArrangement = Arrangement.spacedBy(50.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+fun Transition<Int>.DeclarativeGradle() {
+    val buildGradleKts = buildAndRememberCodeSamples {
+        val appDeveloper1 by tag()
+        val appDeveloper2 by tag()
+        val appDeveloper3 by tag()
+        val buildEngineer1 by tag()
+        val buildEngineer2 by tag()
+
+        """
+        ${buildEngineer1}plugins {
+            ${appDeveloper1}`application`
+            alias(libs.plugins.kotlin.jvm)${appDeveloper1}
+            alias(libs.plugins.ktlint)
+            alias(libs.plugins.integration.test)
+        }${buildEngineer1}
+        
+        kotlin {
+            ${appDeveloper2}jvmToolchain(24)${appDeveloper2}
+        }
+        
+        ${appDeveloper3}dependencies {
+            implementation(libs.spring.boot.web)
+        }${appDeveloper3}
+        
+        ${buildEngineer2}tasks {
+            register("mySpecialTask") {
+                // ...
+            }
+        }${buildEngineer2}
+        """
+            .trimIndent()
+            .toCodeSample(language = Language.Kotlin)
+            .startWith { this }
+            .then { focus(appDeveloper1, appDeveloper2, appDeveloper3) }
+            .then { unfocus() }
+            .then { focus(buildEngineer1, buildEngineer2) }
+            .then { unfocus() }
+    }
+
+    val ideTopPadding by animateDp {
+        when {
+            it >= DECLARATIVE_GRADLE[6] -> 150.dp
+            else -> 32.dp
+        }
+    }
+
+    FadeOutAnimatedVisibility({ it in DECLARATIVE_GRADLE }) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth().padding(top = 32.dp)
+            ) {
+                SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[7] }) {
+                    Row {
+                        h6 {
+                            Text {
+                                withPrimaryColor { append("Software Definition") }
+                                append(" - what needs to be built?")
+                            }
+                        }
+                    }
+                }
+
+                SlideFromTopAnimatedVisibility({ it >= DECLARATIVE_GRADLE[8] }) {
+                    Row {
+                        h6 {
+                            Text {
+                                withPrimaryColor { append("Build Logic") }
+                                append(" - how to build it?")
+                            }
+                        }
+                    }
+                }
+            }
+
+            SlideFromBottomAnimatedVisibility({ it in DECLARATIVE_GRADLE.drop(1) }) {
+                Box(contentAlignment = Alignment.Center) {
+                    val files = buildList {
+                        addFile(name = "build.gradle.kts", content = createChildTransition { buildGradleKts.safeGet(it - DECLARATIVE_GRADLE[1]) })
+                    }
+                    IDE(
+                        files = files,
+                        selectedFile = "build.gradle.kts",
+                        modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
+                    )
+
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                        SlideFromTopAnimatedVisibility({ it == DECLARATIVE_GRADLE[2] }) {
+                            AppDeveloper(Modifier.padding(end = 64.dp))
+                        }
+
+                        SlideFromTopAnimatedVisibility({ it == DECLARATIVE_GRADLE[4] }) {
+                            BuildEngineer(Modifier.padding(end = 64.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AppDeveloper(modifier: Modifier = Modifier) {
+    GuyChangingHats(modifier = modifier.scale(0.75f), hat = BASEBALL_CAP, name = "App Developer")
+}
+
+@Composable
+fun BuildEngineer(modifier: Modifier = Modifier) {
+    GuyChangingHats(modifier = modifier.scale(0.75f), hat = TOP_HAT, name = "Build Engineer")
+}
+
+@Composable
+fun GuyChangingHats(modifier: Modifier = Modifier, name: String?, hat: Hat) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(50.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
         Box(contentAlignment = Alignment.Center) {
             h1 { Text("😁", Modifier.offset(y = 50.dp)) }
 
@@ -888,7 +1014,9 @@ fun GuyChangingHats(name: String, hat: Hat) {
             }
         }
 
-        h6 { Text(name) }
+        if (name != null) {
+            h6 { Text(name) }
+        }
     }
 }
 
