@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -78,6 +79,7 @@ import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
+import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
@@ -95,6 +97,8 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
+import talks.future_of_jvm_build_tools.generated.resources.Res
+import talks.future_of_jvm_build_tools.generated.resources.sogood
 import kotlin.math.max
 
 object Stages {
@@ -108,11 +112,7 @@ object Stages {
         stateList.lastOrNull()?.let { lastState = it }
         return stateList
     }
-
-    val DECLARATIVE_GRADLE = states(lastState + 1, count = 100)
-    val APP_DEVELOPER_AND_BUILD_ENGINEER = states(lastState + 1, count = 6)
-    val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
-    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 24)
+    
     val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
     val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
     val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
@@ -122,6 +122,10 @@ object Stages {
     val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
     val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
     val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
+    val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
+    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 24)
+    val APP_DEVELOPER_AND_BUILD_ENGINEER = states(lastState + 1, count = 6)
+    val DECLARATIVE_GRADLE = states(lastState + 1, count = 19)
 
     val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
     val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
@@ -948,6 +952,7 @@ fun Transition<Int>.DeclarativeGradle() {
     val ideShrinkedSince = DECLARATIVE_GRADLE[6]
     val ideBackToNormalSince = DECLARATIVE_GRADLE[14]
     val migratedToDeclarative = ideBackToNormalSince + buildGradleKtsAfterShrink.size
+    val soGoodVisible = migratedToDeclarative + 2
 
     val ideTopPadding by animateDp {
         when {
@@ -1102,6 +1107,21 @@ fun Transition<Int>.DeclarativeGradle() {
 
                         SlideFromTopAnimatedVisibility({ it == DECLARATIVE_GRADLE[4] }) {
                             BuildEngineer(Modifier.padding(end = 64.dp))
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .offset(x = 120.dp, y = -90.dp)
+                        ) {
+                            FadeInOutAnimatedVisibility({ it == soGoodVisible }) {
+                                ResourceImage(remember { Res.drawable.sogood }, modifier = Modifier.border(1.dp, Color(0xFFFF8A04)))
+                            }
                         }
                     }
                 }
