@@ -56,6 +56,7 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
+import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
@@ -752,11 +753,13 @@ fun Transition<Int>.ConventionPlugins() {
                     }
 
                     IDE(
-                        files = files,
-                        selectedFile = selectedFile,
-                        leftPaneFile = leftPaneFile,
-                        rightPaneFile = rightPaneFile,
-                        fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
+                        IdeState(
+                            files = files,
+                            selectedFile = selectedFile,
+                            leftPaneFile = leftPaneFile,
+                            rightPaneFile = rightPaneFile,
+                            fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
+                        ),
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
                     )
                 }
@@ -1054,13 +1057,15 @@ fun Transition<Int>.DeclarativeGradle() {
                             })
                     }
                     IDE(
-                        files = files,
-                        selectedFile = if (currentState >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
-                        enlargedFile = when {
-                            currentState >= migratedToDeclarative + 1 -> "build.gradle.dcl"
-                            currentState >= migratedToDeclarative -> "build.gradle.kts"
-                            else -> null
-                        },
+                        IdeState(
+                            files = files,
+                            selectedFile = if (currentState >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+                            enlargedFile = when {
+                                currentState >= migratedToDeclarative + 1 -> "build.gradle.dcl"
+                                currentState >= migratedToDeclarative -> "build.gradle.kts"
+                                else -> null
+                            },
+                        ),
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
                     )
 

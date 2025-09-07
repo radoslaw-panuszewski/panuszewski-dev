@@ -12,6 +12,14 @@ import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.Title
 import dev.panuszewski.template.Stages
 
+/**
+ * - [ ] avoid touching build tool
+ * - [ ] it tells you that dependency version is overridden by a newer one (Gradle does not do that)
+ * - [ ] configuration that reflects reality
+ * - [x] ./amper show settings (pokazać default wersję spring boota)
+ * - [x] show up when needed, stay out of the way when not
+ * - [ ] smart completion (like when typed 'jdk' it finds 'jvm.release' property)
+ */
 fun StoryboardBuilder.Amper() {
     scene(100) {
         val stages = Stages()
@@ -30,6 +38,7 @@ fun StoryboardBuilder.Amper() {
                 Title(title.value)
                 AmperBriefDescription(stages, title)
                 AmperSpringBoot(stages, title)
+                AmperPrinciples(stages, title)
             }
         }
     }

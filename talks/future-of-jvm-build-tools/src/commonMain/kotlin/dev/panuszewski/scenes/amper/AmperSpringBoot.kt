@@ -1,6 +1,7 @@
 package dev.panuszewski.scenes.amper
 
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -8,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
+import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
@@ -25,14 +28,6 @@ import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import kotlin.math.max
 
-/**
- * - [ ] avoid touching build tool
- * - [ ] it tells you that dependency version is overridden by a newer one (Gradle does not do that)
- * - [ ] configuration that reflects reality
- * - [x] ./amper show settings (pokazać default wersję spring boota)
- * - [x] show up when needed, stay out of the way when not
- * - [ ] smart completion (like when typed 'jdk' it finds 'jvm.release' property)
- */
 @Composable
 fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>) {
     val moduleYaml = ModuleYaml()
@@ -67,60 +62,70 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
     val terminalDisappears = terminalAppears + terminalTexts.size + 1
     val ideIsBackToNormal = terminalDisappears + 1
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
-            Terminal(
-                textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
-                bottomSpacerHeight = 0.dp,
-                modifier = Modifier
-                    .fillMaxHeight(0.5f)
-                    .padding(start = 32.dp, bottom = 32.dp, end = 16.dp)
-            )
-        }
+    val ideShrinks = ideIsBackToNormal + moduleYamlAfterTerminal.size
+    val ideTopPadding by animateDp { if (it >= ideShrinks) 281.dp else 0.dp }
 
-        SlideFromBottomAnimatedVisibility({ ideAppears <= it }) {
-            IDE(
-                files = buildList {
-                    addFile(
-                        name = "module.yaml",
-                        content = createChildTransition {
-                            when {
-                                it >= ideIsBackToNormal -> moduleYamlAfterTerminal.safeGet(it - ideIsBackToNormal)
-                                else -> moduleYamlBeforeTerminal.safeGet(it - ideAppears)
+    val finalState = ideShrinks
+
+    if (currentState in initialState..finalState) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
+                Terminal(
+                    textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
+                    bottomSpacerHeight = 0.dp,
+                    modifier = Modifier
+                        .fillMaxHeight(0.5f)
+                        .padding(start = 32.dp, bottom = 32.dp, end = 16.dp)
+                )
+            }
+
+            SlideFromBottomAnimatedVisibility({ ideAppears <= it }) {
+                AMPER_IDE_STATE = IdeState(
+                    files = buildList {
+                        addFile(
+                            name = "module.yaml",
+                            content = createChildTransition {
+                                when {
+                                    it >= ideIsBackToNormal -> moduleYamlAfterTerminal.safeGet(it - ideIsBackToNormal)
+                                    else -> moduleYamlBeforeTerminal.safeGet(it - ideAppears)
+                                }
                             }
-                        }
-                    )
-                    addDirectory(name = "src")
-                    addDirectory(name = "com/example", path = "src/com/example")
-                    addFile(
-                        name = "main.kt",
-                        path = "src/com/example/main.kt",
-                        content = createChildTransition { mainKt[0] }
-                    )
-                    addDirectory(name = "test")
-                    addDirectory(name = "com/example", path = "test/com/example")
-                    addFile(
-                        name = "ExampleTest.kt",
-                        path = "test/com/example/ExampleTest.kt",
-                        content = createChildTransition { exampleTestKt[0] }
-                    )
-                },
-                selectedFile = when (currentState) {
-                    mainKtIsSelected -> "src/com/example/main.kt"
-                    exampleTestKtIsSelected -> "test/com/example/ExampleTest.kt"
-                    else -> "module.yaml"
-                },
-                modifier = Modifier.fillMaxWidth().padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
-            )
+                        )
+                        addDirectory(name = "src")
+                        addDirectory(name = "com/example", path = "src/com/example")
+                        addFile(
+                            name = "main.kt",
+                            path = "src/com/example/main.kt",
+                            content = createChildTransition { mainKt[0] }
+                        )
+                        addDirectory(name = "test")
+                        addDirectory(name = "com/example", path = "test/com/example")
+                        addFile(
+                            name = "ExampleTest.kt",
+                            path = "test/com/example/ExampleTest.kt",
+                            content = createChildTransition { exampleTestKt[0] }
+                        )
+                    },
+                    selectedFile = when (currentState) {
+                        mainKtIsSelected -> "src/com/example/main.kt"
+                        exampleTestKtIsSelected -> "test/com/example/ExampleTest.kt"
+                        else -> "module.yaml"
+                    },
+                )
+                IDE(
+                    ideState = AMPER_IDE_STATE,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp)
+                )
+            }
         }
     }
 
-    val states = stages.registerStatesByRange(start = initialState, end = terminalAppears)
+    val states = stages.registerStatesByRange(start = initialState, end = ideShrinks - 1)
 
-    if (currentState in states) {
-        title.value = "Amper + Spring Boot"
+    when (currentState) {
+        in states -> title.value = "Amper + Spring Boot"
     }
 }
 
