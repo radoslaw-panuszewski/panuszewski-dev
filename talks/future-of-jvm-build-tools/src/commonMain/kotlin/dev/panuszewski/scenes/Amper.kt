@@ -5,14 +5,12 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -30,8 +28,6 @@ import dev.panuszewski.components.addFile
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.RevealSequentially
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.SlideFromLeftAnimatedVisibility
-import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Text
 import dev.panuszewski.template.buildAndRememberCodeSamples
@@ -129,14 +125,11 @@ private fun Transition<Int>.SpringBoot(stages: Stages, title: MutableState<Strin
           experimental:
             hotReload:
               enabled: false  # [default]
-          
-          
           resources:
             exposedAccessors: false  # [default]
             packageName:   # [default]
           
           version:
-        
         
         junit: junit-5  # [default]
         jvm:
@@ -202,29 +195,34 @@ private fun Transition<Int>.SpringBoot(stages: Stages, title: MutableState<Strin
     val moduleYamlBeforeTerminal = moduleYaml.take(samplesBeforeTerminal)
     val moduleYamlAfterTerminal = moduleYaml.drop(samplesBeforeTerminal)
 
-    val fileTreeHides = ideAppears + samplesBeforeTerminal
-    val terminalAppears = fileTreeHides + 1
+    val terminalAppears = ideAppears + samplesBeforeTerminal
 
     val terminalTexts = listOf(
         "$ ./amper show settings",
-        moduleYamlAfterTerminal[1].String().text
+        """
+        compose:
+          enabled: false  # [default]
+          experimental:
+            hotReload:
+              enabled: false  # [default]
+        (...)
+        """.trimIndent()
     )
 
     val terminalDisappears = terminalAppears + terminalTexts.size + 1
-    val fileTreeAppears = terminalDisappears + 1
 
-    val ideIsBackToNormal = fileTreeAppears + 1
+    val ideIsBackToNormal = terminalDisappears + 1
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SlideFromLeftAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
+        SlideFromTopAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
             Terminal(
                 textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
+                bottomSpacerHeight = 0.dp,
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .fillMaxHeight()
-                    .padding(start = 32.dp, bottom = 32.dp, end = 32.dp)
+                    .fillMaxHeight(0.5f)
+                    .padding(start = 32.dp, bottom = 32.dp, end = 16.dp)
             )
         }
 
@@ -242,7 +240,6 @@ private fun Transition<Int>.SpringBoot(stages: Stages, title: MutableState<Strin
                     )
                 },
                 selectedFile = "module.yaml",
-                fileTreeHidden = currentState in fileTreeHides until fileTreeAppears,
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
             )
         }

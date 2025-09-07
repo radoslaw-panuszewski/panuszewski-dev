@@ -27,13 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.panuszewski.template.code3
 import kotlinx.coroutines.delay
 import kotlin.math.max
 
 @Composable
-fun Terminal(textsToDisplay: List<String>, modifier: Modifier = Modifier) {
+fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .border(
@@ -107,7 +108,7 @@ fun Terminal(textsToDisplay: List<String>, modifier: Modifier = Modifier) {
                         }
 
                         if (index == texts.lastIndex) {
-                            Spacer(Modifier.height(50.dp))
+                            Spacer(Modifier.height(bottomSpacerHeight))
                         }
                     }
                 }
