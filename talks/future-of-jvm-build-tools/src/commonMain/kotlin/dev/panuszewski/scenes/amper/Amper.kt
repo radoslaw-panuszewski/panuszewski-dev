@@ -11,9 +11,9 @@ import dev.bnorm.storyboard.StoryboardBuilder
  * - [ ] smart completion (like when typed 'jdk' it finds 'jvm.release' property)
  */
 fun StoryboardBuilder.Amper() {
-    AmperBriefDescription()
-    AmperSpringBoot()
-    AmperPrinciples()
+//    AmperBriefDescription()
+//    AmperSpringBoot()
+//    AmperPrinciples()
     AmperCatchErrorsEarly()
 }
 

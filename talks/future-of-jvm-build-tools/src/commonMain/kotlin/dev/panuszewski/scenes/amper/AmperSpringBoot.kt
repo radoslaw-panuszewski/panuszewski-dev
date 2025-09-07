@@ -4,26 +4,20 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
-import dev.panuszewski.components.Title
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
-import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.Text
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.precompose
 import dev.panuszewski.template.safeGet
@@ -33,16 +27,13 @@ import dev.panuszewski.template.withStateTransition
 import kotlin.math.max
 
 fun StoryboardBuilder.AmperSpringBoot() {
-    val moduleYaml = ModuleYaml()
-    val mainKt = MainKt()
-    val exampleTestKt = ExampleTestKt()
 
     val initialState = 0
     val ideAppears = initialState + 1
 
     val samplesBeforeTerminal = 1
-    val moduleYamlBeforeTerminal = moduleYaml.take(samplesBeforeTerminal)
-    val moduleYamlAfterTerminal = moduleYaml.drop(samplesBeforeTerminal)
+    val moduleYamlBeforeTerminal = MODULE_YAML.take(samplesBeforeTerminal)
+    val moduleYamlAfterTerminal = MODULE_YAML.drop(samplesBeforeTerminal)
 
     val mainKtIsSelected = ideAppears + samplesBeforeTerminal
     val exampleTestKtIsSelected = mainKtIsSelected + 1
@@ -69,9 +60,9 @@ fun StoryboardBuilder.AmperSpringBoot() {
     val finalState = ideShrinks
 
     scene(stateCount = finalState + 1) {
-//        moduleYaml.precompose()
-//        mainKt.precompose()
-//        exampleTestKt.precompose()
+        MODULE_YAML.precompose()
+        MAIN_KT.precompose()
+        EXAMPLE_TEST_KT.precompose()
 
         withStateTransition {
             val ideTopPadding by animateDp { if (it >= ideShrinks) 281.dp else 0.dp }
@@ -105,14 +96,14 @@ fun StoryboardBuilder.AmperSpringBoot() {
                                 addFile(
                                     name = "main.kt",
                                     path = "src/com/example/main.kt",
-                                    content = createChildTransition { mainKt[0] }
+                                    content = createChildTransition { MAIN_KT[0] }
                                 )
                                 addDirectory(name = "test")
                                 addDirectory(name = "com/example", path = "test/com/example")
                                 addFile(
                                     name = "ExampleTest.kt",
                                     path = "test/com/example/ExampleTest.kt",
-                                    content = createChildTransition { exampleTestKt[0] }
+                                    content = createChildTransition { EXAMPLE_TEST_KT[0] }
                                 )
                             },
                             selectedFile = when (currentState) {
@@ -134,7 +125,7 @@ fun StoryboardBuilder.AmperSpringBoot() {
     }
 }
 
-private fun ModuleYaml(): List<CodeSample> = buildCodeSamples {
+private val MODULE_YAML = buildCodeSamples {
     val normal by tag()
     val normalSpringBootVersion by tag()
     val afterShowSettings by tag()
@@ -222,7 +213,7 @@ private fun ModuleYaml(): List<CodeSample> = buildCodeSamples {
         .then { unfocus() }
 }
 
-private fun MainKt() = buildCodeSamples {
+val MAIN_KT = buildCodeSamples {
     """
     package com.example
     
@@ -238,7 +229,7 @@ private fun MainKt() = buildCodeSamples {
         .startWith { this }
 }
 
-private fun ExampleTestKt() = buildCodeSamples {
+val EXAMPLE_TEST_KT = buildCodeSamples {
     """
     package com.example
     
