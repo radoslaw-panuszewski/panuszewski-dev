@@ -41,7 +41,7 @@ import talks.future_of_jvm_build_tools.generated.resources.amper_catching_errors
 fun StoryboardBuilder.AmperCatchErrorsEarly() {
     val initialState = 0
     val ideExpands = initialState + 1
-    val warningAppears = ideExpands + 3
+    val warningAppears = ideExpands + 2
     val warningEnlarged = warningAppears + 1
     val warningDisappears = warningEnlarged + 2
     val finalState = MODULE_YAML.size

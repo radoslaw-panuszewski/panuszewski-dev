@@ -144,6 +144,7 @@ private fun SceneScope<Int>.GradleTitle() {
             in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
             in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
             in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
+            in APP_DEVELOPER_AND_BUILD_ENGINEER -> "Two types of Gradle users"
             in DECLARATIVE_GRADLE -> "Declarative Gradle"
             else -> "Gradle"
         }
@@ -793,7 +794,7 @@ fun Transition<Int>.ConventionPlugins() {
 @Composable
 fun Transition<Int>.AppDeveloperAndBuildEngineer() {
     SlideFromTopAnimatedVisibility({ it in APP_DEVELOPER_AND_BUILD_ENGINEER }) {
-        Row(horizontalArrangement = Arrangement.spacedBy(64.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(64.dp), modifier = Modifier.padding(top = 32.dp)) {
             val appDeveloperHat = when {
                 currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[5] -> BASEBALL_CAP
                 currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] -> TOP_HAT
