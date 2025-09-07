@@ -39,6 +39,7 @@ fun StoryboardBuilder.Amper() {
                 AmperBriefDescription(stages, title)
                 AmperSpringBoot(stages, title)
                 AmperPrinciples(stages, title)
+                AmperCatchErrorsEarly(stages, title)
             }
         }
     }
