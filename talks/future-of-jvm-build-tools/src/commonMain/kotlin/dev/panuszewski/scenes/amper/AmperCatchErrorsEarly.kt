@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
+import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
@@ -27,6 +28,7 @@ import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
+import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.safeGet
@@ -42,7 +44,7 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
     val warningAppears = ideExpands + 3
     val warningEnlarged = warningAppears + 1
     val warningDisappears = warningEnlarged + 2
-    val finalState = MODULE_YAML.size + 1
+    val finalState = MODULE_YAML.size
 
     scene((initialState..finalState).toList()) {
         withStateTransition {
@@ -77,24 +79,26 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
                     selectedFile = "module.yaml"
                 )
 
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
-                    IDE(
-                        ideState = AMPER_IDE_STATE,
-                        modifier = Modifier
-                            .alpha(ideAlpha)
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp)
-                    )
-                    Box(Modifier.offset(x = warningXOffset, y = warningYOffset)) {
-                        FadeInOutAnimatedVisibility({ it in warningAppears until warningDisappears }) {
-                            ResourceImage(
-                                resource = Res.drawable.amper_catching_errors,
-                                modifier = Modifier
-                                    .height(warningHeight)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-                            )
+                transition.FadeOutAnimatedVisibility({ it is Frame.State<*> }) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
+                        IDE(
+                            ideState = AMPER_IDE_STATE,
+                            modifier = Modifier
+                                .alpha(ideAlpha)
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp)
+                        )
+                        Box(Modifier.offset(x = warningXOffset, y = warningYOffset)) {
+                            FadeInOutAnimatedVisibility({ it in warningAppears until warningDisappears }) {
+                                ResourceImage(
+                                    resource = Res.drawable.amper_catching_errors,
+                                    modifier = Modifier
+                                        .height(warningHeight)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                )
+                            }
                         }
                     }
                 }

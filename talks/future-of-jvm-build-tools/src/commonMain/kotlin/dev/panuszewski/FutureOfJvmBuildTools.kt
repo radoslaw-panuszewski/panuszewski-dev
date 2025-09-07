@@ -4,6 +4,7 @@ import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
 import dev.panuszewski.scenes.amper.Amper
+import dev.panuszewski.scenes.amper.AmperTransitionOnChart
 import dev.panuszewski.template.LIGHT_THEME
 import dev.panuszewski.template.SectionTitle
 
@@ -35,7 +36,8 @@ val FutureOfJvmBuildTools = Storyboard.build(
 
     section("Amper") {
         SectionTitle(animateToHeader = true)
-        Amper()
+//        Amper()
+        AmperTransitionOnChart()
     }
 
 //    section("Wrapping up!") {
