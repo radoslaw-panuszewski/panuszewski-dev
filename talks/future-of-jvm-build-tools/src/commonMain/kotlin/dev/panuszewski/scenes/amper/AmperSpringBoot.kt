@@ -15,8 +15,8 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addFile
+import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.safeGet
@@ -26,89 +26,7 @@ import kotlin.math.max
 
 @Composable
 fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>) {
-    val moduleYaml = buildAndRememberCodeSamples {
-        val normal by tag()
-        val normalSpringBootVersion by tag()
-        val afterShowSettings by tag()
-        val springBootVersionFromShowSettings by tag()
-        val springBootEnabledFromShowSettings by tag()
-
-        $$"""
-        $${normal}product: jvm/app
-
-        settings:
-          springBoot:
-            enabled: true$${normalSpringBootVersion}
-            version: 3.5.3$${normalSpringBootVersion}
-
-        dependencies:
-          - $spring.boot.starter.web$${normal}$${afterShowSettings}compose:
-          enabled: false  # [default]
-          experimental:
-            hotReload:
-              enabled: false  # [default]
-          resources:
-            exposedAccessors: false  # [default]
-            packageName:   # [default]
-          
-          version:
-        
-        junit: junit-5  # [default]
-        jvm:
-          release: 17  # [default]
-          storeParameterNames: true
-          test:
-            freeJvmArgs: []  # [default]
-            systemProperties: {}  # [default]
-            
-        ktor:
-          enabled: false  # [default]
-          version: 3.1.1  # [default]
-        
-        springBoot:
-          $${springBootEnabledFromShowSettings}enabled: true  # [module.yaml (amper-playground)]$${springBootEnabledFromShowSettings}
-          $${springBootVersionFromShowSettings}version: 3.4.3  # [default]$${springBootVersionFromShowSettings}
-          
-        kotlin:
-          allOpen:
-            enabled: true
-            presets: [spring]
-          
-          allWarningsAsErrors: false  # [default]
-          apiVersion: 2.1  # [Inherited from 'languageVersion']
-          debug: true  # [default]
-          ksp:
-            processorOptions: {}  # [default]
-            processors: []  # [default]
-            version: 2.1.21-2.0.1  # [default]
-          
-          languageVersion: 2.1  # [default]
-          noArg:
-            enabled: true
-            invokeInitializers: false  # [default]
-            presets: [jpa]
-          
-          progressiveMode: false  # [default]
-          serialization:
-            enabled: false  # [Enabled when 'format' is specified]
-            format:
-            
-            version: 1.8.0  # [default]
-          
-          suppressWarnings: false  # [default]
-          verbose: false  # [default]$${afterShowSettings}
-        """
-            .trimIndent()
-            .toCodeSample(language = Language.Yaml)
-            .startWith { hide(afterShowSettings, normalSpringBootVersion) }
-            .then { reveal(afterShowSettings).hide(normal) }
-            .then { focus(springBootVersionFromShowSettings, unfocusedStyle = null) }
-            .then { focus(springBootEnabledFromShowSettings, unfocusedStyle = null, scroll = false) }
-            .then { unfocus() }
-            .then { reveal(normal).hide(afterShowSettings) }
-            .then { reveal(normalSpringBootVersion).focus(normalSpringBootVersion) }
-            .then { unfocus() }
-    }
+    val moduleYaml = ModuleYaml()
 
     val initialState = stages.lastState
     val ideAppears = initialState + 1
@@ -127,7 +45,8 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
           experimental:
             hotReload:
               enabled: false  # [default]
-        (...)
+        resources:
+          exposedAccessors: (...)
         """.trimIndent()
     )
 
@@ -138,7 +57,7 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SlideFromTopAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
+        SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
             Terminal(
                 textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
                 bottomSpacerHeight = 0.dp,
@@ -172,4 +91,88 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
     if (currentState in states) {
         title.value = "Amper + Spring Boot"
     }
+}
+
+@Composable
+private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
+    val normal by tag()
+    val normalSpringBootVersion by tag()
+    val afterShowSettings by tag()
+    val springBootVersionFromShowSettings by tag()
+    val springBootEnabledFromShowSettings by tag()
+
+    $$"""
+    $${normal}product: jvm/app
+
+    settings:
+      springBoot:
+        enabled: true$${normalSpringBootVersion}
+        version: 3.5.3$${normalSpringBootVersion}
+
+    dependencies:
+      - $spring.boot.starter.web$${normal}$${afterShowSettings}compose:
+      enabled: false  # [default]
+      experimental:
+        hotReload:
+          enabled: false  # [default]
+      resources:
+        exposedAccessors: false  # [default]
+        packageName:   # [default]
+    
+    junit: junit-5  # [default]
+    
+    jvm:
+      release: 17  # [default]
+      storeParameterNames: true
+      test:
+        freeJvmArgs: []  # [default]
+        systemProperties: {}  # [default]
+        
+    ktor:
+      enabled: false  # [default]
+      version: 3.1.1  # [default]
+    
+    springBoot:
+      $${springBootEnabledFromShowSettings}enabled: true  # [module.yaml (amper-playground)]$${springBootEnabledFromShowSettings}
+      $${springBootVersionFromShowSettings}version: 3.4.3  # [default]$${springBootVersionFromShowSettings}
+      
+    kotlin:
+      allOpen:
+        enabled: true
+        presets: [spring]
+      
+      allWarningsAsErrors: false  # [default]
+      apiVersion: 2.1  # [Inherited from 'languageVersion']
+      debug: true  # [default]
+      ksp:
+        processorOptions: {}  # [default]
+        processors: []  # [default]
+        version: 2.1.21-2.0.1  # [default]
+      
+      languageVersion: 2.1  # [default]
+      noArg:
+        enabled: true
+        invokeInitializers: false  # [default]
+        presets: [jpa]
+      
+      progressiveMode: false  # [default]
+      serialization:
+        enabled: false  # [Enabled when 'format' is specified]
+        format:
+        
+        version: 1.8.0  # [default]
+      
+      suppressWarnings: false  # [default]
+      verbose: false  # [default]$${afterShowSettings}
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.Yaml)
+        .startWith { hide(afterShowSettings, normalSpringBootVersion) }
+        .then { reveal(afterShowSettings).hide(normal) }
+        .then { focus(springBootVersionFromShowSettings, unfocusedStyle = null) }
+        .then { focus(springBootEnabledFromShowSettings, unfocusedStyle = null, scroll = false) }
+        .then { unfocus() }
+        .then { reveal(normal).hide(afterShowSettings) }
+        .then { reveal(normalSpringBootVersion).focus(normalSpringBootVersion) }
+        .then { unfocus() }
 }
