@@ -59,19 +59,11 @@ import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.ProjectFile
 import dev.panuszewski.components.Terminal
+import dev.panuszewski.components.addDirectory
+import dev.panuszewski.components.addFile
 import dev.panuszewski.scenes.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.Hat.TOP_HAT
-import dev.panuszewski.scenes.Stages.CHARACTERIZING_PHASES
-import dev.panuszewski.scenes.Stages.CONFIGURATION_IS_LONG
-import dev.panuszewski.scenes.Stages.EXECUTION_IS_LONG
-import dev.panuszewski.scenes.Stages.EXPLAINING_BUILD_CACHE
-import dev.panuszewski.scenes.Stages.EXPLAINING_CONFIG_EXECUTION_DIFFERENCE
-import dev.panuszewski.scenes.Stages.CONVENTION_PLUGINS
-import dev.panuszewski.scenes.Stages.APP_DEVELOPER_AND_BUILD_ENGINEER
-import dev.panuszewski.scenes.Stages.DECLARATIVE_GRADLE
-import dev.panuszewski.scenes.Stages.EXPLAINING_CONVENTION_PLUGINS
-import dev.panuszewski.scenes.Stages.PHASES_BAR_VISIBLE
-import dev.panuszewski.scenes.Stages.SHOWING_THAT_BUILD_CACHE_IS_OLD
+import dev.panuszewski.template.Stages
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
@@ -101,39 +93,29 @@ import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
 import kotlin.math.max
 
-object Stages {
-    var lastState = 0
-        private set
+private val stages = Stages()
+private val lastState: Int get() = stages.lastState
 
-    val stateCount get() = lastState + 1
+private val PHASES_BAR_APPEARS = stages.registerStates(since = lastState + 1, count = 1)
+private val CHARACTERIZING_PHASES = stages.registerStates(since = lastState + 1, count = 3)
+private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStates(since = lastState + 2, count = 5)
+private val EXECUTION_BECOMES_LONG = stages.registerStates(since = lastState + 2, count = 1)
+private val EXPLAINING_BUILD_CACHE = stages.registerStates(since = lastState + 1, count = 12)
+private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStates(since = lastState + 2, count = 2)
+private val EXECUTION_BECOMES_SHORT = stages.registerStates(since = lastState + 1, count = 1)
+private val CONFIGURATION_IS_LONG = stages.registerStates(since = lastState + 1, count = 21)
+private val PHASES_BAR_DISAPPEARS = stages.registerStates(since = lastState + 2, count = 1)
+private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStates(since = lastState + 1, count = 9)
+private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStates(since = lastState + 1, count = 24)
+private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStates(lastState + 1, count = 6)
+private val DECLARATIVE_GRADLE = stages.registerStates(lastState + 1, count = 19)
 
-    fun states(since: Int, count: Int): List<Int> {
-        val stateList = (since until since + count).toList()
-        stateList.lastOrNull()?.let { lastState = it }
-        return stateList
-    }
-    
-    val PHASES_BAR_APPEARS = states(since = lastState + 1, count = 1)
-    val CHARACTERIZING_PHASES = states(since = lastState + 1, count = 3)
-    val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = states(since = lastState + 2, count = 5)
-    val EXECUTION_BECOMES_LONG = states(since = lastState + 2, count = 1)
-    val EXPLAINING_BUILD_CACHE = states(since = lastState + 1, count = 12)
-    val SHOWING_THAT_BUILD_CACHE_IS_OLD = states(since = lastState + 2, count = 2)
-    val EXECUTION_BECOMES_SHORT = states(since = lastState + 1, count = 1)
-    val CONFIGURATION_IS_LONG = states(since = lastState + 1, count = 21)
-    val PHASES_BAR_DISAPPEARS = states(since = lastState + 2, count = 1)
-    val EXTRACTING_CONVENTION_PLUGIN = states(since = lastState + 1, count = 9)
-    val EXPLAINING_CONVENTION_PLUGINS = states(since = lastState + 1, count = 24)
-    val APP_DEVELOPER_AND_BUILD_ENGINEER = states(lastState + 1, count = 6)
-    val DECLARATIVE_GRADLE = states(lastState + 1, count = 19)
-
-    val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
-    val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
-    val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVENTION_PLUGINS
-}
+private val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
+private val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
+private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVENTION_PLUGINS
 
 fun StoryboardBuilder.Gradle() {
-    scene(stateCount = Stages.stateCount) {
+    scene(stateCount = stages.stateCount) {
         val stateTransition = transition.createChildTransition { it.toState() }
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -511,21 +493,6 @@ fun Transition<Int>.ExplainingConfigurationCache() {
             }
         }
     }
-}
-
-private fun MutableList<ProjectFile>.addFile(
-    name: String,
-    path: String = name,
-    content: Transition<CodeSample>? = null,
-    staticContent: Transition<AnnotatedString>? = null
-) {
-    val file = ProjectFile(name = name, path = path, content = content, staticContent = staticContent)
-    add(file)
-}
-
-private fun MutableList<ProjectFile>.addDirectory(name: String, path: String = name) {
-    val file = ProjectFile(name = name, path = path, isDirectory = true)
-    add(file)
 }
 
 @Composable

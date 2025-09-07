@@ -548,3 +548,18 @@ private fun findParentFolder(path: String, folders: List<ProjectFile>): String? 
         .maxByOrNull { it.path.length }
         ?.path
 }
+
+fun MutableList<ProjectFile>.addFile(
+    name: String,
+    path: String = name,
+    content: Transition<CodeSample>? = null,
+    staticContent: Transition<AnnotatedString>? = null
+) {
+    val file = ProjectFile(name = name, path = path, content = content, staticContent = staticContent)
+    add(file)
+}
+
+fun MutableList<ProjectFile>.addDirectory(name: String, path: String = name) {
+    val file = ProjectFile(name = name, path = path, isDirectory = true)
+    add(file)
+}
