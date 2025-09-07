@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.Terminal
+import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
@@ -46,12 +47,11 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
             hotReload:
               enabled: false  # [default]
         resources:
-          exposedAccessors: (...)
+          exposedAccessors: <truncated...>
         """.trimIndent()
     )
 
     val terminalDisappears = terminalAppears + terminalTexts.size + 1
-
     val ideIsBackToNormal = terminalDisappears + 1
 
     Column(
@@ -78,6 +78,20 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
                                 else -> moduleYamlBeforeTerminal.safeGet(it - ideAppears)
                             }
                         }
+                    )
+                    addDirectory(name = "src")
+                    addDirectory(name = "com/example", path = "src/com/example")
+                    addFile(
+                        name = "main.kt",
+                        path = "src/com/example/main.kt",
+                        content = createChildTransition { moduleYaml[0] }
+                    )
+                    addDirectory(name = "test")
+                    addDirectory(name = "com/example", path = "test/com/example")
+                    addFile(
+                        name = "ExampleTest.kt",
+                        path = "test/com/example/ExampleTest.kt",
+                        content = createChildTransition { moduleYaml[0] }
                     )
                 },
                 selectedFile = "module.yaml",

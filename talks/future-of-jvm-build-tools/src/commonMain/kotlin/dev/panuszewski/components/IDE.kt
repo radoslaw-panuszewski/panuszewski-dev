@@ -411,14 +411,18 @@ private fun FileTreeItem(
             )
             ProvideTextStyle(textStyle) {
                 MagicText(text = buildAnnotatedString {
-                    val beforeExtension = node.name.substringBeforeLast(".")
-                    val afterExtension = node.name.substringAfterLast(".")
-                    append(beforeExtension)
-                    append(".")
-                    if (afterExtension == "dcl") {
-                        withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                    if (node.name.contains(".")) {
+                        val beforeExtension = node.name.substringBeforeLast(".")
+                        val afterExtension = node.name.substringAfterLast(".")
+                        append(beforeExtension)
+                        append(".")
+                        if (afterExtension == "dcl") {
+                            withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                        } else {
+                            append(afterExtension)
+                        }
                     } else {
-                        append(afterExtension)
+                        append(node.name)
                     }
                 })
             }
