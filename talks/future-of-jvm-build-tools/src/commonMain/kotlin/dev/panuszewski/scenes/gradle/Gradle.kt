@@ -47,7 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.Frame
@@ -96,10 +95,6 @@ import kotlin.math.max
 private val stages = Stages()
 private val lastState: Int get() = stages.lastState
 
-private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
-private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 22)
-private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
-private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState + 1, count = 1)
 private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
 private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
@@ -107,8 +102,12 @@ private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastSt
 private val EXPLAINING_BUILD_CACHE = stages.registerStatesByCount(start = lastState + 1, count = 12)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 21)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 25)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
+private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
+private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 22)
+private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
+private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 
 private val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
 private val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
@@ -126,7 +125,7 @@ fun StoryboardBuilder.Gradle() {
             stateTransition.ExplainingConfigExecutionDifference()
             stateTransition.ExplainingBuildCache()
             stateTransition.ShowingThatBuildCacheIsOld()
-            // TODO merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
+            // TODO maybe merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
             stateTransition.AppDeveloperAndBuildEngineer()
@@ -364,7 +363,6 @@ private fun Transition<Int>.ExplainingBuildCache() {
 fun Transition<Int>.ExplainingConfigurationCache() {
     val codeSamples = buildAndRememberCodeSamples {
         val configuring by tag()
-        val executing by tag()
 
         """
         tasks {
@@ -381,7 +379,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
             .then { unfocus() }
     }
 
-    val afterCodeSamples = CONFIGURATION_IS_LONG[4] + codeSamples.size
+    val afterCodeSamples = CONFIGURATION_IS_LONG[8] + codeSamples.size
 
     val terminalTexts = listOf(
         "$ ./gradlew printMessage",
@@ -396,32 +394,70 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 
     FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            SlideFromBottomAnimatedVisibility({ it == CONFIGURATION_IS_LONG[2] }) {
-                val inputs = listOf(
-                    "Gradle configs",
-                    "Files read at config time",
-                    "System props read at config time",
-                    "Env variables read at config time",
-                )
+            SlideFromBottomAnimatedVisibility({ CONFIGURATION_IS_LONG[2] <= it && it <= CONFIGURATION_IS_LONG[6] }) {
+                val allInputs = when {
+                    currentState >= CONFIGURATION_IS_LONG[6] -> listOf("Gradle configs", "Files read at config time", "System props read at config time", "Env variables read at config time")
+                    currentState >= CONFIGURATION_IS_LONG[5] -> listOf("Gradle configs", "Files read at config time", "System props read at config time")
+                    currentState >= CONFIGURATION_IS_LONG[4] -> listOf("Gradle configs", "Files read at config time")
+                    currentState >= CONFIGURATION_IS_LONG[3] -> listOf("Gradle configs")
+                    else -> listOf("Configuration")
+                }
 
-                HorizontalTree(
-                    roots = inputs,
-                    getChildren = { if (it in inputs) listOf("Configuration") else emptyList() },
-                    connection = { _, parentRect, _, childRect -> Connection(parentRect, childRect) }
-                ) {
-                    Box(Modifier.border(1.dp, Color.Black, RoundedCornerShape(8.dp))) {
-                        Text(modifier = Modifier.padding(8.dp), text = it)
+                SharedTransitionLayout {
+                    AnimatedContent(
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        targetState = allInputs
+                    ) { inputs ->
+
+                        var offset by remember { mutableStateOf(Offset.Zero) }
+                        val placements = remember { mutableStateMapOf<String, Rect>() }
+
+                        Box(
+                            contentAlignment = Alignment.TopCenter,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            HorizontalTree(
+                                roots = inputs,
+                                getChildren = { if (it != "Configuration") listOf("Configuration") else emptyList() },
+                                modifier = Modifier.onPlaced { offset = it.positionInParent() }
+                            ) { input ->
+                                Box(
+                                    Modifier
+                                        .sharedElement(
+                                            rememberSharedContentState(input),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                        .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
+                                        .onPlaced { placements[input] = it.boundsInParent() },
+                                ) {
+                                    Text(modifier = Modifier.padding(8.dp), text = input)
+                                }
+                            }
+                        }
+
+                        val childRect = placements["Configuration"] ?: Rect.Zero
+
+                        for ((parentName, parentRect) in placements.filterKeys { it != "Configuration" }) {
+                            Connection(
+                                childRect = childRect.translate(offset),
+                                parentRect = parentRect.translate(offset),
+                                modifier = Modifier.sharedElement(
+                                    rememberSharedContentState("connection:$parentName"),
+                                    animatedVisibilityScope = this@AnimatedContent
+                                )
+                            )
+                        }
                     }
                 }
             }
 
-            FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[4] until afterTerminal }) {
+            FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[8] until afterTerminal }) {
                 Row {
                     Spacer(Modifier.width(32.dp))
 
-                    SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[4] }) {
+                    SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[8] }) {
                         code2 {
-                            createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[4]) }
+                            createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[8]) }
                                 .MagicCodeSample()
                         }
                     }
@@ -439,11 +475,11 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                 Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     SlideFromTopAnimatedVisibility({ it > afterTerminal }) {
                         h6 {
-                            Text(buildAnnotatedString {
+                            Text {
                                 append("It can really save you ")
                                 withColor(Color(0xFFFF8A04)) { append("a lot of") }
                                 append(" time!")
-                            })
+                            }
                         }
                     }
 

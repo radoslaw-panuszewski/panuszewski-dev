@@ -139,6 +139,5 @@ private val MODULE_YAML = buildCodeSamples {
         }
         .then { this }
         .then { this }
-        .then { this }
         .then { reveal(correctVersion).hide(wrongVersion).unfocus() }
 }
