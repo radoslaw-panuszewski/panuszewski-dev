@@ -62,7 +62,6 @@ import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.scenes.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.Hat.TOP_HAT
-import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
@@ -73,6 +72,7 @@ import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
+import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Text
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
