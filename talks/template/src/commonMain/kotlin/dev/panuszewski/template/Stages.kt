@@ -6,9 +6,13 @@ class Stages {
 
     val stateCount get() = lastState + 1
 
-    fun registerStates(since: Int, count: Int): List<Int> {
-        val stateList = (since until since + count).toList()
+    fun registerStatesByCount(start: Int, count: Int): List<Int> {
+        return registerStatesByRange(start, start + count - 1)
+    }
+
+    fun registerStatesByRange(start: Int, end: Int): List<Int> {
+        val stateList = start..end
         stateList.lastOrNull()?.let { lastState = it }
-        return stateList
+        return stateList.toList()
     }
 }

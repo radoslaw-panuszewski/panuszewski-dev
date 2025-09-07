@@ -47,7 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
@@ -57,14 +56,12 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
-import dev.panuszewski.components.ProjectFile
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.scenes.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.Hat.TOP_HAT
 import dev.panuszewski.template.Stages
-import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
@@ -96,19 +93,19 @@ import kotlin.math.max
 private val stages = Stages()
 private val lastState: Int get() = stages.lastState
 
-private val PHASES_BAR_APPEARS = stages.registerStates(since = lastState + 1, count = 1)
-private val CHARACTERIZING_PHASES = stages.registerStates(since = lastState + 1, count = 3)
-private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStates(since = lastState + 2, count = 5)
-private val EXECUTION_BECOMES_LONG = stages.registerStates(since = lastState + 2, count = 1)
-private val EXPLAINING_BUILD_CACHE = stages.registerStates(since = lastState + 1, count = 12)
-private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStates(since = lastState + 2, count = 2)
-private val EXECUTION_BECOMES_SHORT = stages.registerStates(since = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStates(since = lastState + 1, count = 21)
-private val PHASES_BAR_DISAPPEARS = stages.registerStates(since = lastState + 2, count = 1)
-private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStates(since = lastState + 1, count = 9)
-private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStates(since = lastState + 1, count = 24)
-private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStates(lastState + 1, count = 6)
-private val DECLARATIVE_GRADLE = stages.registerStates(lastState + 1, count = 19)
+private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState + 1, count = 1)
+private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
+private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
+private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
+private val EXPLAINING_BUILD_CACHE = stages.registerStatesByCount(start = lastState + 1, count = 12)
+private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
+private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 21)
+private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
+private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
+private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
+private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 6)
+private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 
 private val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
 private val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()

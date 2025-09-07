@@ -84,9 +84,17 @@ fun Transition<CodeSample>.ScrollableMagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
+    scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = {
+        tween(DefaultMoveDurationMillis, delayMillis = DefaultFadeDurationMillis, easing = EaseInOut)
+    },
+    scrollMargin: Int = 0
 ) {
     val state = rememberScrollState()
-    animateScroll(state)
+    animateScroll(
+        verticalScrollState = state,
+        transitionSpec = scrollTransitionSpec,
+        scrollMargin = scrollMargin,
+    )
 
     Box(
         // Scroll should come before any padding, so it is not clipped.
@@ -111,12 +119,13 @@ fun Transition<CodeSample>.animateScroll(
     transitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = {
         tween(DefaultMoveDurationMillis, delayMillis = DefaultFadeDurationMillis, easing = EaseInOut)
     },
+    scrollMargin: Int = 0,
     label: String = "ScrollAnimation",
 ) {
     // TODO auto-scroll doesn't seem to be working on the companion app...
     //  - i bet it's the same problem as with the start animation!
     //  - something to do with SeekableTransitionState.snapTo()?
     val lineHeight = with(LocalDensity.current) { style.lineHeight.toPx() }
-    val scrollPosition by animateFloat(transitionSpec, label) { it.Scroll() * lineHeight }
+    val scrollPosition by animateFloat(transitionSpec, label) { (it.Scroll() - scrollMargin) * lineHeight }
     verticalScrollState.dispatchRawDelta(scrollPosition - verticalScrollState.value)
 }

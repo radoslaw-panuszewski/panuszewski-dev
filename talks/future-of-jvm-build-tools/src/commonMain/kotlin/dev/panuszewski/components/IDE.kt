@@ -2,6 +2,7 @@ package dev.panuszewski.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -44,10 +45,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.magic.DefaultFadeDurationMillis
+import dev.bnorm.storyboard.text.magic.DefaultMoveDurationMillis
 import dev.bnorm.storyboard.text.magic.MagicText
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.MagicCodeSample
+import dev.panuszewski.template.ScrollableMagicCodeSample
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.code3
 import dev.panuszewski.template.withColor
@@ -443,7 +447,10 @@ private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
             .background(Color.White)
     ) {
         code2 {
-            file.content?.MagicCodeSample() ?: file.staticContent?.MagicAnnotatedString()
+            file.content?.ScrollableMagicCodeSample(
+                scrollTransitionSpec = { tween(durationMillis = 1000, delayMillis = 0) },
+                scrollMargin = 8
+            ) ?: file.staticContent?.MagicAnnotatedString()
         }
     }
 }
