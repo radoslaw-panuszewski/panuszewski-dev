@@ -25,9 +25,19 @@ import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import kotlin.math.max
 
+/**
+ * - [ ] avoid touching build tool
+ * - [ ] it tells you that dependency version is overridden by a newer one (Gradle does not do that)
+ * - [ ] configuration that reflects reality
+ * - [x] ./amper show settings (pokazać default wersję spring boota)
+ * - [x] show up when needed, stay out of the way when not
+ * - [ ] smart completion (like when typed 'jdk' it finds 'jvm.release' property)
+ */
 @Composable
 fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>) {
     val moduleYaml = ModuleYaml()
+    val mainKt = MainKt()
+    val exampleTestKt = ExampleTestKt()
 
     val initialState = stages.lastState
     val ideAppears = initialState + 1
@@ -36,7 +46,10 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
     val moduleYamlBeforeTerminal = moduleYaml.take(samplesBeforeTerminal)
     val moduleYamlAfterTerminal = moduleYaml.drop(samplesBeforeTerminal)
 
-    val terminalAppears = ideAppears + samplesBeforeTerminal
+    val mainKtIsSelected = ideAppears + samplesBeforeTerminal
+    val exampleTestKtIsSelected = mainKtIsSelected + 1
+
+    val terminalAppears = exampleTestKtIsSelected + 2
 
     val terminalTexts = listOf(
         "$ ./amper show settings",
@@ -84,17 +97,21 @@ fun Transition<Int>.AmperSpringBoot(stages: Stages, title: MutableState<String>)
                     addFile(
                         name = "main.kt",
                         path = "src/com/example/main.kt",
-                        content = createChildTransition { moduleYaml[0] }
+                        content = createChildTransition { mainKt[0] }
                     )
                     addDirectory(name = "test")
                     addDirectory(name = "com/example", path = "test/com/example")
                     addFile(
                         name = "ExampleTest.kt",
                         path = "test/com/example/ExampleTest.kt",
-                        content = createChildTransition { moduleYaml[0] }
+                        content = createChildTransition { exampleTestKt[0] }
                     )
                 },
-                selectedFile = "module.yaml",
+                selectedFile = when (currentState) {
+                    mainKtIsSelected -> "src/com/example/main.kt"
+                    exampleTestKtIsSelected -> "test/com/example/ExampleTest.kt"
+                    else -> "module.yaml"
+                },
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
             )
         }
@@ -114,6 +131,7 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
     val afterShowSettings by tag()
     val springBootVersionFromShowSettings by tag()
     val springBootEnabledFromShowSettings by tag()
+    val mainClass by tag()
 
     $$"""
     $${normal}product: jvm/app
@@ -121,7 +139,9 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
     settings:
       springBoot:
         enabled: true$${normalSpringBootVersion}
-        version: 3.5.3$${normalSpringBootVersion}
+        version: 3.5.3$${normalSpringBootVersion}$${mainClass}
+      jvm:
+        mainClass: com.example.MainKt$${mainClass}
 
     dependencies:
       - $spring.boot.starter.web$${normal}$${afterShowSettings}compose:
@@ -181,7 +201,7 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.Yaml)
-        .startWith { hide(afterShowSettings, normalSpringBootVersion) }
+        .startWith { hide(afterShowSettings, normalSpringBootVersion, mainClass) }
         .then { reveal(afterShowSettings).hide(normal) }
         .then { focus(springBootVersionFromShowSettings, unfocusedStyle = null) }
         .then { focus(springBootEnabledFromShowSettings, unfocusedStyle = null, scroll = false) }
@@ -189,4 +209,40 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
         .then { reveal(normal).hide(afterShowSettings) }
         .then { reveal(normalSpringBootVersion).focus(normalSpringBootVersion) }
         .then { unfocus() }
+        .then { reveal(mainClass).focus(mainClass) }
+        .then { unfocus() }
+}
+
+@Composable
+private fun MainKt() = buildAndRememberCodeSamples {
+    """
+    package com.example
+    
+    @SpringBootApplication
+    class Application
+    
+    fun main(args: Array<String>) {
+        runApplication<Application>(*args)
+    }
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.Kotlin)
+        .startWith { this }
+}
+
+@Composable
+private fun ExampleTestKt() = buildAndRememberCodeSamples {
+    """
+    package com.example
+    
+    @SpringBootTest
+    class ExampleTest {
+    
+        @Test
+        fun contextLoads() { }
+    }
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.Kotlin)
+        .startWith { this }
 }
