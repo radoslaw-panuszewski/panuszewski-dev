@@ -15,6 +15,7 @@ import dev.bnorm.storyboard.easel.sharedElement
 import dev.panuszewski.template.h4
 
 @Composable
+context(_: SharedTransitionScope, animatedVisibilityScope: AnimatedVisibilityScope)
 fun Title(title: String) {
     Spacer(Modifier.height(16.dp))
     AnimatedContent(targetState = title) { targetTitle ->
