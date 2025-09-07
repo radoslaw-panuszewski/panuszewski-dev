@@ -18,6 +18,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.SceneDecorator
 
+val NICE_ORANGE = Color(0xFFFF8A04)
+
 val DARK_THEME = SceneDecorator { content ->
     MaterialTheme(DARK_COLORS, Typography()) {
         Surface {
@@ -35,6 +37,7 @@ val DARK_COLORS = darkColors(
     primary = Color(0xFF0E4A3E),
     primaryVariant = Color(0xFF145F50),
     secondary = Color(0xFF942DF3),
+    secondaryVariant = NICE_ORANGE
 )
 
 val LIGHT_THEME = SceneDecorator { content ->
@@ -53,6 +56,7 @@ val LIGHT_COLORS = lightColors(
     primary = Color(54, 161, 165),
     primaryVariant = Color(0xFF145F50),
     secondary = Color(148, 45, 243),
+    secondaryVariant = NICE_ORANGE
 )
 
 val Typography.code1: TextStyle

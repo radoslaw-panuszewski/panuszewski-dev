@@ -1,12 +1,24 @@
 package dev.panuszewski.scenes.amper
 
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -14,28 +26,38 @@ import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
-import dev.panuszewski.template.CodeSample
+import dev.panuszewski.template.FadeInOutAnimatedVisibility
+import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
 import dev.panuszewski.template.withStateTransition
+import talks.future_of_jvm_build_tools.generated.resources.Res
+import talks.future_of_jvm_build_tools.generated.resources.amper_catching_errors
 
 fun StoryboardBuilder.AmperCatchErrorsEarly() {
     val initialState = 0
     val ideExpands = initialState + 1
-    val finalState = initialState + 10
+    val warningAppears = ideExpands + 3
+    val warningEnlarged = warningAppears + 1
+    val warningDisappears = warningEnlarged + 2
+    val finalState = MODULE_YAML.size + 1
 
     scene((initialState..finalState).toList()) {
         withStateTransition {
             val ideTopPadding by animateDp { if (it >= ideExpands) 0.dp else 281.dp }
+            val warningHeight by animateDp { if (it == warningEnlarged) 225.dp else 150.dp }
+            val warningXOffset by animateDp { if (it == warningEnlarged) 0.dp else 165.dp }
+            val warningYOffset by animateDp { if (it == warningEnlarged) 0.dp else 70.dp }
+            val ideAlpha by animateFloat { if (it == warningEnlarged) 0.1f else 1f }
 
             AmperTitleScaffold("Catching errors early") {
                 AMPER_IDE_STATE = IdeState(
                     files = buildList {
                         addFile(
                             name = "module.yaml",
-                            content = createChildTransition { MODULE_YAML.safeGet(it) }
+                            content = createChildTransition { MODULE_YAML.safeGet(it - ideExpands) }
                         )
                         addDirectory(name = "src")
                         addDirectory(name = "com/example", path = "src/com/example")
@@ -54,19 +76,39 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
                     },
                     selectedFile = "module.yaml"
                 )
-                IDE(
-                    ideState = AMPER_IDE_STATE,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp)
-                )
+
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
+                    IDE(
+                        ideState = AMPER_IDE_STATE,
+                        modifier = Modifier
+                            .alpha(ideAlpha)
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp)
+                    )
+                    Box(Modifier.offset(x = warningXOffset, y = warningYOffset)) {
+                        FadeInOutAnimatedVisibility({ it in warningAppears until warningDisappears }) {
+                            ResourceImage(
+                                resource = Res.drawable.amper_catching_errors,
+                                modifier = Modifier
+                                    .height(warningHeight)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 private val MODULE_YAML = buildCodeSamples {
+    val springCoreDependency by tag()
+    val warning by tag()
+    val wrongVersion by tag()
+    val correctVersion by tag()
+
     $$"""
     product: jvm/app
 
@@ -76,9 +118,23 @@ private val MODULE_YAML = buildCodeSamples {
         version: 3.5.3
 
     dependencies:
-      - $spring.boot.starter.web
+      - $spring.boot.starter.web$${springCoreDependency}
+      - $${warning}org.springframework:spring-core:$${wrongVersion}5.0.0$${wrongVersion}$${correctVersion}6.2.3$${correctVersion}$${warning}$${springCoreDependency}
     """
         .trimIndent()
         .toCodeSample(language = Language.Yaml)
-        .startWith { hide(this) }
+        .startWith { hide(springCoreDependency).hide(correctVersion) }
+        .then { reveal(springCoreDependency) }
+        .then {
+            focus(
+                tag = warning,
+                focusedStyle = SpanStyle(background = Color(0xFFFBF4D7)),
+                unfocusedStyle = null,
+                scroll = false
+            )
+        }
+        .then { this }
+        .then { this }
+        .then { this }
+        .then { reveal(correctVersion).hide(wrongVersion).unfocus() }
 }
