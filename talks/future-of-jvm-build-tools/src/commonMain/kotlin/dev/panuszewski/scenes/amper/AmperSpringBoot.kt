@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
@@ -21,7 +23,7 @@ import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.Stages
+import dev.panuszewski.template.Text
 import dev.panuszewski.template.buildCodeSamples
 import dev.panuszewski.template.precompose
 import dev.panuszewski.template.safeGet
@@ -30,12 +32,12 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.withStateTransition
 import kotlin.math.max
 
-fun StoryboardBuilder.AmperSpringBoot(stages: Stages) {
+fun StoryboardBuilder.AmperSpringBoot() {
     val moduleYaml = ModuleYaml()
     val mainKt = MainKt()
     val exampleTestKt = ExampleTestKt()
 
-    val initialState = stages.lastState
+    val initialState = 0
     val ideAppears = initialState + 1
 
     val samplesBeforeTerminal = 1
@@ -66,12 +68,10 @@ fun StoryboardBuilder.AmperSpringBoot(stages: Stages) {
     val ideShrinks = ideIsBackToNormal + moduleYamlAfterTerminal.size
     val finalState = ideShrinks
 
-    val states = stages.registerStatesByRange(start = initialState, end = finalState)
-
-    scene(states = states) {
-        moduleYaml.precompose()
-        mainKt.precompose()
-        exampleTestKt.precompose()
+    scene(stateCount = finalState + 1) {
+//        moduleYaml.precompose()
+//        mainKt.precompose()
+//        exampleTestKt.precompose()
 
         withStateTransition {
             val ideTopPadding by animateDp { if (it >= ideShrinks) 281.dp else 0.dp }
@@ -80,7 +80,11 @@ fun StoryboardBuilder.AmperSpringBoot(stages: Stages) {
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Title("Amper")
+                when (transition.currentState) {
+                    is Frame.State<*> -> AMPER_TITLE = "Amper + Spring Boot"
+                    else -> {}
+                }
+                Title(AMPER_TITLE)
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
@@ -223,7 +227,7 @@ private fun ModuleYaml(): List<CodeSample> = buildCodeSamples {
         .then { focus(springBootEnabledReason, unfocusedStyle = null, scroll = false) }
         .then { unfocus() }
         .then { reveal(normal).hide(afterShowSettings) }
-        .then { reveal(normalSpringBootVersion).focus(normalSpringBootVersion) }
+        .then { reveal(normalSpringBootVersion).focus(normalSpringBootVersion, scroll = false) }
         .then { unfocus() }
 }
 

@@ -12,8 +12,8 @@ import dev.panuszewski.template.Stages
  * - [ ] smart completion (like when typed 'jdk' it finds 'jvm.release' property)
  */
 fun StoryboardBuilder.Amper() {
-    val stages = Stages()
-    AmperBriefDescription(stages)
-    AmperSpringBoot(stages)
+    AmperBriefDescription()
+    AmperSpringBoot()
+    AmperPrinciples()
 }
 
