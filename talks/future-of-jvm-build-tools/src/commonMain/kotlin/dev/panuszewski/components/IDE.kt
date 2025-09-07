@@ -51,6 +51,7 @@ import dev.bnorm.storyboard.text.magic.MagicText
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.MagicCodeSample
+import dev.panuszewski.template.NICE_ORANGE
 import dev.panuszewski.template.ScrollableMagicCodeSample
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.code3
@@ -63,6 +64,7 @@ data class IdeState(
     val rightPaneFile: String? = null,
     val fileTreeHidden: Boolean = false,
     val enlargedFile: String? = null,
+    val highlightedFile: String? = null,
 )
 
 @Composable
@@ -70,6 +72,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
     with(ideState) {
         val selectedFile = files.find { it.path == selectedFile }
         val enlargedFile = files.find { it.path == enlargedFile }
+        val highlightedFile = files.find { it.path == highlightedFile }
 
         // Find files in left and right panes
         val leftPaneFile = files.find { it.path == leftPaneFile }
@@ -178,7 +181,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                         depth = 0,
                                         expandedFolders = expandedFolders,
                                         currentOpenFile = selectedFile,
-                                        enlargedFile = enlargedFile
+                                        enlargedFile = enlargedFile,
+                                        highlightedFile = highlightedFile
                                     )
                                 }
                             }
@@ -345,10 +349,12 @@ private fun FileTreeItem(
     expandedFolders: MutableMap<String, Boolean>,
     currentOpenFile: ProjectFile?,
     enlargedFile: ProjectFile?,
+    highlightedFile: ProjectFile?
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
     val isEnlarged = node.file == enlargedFile
+    val isHighlighted = node.file == highlightedFile
 
     val iconSize by animateDpAsState(targetValue = if (isEnlarged) 20.dp else 16.dp)
     val spacerWidth by animateDpAsState(targetValue = if (isEnlarged) 12.dp else 8.dp)
@@ -359,6 +365,7 @@ private fun FileTreeItem(
             .fillMaxWidth()
             .background(
                 when {
+                    isHighlighted -> NICE_ORANGE
                     isEnlarged -> Color.Transparent
                     isSelected -> Color(0xFFD2E4FF)
                     else -> Color.Transparent
@@ -441,6 +448,7 @@ private fun FileTreeItem(
                 expandedFolders = expandedFolders,
                 currentOpenFile = currentOpenFile,
                 enlargedFile = enlargedFile,
+                highlightedFile = highlightedFile
             )
         }
     }

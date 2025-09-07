@@ -47,7 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,6 +96,10 @@ import kotlin.math.max
 private val stages = Stages()
 private val lastState: Int get() = stages.lastState
 
+private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
+private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 22)
+private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
+private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState + 1, count = 1)
 private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
 private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
@@ -106,10 +109,6 @@ private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
 private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 21)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
-private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
-private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
-private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 6)
-private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 
 private val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
 private val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_BECOMES_SHORT.first()
@@ -561,12 +560,8 @@ fun Transition<Int>.ConventionPlugins() {
             .then { reveal(topWhen, bottomWhen, monday) }
             .then { reveal(postgres, cassandra) }
             .then { reveal(masochistIfTop, masochistIfBottom) }
-            .then { focus(mavenPublishImperative, randomDatabase, groovy) }
-            .then { hide(mavenPublishImperative, randomDatabase, groovy).unfocus() }
-            .then { this }
-            .then { focus(javaPlugin) }
-            .then { hide(javaPlugin, pluginsBlockNewline).unfocus() }
-            .then { reveal(wtfAppPlugin, pluginsBlockNewline).focus(wtfAppPlugin) }
+            .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
+            .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
             .then { unfocus() }
             .then { reveal(someImperativeCode).focus(someImperativeCode) }
             .then { this }
@@ -608,23 +603,20 @@ fun Transition<Int>.ConventionPlugins() {
             .toCodeSample(language = Language.Kotlin)
             .startWith { hide(javaPlugin, imperativeCode) }
             .then { this }
-            .then { reveal(imperativeCode) }
-            .then { focus(implementation1, implementation2, implementation3, implementation4, focusedStyle = SpanStyle(Color.Red), unfocusedStyle = null).hide(todo) }
-            .then { this }
-            .then { reveal(javaPlugin).unfocus() }
-            .then { focus(todo) }
-            .then { unfocus() }
+            .then { reveal(imperativeCode, javaPlugin) }
     }
 
     val buildGradleKtsBeforeSplitPane = buildGradleKts.take(6)
-    val buildGradleKtsOnSplitPane = buildGradleKts.drop(buildGradleKtsBeforeSplitPane.size - 1).take(8)
+    val buildGradleKtsOnSplitPane = buildGradleKts.drop(buildGradleKtsBeforeSplitPane.size - 1).take(4)
     val buildGradleKtsInSmallIde = buildGradleKts.takeLast(4)
 
     val grimacingEmojiVisible = CONVENTION_PLUGINS[0] + buildGradleKtsBeforeSplitPane.size
     val ideIsShrinkedSince = grimacingEmojiVisible + 2
     val ideIsBackToNormalSince = EXPLAINING_CONVENTION_PLUGINS[4]
 
-    val splitPaneEnabledSince = ideIsBackToNormalSince + 1
+    val conventionFileAdded = ideIsBackToNormalSince + 1
+    val conventionFileEnlarged = conventionFileAdded + 1
+    val splitPaneEnabledSince = conventionFileEnlarged + 1
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
@@ -694,13 +686,18 @@ fun Transition<Int>.ConventionPlugins() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SlideFromTopAnimatedVisibility({ ideIsShrinkedAgainSince + 1 <= it }) {
-                        h6 { Text { append("It's cool, but... is it enough?") } }
+                        h6 {
+                            Text {
+                                withPrimaryColor { append("It's cool") }
+                                append(" but... is it enough?")
+                            }
+                        }
                     }
 
                     SlideFromTopAnimatedVisibility({ ideIsShrinkedAgainSince + 2 <= it }) {
                         h6 {
                             Text {
-                                append("This approach encourages declarativity, but ")
+                                append("It encourages declarativity, but ")
                                 withPrimaryColor { append("does not enforce it") }
                             }
                         }
@@ -731,7 +728,7 @@ fun Transition<Int>.ConventionPlugins() {
                                 }
                             }
                         )
-                        if (currentState >= ideIsBackToNormalSince + 1) {
+                        if (currentState >= conventionFileAdded) {
                             addDirectory("buildSrc")
                             addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
                             addFile(
@@ -761,12 +758,19 @@ fun Transition<Int>.ConventionPlugins() {
                         else -> null
                     }
 
+                    val highlightedAndEnlargedFile = when {
+                        currentState == conventionFileEnlarged -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                        else -> null
+                    }
+
                     IDE(
                         IdeState(
                             files = files,
                             selectedFile = selectedFile,
                             leftPaneFile = leftPaneFile,
                             rightPaneFile = rightPaneFile,
+                            enlargedFile = highlightedAndEnlargedFile,
+                            highlightedFile = highlightedAndEnlargedFile,
                             fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
                         ),
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
@@ -793,11 +797,11 @@ fun Transition<Int>.ConventionPlugins() {
 
 @Composable
 fun Transition<Int>.AppDeveloperAndBuildEngineer() {
-    SlideFromTopAnimatedVisibility({ it in APP_DEVELOPER_AND_BUILD_ENGINEER }) {
+    SlideFromTopAnimatedVisibility({ it in APP_DEVELOPER_AND_BUILD_ENGINEER.drop(1) }) {
         Row(horizontalArrangement = Arrangement.spacedBy(64.dp), modifier = Modifier.padding(top = 32.dp)) {
             val appDeveloperHat = when {
-                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[5] -> BASEBALL_CAP
-                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] -> TOP_HAT
+                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[6] -> BASEBALL_CAP
+                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[5] -> TOP_HAT
                 else -> BASEBALL_CAP
             }
 
@@ -812,7 +816,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[1] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
                         body1 {
                             Text {
                                 append("Ships new ")
@@ -820,7 +824,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
                         body1 {
                             Text {
                                 append("Interested in: ")
@@ -828,7 +832,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
                         body1 { Text("Often changes hats") }
                     }
                 }
@@ -845,7 +849,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[1] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
                         body1 {
                             Text {
                                 append("Maintains the ")
@@ -853,7 +857,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
                         body1 {
                             Text {
                                 append("Interested in: ")
@@ -861,7 +865,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
+                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
                         body1 { Text("Seen in the wild mostly in large codebases") }
                     }
                 }
