@@ -16,7 +16,7 @@ import dev.panuszewski.template.withStateTransition
 
 fun StoryboardBuilder.AmperBriefDescription(stages: Stages) {
     val initialState = stages.lastState
-    val states = stages.registerStatesByCount(start = initialState, count = 4)
+    val states = stages.registerStatesByCount(start = initialState, count = 5)
 
     scene(states = states) {
         withStateTransition {

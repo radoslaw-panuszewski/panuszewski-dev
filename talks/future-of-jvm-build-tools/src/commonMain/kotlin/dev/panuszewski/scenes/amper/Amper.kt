@@ -14,5 +14,6 @@ import dev.panuszewski.template.Stages
 fun StoryboardBuilder.Amper() {
     val stages = Stages()
     AmperBriefDescription(stages)
+    AmperSpringBoot(stages)
 }
 
