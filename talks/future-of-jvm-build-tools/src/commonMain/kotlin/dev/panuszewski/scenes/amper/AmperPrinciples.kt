@@ -21,16 +21,7 @@ import dev.panuszewski.template.withStateTransition
 fun StoryboardBuilder.AmperPrinciples() {
     scene(stateCount = 5) {
         withStateTransition {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                when (transition.currentState) {
-                    is Frame.State<*> -> AMPER_TITLE = "Amper Principles"
-                    else -> {}
-                }
-                Title(AMPER_TITLE)
-
+            AmperTitleScaffold("Amper Principles") {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(32.dp),

@@ -17,16 +17,7 @@ import dev.panuszewski.template.withStateTransition
 fun StoryboardBuilder.AmperBriefDescription() {
     scene(stateCount = 5) {
         withStateTransition {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                when (transition.currentState) {
-                    is Frame.State<*> -> AMPER_TITLE = "Amper"
-                    else -> {}
-                }
-                Title(AMPER_TITLE)
-
+            AmperTitleScaffold("Amper") {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally

@@ -76,16 +76,7 @@ fun StoryboardBuilder.AmperSpringBoot() {
         withStateTransition {
             val ideTopPadding by animateDp { if (it >= ideShrinks) 281.dp else 0.dp }
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                when (transition.currentState) {
-                    is Frame.State<*> -> AMPER_TITLE = "Amper + Spring Boot"
-                    else -> {}
-                }
-                Title(AMPER_TITLE)
-
+            AmperTitleScaffold("Amper + Spring Boot") {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
                         Terminal(

@@ -1,7 +1,6 @@
 package dev.panuszewski.scenes.amper
 
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.panuszewski.template.Stages
 
 /**
  * - [ ] avoid touching build tool
@@ -15,5 +14,6 @@ fun StoryboardBuilder.Amper() {
     AmperBriefDescription()
     AmperSpringBoot()
     AmperPrinciples()
+    AmperCatchErrorsEarly()
 }
 
