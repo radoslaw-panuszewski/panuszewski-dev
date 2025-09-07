@@ -3,6 +3,13 @@ package dev.panuszewski
 import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
+import dev.panuszewski.scenes.Agenda
+import dev.panuszewski.scenes.Gradle
+import dev.panuszewski.scenes.GradleTransitionOnChart
+import dev.panuszewski.scenes.Maven
+import dev.panuszewski.scenes.MavenTransitionOnChart
+import dev.panuszewski.scenes.Overview
+import dev.panuszewski.scenes.Title
 import dev.panuszewski.scenes.amper.Amper
 import dev.panuszewski.scenes.amper.AmperTransitionOnChart
 import dev.panuszewski.template.LIGHT_THEME
@@ -15,28 +22,28 @@ val FutureOfJvmBuildTools = Storyboard.build(
 ) {
     // TODO hook na początku!
 
-//    section("The Future of JVM Build Tools") {
-//        Title(animateToPresent = false)
-//        Agenda()
-//        Title(animateToPresent = true)
-//        Overview()
-//    }
-//
-//    section("Maven") {
-//        SectionTitle(animateToHeader = true)
-//        Maven()
-//        MavenTransitionOnChart()
-//    }
+    section("The Future of JVM Build Tools") {
+        Title(animateToPresent = false)
+        Agenda()
+        Title(animateToPresent = true)
+        Overview()
+    }
 
-//    section("Gradle") {
-//        SectionTitle(animateToHeader = true)
-//        Gradle()
-//        GradleTransitionOnChart()
-//    }
+    section("Maven") {
+        SectionTitle(animateToHeader = true)
+        Maven()
+        MavenTransitionOnChart()
+    }
+
+    section("Gradle") {
+        SectionTitle(animateToHeader = true)
+        Gradle()
+        GradleTransitionOnChart()
+    }
 
     section("Amper") {
         SectionTitle(animateToHeader = true)
-//        Amper()
+        Amper()
         AmperTransitionOnChart()
     }
 
