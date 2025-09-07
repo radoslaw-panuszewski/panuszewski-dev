@@ -118,7 +118,7 @@ fun StoryboardBuilder.Gradle() {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            stateTransition.Title()
+            stateTransition.GradleTitle()
             stateTransition.PhasesBar()
             stateTransition.ExplainingConfigExecutionDifference()
             stateTransition.ExplainingBuildCache()
@@ -133,7 +133,7 @@ fun StoryboardBuilder.Gradle() {
 }
 
 @Composable
-private fun Transition<Int>.Title() {
+private fun Transition<Int>.GradleTitle() {
     Spacer(Modifier.height(16.dp))
     h4 {
         AnimatedContent(
