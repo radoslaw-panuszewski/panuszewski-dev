@@ -130,7 +130,8 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
     val normalSpringBootVersion by tag()
     val afterShowSettings by tag()
     val springBootVersionFromShowSettings by tag()
-    val springBootEnabledFromShowSettings by tag()
+    val springBootVersionReason by tag()
+    val springBootEnabledReason by tag()
     val mainClass by tag()
 
     $$"""
@@ -167,8 +168,8 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
       version: 3.1.1  # [default]
     
     springBoot:
-      $${springBootEnabledFromShowSettings}enabled: true  # [module.yaml (amper-playground)]$${springBootEnabledFromShowSettings}
-      $${springBootVersionFromShowSettings}version: 3.4.3  # [default]$${springBootVersionFromShowSettings}
+      enabled: true  $${springBootEnabledReason}# [module.yaml (amper-playground)]$${springBootEnabledReason}
+      $${springBootVersionFromShowSettings}version: 3.4.3$${springBootVersionFromShowSettings}  $${springBootVersionReason}# [default]$${springBootVersionReason}
       
     kotlin:
       allOpen:
@@ -204,12 +205,11 @@ private fun ModuleYaml(): List<CodeSample> = buildAndRememberCodeSamples {
         .startWith { hide(afterShowSettings, normalSpringBootVersion, mainClass) }
         .then { reveal(afterShowSettings).hide(normal) }
         .then { focus(springBootVersionFromShowSettings, unfocusedStyle = null) }
-        .then { focus(springBootEnabledFromShowSettings, unfocusedStyle = null, scroll = false) }
+        .then { focus(springBootVersionReason, unfocusedStyle = null) }
+        .then { focus(springBootEnabledReason, unfocusedStyle = null, scroll = false) }
         .then { unfocus() }
         .then { reveal(normal).hide(afterShowSettings) }
         .then { reveal(normalSpringBootVersion).focus(normalSpringBootVersion) }
-        .then { unfocus() }
-        .then { reveal(mainClass).focus(mainClass) }
         .then { unfocus() }
 }
 
