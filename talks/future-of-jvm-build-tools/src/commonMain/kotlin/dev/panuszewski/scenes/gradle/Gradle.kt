@@ -1,4 +1,4 @@
-package dev.panuszewski.scenes
+package dev.panuszewski.scenes.gradle
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -51,6 +51,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.bnorm.storyboard.Frame
+import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
@@ -60,8 +62,8 @@ import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
-import dev.panuszewski.scenes.Hat.BASEBALL_CAP
-import dev.panuszewski.scenes.Hat.TOP_HAT
+import dev.panuszewski.scenes.gradle.Hat.BASEBALL_CAP
+import dev.panuszewski.scenes.gradle.Hat.TOP_HAT
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
@@ -89,6 +91,7 @@ import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
+import kotlin.collections.iterator
 import kotlin.math.max
 
 private val stages = Stages()
@@ -119,7 +122,7 @@ fun StoryboardBuilder.Gradle() {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            stateTransition.GradleTitle()
+            GradleTitle()
             stateTransition.PhasesBar()
             stateTransition.ExplainingConfigExecutionDifference()
             stateTransition.ExplainingBuildCache()
@@ -134,18 +137,23 @@ fun StoryboardBuilder.Gradle() {
 }
 
 @Composable
-private fun Transition<Int>.GradleTitle() {
+private fun SceneScope<Int>.GradleTitle() {
     Spacer(Modifier.height(16.dp))
     h4 {
-        AnimatedContent(
-            targetState = when (currentState) {
-                in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
-                in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
-                in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
-                in DECLARATIVE_GRADLE -> "Declarative Gradle"
-                else -> "Gradle"
-            },
-        ) { text ->
+        val targetTitle = when (transition.currentState.toState()) {
+            in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
+            in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+            in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
+            in DECLARATIVE_GRADLE -> "Declarative Gradle"
+            else -> "Gradle"
+        }
+
+        when (transition.currentState) {
+            is Frame.State<*> -> GRADLE_TITLE = targetTitle
+            else -> {}
+        }
+
+        AnimatedContent(targetState = GRADLE_TITLE) { text ->
             Text(text)
         }
     }
