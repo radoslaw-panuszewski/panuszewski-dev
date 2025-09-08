@@ -8,7 +8,7 @@ import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.panuszewski.template.ResourceImage
 import talks.future_of_jvm_build_tools.generated.resources.Res
-import talks.future_of_jvm_build_tools.generated.resources.first_slide
+import talks.future_of_jvm_build_tools.generated.resources.first_slide_original
 
 fun StoryboardBuilder.FirstSlide() {
     scene(
@@ -16,6 +16,6 @@ fun StoryboardBuilder.FirstSlide() {
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
         exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
-        ResourceImage(Res.drawable.first_slide, modifier = Modifier.fillMaxSize())
+        ResourceImage(Res.drawable.first_slide_original, modifier = Modifier.fillMaxSize())
     }
 }
