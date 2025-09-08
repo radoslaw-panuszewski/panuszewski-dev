@@ -22,7 +22,6 @@ val FutureOfJvmBuildTools = Storyboard.build(
     format = SceneFormat.Default,
     decorator = LIGHT_THEME,
 ) {
-    // TODO hook na początku!
     FirstSlide()
 
     section("The Future of JVM Build Tools") {

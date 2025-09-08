@@ -46,10 +46,7 @@ fun StoryboardBuilder.MavenTransitionOnChart() {
 
             ProvideTextStyle(MaterialTheme.typography.h4) {
                 Text(
-                    text = buildAnnotatedString {
-                        append("Maven")
-                        withPrimaryColor { append(" 4") }
-                    },
+                    text = "Maven 4",
                     modifier = Modifier
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState("text/Title"),

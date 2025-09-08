@@ -73,13 +73,10 @@ fun StoryboardBuilder.Maven() = scene(
         ProvideTextStyle(MaterialTheme.typography.h4) {
             consumerPomTitleTransition.createChildTransition {
                 when {
-                    it == "Consumer pom (4.0.0)" -> buildAnnotatedString {
-                        append("Maven")
-                        withPrimaryColor { append(" 4") }
-                    }
-                    else -> AnnotatedString("Maven")
+                    it == "Consumer pom (4.0.0)" -> "Maven 4"
+                    else -> "Maven"
                 }
-            }.MagicAnnotatedString()
+            }.MagicString()
         }
         Spacer(Modifier.height(16.dp))
 
@@ -245,8 +242,8 @@ private val BUILD_POM_ALTERNATIVE_SYNTAX = buildCodeSamples {
     codeSample
         .startWith { reveal(xmlExpanded).hide(xmlFolded, yaml, toml, hocon) }
         .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
-        .then { reveal(toml).hide(yaml).changeTitle("pom.toml") }
-        .then { reveal(hocon).hide(toml).changeTitle("pom.hocon") }
+        .then { reveal(toml).hide(yaml).changeLanguage(Language.Toml).changeTitle("pom.toml") }
+        .then { reveal(hocon).hide(toml).changeLanguage(Language.Hocon).changeTitle("pom.hocon") }
 }
 
 private val BUILD_POM = buildCodeSamples {

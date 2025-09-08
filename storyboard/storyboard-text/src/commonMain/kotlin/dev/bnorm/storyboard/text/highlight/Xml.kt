@@ -111,11 +111,3 @@ internal fun highlightXml(
         walker.walk(formatListener, context)
     }
 }
-
-private fun AnnotatedString.Builder.addStyle(style: SpanStyle, ctx: ParserRuleContext) {
-    addStyle(style, ctx.start!!.startIndex, ctx.stop!!.stopIndex + 1)
-}
-
-private fun AnnotatedString.Builder.addStyle(spanStyle: SpanStyle, token: Token) {
-    addStyle(spanStyle, token.startIndex, token.stopIndex + 1)
-}

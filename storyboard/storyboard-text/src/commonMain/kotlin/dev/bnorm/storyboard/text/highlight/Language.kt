@@ -7,7 +7,9 @@ enum class Language {
     Kotlin,
     Xml,
     Yaml,
-    Properties
+    Properties,
+    Toml,
+    Hocon
 }
 
 fun String.highlight(
@@ -21,5 +23,7 @@ fun String.highlight(
         Language.Xml -> highlightXml(this, codeStyle, scope, identifierStyle)
         Language.Yaml -> highlightYaml(this, codeStyle, scope, identifierStyle)
         Language.Properties -> highlightProperties(this, codeStyle, scope, identifierStyle)
+        Language.Toml -> highlightToml(this, codeStyle)
+        Language.Hocon -> highlightHocon(this, codeStyle)
     }
 }
