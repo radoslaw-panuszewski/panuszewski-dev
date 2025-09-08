@@ -11,3 +11,17 @@ kotlin {
         }
     }
 }
+
+tasks {
+    jvmDistZip {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    jvmDistTar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    installJvmDist {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}

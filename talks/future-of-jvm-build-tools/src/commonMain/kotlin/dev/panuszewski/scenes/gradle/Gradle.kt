@@ -142,8 +142,8 @@ private fun SceneScope<Int>.GradleTitle() {
             in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
             in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
             in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
-            in APP_DEVELOPER_AND_BUILD_ENGINEER -> "Two types of Gradle users"
-            in DECLARATIVE_GRADLE -> "Declarative Gradle"
+            in (APP_DEVELOPER_AND_BUILD_ENGINEER + DECLARATIVE_GRADLE.take(5)) -> "Two types of Gradle users"
+            in DECLARATIVE_GRADLE.drop(5) -> "Declarative Gradle"
             else -> "Gradle"
         }
 
@@ -805,7 +805,7 @@ fun Transition<Int>.ConventionPlugins() {
                             selectedFile = selectedFile,
                             leftPaneFile = leftPaneFile,
                             rightPaneFile = rightPaneFile,
-                            enlargedFile = highlightedAndEnlargedFile,
+//                            enlargedFile = highlightedAndEnlargedFile,
                             highlightedFile = highlightedAndEnlargedFile,
                             fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
                         ),
