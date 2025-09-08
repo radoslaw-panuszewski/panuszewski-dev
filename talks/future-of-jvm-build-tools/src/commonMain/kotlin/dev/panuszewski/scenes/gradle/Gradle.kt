@@ -651,7 +651,7 @@ fun Transition<Int>.ConventionPlugins() {
     val ideIsBackToNormalSince = EXPLAINING_CONVENTION_PLUGINS[4]
 
     val conventionFileAdded = ideIsBackToNormalSince + 1
-    val conventionFileEnlarged = conventionFileAdded + 1
+    val conventionFileEnlarged = conventionFileAdded
     val splitPaneEnabledSince = conventionFileEnlarged + 1
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size

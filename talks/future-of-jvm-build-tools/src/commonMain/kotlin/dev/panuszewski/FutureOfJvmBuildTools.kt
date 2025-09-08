@@ -4,6 +4,8 @@ import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
 import dev.panuszewski.scenes.Agenda
+import dev.panuszewski.scenes.FirstSlide
+import dev.panuszewski.scenes.LastSlide
 import dev.panuszewski.scenes.Maven
 import dev.panuszewski.scenes.MavenTransitionOnChart
 import dev.panuszewski.scenes.Overview
@@ -21,6 +23,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     decorator = LIGHT_THEME,
 ) {
     // TODO hook na początku!
+    FirstSlide()
 
     section("The Future of JVM Build Tools") {
         Title(animateToPresent = false)
@@ -55,5 +58,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     section("Thank You!") {
         SectionTitle()
     }
+
+    LastSlide()
 }
 

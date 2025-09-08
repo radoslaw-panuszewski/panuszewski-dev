@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
+import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.safeGet
@@ -36,7 +37,10 @@ val TITLE = listOf(
 )
 
 fun StoryboardBuilder.Title(animateToPresent: Boolean) {
-    scene(if (animateToPresent) 2 else 1) {
+    scene(
+        stateCount = if (animateToPresent) 2 else 1,
+        enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
+    ) {
         val titleTransition = transition.createChildTransition { TITLE.safeGet(it.toState()) }
 
         Row(
