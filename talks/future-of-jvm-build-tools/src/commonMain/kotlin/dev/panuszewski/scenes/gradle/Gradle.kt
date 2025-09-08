@@ -794,7 +794,7 @@ fun Transition<Int>.ConventionPlugins() {
                         else -> null
                     }
 
-                    val highlightedAndEnlargedFile = when {
+                    val highlightedFile = when {
                         currentState == conventionFileEnlarged -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
                         else -> null
                     }
@@ -805,8 +805,7 @@ fun Transition<Int>.ConventionPlugins() {
                             selectedFile = selectedFile,
                             leftPaneFile = leftPaneFile,
                             rightPaneFile = rightPaneFile,
-//                            enlargedFile = highlightedAndEnlargedFile,
-                            highlightedFile = highlightedAndEnlargedFile,
+                            highlightedFile = highlightedFile,
                             fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
                         ),
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),
