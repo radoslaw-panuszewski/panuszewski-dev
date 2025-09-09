@@ -99,7 +99,6 @@ private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState 
 private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
 private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
-private val EXPLAINING_BUILD_CACHE = stages.registerStatesByCount(start = lastState + 1, count = 12)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
 private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 25)
@@ -123,7 +122,6 @@ fun StoryboardBuilder.Gradle() {
             GradleTitle()
             stateTransition.PhasesBar()
             stateTransition.ExplainingConfigExecutionDifference()
-            stateTransition.ExplainingBuildCache()
             stateTransition.ShowingThatBuildCacheIsOld()
             // TODO maybe merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
@@ -289,72 +287,6 @@ private fun Transition<Int>.ExplainingConfigExecutionDifference() {
         code2 {
             createChildTransition { phaseSamples.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
                 .MagicCodeSample()
-        }
-    }
-}
-
-@Composable
-private fun Transition<Int>.ExplainingBuildCache() {
-    val codeSamples = buildAndRememberCodeSamples {
-        val cacheable by tag()
-
-        """
-        ${cacheable}@CacheableTask
-        ${cacheable}abstract class PrintMessageTask : DefaultTask() {
-        
-            @OutputFile
-            val outputFile = project.objects.fileProperty()
-        
-            @TaskAction
-            fun execute() {
-                println("Executing the task...")
-                outputFile.get().asFile.writeText("Job done")
-            }
-        }
-        """
-            .trimIndent()
-            .toCodeSample(language = Language.Kotlin)
-            .startWith { hide(cacheable) }
-            .then { reveal(cacheable).focus(cacheable) }
-    }
-
-    FadeOutAnimatedVisibility({ it in EXPLAINING_BUILD_CACHE }) {
-        val terminalTexts = listOf(
-            "$ ./gradlew printMessage",
-            "> Task :printMessage\nExecuting the task...",
-            "$ ./gradlew printMessage",
-            "> Task :printMessage UP-TO-DATE",
-            "$ ./gradlew clean printMessage",
-            "> Task :printMessage\nExecuting the task... 😞",
-            "",
-            "$ ./gradlew clean printMessage",
-            "> Task :printMessage FROM-CACHE ❤️",
-        )
-        val terminalTextsToDisplay = terminalTexts
-            .take(max(0, currentState - EXPLAINING_BUILD_CACHE[2]))
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Row {
-                SlideFromBottomAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[1] }) {
-                    code2 {
-                        createChildTransition {
-                            val texts = terminalTexts.take(max(0, it - EXPLAINING_BUILD_CACHE[2]))
-                            if (texts.contains("")) {
-                                codeSamples[1]
-                            } else {
-                                codeSamples[0]
-                            }
-                        }
-                            .MagicCodeSample()
-                    }
-                }
-
-                Spacer(Modifier.width(32.dp))
-
-                SlideFromRightAnimatedVisibility({ it >= EXPLAINING_BUILD_CACHE[2] }) {
-                    Terminal(terminalTextsToDisplay)
-                }
-            }
         }
     }
 }

@@ -49,6 +49,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
         AmperTransitionOnChart()
     }
 
+    // TODO either add this section, or remove from agenda!
 //    section("Wrapping up!") {
 //        SectionTitle(animateToHeader = true)
 //        WrappingUp()
