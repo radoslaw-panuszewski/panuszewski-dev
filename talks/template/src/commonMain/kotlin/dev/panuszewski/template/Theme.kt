@@ -99,16 +99,46 @@ fun <T : Any> Builder.withColor(color: Color, block: Builder.() -> T) {
 }
 
 @Composable
-fun <T : Any> Builder.withColor(color: Colors.() -> Color, block: Builder.() -> T) {
-    withStyle(SpanStyle(color = color(MaterialTheme.colors)), block)
-}
-
-@Composable
 fun <T : Any> Builder.withPrimaryColor(block: Builder.() -> T) {
     withStyle(SpanStyle(color = MaterialTheme.colors.primary), block)
 }
 
 @Composable
+fun <T : Any> Builder.withPrimaryVariantColor(block: Builder.() -> T) {
+    withStyle(SpanStyle(color = MaterialTheme.colors.primaryVariant), block)
+}
+
+@Composable
 fun <T : Any> Builder.withSecondaryColor(block: Builder.() -> T) {
     withStyle(SpanStyle(color = MaterialTheme.colors.secondary), block)
+}
+
+@Composable
+fun <T : Any> Builder.withSecondaryVariantColor(block: Builder.() -> T) {
+    withStyle(SpanStyle(color = MaterialTheme.colors.secondaryVariant), block)
+}
+
+@Composable
+fun Builder.appendWithColor(color: Color, text: String) {
+    withColor(color) { append(text) }
+}
+
+@Composable
+fun Builder.appendWithPrimaryColor(text: String) {
+    withPrimaryColor { append(text) }
+}
+
+@Composable
+fun Builder.appendWithPrimaryVariantColor(text: String) {
+    withPrimaryVariantColor { append(text) }
+}
+
+@Composable
+fun Builder.appendWithSecondaryColor(text: String) {
+    withSecondaryColor { append(text) }
+}
+
+@Composable
+fun Builder.appendWithSecondaryVariantColor(text: String) {
+    withSecondaryVariantColor { append(text) }
 }

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 
-private var SHARED_TITLE: String = "Amper"
+private var SHARED_TITLE: String? = null
 
 @Composable
 fun SceneScope<*>.TitleScaffold(title: String, content: @Composable () -> Unit) {
@@ -20,7 +20,10 @@ fun SceneScope<*>.TitleScaffold(title: String, content: @Composable () -> Unit) 
             is Frame.State<*> -> SHARED_TITLE = title
             else -> {}
         }
-        Title(SHARED_TITLE)
+        if (SHARED_TITLE == null) {
+            SHARED_TITLE = title
+        }
+        SHARED_TITLE?.let { Title(it) }
         content()
     }
 }

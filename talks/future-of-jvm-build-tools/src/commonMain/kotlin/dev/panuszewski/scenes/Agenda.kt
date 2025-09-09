@@ -23,6 +23,8 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.template.Text
+import dev.panuszewski.template.appendWithSecondaryColor
 
 fun StoryboardBuilder.Agenda() {
     scene(stateCount = 3) {
@@ -52,27 +54,27 @@ fun StoryboardBuilder.Agenda() {
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.Start,
                 ) {
-                    Text(buildAnnotatedString {
-                        append("1. State of the world as of today")
-                    })
-                    Text(buildAnnotatedString {
+                    Text {
+                        append("1. Current state of the world")
+                    }
+                    Text {
                         append("2. ")
-                        withStyle(SpanStyle(MaterialTheme.colors.secondary)) { append("Maven 4") }
+                        appendWithSecondaryColor("Maven 4")
                         append(" on the horizon")
-                    })
-                    Text(buildAnnotatedString {
-                        append("3. ")
-                        withStyle(SpanStyle(MaterialTheme.colors.secondary)) { append("Gradle") }
-                        append(" and its path towards declarativeness")
-                    })
-                    Text(buildAnnotatedString {
-                        append("4. ")
-                        withStyle(SpanStyle(MaterialTheme.colors.secondary)) { append("Amper") }
-                        append(" - a new player joins the party!")
-                    })
-                    Text(buildAnnotatedString {
+                    }
+                    Text {
+                        append("3. Modern ")
+                        appendWithSecondaryColor("Gradle")
+                        append(" features and its path towards declarativeness")
+                    }
+                    Text {
+                        append("4. Meet ")
+                        appendWithSecondaryColor("Amper")
+                        append(" - a brand new build tool from JetBrains!")
+                    }
+                    Text {
                         append("5. Wrapping up")
-                    })
+                    }
                 }
             }
         }

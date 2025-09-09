@@ -105,7 +105,7 @@ private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastSta
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
 private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 22)
-private val APP_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
+private val SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
 private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 
 private val PHASES_BAR_VISIBLE = PHASES_BAR_APPEARS.first() until PHASES_BAR_DISAPPEARS.first()
@@ -126,7 +126,7 @@ fun StoryboardBuilder.Gradle() {
             // TODO maybe merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
-            stateTransition.AppDeveloperAndBuildEngineer()
+            stateTransition.SoftwareDeveloperAndBuildEngineer()
             stateTransition.DeclarativeGradle()
         }
     }
@@ -139,8 +139,9 @@ private fun SceneScope<Int>.GradleTitle() {
         val targetTitle = when (transition.currentState.toState()) {
             in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
             in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+            in EXTRACTING_CONVENTION_PLUGIN -> "The biggest issue with Gradle"
             in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
-            in (APP_DEVELOPER_AND_BUILD_ENGINEER + DECLARATIVE_GRADLE.take(5)) -> "Two types of Gradle users"
+            in (SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER + DECLARATIVE_GRADLE.take(5)) -> "Two types of Gradle users"
             in DECLARATIVE_GRADLE.drop(5) -> "Declarative Gradle"
             else -> "Gradle"
         }
@@ -763,12 +764,12 @@ fun Transition<Int>.ConventionPlugins() {
 }
 
 @Composable
-fun Transition<Int>.AppDeveloperAndBuildEngineer() {
-    SlideFromTopAnimatedVisibility({ it in APP_DEVELOPER_AND_BUILD_ENGINEER.drop(1) }) {
+fun Transition<Int>.SoftwareDeveloperAndBuildEngineer() {
+    SlideFromTopAnimatedVisibility({ it in SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER.drop(1) }) {
         Row(horizontalArrangement = Arrangement.spacedBy(64.dp), modifier = Modifier.padding(top = 32.dp)) {
             val appDeveloperHat = when {
-                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[6] -> BASEBALL_CAP
-                currentState >= APP_DEVELOPER_AND_BUILD_ENGINEER[5] -> TOP_HAT
+                currentState >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[6] -> BASEBALL_CAP
+                currentState >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[5] -> TOP_HAT
                 else -> BASEBALL_CAP
             }
 
@@ -776,14 +777,14 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                GuyChangingHats(name = "App Developer", hat = appDeveloperHat)
+                GuyChangingHats(name = "Software Developer", hat = appDeveloperHat)
 
                 Column(
                     modifier = Modifier.width(400.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
+                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
                         body1 {
                             Text {
                                 append("Ships new ")
@@ -791,7 +792,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
+                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
                         body1 {
                             Text {
                                 append("Interested in: ")
@@ -799,7 +800,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
+                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
                         body1 { Text("Often changes hats") }
                     }
                 }
@@ -816,7 +817,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
+                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
                         body1 {
                             Text {
                                 append("Maintains the ")
@@ -824,7 +825,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
+                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
                         body1 {
                             Text {
                                 append("Interested in: ")
@@ -832,7 +833,7 @@ fun Transition<Int>.AppDeveloperAndBuildEngineer() {
                             }
                         }
                     }
-                    SlideFromTopAnimatedVisibility({ it >= APP_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
+                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
                         body1 { Text("Seen in the wild mostly in large codebases") }
                     }
                 }
@@ -1051,7 +1052,7 @@ fun Transition<Int>.DeclarativeGradle() {
 
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
                         SlideFromTopAnimatedVisibility({ it == DECLARATIVE_GRADLE[2] }) {
-                            AppDeveloper(Modifier.padding(end = 64.dp))
+                            SoftwareDeveloper(Modifier.padding(end = 64.dp))
                         }
 
                         SlideFromTopAnimatedVisibility({ it == DECLARATIVE_GRADLE[4] }) {
@@ -1080,8 +1081,8 @@ fun Transition<Int>.DeclarativeGradle() {
 }
 
 @Composable
-fun AppDeveloper(modifier: Modifier = Modifier) {
-    GuyChangingHats(modifier = modifier.scale(0.75f), hat = BASEBALL_CAP, name = "App Developer")
+fun SoftwareDeveloper(modifier: Modifier = Modifier) {
+    GuyChangingHats(modifier = modifier.scale(0.75f), hat = BASEBALL_CAP, name = "Software Developer")
 }
 
 @Composable

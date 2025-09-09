@@ -57,8 +57,8 @@ fun StoryboardBuilder.Maven() = scene(
     val buildPomTitleTransition = transition.createChildTransition {
         if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Published pom") {
             "Local pom"
-        } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom (4.0.0)") {
-            "Build pom (4.1.0)"
+        } else if (plan.getActiveSlot(it.toState()) == CONSUMER_POM_SLOT && plan.getSample(CONSUMER_POM_SLOT, it.toState()).title == "Consumer pom") {
+            "Build pom"
         } else {
             plan.getSample(BUILD_POM_SLOT, it.toState()).title.orEmpty()
         }
@@ -73,7 +73,7 @@ fun StoryboardBuilder.Maven() = scene(
         ProvideTextStyle(MaterialTheme.typography.h4) {
             consumerPomTitleTransition.createChildTransition {
                 when {
-                    it == "Consumer pom (4.0.0)" -> "Maven 4"
+                    it == "Consumer pom" -> "Maven 4"
                     else -> "Maven"
                 }
             }.MagicString()
@@ -170,7 +170,7 @@ private val CONSUMER_POM = buildCodeSamples {
         .then { this }
         .then { this }
         .then { focus(properties, build, scroll = false) }
-        .then { hide(properties, build).unfocus().changeTitle("Consumer pom (4.0.0)") }
+        .then { hide(properties, build).unfocus().changeTitle("Consumer pom") }
         .then { this }
 }
 
