@@ -2,19 +2,11 @@ package dev.panuszewski.template
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -23,47 +15,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import kotlin.collections.set
 
 @Composable
 fun <T : Any> AnimatedHorizontalTree(
-    roots: List<T>,
-    getChildren: (node: T) -> Collection<T>,
-    content: @Composable (node: T) -> Unit,
+    roots: List<TreeElement<T>>,
+    content: @Composable (node: TreeElement<T>) -> Unit,
 ) {
-    val treeState = TreeState(roots, getChildren)
-
     SharedTransitionLayout {
         AnimatedContent(
             transitionSpec = { fadeIn() togetherWith fadeOut() },
-            targetState = treeState
-        ) { targetTreeState ->
+            targetState = roots
+        ) { targetRoots ->
 
             var offset by remember { mutableStateOf(Offset.Zero) }
-            val placements = remember { mutableStateMapOf<T, Rect>() }
+            val placements = remember { mutableStateMapOf<TreeElement<T>, Rect>() }
 
             Box(
                 contentAlignment = BiasAlignment(0f, -0.5f),
                 modifier = Modifier.fillMaxSize()
             ) {
                 HorizontalTree(
-                    roots = targetTreeState.roots,
-                    getChildren = targetTreeState.getChildren,
+                    roots = targetRoots,
+                    getChildren = { it.children },
                     modifier = Modifier.onPlaced { offset = it.positionInParent() },
                 ) { item ->
                     Box(
                         Modifier
                             .sharedElement(
-                                sharedContentState = rememberSharedContentState(item),
+                                sharedContentState = rememberSharedContentState(item.value),
                                 animatedVisibilityScope = this@AnimatedContent
                             )
                             .onPlaced { placements[item] = it.boundsInParent() },
@@ -74,7 +60,7 @@ fun <T : Any> AnimatedHorizontalTree(
             }
 
             for ((parent, parentRect) in placements) {
-                for (child in getChildren(parent)) {
+                for (child in parent.children) {
                     val childRect = placements[child] ?: continue
 
                     Connection(
@@ -91,7 +77,32 @@ fun <T : Any> AnimatedHorizontalTree(
     }
 }
 
-private data class TreeState<T>(
-    val roots: List<T>,
-    val getChildren: (node: T) -> Collection<T>,
+data class TreeElement<T : Any>(
+    val value: T,
+    val color: Color? = null,
+    val children: List<TreeElement<T>> = emptyList(),
 )
+
+fun <T : Any> buildTree(block: TreeBuilder<T>.() -> Unit): List<TreeElement<T>> {
+    val builder = TreeBuilder<T>()
+    builder.apply(block)
+    return builder.nodes
+}
+
+class TreeBuilder<T : Any> {
+    val nodes = mutableListOf<TreeElement<T>>()
+
+    fun reusableNode(value: T, color: Color? = null, block: TreeBuilder<T>.() -> Unit = {}): TreeElement<T> {
+        val element = TreeElement(value = value, color = color, children = TreeBuilder<T>().apply(block).nodes)
+        return element
+    }
+
+    fun node(value: T, color: Color? = null, block: TreeBuilder<T>.() -> Unit = {}): TreeElement<T> {
+        val element = reusableNode(value, color, block)
+        nodes.add(element)
+        return element
+    }
+
+    fun node(element: TreeElement<T>) =
+        nodes.add(element)
+}

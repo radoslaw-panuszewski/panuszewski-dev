@@ -1,6 +1,5 @@
 package dev.panuszewski.template
 
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Typography
@@ -19,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.SceneDecorator
 
 val NICE_ORANGE = Color(0xFFFF8A04)
+val NICE_BLUE = Color(0xFF0A7CFA)
+val NICE_GREEN = Color(0xFF389E2D)
 
 val DARK_THEME = SceneDecorator { content ->
     MaterialTheme(DARK_COLORS, Typography()) {
@@ -58,6 +59,22 @@ val LIGHT_COLORS = lightColors(
     secondary = Color(148, 45, 243),
     secondaryVariant = NICE_ORANGE
 )
+
+val primaryColor: Color
+    @Composable
+    get() = MaterialTheme.colors.primary
+
+val secondaryColor: Color
+    @Composable
+    get() = MaterialTheme.colors.secondary
+
+val primaryVariantColor: Color
+    @Composable
+    get() = MaterialTheme.colors.primaryVariant
+
+val secondaryVariantColor: Color
+    @Composable
+    get() = MaterialTheme.colors.secondaryVariant
 
 val Typography.code1: TextStyle
     @Composable

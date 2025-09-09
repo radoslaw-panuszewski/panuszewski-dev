@@ -2,7 +2,6 @@ package dev.panuszewski.scenes.gradle
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Transition
@@ -39,7 +38,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -55,8 +53,6 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.easel.rememberSharedContentState
-import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
@@ -74,19 +70,26 @@ import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
 import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
+import dev.panuszewski.template.NICE_BLUE
+import dev.panuszewski.template.NICE_GREEN
+import dev.panuszewski.template.NICE_ORANGE
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Text
+import dev.panuszewski.template.TreeElement
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
+import dev.panuszewski.template.buildTree
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
 import dev.panuszewski.template.h4
 import dev.panuszewski.template.h6
+import dev.panuszewski.template.primaryColor
+import dev.panuszewski.template.primaryVariantColor
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
@@ -102,7 +105,7 @@ private val stages = Stages()
 private val lastState: Int get() = stages.lastState
 
 private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 25)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 26)
 private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
 private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
@@ -318,7 +321,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
             .then { unfocus() }
     }
 
-    val afterCodeSamples = CONFIGURATION_IS_LONG[8] + codeSamples.size
+    val afterCodeSamples = CONFIGURATION_IS_LONG[9] + codeSamples.size
 
     val terminalTexts = listOf(
         "$ ./gradlew printMessage",
@@ -333,41 +336,60 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 
     FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            SlideFromBottomAnimatedVisibility({ CONFIGURATION_IS_LONG[2] <= it && it <= CONFIGURATION_IS_LONG[6] }) {
+            SlideFromBottomAnimatedVisibility({ CONFIGURATION_IS_LONG[2] <= it && it <= CONFIGURATION_IS_LONG[7] }) {
+                val primaryVariantColor = primaryVariantColor
 
-                val rootName = "Configuration inputs"
-
-                val allInputs = when {
-                    currentState >= CONFIGURATION_IS_LONG[6] -> listOf("Gradle configs", "Files read at config time", "System props read at config time", "Env variables read at config time")
-                    currentState >= CONFIGURATION_IS_LONG[5] -> listOf("Gradle configs", "Files read at config time", "System props read at config time")
-                    currentState >= CONFIGURATION_IS_LONG[4] -> listOf("Gradle configs", "Files read at config time")
-                    currentState >= CONFIGURATION_IS_LONG[3] -> listOf("Gradle configs")
-                    else -> emptyList()
+                val roots = when {
+                    currentState >= CONFIGURATION_IS_LONG[7] -> buildTree {
+                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
+                        node("Gradle config files") { node(configuration) }
+                        node("Files read at config time") { node(configuration) }
+                        node("System props read at config time") { node(configuration) }
+                        node("Env variables read at config time") { node(configuration) }
+                    }
+                    currentState >= CONFIGURATION_IS_LONG[6] -> buildTree {
+                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
+                        node("Gradle config files") { node(configuration) }
+                        node("Files read at config time") { node(configuration) }
+                        node("System props read at config time") { node(configuration) }
+                    }
+                    currentState >= CONFIGURATION_IS_LONG[5] -> buildTree {
+                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
+                        node("Gradle config files") { node(configuration) }
+                        node("Files read at config time") { node(configuration) }
+                    }
+                    currentState >= CONFIGURATION_IS_LONG[4] -> buildTree {
+                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
+                        node("Gradle config files") { node(configuration) }
+                    }
+                    currentState >= CONFIGURATION_IS_LONG[3] -> buildTree {
+                        node("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
+                    }
+                    else -> buildTree {
+                        node("Configuration", primaryVariantColor)
+                    }
                 }
 
-                AnimatedHorizontalTree(
-                    roots = listOf(rootName),
-                    getChildren = { if (it == rootName) allInputs else emptyList() }
-                ) { name ->
+                AnimatedHorizontalTree(roots) { node ->
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (name != rootName) Color(0xFFA97608) else Color(0xFF767D08))
+                            .background(node.color ?: NICE_GREEN)
                     ) {
                         ProvideTextStyle(TextStyle(color = MaterialTheme.colors.background)) {
-                            Text(modifier = Modifier.padding(8.dp), text = name)
+                            Text(text = node.value, modifier = Modifier.padding(8.dp))
                         }
                     }
                 }
             }
 
-            FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[8] until afterTerminal }) {
+            FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[9] until afterTerminal }) {
                 Row {
                     Spacer(Modifier.width(32.dp))
 
-                    SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[8] }) {
+                    SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[9] }) {
                         code2 {
-                            createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[8]) }
+                            createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[9]) }
                                 .MagicCodeSample()
                         }
                     }

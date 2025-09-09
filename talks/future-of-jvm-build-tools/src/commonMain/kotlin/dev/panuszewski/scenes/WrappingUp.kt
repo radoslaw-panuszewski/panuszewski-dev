@@ -9,6 +9,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.panuszewski.components.TitleScaffold
+import dev.panuszewski.template.NICE_BLUE
 import dev.panuszewski.template.RevealSequentially
 import dev.panuszewski.template.appendWithColor
 import dev.panuszewski.template.appendWithPrimaryColor
@@ -43,7 +44,7 @@ fun StoryboardBuilder.WrappingUp() {
                         }
                         textItem {
                             append("Play around with ")
-                            appendWithColor(Color(0xFF0A7CFA), "Amper")
+                            appendWithColor(NICE_BLUE, "Amper")
                             append(" and see how simple your build can be 😉")
                         }
                         textItem {
