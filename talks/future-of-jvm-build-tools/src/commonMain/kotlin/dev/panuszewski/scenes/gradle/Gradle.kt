@@ -78,6 +78,7 @@ import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Text
+import dev.panuszewski.template.appendWithPrimaryColor
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
@@ -107,7 +108,7 @@ private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCoun
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 26)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 27)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
 private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
@@ -129,7 +130,6 @@ fun StoryboardBuilder.Gradle() {
             stateTransition.PhasesBar()
             stateTransition.ExplainingConfigExecutionDifference()
             stateTransition.ShowingThatBuildCacheIsOld()
-            // TODO maybe merge Build Cache and Configuration Cache to a single example: "Caching in Action!"
             stateTransition.ExplainingConfigurationCache()
             stateTransition.ConventionPlugins()
             stateTransition.SoftwareDeveloperAndBuildEngineer()
@@ -229,7 +229,11 @@ private fun Transition<Int>.ShowingThatBuildCacheIsOld() {
                 }
                 Spacer(Modifier.height(32.dp))
                 SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
-                    Text("Just enable it in your gradle.properties!")
+                    Text {
+                        append("Just enable it in your ")
+                        appendWithPrimaryColor("gradle.properties")
+                        append("!")
+                    }
                 }
             }
 
@@ -302,12 +306,16 @@ private fun Transition<Int>.ExplainingConfigExecutionDifference() {
 fun Transition<Int>.ExplainingConfigurationCache() {
     val codeSamples = buildAndRememberCodeSamples {
         val configuring by tag()
+        val executing by tag()
 
         """
         tasks {
             register<PrintMessageTask>("printMessage") {
                 ${configuring}println("Configuring the task...")${configuring}
-                outputFile = file("output.txt")
+                doLast {
+                    ${executing}println("Executing the task...")${executing}
+                    file("output.txt").writeText("Job done")
+                }
             }
         }
         """
@@ -315,6 +323,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
             .toCodeSample(language = Language.Kotlin)
             .startWith { this }
             .then { focus(configuring) }
+            .then { focus(executing) }
             .then { unfocus() }
     }
 
@@ -454,7 +463,13 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                     }
 
                     SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear + 2 }) {
-                        h6 { Text("Enable it now!") }
+                        h6 {
+                            Text {
+                                append("Enable it now in your ")
+                                appendWithPrimaryColor("gradle.properties")
+                                append("!")
+                            }
+                        }
                     }
 
                     SlideFromBottomAnimatedVisibility({ it >= bulletpointsAppear + 2 }) {
