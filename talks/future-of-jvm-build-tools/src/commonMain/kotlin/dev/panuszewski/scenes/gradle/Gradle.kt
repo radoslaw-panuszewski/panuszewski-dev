@@ -72,14 +72,12 @@ import dev.panuszewski.template.MagicCodeSample
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.NICE_BLUE
 import dev.panuszewski.template.NICE_GREEN
-import dev.panuszewski.template.NICE_ORANGE
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Text
-import dev.panuszewski.template.TreeElement
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
@@ -88,7 +86,6 @@ import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
 import dev.panuszewski.template.h4
 import dev.panuszewski.template.h6
-import dev.panuszewski.template.primaryColor
 import dev.panuszewski.template.primaryVariantColor
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
@@ -105,12 +102,12 @@ private val stages = Stages()
 private val lastState: Int get() = stages.lastState
 
 private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 26)
 private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
 private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 24)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
 private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
@@ -321,7 +318,8 @@ fun Transition<Int>.ExplainingConfigurationCache() {
             .then { unfocus() }
     }
 
-    val afterCodeSamples = CONFIGURATION_IS_LONG[9] + codeSamples.size
+    val codeSamplesAppear = CONFIGURATION_IS_LONG[2]
+    val terminalAppears = codeSamplesAppear + codeSamples.size
 
     val terminalTexts = listOf(
         "$ ./gradlew printMessage",
@@ -331,38 +329,44 @@ fun Transition<Int>.ExplainingConfigurationCache() {
         "$ ./gradlew printMessage --configuration-cache",
         "Reusing configuration cache. ❤️\n\n> Task :printMessage UP-TO-DATE",
     )
-    val terminalTextsToDisplay = terminalTexts.take(max(0, currentState - afterCodeSamples))
-    val afterTerminal = afterCodeSamples + terminalTexts.size + 1
+    val terminalTextsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears))
+    val terminalDisappears = terminalAppears + terminalTexts.size + 1
+
+    val treeAppears = terminalDisappears + 1
+    val treeDisappears = treeAppears + 6
+
+    val bulletpointsAppear = treeDisappears + 1
+    val bulletpointsDisappear = bulletpointsAppear + 3
 
     FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            SlideFromBottomAnimatedVisibility({ CONFIGURATION_IS_LONG[2] <= it && it <= CONFIGURATION_IS_LONG[7] }) {
+            SlideFromBottomAnimatedVisibility({ it in treeAppears until treeDisappears }) {
                 val primaryVariantColor = primaryVariantColor
 
                 val roots = when {
-                    currentState >= CONFIGURATION_IS_LONG[7] -> buildTree {
+                    currentState >= treeAppears + 5 -> buildTree {
                         val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
                         node("Gradle config files") { node(configuration) }
                         node("Files read at config time") { node(configuration) }
                         node("System props read at config time") { node(configuration) }
                         node("Env variables read at config time") { node(configuration) }
                     }
-                    currentState >= CONFIGURATION_IS_LONG[6] -> buildTree {
+                    currentState >= treeAppears + 4 -> buildTree {
                         val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
                         node("Gradle config files") { node(configuration) }
                         node("Files read at config time") { node(configuration) }
                         node("System props read at config time") { node(configuration) }
                     }
-                    currentState >= CONFIGURATION_IS_LONG[5] -> buildTree {
+                    currentState >= treeAppears + 3 -> buildTree {
                         val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
                         node("Gradle config files") { node(configuration) }
                         node("Files read at config time") { node(configuration) }
                     }
-                    currentState >= CONFIGURATION_IS_LONG[4] -> buildTree {
+                    currentState >= treeAppears + 2 -> buildTree {
                         val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
                         node("Gradle config files") { node(configuration) }
                     }
-                    currentState >= CONFIGURATION_IS_LONG[3] -> buildTree {
+                    currentState >= treeAppears + 1 -> buildTree {
                         node("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
                     }
                     else -> buildTree {
@@ -383,29 +387,29 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                 }
             }
 
-            FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG[9] until afterTerminal }) {
+            FadeOutAnimatedVisibility({ it in codeSamplesAppear until terminalDisappears }) {
                 Row {
                     Spacer(Modifier.width(32.dp))
 
-                    SlideFromBottomAnimatedVisibility({ it >= CONFIGURATION_IS_LONG[9] }) {
+                    SlideFromBottomAnimatedVisibility({ it >= codeSamplesAppear }) {
                         code2 {
-                            createChildTransition { codeSamples.safeGet(it - CONFIGURATION_IS_LONG[9]) }
+                            createChildTransition { codeSamples.safeGet(it - codeSamplesAppear) }
                                 .MagicCodeSample()
                         }
                     }
 
                     Spacer(Modifier.width(32.dp))
 
-                    SlideFromRightAnimatedVisibility({ it >= afterCodeSamples }) {
+                    SlideFromRightAnimatedVisibility({ it >= terminalAppears }) {
                         Terminal(terminalTextsToDisplay)
                     }
                 }
             }
 
-            FadeOutAnimatedVisibility({ it in afterTerminal..(afterTerminal + 2) }) {
+            FadeOutAnimatedVisibility({ it in terminalDisappears..(terminalDisappears + 2) }) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    SlideFromTopAnimatedVisibility({ it > afterTerminal }) {
+                    SlideFromTopAnimatedVisibility({ it > terminalDisappears }) {
                         h6 {
                             Text {
                                 append("It can really save you ")
@@ -415,7 +419,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                         }
                     }
 
-                    SlideFromBottomAnimatedVisibility({ it > afterTerminal + 1 }) {
+                    SlideFromBottomAnimatedVisibility({ it > terminalDisappears + 1 }) {
                         Row(verticalAlignment = Alignment.Bottom) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("30 s")
@@ -435,22 +439,22 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                 }
             }
 
-            FadeOutAnimatedVisibility({ it >= afterTerminal + 3 }) {
+            FadeOutAnimatedVisibility({ it in bulletpointsAppear until bulletpointsDisappear }) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    SlideFromTopAnimatedVisibility({ it > afterTerminal + 3 }) {
+                    SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear }) {
                         h6 { Text("Introduced in Gradle 6.6, made stable in 8.1") }
                     }
 
-                    SlideFromTopAnimatedVisibility({ it > afterTerminal + 4 }) {
+                    SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear + 1 }) {
                         h6 { Text("Preferred mode in 9.0 (still not default, though)") }
                     }
 
-                    SlideFromTopAnimatedVisibility({ it > afterTerminal + 5 }) {
+                    SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear + 2 }) {
                         h6 { Text("Enable it now!") }
                     }
 
-                    SlideFromBottomAnimatedVisibility({ it > afterTerminal + 5 }) {
+                    SlideFromBottomAnimatedVisibility({ it >= bulletpointsAppear + 2 }) {
                         Box(
                             modifier = Modifier
                                 .border(
