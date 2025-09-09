@@ -314,7 +314,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                 ${configuring}println("Configuring the task...")${configuring}
                 doLast {
                     ${executing}println("Executing the task...")${executing}
-                    file("output.txt").writeText("Job done")
+                    File("build/output.txt").writeText("Job done")
                 }
             }
         }
