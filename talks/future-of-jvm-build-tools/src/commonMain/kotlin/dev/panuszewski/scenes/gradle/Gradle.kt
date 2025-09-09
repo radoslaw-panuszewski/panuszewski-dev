@@ -2,6 +2,7 @@ package dev.panuszewski.scenes.gradle
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Transition
@@ -54,6 +55,8 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.StoryboardBuilder
+import dev.bnorm.storyboard.easel.rememberSharedContentState
+import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
@@ -64,6 +67,7 @@ import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.scenes.gradle.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.gradle.Hat.TOP_HAT
+import dev.panuszewski.template.AnimatedHorizontalTree
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
@@ -341,55 +345,17 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                     else -> emptyList()
                 }
 
-                SharedTransitionLayout {
-                    AnimatedContent(
-                        transitionSpec = { fadeIn() togetherWith fadeOut() },
-                        targetState = allInputs
-                    ) { inputs ->
-
-                        var offset by remember { mutableStateOf(Offset.Zero) }
-                        val placements = remember { mutableStateMapOf<String, Rect>() }
-
-                        Box(
-                            contentAlignment = BiasAlignment(0f, -0.5f),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            HorizontalTree(
-                                root = rootName,
-                                getChildren = { if (it == rootName) inputs else emptyList() },
-                                modifier = Modifier.onPlaced { offset = it.positionInParent() }
-                            ) { name ->
-                                Box(
-                                    Modifier
-                                        .sharedElement(
-                                            rememberSharedContentState(name),
-                                            animatedVisibilityScope = this@AnimatedContent
-                                        )
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .run {
-                                            if (name != rootName) background(Color(0xFFA97608))
-                                            else background(Color(0xFF767D08))
-                                        }
-                                        .onPlaced { placements[name] = it.boundsInParent() },
-                                ) {
-                                    ProvideTextStyle(TextStyle(color = MaterialTheme.colors.background)) {
-                                        Text(modifier = Modifier.padding(8.dp), text = name)
-                                    }
-                                }
-                            }
-                        }
-
-                        val parentRect = placements[rootName] ?: Rect.Zero
-
-                        for ((childName, childRect) in placements.filterKeys { it != rootName }) {
-                            Connection(
-                                parentRect = parentRect.translate(offset),
-                                childRect = childRect.translate(offset),
-                                modifier = Modifier.sharedElement(
-                                    rememberSharedContentState("connection:$childName"),
-                                    animatedVisibilityScope = this@AnimatedContent
-                                )
-                            )
+                AnimatedHorizontalTree(
+                    roots = listOf(rootName),
+                    getChildren = { if (it == rootName) allInputs else emptyList() }
+                ) { name ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (name != rootName) Color(0xFFA97608) else Color(0xFF767D08))
+                    ) {
+                        ProvideTextStyle(TextStyle(color = MaterialTheme.colors.background)) {
+                            Text(modifier = Modifier.padding(8.dp), text = name)
                         }
                     }
                 }
