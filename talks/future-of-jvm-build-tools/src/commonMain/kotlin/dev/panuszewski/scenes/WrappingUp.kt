@@ -48,6 +48,9 @@ fun StoryboardBuilder.WrappingUp() {
                             append(" and see how simple your build can be 😉")
                         }
                         textItem {
+                            append("The overall direction is towards improving toolability 🛠️")
+                        }
+                        textItem {
                             append("Remember that most this stuff is experimental! 🧪")
                         }
                     }

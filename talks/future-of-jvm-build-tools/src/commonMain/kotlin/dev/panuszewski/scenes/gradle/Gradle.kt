@@ -107,7 +107,7 @@ private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCoun
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 24)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 26)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
 private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
@@ -335,7 +335,10 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     val treeAppears = terminalDisappears + 1
     val treeDisappears = treeAppears + 6
 
-    val bulletpointsAppear = treeDisappears + 1
+    val chartAppears = treeDisappears + 1
+    val chartDisappears = chartAppears + 2
+
+    val bulletpointsAppear = chartDisappears + 1
     val bulletpointsDisappear = bulletpointsAppear + 3
 
     FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
@@ -406,10 +409,10 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                 }
             }
 
-            FadeOutAnimatedVisibility({ it in terminalDisappears..(terminalDisappears + 2) }) {
+            FadeOutAnimatedVisibility({ it in chartAppears until chartDisappears }) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    SlideFromTopAnimatedVisibility({ it > terminalDisappears }) {
+                    SlideFromTopAnimatedVisibility({ it >= chartAppears }) {
                         h6 {
                             Text {
                                 append("It can really save you ")
@@ -419,7 +422,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                         }
                     }
 
-                    SlideFromBottomAnimatedVisibility({ it > terminalDisappears + 1 }) {
+                    SlideFromBottomAnimatedVisibility({ it >= chartAppears + 1 }) {
                         Row(verticalAlignment = Alignment.Bottom) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("30 s")
