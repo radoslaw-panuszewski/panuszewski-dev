@@ -104,7 +104,7 @@ private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastS
 private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 25)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
-private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 22)
+private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
 private val SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
 private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 
@@ -583,7 +583,9 @@ fun Transition<Int>.ConventionPlugins() {
     val ideIsShrinkedSince = grimacingEmojiVisible + 2
     val ideIsBackToNormalSince = EXPLAINING_CONVENTION_PLUGINS[4]
 
-    val conventionFileAdded = ideIsBackToNormalSince + 1
+    val buildSrcAdded = ideIsBackToNormalSince + 1
+    val srcMainKotlinAdded = buildSrcAdded + 1
+    val conventionFileAdded = srcMainKotlinAdded + 1
     val conventionFileEnlarged = conventionFileAdded
     val splitPaneEnabledSince = conventionFileEnlarged + 1
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
@@ -697,9 +699,13 @@ fun Transition<Int>.ConventionPlugins() {
                                 }
                             }
                         )
-                        if (currentState >= conventionFileAdded) {
+                        if (currentState >= buildSrcAdded) {
                             addDirectory("buildSrc")
+                        }
+                        if (currentState >= srcMainKotlinAdded) {
                             addDirectory(name = "src/main/kotlin", path = "buildSrc/src/main/kotlin")
+                        }
+                        if (currentState >= conventionFileAdded) {
                             addFile(
                                 name = "wtf-app.gradle.kts",
                                 path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
@@ -738,7 +744,7 @@ fun Transition<Int>.ConventionPlugins() {
                             selectedFile = selectedFile,
                             leftPaneFile = leftPaneFile,
                             rightPaneFile = rightPaneFile,
-                            highlightedFile = highlightedFile,
+//                            highlightedFile = highlightedFile,
                             fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
                         ),
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),

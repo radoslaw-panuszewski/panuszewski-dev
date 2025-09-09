@@ -25,18 +25,18 @@ val FutureOfJvmBuildTools = Storyboard.build(
 ) {
 //    FirstSlide()
 
-    section("The Future of JVM Build Tools") {
-        Title(animateToPresent = false)
-        Agenda()
-        Title(animateToPresent = true)
-        Overview()
-    }
-
-    section("Maven") {
-        SectionTitle(animateToHeader = true)
-        Maven()
-        MavenTransitionOnChart()
-    }
+//    section("The Future of JVM Build Tools") {
+//        Title(animateToPresent = false)
+//        Agenda()
+//        Title(animateToPresent = true)
+//        Overview()
+//    }
+//
+//    section("Maven") {
+//        SectionTitle(animateToHeader = true)
+//        Maven()
+//        MavenTransitionOnChart()
+//    }
 
     section("Gradle") {
         SectionTitle(animateToHeader = true)

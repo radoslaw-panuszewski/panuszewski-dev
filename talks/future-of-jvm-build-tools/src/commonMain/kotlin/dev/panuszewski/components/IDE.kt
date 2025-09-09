@@ -170,9 +170,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                             .background(Color(0xFFF3F3F3))
                             .border(width = 1.dp, color = Color(0xFFDDDDDD))
                     ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
                             // Render the file tree
                             fileTree.forEach { node ->
                                 item {
@@ -182,7 +180,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                         expandedFolders = expandedFolders,
                                         currentOpenFile = selectedFile,
                                         enlargedFile = enlargedFile,
-                                        highlightedFile = highlightedFile
+                                        highlightedFile = highlightedFile,
+                                        modifier = Modifier.animateItem()
                                     )
                                 }
                             }
@@ -349,7 +348,8 @@ private fun FileTreeItem(
     expandedFolders: MutableMap<String, Boolean>,
     currentOpenFile: ProjectFile?,
     enlargedFile: ProjectFile?,
-    highlightedFile: ProjectFile?
+    highlightedFile: ProjectFile?,
+    modifier: Modifier = Modifier,
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
@@ -361,7 +361,7 @@ private fun FileTreeItem(
 
     // Render this node
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(
                 when {
@@ -448,7 +448,8 @@ private fun FileTreeItem(
                 expandedFolders = expandedFolders,
                 currentOpenFile = currentOpenFile,
                 enlargedFile = enlargedFile,
-                highlightedFile = highlightedFile
+                highlightedFile = highlightedFile,
+                modifier = modifier
             )
         }
     }
