@@ -19,7 +19,7 @@ import dev.panuszewski.template.withStateTransition
 
 fun StoryboardBuilder.WrappingUp() {
     scene(
-        stateCount = 6,
+        stateCount = 7,
         exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
         withStateTransition {

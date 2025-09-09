@@ -310,11 +310,11 @@ fun Transition<Int>.ExplainingConfigurationCache() {
 
         """
         tasks {
-            register<PrintMessageTask>("printMessage") {
+            register("printMessage") {
                 ${configuring}println("Configuring the task...")${configuring}
                 doLast {
                     ${executing}println("Executing the task...")${executing}
-                    File("build/output.txt").writeText("Job done")
+                    File("build/out.txt").writeText("Done!")
                 }
             }
         }
@@ -341,11 +341,11 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     val terminalTextsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears))
     val terminalDisappears = terminalAppears + terminalTexts.size + 1
 
-    val treeAppears = terminalDisappears + 1
-    val treeDisappears = treeAppears + 6
-
-    val chartAppears = treeDisappears + 1
+    val chartAppears = terminalDisappears + 1
     val chartDisappears = chartAppears + 2
+
+    val treeAppears = chartDisappears + 1
+    val treeDisappears = treeAppears + 6
 
     val bulletpointsAppear = chartDisappears + 1
     val bulletpointsDisappear = bulletpointsAppear + 3
