@@ -38,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.Frame
@@ -96,12 +98,12 @@ private val stages = Stages()
 private val lastState: Int get() = stages.lastState
 
 private val PHASES_BAR_APPEARS = stages.registerStatesByCount(start = lastState + 1, count = 1)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 25)
 private val CHARACTERIZING_PHASES = stages.registerStatesByCount(start = lastState + 1, count = 3)
 private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCount(start = lastState + 2, count = 5)
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 25)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
 private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
@@ -328,12 +330,15 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             SlideFromBottomAnimatedVisibility({ CONFIGURATION_IS_LONG[2] <= it && it <= CONFIGURATION_IS_LONG[6] }) {
+
+                val rootName = "Configuration inputs"
+
                 val allInputs = when {
                     currentState >= CONFIGURATION_IS_LONG[6] -> listOf("Gradle configs", "Files read at config time", "System props read at config time", "Env variables read at config time")
                     currentState >= CONFIGURATION_IS_LONG[5] -> listOf("Gradle configs", "Files read at config time", "System props read at config time")
                     currentState >= CONFIGURATION_IS_LONG[4] -> listOf("Gradle configs", "Files read at config time")
                     currentState >= CONFIGURATION_IS_LONG[3] -> listOf("Gradle configs")
-                    else -> listOf("Configuration")
+                    else -> emptyList()
                 }
 
                 SharedTransitionLayout {
@@ -346,36 +351,42 @@ fun Transition<Int>.ExplainingConfigurationCache() {
                         val placements = remember { mutableStateMapOf<String, Rect>() }
 
                         Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier.fillMaxWidth()
+                            contentAlignment = BiasAlignment(0f, -0.5f),
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             HorizontalTree(
-                                roots = inputs,
-                                getChildren = { if (it != "Configuration") listOf("Configuration") else emptyList() },
+                                root = rootName,
+                                getChildren = { if (it == rootName) inputs else emptyList() },
                                 modifier = Modifier.onPlaced { offset = it.positionInParent() }
-                            ) { input ->
+                            ) { name ->
                                 Box(
                                     Modifier
                                         .sharedElement(
-                                            rememberSharedContentState(input),
+                                            rememberSharedContentState(name),
                                             animatedVisibilityScope = this@AnimatedContent
                                         )
-                                        .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                                        .onPlaced { placements[input] = it.boundsInParent() },
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .run {
+                                            if (name != rootName) background(Color(0xFFA97608))
+                                            else background(Color(0xFF767D08))
+                                        }
+                                        .onPlaced { placements[name] = it.boundsInParent() },
                                 ) {
-                                    Text(modifier = Modifier.padding(8.dp), text = input)
+                                    ProvideTextStyle(TextStyle(color = MaterialTheme.colors.background)) {
+                                        Text(modifier = Modifier.padding(8.dp), text = name)
+                                    }
                                 }
                             }
                         }
 
-                        val childRect = placements["Configuration"] ?: Rect.Zero
+                        val parentRect = placements[rootName] ?: Rect.Zero
 
-                        for ((parentName, parentRect) in placements.filterKeys { it != "Configuration" }) {
+                        for ((childName, childRect) in placements.filterKeys { it != rootName }) {
                             Connection(
-                                childRect = childRect.translate(offset),
                                 parentRect = parentRect.translate(offset),
+                                childRect = childRect.translate(offset),
                                 modifier = Modifier.sharedElement(
-                                    rememberSharedContentState("connection:$parentName"),
+                                    rememberSharedContentState("connection:$childName"),
                                     animatedVisibilityScope = this@AnimatedContent
                                 )
                             )
