@@ -34,13 +34,12 @@ fun StoryboardBuilder.WrappingUp() {
                             appendWithPrimaryColor("alternative POM syntaxes")
                         }
                         textItem {
-                            append("Don't wait and enable ")
-                            appendWithSecondaryVariantColor("configuration cache")
-                            append(" in your Gradle build!")
+                            appendWithSecondaryVariantColor("Configuration cache")
+                            append(" can save you a lot of time!")
                         }
                         textItem {
                             appendWithSecondaryColor("Declarative Gradle")
-                            append(" will replace Kotlin with DCL - a tiny subset of Kotlin")
+                            append(" is what's Gradle needs the most")
                         }
                         textItem {
                             append("Play around with ")
