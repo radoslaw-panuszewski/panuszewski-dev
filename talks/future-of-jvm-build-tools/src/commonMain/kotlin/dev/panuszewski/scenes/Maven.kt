@@ -14,16 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -32,7 +27,6 @@ import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.CodeSample
 import dev.panuszewski.template.Foldable
-import dev.panuszewski.template.MagicAnnotatedString
 import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.ScrollableMagicCodeSample
 import dev.panuszewski.template.SlideFromLeftAnimatedVisibility
@@ -42,8 +36,6 @@ import dev.panuszewski.template.expand
 import dev.panuszewski.template.fold
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
-import dev.panuszewski.template.withColor
-import dev.panuszewski.template.withPrimaryColor
 
 private val STATE_COUNT: Int get() = BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_ALTERNATIVE_SYNTAX.size
 
@@ -222,14 +214,14 @@ private val BUILD_POM_ALTERNATIVE_SYNTAX = buildCodeSamples {
         [[build.plugins]]
         id = "org.jetbrains.kotlin:kotlin-maven-plugin:2.2.0"${toml}${hocon}id = "pl.allegro.tech.common:andamio-starter-core:1.0.0"
         dependencies = [
-           "org.springframework.boot:spring-boot-starter-core:3.5.4"
+            "org.springframework.boot:spring-boot-starter-core:3.5.4"
         ]
         build {
-          plugins = [
-            {
-              id = "org.jetbrains.kotlin:kotlin-maven-plugin:2.2.0"
-            }
-          ]
+            plugins = [
+                {
+                    id = "org.jetbrains.kotlin:kotlin-maven-plugin:2.2.0"
+                }
+            ]
         }${hocon}
         """
         .trimIndent()
@@ -241,8 +233,7 @@ private val BUILD_POM_ALTERNATIVE_SYNTAX = buildCodeSamples {
 
     codeSample
         .startWith { reveal(xmlExpanded).hide(xmlFolded, yaml, toml, hocon) }
-        .then { reveal(yaml).hide(xml).changeLanguage(Language.Yaml).changeTitle("pom.yaml") }
-        .then { reveal(toml).hide(yaml).changeLanguage(Language.Toml).changeTitle("pom.toml") }
+        .then { reveal(toml).hide(xml).changeLanguage(Language.Toml).changeTitle("pom.toml") }
         .then { reveal(hocon).hide(toml).changeLanguage(Language.Hocon).changeTitle("pom.hocon") }
 }
 

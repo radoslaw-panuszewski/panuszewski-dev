@@ -108,7 +108,7 @@ private val EXPLAINING_CONFIG_EXECUTION_DIFFERENCE = stages.registerStatesByCoun
 private val EXECUTION_BECOMES_LONG = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val SHOWING_THAT_BUILD_CACHE_IS_OLD = stages.registerStatesByCount(start = lastState + 2, count = 2)
 private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastState + 1, count = 1)
-private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 27)
+private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 28)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
 private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
@@ -307,14 +307,15 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     val codeSamples = buildAndRememberCodeSamples {
         val configuring by tag()
         val executing by tag()
+        val writeOutput by tag()
 
         """
         tasks {
-            register("printMessage") {
+            register("doSomething") {
                 ${configuring}println("Configuring the task...")${configuring}
                 doLast {
                     ${executing}println("Executing the task...")${executing}
-                    File("build/out.txt").writeText("Done!")
+                    ${writeOutput}File("build/out.txt").writeText("Done!")${writeOutput}
                 }
             }
         }
@@ -324,6 +325,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
             .startWith { this }
             .then { focus(configuring) }
             .then { focus(executing) }
+            .then { focus(writeOutput) }
             .then { unfocus() }
     }
 
@@ -331,12 +333,12 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     val terminalAppears = codeSamplesAppear + codeSamples.size
 
     val terminalTexts = listOf(
-        "$ ./gradlew printMessage",
-        "Configuring the task...\n\n> Task :printMessage\nExecuting the task...",
-        "$ ./gradlew printMessage",
-        "Configuring the task... 😞\n\n> Task :printMessage UP-TO-DATE",
-        "$ ./gradlew printMessage --configuration-cache",
-        "Reusing configuration cache. ❤️\n\n> Task :printMessage UP-TO-DATE",
+        "$ ./gradlew doSomething",
+        "Configuring the task...\n\n> Task :doSomething\nExecuting the task...",
+        "$ ./gradlew doSomething",
+        "Configuring the task... 😞\n\n> Task :doSomething UP-TO-DATE",
+        "$ ./gradlew doSomething --configuration-cache",
+        "Reusing configuration cache. ❤️\n\n> Task :doSomething UP-TO-DATE",
     )
     val terminalTextsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears))
     val terminalDisappears = terminalAppears + terminalTexts.size + 1
