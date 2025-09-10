@@ -35,6 +35,7 @@ fun StoryboardBuilder.AmperBriefDescription() {
                             Text {
                                 append("Started as a Gradle plugin, now ")
                                 withPrimaryColor { append("standalone") }
+                                append(" executable")
                             }
                         }
                         item { Text { append("Focused on UX and toolability") } }
