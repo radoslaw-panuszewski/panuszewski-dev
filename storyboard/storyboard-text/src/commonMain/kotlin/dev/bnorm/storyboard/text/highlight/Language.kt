@@ -5,15 +5,25 @@ import androidx.compose.ui.text.SpanStyle
 
 enum class Language {
     Kotlin,
+    Xml,
+    Yaml,
+    Properties,
+    Toml,
+    Hocon
 }
 
 fun String.highlight(
-    codeStyle: CodeStyle,
     language: Language,
+    codeStyle: CodeStyle,
     scope: CodeScope = CodeScope.File,
     identifierStyle: (String) -> SpanStyle? = { null },
 ): AnnotatedString {
-    when (language) {
-        Language.Kotlin -> return highlightKotlin(this, codeStyle, scope, identifierStyle)
+    return when (language) {
+        Language.Kotlin -> highlightKotlin(this, codeStyle, scope, identifierStyle)
+        Language.Xml -> highlightXml(this, codeStyle, scope, identifierStyle)
+        Language.Yaml -> highlightYaml(this, codeStyle, scope, identifierStyle)
+        Language.Properties -> highlightProperties(this, codeStyle, scope, identifierStyle)
+        Language.Toml -> highlightToml(this, codeStyle)
+        Language.Hocon -> highlightHocon(this, codeStyle)
     }
 }

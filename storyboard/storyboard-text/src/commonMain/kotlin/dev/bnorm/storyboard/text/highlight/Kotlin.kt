@@ -36,7 +36,7 @@ internal fun highlightKotlin(
         withStyle(codeStyle.simple) { append(text) }
 
         val formatListener = object : KotlinParserBaseListener() {
-            private var multiDollars = 0
+            private var multiDollars = -1
 
             private var scopes = ArrayDeque<CodeScope>().apply {
                 addFirst(scope)
@@ -102,15 +102,23 @@ internal fun highlightKotlin(
             }
 
             override fun enterVariableDeclaration(ctx: KotlinParser.VariableDeclarationContext) {
-                if (scopes.first() == CodeScope.Function) return // Local scope
-                addStyle(codeStyle.property, ctx.simpleIdentifier())
+//                if (scopes.first() == CodeScope.Function) return // Local scope
+//                addStyle(codeStyle.property, ctx.simpleIdentifier())
             }
 
             override fun enterPrimaryExpression(ctx: KotlinParser.PrimaryExpressionContext) {
                 // Expression without a qualifier.
+                val text = ctx.text
+
                 ctx.simpleIdentifier()?.let {
                     val style = identifierStyle(it.text)
                     if (style != null) addStyle(style, it)
+                }
+            }
+
+            override fun enterPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext) {
+                if (ctx.text.startsWith("libs.")) {
+                    addStyle(codeStyle.property, ctx)
                 }
             }
 
@@ -201,6 +209,12 @@ internal fun highlightKotlin(
                 ctx.AT_POST_WS()?.let { addStyle(codeStyle.label, it.symbol) }
             }
 
+            override fun enterSimpleIdentifier(ctx: KotlinParser.SimpleIdentifierContext) {
+                if (ctx.text.contains("`")) {
+                    addStyle(codeStyle.property, ctx)
+                }
+            }
+
             override fun visitTerminal(node: TerminalNode) {
                 val symbol = node.symbol
                 when (symbol.type) {
@@ -280,10 +294,3 @@ internal fun highlightKotlin(
     }
 }
 
-private fun AnnotatedString.Builder.addStyle(style: SpanStyle, ctx: ParserRuleContext) {
-    addStyle(style, ctx.start!!.startIndex, ctx.stop!!.stopIndex + 1)
-}
-
-private fun AnnotatedString.Builder.addStyle(spanStyle: SpanStyle, token: Token) {
-    addStyle(spanStyle, token.startIndex, token.stopIndex + 1)
-}

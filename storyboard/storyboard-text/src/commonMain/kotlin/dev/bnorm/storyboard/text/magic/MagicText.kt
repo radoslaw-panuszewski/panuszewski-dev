@@ -1,7 +1,20 @@
 package dev.bnorm.storyboard.text.magic
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.EaseInCubic
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.wrapContentSize
@@ -27,7 +40,7 @@ fun MagicText(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
-    val words = remember(text) { text.toWords() }
+    val words = remember(text) { text.splitByWords() }
     val transition = updateTransition(words)
     MagicText(transition, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
@@ -42,7 +55,7 @@ fun MagicText(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
-    val worlds = transition.createChildTransition { remember(it) { it.toWords() } }
+    val worlds = transition.createChildTransition { remember(it) { it.splitByWords() } }
     MagicText(worlds, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
 

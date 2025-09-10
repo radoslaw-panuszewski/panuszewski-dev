@@ -134,13 +134,14 @@ abstract class TextTagScope(
 }
 
 fun AnnotatedString.addStyleByTag(
-    tag: TextTag,
+    tags: List<TextTag>,
     tagged: SpanStyle? = null,
     untagged: SpanStyle? = null,
 ): AnnotatedString {
     if (tagged == null && untagged == null) return this
 
-    val ranges = getStringAnnotations(tag.annotationStringTag, 0, length).filter { it.item == tag.id }
+    val ranges =
+        tags.flatMap { tag -> getStringAnnotations(tag.annotationStringTag, 0, length).filter { it.item == tag.id } }
     if (ranges.isEmpty()) {
         return when (untagged) {
             null -> this
