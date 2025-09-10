@@ -9,6 +9,7 @@ import dev.panuszewski.scenes.LastSlide
 import dev.panuszewski.scenes.Maven
 import dev.panuszewski.scenes.MavenTransitionOnChart
 import dev.panuszewski.scenes.Overview
+import dev.panuszewski.scenes.ThankYouSlide
 import dev.panuszewski.scenes.Title
 import dev.panuszewski.scenes.WrappingUp
 import dev.panuszewski.scenes.gradle.Gradle
@@ -55,10 +56,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
         WrappingUp()
     }
 
-    section("Thank You!") {
-        SectionTitle()
-    }
-
+    ThankYouSlide()
     LastSlide()
 }
 
