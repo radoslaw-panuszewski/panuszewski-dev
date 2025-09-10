@@ -63,14 +63,14 @@ fun StoryboardBuilder.Agenda() {
                         append(" on the horizon")
                     }
                     Text {
-                        append("3. Modern ")
+                        append("3. ")
                         appendWithSecondaryColor("Gradle")
-                        append(" features and its path towards declarativeness")
+                        append(" and its path towards declarativeness")
                     }
                     Text {
-                        append("4. Meet ")
+                        append("4. ")
                         appendWithSecondaryColor("Amper")
-                        append(" - a brand new build tool from JetBrains!")
+                        append(" - a brand new build tool from JetBrains")
                     }
                     Text {
                         append("5. Wrapping up")
