@@ -347,7 +347,7 @@ fun Transition<Int>.ExplainingConfigurationCache() {
     val treeAppears = chartDisappears + 1
     val treeDisappears = treeAppears + 6
 
-    val bulletpointsAppear = chartDisappears + 1
+    val bulletpointsAppear = treeDisappears + 1
     val bulletpointsDisappear = bulletpointsAppear + 3
 
     FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
