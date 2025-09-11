@@ -96,6 +96,7 @@ import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
+import talks.future_of_jvm_build_tools.generated.resources.typesafe_conventions
 import kotlin.collections.iterator
 import kotlin.math.max
 
@@ -111,7 +112,7 @@ private val EXECUTION_BECOMES_SHORT = stages.registerStatesByCount(start = lastS
 private val CONFIGURATION_IS_LONG = stages.registerStatesByCount(start = lastState + 1, count = 28)
 private val PHASES_BAR_DISAPPEARS = stages.registerStatesByCount(start = lastState + 2, count = 1)
 private val EXTRACTING_CONVENTION_PLUGIN = stages.registerStatesByCount(start = lastState + 1, count = 9)
-private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 24)
+private val EXPLAINING_CONVENTION_PLUGINS = stages.registerStatesByCount(start = lastState + 1, count = 26)
 private val SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER = stages.registerStatesByCount(lastState + 1, count = 7)
 private val DECLARATIVE_GRADLE = stages.registerStatesByCount(lastState + 1, count = 19)
 
@@ -614,8 +615,10 @@ fun Transition<Int>.ConventionPlugins() {
     val fileTreeHiddenSince = splitPaneEnabledSince + 1
     val splitPaneClosedSince = fileTreeHiddenSince + buildGradleKtsOnSplitPane.size
     val fileTreeRevealedSince = splitPaneClosedSince
+    val typesafeConventionsAppear = fileTreeRevealedSince + 1
+    val typesafeConventionsDisappear = typesafeConventionsAppear + 1
 
-    val ideIsShrinkedAgainSince = fileTreeRevealedSince + 1
+    val ideIsShrinkedAgainSince = typesafeConventionsDisappear + 1
 
     val ideBackToNormalAgainSince = ideIsShrinkedAgainSince + 3
     val noIdeaEmojiVisible = ideBackToNormalAgainSince + 2
@@ -627,6 +630,8 @@ fun Transition<Int>.ConventionPlugins() {
             it >= ideIsShrinked3Since -> 275.dp
             it >= ideBackToNormalAgainSince -> 150.dp
             it >= ideIsShrinkedAgainSince -> 275.dp
+            it >= typesafeConventionsDisappear -> 32.dp
+            it >= typesafeConventionsAppear -> 150.dp
             it >= ideIsBackToNormalSince -> 32.dp
             it >= ideIsShrinkedSince -> 275.dp
             else -> 32.dp
@@ -709,6 +714,15 @@ fun Transition<Int>.ConventionPlugins() {
                 }
             }
 
+            SlideFromBottomAnimatedVisibility({ it in typesafeConventionsAppear until typesafeConventionsDisappear }) {
+                Box(Modifier.padding(top = 32.dp)) {
+                    ResourceImage(
+                        resource = Res.drawable.typesafe_conventions,
+                        modifier = Modifier.border(1.dp, Color.LightGray, RoundedCornerShape(8.dp)).padding(8.dp)
+                    )
+                }
+            }
+
             Box(contentAlignment = Alignment.Center) {
                 SlideFromBottomAnimatedVisibility({ CONVENTION_PLUGINS[0] <= it && it < ideHiddenSince }) {
                     val files = buildList {
@@ -756,18 +770,12 @@ fun Transition<Int>.ConventionPlugins() {
                         else -> null
                     }
 
-                    val highlightedFile = when {
-                        currentState == conventionFileEnlarged -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
-                        else -> null
-                    }
-
                     IDE(
                         IdeState(
                             files = files,
                             selectedFile = selectedFile,
                             leftPaneFile = leftPaneFile,
                             rightPaneFile = rightPaneFile,
-//                            highlightedFile = highlightedFile,
                             fileTreeHidden = currentState in fileTreeHiddenSince until fileTreeRevealedSince,
                         ),
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp),

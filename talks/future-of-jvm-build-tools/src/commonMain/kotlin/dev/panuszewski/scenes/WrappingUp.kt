@@ -39,7 +39,7 @@ fun StoryboardBuilder.WrappingUp() {
                         }
                         textItem {
                             appendWithSecondaryColor("Declarative Gradle")
-                            append(" is what's Gradle needs the most")
+                            append(" is what Gradle needs the most")
                         }
                         textItem {
                             append("Play around with ")
