@@ -114,54 +114,16 @@ private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVE
 fun StoryboardBuilder.Gradle() {
     CharacterizingPhases()
     ExplainingConfigExecutionDifference()
+    ShowingThatBuildCacheIsOld()
 
 //    scene(stateCount = stages.stateCount) {
 //        withStateTransition {
-//            ExplainingConfigExecutionDifference()
-//            ShowingThatBuildCacheIsOld()
 //            ExplainingConfigurationCache()
 //            ConventionPlugins()
 //            SoftwareDeveloperAndBuildEngineer()
 //            DeclarativeGradle()
 //        }
 //    }
-}
-
-@Composable
-private fun Transition<Int>.ShowingThatBuildCacheIsOld() {
-    FadeOutAnimatedVisibility({ it in SHOWING_THAT_BUILD_CACHE_IS_OLD }) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            h6 {
-                SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[0] }) {
-                    Text("Build Cache is there since Gradle 3.5 👴🏼")
-                }
-                Spacer(Modifier.height(32.dp))
-                SlideFromTopAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
-                    Text {
-                        append("Just enable it in your ")
-                        appendWithPrimaryColor("gradle.properties")
-                        append("!")
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            SlideFromBottomAnimatedVisibility({ it >= SHOWING_THAT_BUILD_CACHE_IS_OLD[1] }) {
-                Box(
-                    modifier = Modifier
-                        .border(
-                            color = Color.Black,
-                            width = 1.dp,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(16.dp)
-                ) {
-                    Text("org.gradle.caching=true".toCode(language = Language.Properties))
-                }
-            }
-        }
-    }
 }
 
 @Composable

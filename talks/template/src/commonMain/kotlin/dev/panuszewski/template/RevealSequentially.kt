@@ -1,11 +1,26 @@
 package dev.panuszewski.template
 
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import dev.bnorm.storyboard.Frame
+import dev.bnorm.storyboard.SceneScope
+import dev.bnorm.storyboard.toState
+
+@Composable
+context(_: SceneScope<Int>)
+fun Transition<out Frame<Int>>.RevealSequentially(
+    since: Int = 1,
+    until: Int = Int.MAX_VALUE,
+    textStyle: TextStyle? = MaterialTheme.typography.h6,
+    configure: RevealSequentiallyScope.() -> Unit
+): Int =
+    createChildTransition { it.toState() }
+        .RevealSequentially(since, until, textStyle, configure)
 
 @Composable
 fun Transition<Int>.RevealSequentially(
