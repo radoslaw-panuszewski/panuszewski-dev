@@ -49,14 +49,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
-import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
-import dev.panuszewski.scenes.gradle.GradlePhase.*
 import dev.panuszewski.scenes.gradle.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.gradle.Hat.TOP_HAT
 import dev.panuszewski.template.AnimatedHorizontalTree
@@ -88,7 +85,6 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
-import dev.panuszewski.template.withStateTransition
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
 import talks.future_of_jvm_build_tools.generated.resources.typesafe_conventions
@@ -117,6 +113,7 @@ private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVE
 
 fun StoryboardBuilder.Gradle() {
     CharacterizingPhases()
+    ExplainingConfigExecutionDifference()
 
 //    scene(stateCount = stages.stateCount) {
 //        withStateTransition {
@@ -163,52 +160,6 @@ private fun Transition<Int>.ShowingThatBuildCacheIsOld() {
                     Text("org.gradle.caching=true".toCode(language = Language.Properties))
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun Transition<Int>.ExplainingConfigExecutionDifference() {
-    val phaseSamples = buildAndRememberCodeSamples {
-        val first by tag()
-        val second by tag()
-        val third by tag()
-        val fourth by tag()
-
-        """
-        plugins {${third}
-            println("Even this place belongs to configuration phase")${third}
-            java
-        }${first}
-        
-        println("Hello from configuration phase!")${first}
-        
-        dependencies {${second}
-            println("It's still configuration phase")${second}
-            implementation("pl.allegro.tech.common:andamio-starter-core:9.0.0")
-        }
-    
-        tasks {
-            register("sayHello") {
-                doLast {
-                    ${fourth}println("Finally, the execution phase!")${fourth}
-                }
-            }
-        }
-        """
-            .trimIndent()
-            .toCodeSample(language = Language.Kotlin)
-            .startWith { hide(first, second, third, fourth) }
-            .then { reveal(first).focus(first) }
-            .then { reveal(second).focus(second).hide(first) }
-            .then { reveal(third).focus(third).hide(second) }
-            .then { reveal(fourth).focus(fourth).hide(third) }
-    }
-
-    SlideFromBottomAnimatedVisibility({ it in EXPLAINING_CONFIG_EXECUTION_DIFFERENCE }) {
-        code2 {
-            createChildTransition { phaseSamples.safeGet(it - EXPLAINING_CONFIG_EXECUTION_DIFFERENCE.first()) }
-                .MagicCodeSample()
         }
     }
 }

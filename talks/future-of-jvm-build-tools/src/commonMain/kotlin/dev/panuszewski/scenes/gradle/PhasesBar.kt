@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,10 +31,10 @@ enum class GradlePhase { INITIALIZATION, CONFIGURATION, EXECUTION }
 
 @Composable
 fun PhasesBar(
-    phasesBarVisible: Transition<Boolean>,
-    highlightedPhase: Transition<GradlePhase?>,
-    executionIsLong: Transition<Boolean>,
-    configurationIsLong: Transition<Boolean>,
+    phasesBarVisible: Transition<Boolean> = updateTransition(true),
+    highlightedPhase: Transition<GradlePhase?> = updateTransition(null),
+    executionIsLong: Transition<Boolean> = updateTransition(false),
+    configurationIsLong: Transition<Boolean> = updateTransition(false),
 ) {
     val phaseNameTextStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.background)
     val phaseDescriptionTextStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.background, fontSize = 12.sp)
