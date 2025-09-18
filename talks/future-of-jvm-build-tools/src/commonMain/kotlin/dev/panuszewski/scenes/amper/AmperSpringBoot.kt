@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
+import dev.panuszewski.components.IDE_STATE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.TitleScaffold
@@ -81,7 +82,7 @@ fun StoryboardBuilder.AmperSpringBoot() {
                     }
 
                     SlideFromBottomAnimatedVisibility({ ideAppears <= it }) {
-                        AMPER_IDE_STATE = IdeState(
+                        IDE_STATE = IdeState(
                             files = buildList {
                                 addFile(
                                     name = "module.yaml",
@@ -114,7 +115,7 @@ fun StoryboardBuilder.AmperSpringBoot() {
                             },
                         )
                         IDE(
-                            ideState = AMPER_IDE_STATE,
+                            ideState = IDE_STATE,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 32.dp, end = 32.dp, top = ideTopPadding, bottom = 32.dp)

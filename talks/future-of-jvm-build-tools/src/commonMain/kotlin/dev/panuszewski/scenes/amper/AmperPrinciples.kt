@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.panuszewski.components.IDE
-import dev.panuszewski.components.Title
+import dev.panuszewski.components.IDE_STATE
 import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.template.RevealSequentially
 import dev.panuszewski.template.Text
@@ -58,7 +57,7 @@ fun StoryboardBuilder.AmperPrinciples() {
                     }
 
                     IDE(
-                        ideState = AMPER_IDE_STATE,
+                        ideState = IDE_STATE,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 32.dp, end = 32.dp, top = 281.dp, bottom = 32.dp)

@@ -16,14 +16,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -61,7 +59,6 @@ import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Text
-import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.code2
@@ -70,7 +67,6 @@ import dev.panuszewski.template.h6
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
-import dev.panuszewski.template.withPrimaryColor
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
 import kotlin.collections.iterator
@@ -101,92 +97,13 @@ fun StoryboardBuilder.Gradle() {
     BuildCache()
     ConfigurationCache()
     ConventionPlugins()
+    TwoTypesOfGradleUsers()
 
 //    scene(stateCount = stages.stateCount) {
 //        withStateTransition {
-//            SoftwareDeveloperAndBuildEngineer()
 //            DeclarativeGradle()
 //        }
 //    }
-}
-
-@Composable
-fun Transition<Int>.SoftwareDeveloperAndBuildEngineer() {
-    SlideFromTopAnimatedVisibility({ it in SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER.drop(1) }) {
-        Row(horizontalArrangement = Arrangement.spacedBy(64.dp)) {
-            val appDeveloperHat = when {
-                currentState >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[6] -> BASEBALL_CAP
-                currentState >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[5] -> TOP_HAT
-                else -> BASEBALL_CAP
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                GuyChangingHats(name = "Software Developer", hat = appDeveloperHat)
-
-                Column(
-                    modifier = Modifier.width(400.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
-                        body1 {
-                            Text {
-                                append("Ships new ")
-                                withPrimaryColor { append("features") }
-                            }
-                        }
-                    }
-                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
-                        body1 {
-                            Text {
-                                append("Interested in: ")
-                                withPrimaryColor { append("JDK version, dependencies") }
-                            }
-                        }
-                    }
-                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
-                        body1 { Text("Often changes hats") }
-                    }
-                }
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                GuyChangingHats(name = "Build Engineer", hat = TOP_HAT)
-
-                Column(
-                    modifier = Modifier.width(400.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[2] }) {
-                        body1 {
-                            Text {
-                                append("Maintains the ")
-                                withPrimaryColor { append("build") }
-                            }
-                        }
-                    }
-                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[3] }) {
-                        body1 {
-                            Text {
-                                append("Interested in: ")
-                                withPrimaryColor { append("plugins, tasks, configurations") }
-                            }
-                        }
-                    }
-                    SlideFromTopAnimatedVisibility({ it >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[4] }) {
-                        body1 { Text("Seen in the wild mostly in large codebases") }
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable

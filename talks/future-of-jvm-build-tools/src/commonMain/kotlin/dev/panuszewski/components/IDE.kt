@@ -57,6 +57,8 @@ import dev.panuszewski.template.code2
 import dev.panuszewski.template.code3
 import dev.panuszewski.template.withColor
 
+var IDE_STATE: IdeState = IdeState(emptyList())
+
 data class IdeState(
     val files: List<ProjectFile>,
     val selectedFile: String? = null,
