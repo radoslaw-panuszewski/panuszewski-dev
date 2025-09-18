@@ -116,40 +116,18 @@ private val EXECUTION_IS_LONG = EXECUTION_BECOMES_LONG.first() until EXECUTION_B
 private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVENTION_PLUGINS
 
 fun StoryboardBuilder.Gradle() {
-    scene(stateCount = stages.stateCount) {
-        withStateTransition {
-            val targetTitle = when (currentState) {
-                in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
-                in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
-                in EXTRACTING_CONVENTION_PLUGIN -> "The biggest issue with Gradle"
-                in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
-                in (SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER + DECLARATIVE_GRADLE.take(5)) -> "Two types of Gradle users"
-                in DECLARATIVE_GRADLE.drop(5) -> "Declarative Gradle"
-                else -> "Gradle"
-            }
-            TitleScaffold(targetTitle) {
-                PhasesBar(
-                    phasesBarVisible = createChildTransition { it in PHASES_BAR_VISIBLE },
-                    highlightedPhase = createChildTransition {
-                        when (it) {
-                            CHARACTERIZING_PHASES[0] -> INITIALIZATION
-                            CHARACTERIZING_PHASES[1] -> CONFIGURATION
-                            CHARACTERIZING_PHASES[2] -> EXECUTION
-                            else -> null
-                        }
-                    },
-                    executionIsLong = createChildTransition { it in EXECUTION_IS_LONG },
-                    configurationIsLong = createChildTransition { it in CONFIGURATION_IS_LONG },
-                )
-                ExplainingConfigExecutionDifference()
-                ShowingThatBuildCacheIsOld()
-                ExplainingConfigurationCache()
-                ConventionPlugins()
-                SoftwareDeveloperAndBuildEngineer()
-                DeclarativeGradle()
-            }
-        }
-    }
+    CharacterizingPhases()
+
+//    scene(stateCount = stages.stateCount) {
+//        withStateTransition {
+//            ExplainingConfigExecutionDifference()
+//            ShowingThatBuildCacheIsOld()
+//            ExplainingConfigurationCache()
+//            ConventionPlugins()
+//            SoftwareDeveloperAndBuildEngineer()
+//            DeclarativeGradle()
+//        }
+//    }
 }
 
 @Composable
