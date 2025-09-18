@@ -77,7 +77,7 @@ fun StoryboardBuilder.ConfigurationCache() {
 
     scene(stateCount) {
         with(transition) {
-            val configurationIsLong = createChildTransition { it.toState(end = -1) >= configurationBecomesLong }
+            val configurationIsLong = createChildTransition { it.toState() in configurationBecomesLong until bulletpointsDisappear }
 
             val title = when {
                 currentState.toState() >= titleChanges -> "Configuration Cache!"
@@ -85,7 +85,10 @@ fun StoryboardBuilder.ConfigurationCache() {
             }
 
             TitleScaffold(title) {
-                PhasesBar(configurationIsLong = configurationIsLong)
+                PhasesBar(
+                    phasesBarVisible = createChildTransition { it !is Frame.End },
+                    configurationIsLong = configurationIsLong
+                )
 
                 FadeOutAnimatedVisibility({ it is Frame.State<*> }) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

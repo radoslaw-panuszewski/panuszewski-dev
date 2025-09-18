@@ -11,13 +11,13 @@ import dev.bnorm.storyboard.SceneScope
 private var SHARED_TITLE: String? = null
 
 @Composable
-fun SceneScope<*>.TitleScaffold(title: String, content: @Composable () -> Unit) {
+fun SceneScope<*>.TitleScaffold(title: String?, content: @Composable () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         when (transition.currentState) {
-            is Frame.State<*> -> SHARED_TITLE = title
+            is Frame.State<*> if title != null -> SHARED_TITLE = title
             else -> {}
         }
         if (SHARED_TITLE == null) {
