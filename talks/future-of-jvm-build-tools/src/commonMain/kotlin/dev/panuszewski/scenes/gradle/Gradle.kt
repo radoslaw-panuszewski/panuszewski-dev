@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,51 +44,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
-import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.scenes.gradle.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.gradle.Hat.TOP_HAT
-import dev.panuszewski.template.AnimatedHorizontalTree
 import dev.panuszewski.template.Connection
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
-import dev.panuszewski.template.MagicCodeSample
-import dev.panuszewski.template.NICE_BLUE
-import dev.panuszewski.template.NICE_GREEN
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.Stages
 import dev.panuszewski.template.Text
-import dev.panuszewski.template.appendWithPrimaryColor
 import dev.panuszewski.template.body1
 import dev.panuszewski.template.body2
 import dev.panuszewski.template.buildAndRememberCodeSamples
-import dev.panuszewski.template.buildTree
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
 import dev.panuszewski.template.h6
-import dev.panuszewski.template.primaryVariantColor
 import dev.panuszewski.template.safeGet
 import dev.panuszewski.template.startWith
 import dev.panuszewski.template.tag
-import dev.panuszewski.template.toCode
-import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
 import talks.future_of_jvm_build_tools.generated.resources.typesafe_conventions
 import kotlin.collections.iterator
-import kotlin.math.max
 
 private val stages = Stages()
 private val lastState: Int get() = stages.lastState
@@ -114,207 +100,16 @@ private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVE
 fun StoryboardBuilder.Gradle() {
     CharacterizingPhases()
     ExplainingConfigExecutionDifference()
-    ShowingThatBuildCacheIsOld()
+    BuildCache()
+    ConfigurationCache()
 
 //    scene(stateCount = stages.stateCount) {
 //        withStateTransition {
-//            ExplainingConfigurationCache()
 //            ConventionPlugins()
 //            SoftwareDeveloperAndBuildEngineer()
 //            DeclarativeGradle()
 //        }
 //    }
-}
-
-@Composable
-fun Transition<Int>.ExplainingConfigurationCache() {
-    val codeSamples = buildAndRememberCodeSamples {
-        val configuring by tag()
-        val executing by tag()
-        val writeOutput by tag()
-
-        """
-        tasks {
-            register("doSomething") {
-                ${configuring}println("Configuring the task...")${configuring}
-                doLast {
-                    ${executing}println("Executing the task...")${executing}
-                    ${writeOutput}File("build/out.txt").writeText("Done!")${writeOutput}
-                }
-            }
-        }
-        """
-            .trimIndent()
-            .toCodeSample(language = Language.Kotlin)
-            .startWith { this }
-            .then { focus(configuring) }
-            .then { focus(executing) }
-            .then { focus(writeOutput) }
-            .then { unfocus() }
-    }
-
-    val codeSamplesAppear = CONFIGURATION_IS_LONG[2]
-    val terminalAppears = codeSamplesAppear + codeSamples.size
-
-    val terminalTexts = listOf(
-        "$ ./gradlew doSomething",
-        "Configuring the task...\n\n> Task :doSomething\nExecuting the task...",
-        "$ ./gradlew doSomething",
-        "Configuring the task... 😞\n\n> Task :doSomething UP-TO-DATE",
-        "$ ./gradlew doSomething --configuration-cache",
-        "Reusing configuration cache. ❤️\n\n> Task :doSomething UP-TO-DATE",
-    )
-    val terminalTextsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears))
-    val terminalDisappears = terminalAppears + terminalTexts.size + 1
-
-    val chartAppears = terminalDisappears + 1
-    val chartDisappears = chartAppears + 2
-
-    val treeAppears = chartDisappears + 1
-    val treeDisappears = treeAppears + 6
-
-    val bulletpointsAppear = treeDisappears + 1
-    val bulletpointsDisappear = bulletpointsAppear + 3
-
-    FadeOutAnimatedVisibility({ it in CONFIGURATION_IS_LONG }) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            SlideFromBottomAnimatedVisibility({ it in treeAppears until treeDisappears }) {
-                val primaryVariantColor = primaryVariantColor
-
-                val roots = when {
-                    currentState >= treeAppears + 5 -> buildTree {
-                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
-                        node("Gradle config files") { node(configuration) }
-                        node("Files read at config time") { node(configuration) }
-                        node("System props read at config time") { node(configuration) }
-                        node("Env variables read at config time") { node(configuration) }
-                    }
-                    currentState >= treeAppears + 4 -> buildTree {
-                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
-                        node("Gradle config files") { node(configuration) }
-                        node("Files read at config time") { node(configuration) }
-                        node("System props read at config time") { node(configuration) }
-                    }
-                    currentState >= treeAppears + 3 -> buildTree {
-                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
-                        node("Gradle config files") { node(configuration) }
-                        node("Files read at config time") { node(configuration) }
-                    }
-                    currentState >= treeAppears + 2 -> buildTree {
-                        val configuration = reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
-                        node("Gradle config files") { node(configuration) }
-                    }
-                    currentState >= treeAppears + 1 -> buildTree {
-                        node("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
-                    }
-                    else -> buildTree {
-                        node("Configuration", primaryVariantColor)
-                    }
-                }
-
-                AnimatedHorizontalTree(roots) { node ->
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(node.color ?: NICE_GREEN)
-                    ) {
-                        ProvideTextStyle(TextStyle(color = MaterialTheme.colors.background)) {
-                            Text(text = node.value, modifier = Modifier.padding(8.dp))
-                        }
-                    }
-                }
-            }
-
-            FadeOutAnimatedVisibility({ it in codeSamplesAppear until terminalDisappears }) {
-                Row {
-                    Spacer(Modifier.width(32.dp))
-
-                    SlideFromBottomAnimatedVisibility({ it >= codeSamplesAppear }) {
-                        code2 {
-                            createChildTransition { codeSamples.safeGet(it - codeSamplesAppear) }
-                                .MagicCodeSample()
-                        }
-                    }
-
-                    Spacer(Modifier.width(32.dp))
-
-                    SlideFromRightAnimatedVisibility({ it >= terminalAppears }) {
-                        Terminal(terminalTextsToDisplay)
-                    }
-                }
-            }
-
-            FadeOutAnimatedVisibility({ it in chartAppears until chartDisappears }) {
-
-                Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    SlideFromTopAnimatedVisibility({ it >= chartAppears }) {
-                        h6 {
-                            Text {
-                                append("It can really save you ")
-                                withColor(Color(0xFFFF8A04)) { append("a lot of") }
-                                append(" time!")
-                            }
-                        }
-                    }
-
-                    SlideFromBottomAnimatedVisibility({ it >= chartAppears + 1 }) {
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("30 s")
-                                Box(Modifier.background(MaterialTheme.colors.primary).width(100.dp).height(150.dp))
-                                Text("CC off")
-                            }
-
-                            Spacer(Modifier.width(64.dp))
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("200 ms")
-                                Box(Modifier.background(Color(0xFFFF8A04)).width(100.dp).height(10.dp))
-                                Text("CC on")
-                            }
-                        }
-                    }
-                }
-            }
-
-            FadeOutAnimatedVisibility({ it in bulletpointsAppear until bulletpointsDisappear }) {
-
-                Column(verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear }) {
-                        h6 { Text("Introduced in Gradle 6.6, made stable in 8.1") }
-                    }
-
-                    SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear + 1 }) {
-                        h6 { Text("Preferred mode in 9.0 (still not default, though)") }
-                    }
-
-                    SlideFromTopAnimatedVisibility({ it >= bulletpointsAppear + 2 }) {
-                        h6 {
-                            Text {
-                                append("Enable it now in your ")
-                                appendWithPrimaryColor("gradle.properties")
-                                append("!")
-                            }
-                        }
-                    }
-
-                    SlideFromBottomAnimatedVisibility({ it >= bulletpointsAppear + 2 }) {
-                        Box(
-                            modifier = Modifier
-                                .border(
-                                    color = Color.Black,
-                                    width = 1.dp,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .padding(16.dp)
-                        ) {
-                            Text("org.gradle.configuration-cache=true".toCode(language = Language.Properties))
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable

@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
@@ -26,7 +25,7 @@ import dev.panuszewski.template.appendWithPrimaryColor
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.toCode
 
-fun StoryboardBuilder.ShowingThatBuildCacheIsOld() {
+fun StoryboardBuilder.BuildCache() {
 
     val executionBecomesLong = 1
     val titleChanges = executionBecomesLong + 1
