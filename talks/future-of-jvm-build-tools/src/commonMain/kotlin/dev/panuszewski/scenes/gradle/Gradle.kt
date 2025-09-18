@@ -1,12 +1,10 @@
 package dev.panuszewski.scenes.gradle
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -49,18 +47,17 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
+import dev.panuszewski.scenes.gradle.GradlePhase.*
 import dev.panuszewski.scenes.gradle.Hat.BASEBALL_CAP
 import dev.panuszewski.scenes.gradle.Hat.TOP_HAT
 import dev.panuszewski.template.AnimatedHorizontalTree
@@ -69,7 +66,6 @@ import dev.panuszewski.template.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.FadeOutAnimatedVisibility
 import dev.panuszewski.template.HorizontalTree
 import dev.panuszewski.template.MagicCodeSample
-import dev.panuszewski.template.MagicString
 import dev.panuszewski.template.NICE_BLUE
 import dev.panuszewski.template.NICE_GREEN
 import dev.panuszewski.template.ResourceImage
@@ -94,6 +90,7 @@ import dev.panuszewski.template.tag
 import dev.panuszewski.template.toCode
 import dev.panuszewski.template.withColor
 import dev.panuszewski.template.withPrimaryColor
+import dev.panuszewski.template.withStateTransition
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.sogood
 import talks.future_of_jvm_build_tools.generated.resources.typesafe_conventions
@@ -122,19 +119,32 @@ private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVE
 
 fun StoryboardBuilder.Gradle() {
     scene(stateCount = stages.stateCount) {
-        val stateTransition = transition.createChildTransition { it.toState() }
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            GradleTitle()
-            stateTransition.PhasesBar()
-            stateTransition.ExplainingConfigExecutionDifference()
-            stateTransition.ShowingThatBuildCacheIsOld()
-            stateTransition.ExplainingConfigurationCache()
-            stateTransition.ConventionPlugins()
-            stateTransition.SoftwareDeveloperAndBuildEngineer()
-            stateTransition.DeclarativeGradle()
+        withStateTransition {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                GradleTitle()
+                PhasesBar(
+                    phasesBarVisible = createChildTransition { it in PHASES_BAR_VISIBLE },
+                    highlightedPhase = createChildTransition {
+                        when (it) {
+                            CHARACTERIZING_PHASES[0] -> INITIALIZATION
+                            CHARACTERIZING_PHASES[1] -> CONFIGURATION
+                            CHARACTERIZING_PHASES[2] -> EXECUTION
+                            else -> null
+                        }
+                    },
+                    executionIsLong = createChildTransition { it in EXECUTION_IS_LONG },
+                    configurationIsLong = createChildTransition { it in CONFIGURATION_IS_LONG },
+                )
+                ExplainingConfigExecutionDifference()
+                ShowingThatBuildCacheIsOld()
+                ExplainingConfigurationCache()
+                ConventionPlugins()
+                SoftwareDeveloperAndBuildEngineer()
+                DeclarativeGradle()
+            }
         }
     }
 }
@@ -162,62 +172,7 @@ private fun SceneScope<Int>.GradleTitle() {
             Text(text)
         }
     }
-}
-
-@Composable
-private fun Transition<Int>.PhasesBar() {
-    val phaseNameTextStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.background)
-    val phaseDescriptionTextStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.background, fontSize = 12.sp)
-    val executionIsLong = createChildTransition { it in EXECUTION_IS_LONG }
-    val configurationIsLong = createChildTransition { it in CONFIGURATION_IS_LONG }
-    val executionPhaseWeight by executionIsLong.animateFloat { if (it) 1.5f else 0.5f }
-    val configurationPhaseWeight by configurationIsLong.animateFloat { if (it) 1.5f else 0.5f }
-
-    if (currentState in (PHASES_BAR_VISIBLE.first - 1)..PHASES_BAR_VISIBLE.last) {
-        Spacer(Modifier.height(32.dp))
-    }
-
-    AnimatedVisibility({ it in PHASES_BAR_VISIBLE }) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 100.dp)) {
-            Column(Modifier.background(color = MaterialTheme.colors.primary)) {
-                ProvideTextStyle(phaseNameTextStyle) { Text("Initialization", Modifier.padding(16.dp)) }
-                AnimatedVisibility({ it == CHARACTERIZING_PHASES[0] }) {
-                    ProvideTextStyle(phaseDescriptionTextStyle) {
-                        Text(text = "Figure out the project structure", modifier = Modifier.padding(16.dp))
-                    }
-                }
-            }
-            Column(Modifier.fillMaxWidth().weight(configurationPhaseWeight).background(color = MaterialTheme.colors.primaryVariant)) {
-                ProvideTextStyle(phaseNameTextStyle) {
-                    configurationIsLong.createChildTransition {
-                        if (it) "Configuraaaaaaaaaation"
-                        else "Configuration"
-                    }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
-                }
-                AnimatedVisibility({ it == CHARACTERIZING_PHASES[1] }) {
-                    ProvideTextStyle(phaseDescriptionTextStyle) {
-                        Text(text = "Figure out the task graph", modifier = Modifier.padding(16.dp))
-                    }
-                }
-            }
-            Column(Modifier.fillMaxWidth().weight(executionPhaseWeight).background(color = MaterialTheme.colors.secondary)) {
-                ProvideTextStyle(phaseNameTextStyle) {
-                    executionIsLong.createChildTransition {
-                        if (it) "Execuuuuuuuuuution"
-                        else "Execution"
-                    }.MagicString(modifier = Modifier.padding(16.dp), split = { it.splitByChars() })
-                }
-                AnimatedVisibility({ it == CHARACTERIZING_PHASES[2] }) {
-                    ProvideTextStyle(phaseDescriptionTextStyle) {
-                        Text(text = "Execute the tasks! 🚀", modifier = Modifier.padding(16.dp))
-                    }
-                }
-            }
-        }
-    }
-    if (currentState in PHASES_BAR_VISIBLE) {
-        Spacer(Modifier.height(32.dp))
-    }
+    Spacer(Modifier.height(32.dp))
 }
 
 @Composable
@@ -630,11 +585,11 @@ fun Transition<Int>.ConventionPlugins() {
             it >= ideIsShrinked3Since -> 275.dp
             it >= ideBackToNormalAgainSince -> 150.dp
             it >= ideIsShrinkedAgainSince -> 275.dp
-            it >= typesafeConventionsDisappear -> 32.dp
+            it >= typesafeConventionsDisappear -> 0.dp
             it >= typesafeConventionsAppear -> 150.dp
-            it >= ideIsBackToNormalSince -> 32.dp
+            it >= ideIsBackToNormalSince -> 0.dp
             it >= ideIsShrinkedSince -> 275.dp
-            else -> 32.dp
+            else -> 0.dp
         }
     }
 
@@ -643,7 +598,7 @@ fun Transition<Int>.ConventionPlugins() {
 
             FadeOutAnimatedVisibility({ EXPLAINING_CONVENTION_PLUGINS[0] <= it && it < ideIsBackToNormalSince }) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -680,7 +635,7 @@ fun Transition<Int>.ConventionPlugins() {
 
             FadeOutAnimatedVisibility({ ideIsShrinkedAgainSince <= it && it < ideHiddenSince }) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -715,7 +670,7 @@ fun Transition<Int>.ConventionPlugins() {
             }
 
             SlideFromBottomAnimatedVisibility({ it in typesafeConventionsAppear until typesafeConventionsDisappear }) {
-                Box(Modifier.padding(top = 32.dp)) {
+                Box {
                     ResourceImage(
                         resource = Res.drawable.typesafe_conventions,
                         modifier = Modifier.border(1.dp, Color.LightGray, RoundedCornerShape(8.dp)).padding(8.dp)
@@ -803,7 +758,7 @@ fun Transition<Int>.ConventionPlugins() {
 @Composable
 fun Transition<Int>.SoftwareDeveloperAndBuildEngineer() {
     SlideFromTopAnimatedVisibility({ it in SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER.drop(1) }) {
-        Row(horizontalArrangement = Arrangement.spacedBy(64.dp), modifier = Modifier.padding(top = 32.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(64.dp)) {
             val appDeveloperHat = when {
                 currentState >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[6] -> BASEBALL_CAP
                 currentState >= SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER[5] -> TOP_HAT
@@ -941,9 +896,9 @@ fun Transition<Int>.DeclarativeGradle() {
 
     val ideTopPadding by animateDp {
         when {
-            it >= ideBackToNormalSince -> 32.dp
+            it >= ideBackToNormalSince -> 0.dp
             it >= ideShrinkedSince -> 300.dp
-            else -> 32.dp
+            else -> 0.dp
         }
     }
 
@@ -955,7 +910,7 @@ fun Transition<Int>.DeclarativeGradle() {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth().padding(top = 32.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 FadeInOutAnimatedVisibility({ DECLARATIVE_GRADLE[7] <= it && it < ideBackToNormalSince }) {
 
@@ -1145,7 +1100,7 @@ fun GuyChangingHats(modifier: Modifier = Modifier, name: String?, hat: Hat) {
                 h1 {
                     when (state) {
                         BASEBALL_CAP -> Text("🧢", Modifier.offset(x = -10.dp, y = 10.dp))
-                        TOP_HAT -> Text("🎩", Modifier.offset(x = -2.dp, y = -10.dp)) // TODO military helmet
+                        TOP_HAT -> Text("🎩", Modifier.offset(x = -2.dp, y = -10.dp))
                     }
                 }
             }
