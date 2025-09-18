@@ -1,5 +1,6 @@
 package dev.panuszewski.scenes.gradle
 
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,19 +27,34 @@ import dev.panuszewski.template.h6
 import dev.panuszewski.template.toCode
 
 fun StoryboardBuilder.ShowingThatBuildCacheIsOld() {
-    scene(3) {
-        with(transition) {
-            TitleScaffold("Gradle") {
-                PhasesBar()
 
-                FadeOutAnimatedVisibility({ it is Frame.State<*> }) {
+    val executionBecomesLong = 1
+    val titleChanges = executionBecomesLong + 1
+    val bulletpointsStartAppearing = titleChanges + 1
+    val bulletpointCount = 2
+    val stateCount = bulletpointsStartAppearing + bulletpointCount
+
+    scene(stateCount) {
+        with(transition) {
+            val executionIsLong = createChildTransition { it.toState(end = -1) >= executionBecomesLong }
+            val bulletpointsVisible = createChildTransition { it.toState(end = -1) >= bulletpointsStartAppearing }
+
+            val title = when {
+                currentState.toState() >= titleChanges -> "Build Cache!"
+                else -> "Gradle"
+            }
+
+            TitleScaffold(title) {
+                PhasesBar(executionIsLong = executionIsLong)
+
+                bulletpointsVisible.FadeOutAnimatedVisibility {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         h6 {
-                            SlideFromTopAnimatedVisibility({ it.toState() >= 1 }) {
+                            SlideFromTopAnimatedVisibility({ it.toState() >= bulletpointsStartAppearing }) {
                                 Text("Build Cache is there since Gradle 3.5 👴🏼")
                             }
                             Spacer(Modifier.height(32.dp))
-                            SlideFromTopAnimatedVisibility({ it.toState() >= 2 }) {
+                            SlideFromTopAnimatedVisibility({ it.toState() >= bulletpointsStartAppearing + 1 }) {
                                 Text {
                                     append("Just enable it in your ")
                                     appendWithPrimaryColor("gradle.properties")
@@ -49,7 +65,7 @@ fun StoryboardBuilder.ShowingThatBuildCacheIsOld() {
 
                         Spacer(Modifier.height(32.dp))
 
-                        SlideFromBottomAnimatedVisibility({ it.toState() >= 2 }) {
+                        SlideFromBottomAnimatedVisibility({ it.toState() >= bulletpointsStartAppearing + 1 }) {
                             Box(
                                 modifier = Modifier
                                     .border(
