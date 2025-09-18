@@ -15,6 +15,7 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
@@ -67,7 +68,7 @@ fun StoryboardBuilder.AmperSpringBoot() {
         withStateTransition {
             val ideTopPadding by animateDp { if (it >= ideShrinks) 281.dp else 0.dp }
 
-            AmperTitleScaffold("Amper + Spring Boot") {
+            TitleScaffold("Amper + Spring Boot") {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
                         Terminal(

@@ -25,6 +25,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.template.FadeInOutAnimatedVisibility
@@ -54,7 +55,7 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
             val warningYOffset by animateDp { if (it == warningEnlarged) 0.dp else 70.dp }
             val ideAlpha by animateFloat { if (it == warningEnlarged) 0.1f else 1f }
 
-            AmperTitleScaffold("Catching errors early") {
+            TitleScaffold("Catching errors early") {
                 AMPER_IDE_STATE = IdeState(
                     files = buildList {
                         addFile(

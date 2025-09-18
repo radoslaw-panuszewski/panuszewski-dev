@@ -13,6 +13,7 @@ import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.Title
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.template.RevealSequentially
 import dev.panuszewski.template.Text
 import dev.panuszewski.template.withPrimaryColor
@@ -21,7 +22,7 @@ import dev.panuszewski.template.withStateTransition
 fun StoryboardBuilder.AmperPrinciples() {
     scene(stateCount = 5) {
         withStateTransition {
-            AmperTitleScaffold("Amper Principles") {
+            TitleScaffold("Amper Principles") {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(32.dp),

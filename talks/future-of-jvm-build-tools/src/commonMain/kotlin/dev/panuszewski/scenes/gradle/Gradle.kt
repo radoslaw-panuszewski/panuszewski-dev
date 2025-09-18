@@ -47,14 +47,13 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.Frame
-import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.Terminal
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.components.addDirectory
 import dev.panuszewski.components.addFile
 import dev.panuszewski.scenes.gradle.GradlePhase.*
@@ -81,7 +80,6 @@ import dev.panuszewski.template.buildAndRememberCodeSamples
 import dev.panuszewski.template.buildTree
 import dev.panuszewski.template.code2
 import dev.panuszewski.template.h1
-import dev.panuszewski.template.h4
 import dev.panuszewski.template.h6
 import dev.panuszewski.template.primaryVariantColor
 import dev.panuszewski.template.safeGet
@@ -120,11 +118,16 @@ private val CONVENTION_PLUGINS = EXTRACTING_CONVENTION_PLUGIN + EXPLAINING_CONVE
 fun StoryboardBuilder.Gradle() {
     scene(stateCount = stages.stateCount) {
         withStateTransition {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                GradleTitle()
+            val targetTitle = when (currentState) {
+                in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
+                in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
+                in EXTRACTING_CONVENTION_PLUGIN -> "The biggest issue with Gradle"
+                in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
+                in (SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER + DECLARATIVE_GRADLE.take(5)) -> "Two types of Gradle users"
+                in DECLARATIVE_GRADLE.drop(5) -> "Declarative Gradle"
+                else -> "Gradle"
+            }
+            TitleScaffold(targetTitle) {
                 PhasesBar(
                     phasesBarVisible = createChildTransition { it in PHASES_BAR_VISIBLE },
                     highlightedPhase = createChildTransition {
@@ -147,32 +150,6 @@ fun StoryboardBuilder.Gradle() {
             }
         }
     }
-}
-
-@Composable
-private fun SceneScope<Int>.GradleTitle() {
-    Spacer(Modifier.height(16.dp))
-    h4 {
-        val targetTitle = when (transition.currentState.toState()) {
-            in EXECUTION_IS_LONG.drop(1) -> "Build Cache!"
-            in CONFIGURATION_IS_LONG.drop(1) -> "Configuration Cache!"
-            in EXTRACTING_CONVENTION_PLUGIN -> "The biggest issue with Gradle"
-            in EXPLAINING_CONVENTION_PLUGINS -> "Convention Plugins"
-            in (SOFTWARE_DEVELOPER_AND_BUILD_ENGINEER + DECLARATIVE_GRADLE.take(5)) -> "Two types of Gradle users"
-            in DECLARATIVE_GRADLE.drop(5) -> "Declarative Gradle"
-            else -> "Gradle"
-        }
-
-        when (transition.currentState) {
-            is Frame.State<*> -> GRADLE_TITLE = targetTitle
-            else -> {}
-        }
-
-        AnimatedContent(targetState = GRADLE_TITLE) { text ->
-            Text(text)
-        }
-    }
-    Spacer(Modifier.height(32.dp))
 }
 
 @Composable

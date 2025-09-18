@@ -15,6 +15,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.panuszewski.components.BuildToolChart
 import dev.panuszewski.components.BuildToolItem
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideDirection.FROM_LEFT
 import dev.panuszewski.template.SlideDirection.FROM_RIGHT
@@ -30,7 +31,7 @@ fun StoryboardBuilder.AmperTransitionOnChart() {
         stateCount = 3,
         exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
-        AmperTitleScaffold("Amper") {
+        TitleScaffold("Amper") {
 
             BuildToolChart(
                 itemsVisibleSince = 1,

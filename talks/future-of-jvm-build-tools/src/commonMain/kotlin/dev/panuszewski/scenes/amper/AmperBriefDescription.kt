@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.panuszewski.components.Title
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.template.RevealSequentially
 import dev.panuszewski.template.Text
 import dev.panuszewski.template.withPrimaryColor
@@ -17,7 +18,7 @@ import dev.panuszewski.template.withStateTransition
 fun StoryboardBuilder.AmperBriefDescription() {
     scene(stateCount = 5) {
         withStateTransition {
-            AmperTitleScaffold("Amper") {
+            TitleScaffold("Amper") {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
