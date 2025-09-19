@@ -9,12 +9,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.components.GuyChangingHats
+import dev.panuszewski.components.Hat
+import dev.panuszewski.components.Hat.BASEBALL_CAP
+import dev.panuszewski.components.Hat.TOP_HAT
 import dev.panuszewski.components.IDE
 import dev.panuszewski.components.IdeState
 import dev.panuszewski.components.TitleScaffold
@@ -41,9 +47,9 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
                 SlideFromTopAnimatedVisibility({ it.toState() in bigEmojisAppear until bigEmojisDisappear }) {
                     Row(horizontalArrangement = Arrangement.spacedBy(64.dp)) {
                         val appDeveloperHat = when {
-                            currentState.toState() >= 6 -> Hat.BASEBALL_CAP
-                            currentState.toState() >= 5 -> Hat.TOP_HAT
-                            else -> Hat.BASEBALL_CAP
+                            currentState.toState() >= 6 -> BASEBALL_CAP
+                            currentState.toState() >= 5 -> TOP_HAT
+                            else -> BASEBALL_CAP
                         }
 
                         Column(
@@ -146,6 +152,16 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
             }
         }
     }
+}
+
+@Composable
+fun SoftwareDeveloper(modifier: Modifier = Modifier) {
+    GuyChangingHats(modifier = modifier.scale(0.75f), hat = BASEBALL_CAP, name = "Software Developer")
+}
+
+@Composable
+fun BuildEngineer(modifier: Modifier = Modifier) {
+    GuyChangingHats(modifier = modifier.scale(0.75f), hat = TOP_HAT, name = "Build Engineer")
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {

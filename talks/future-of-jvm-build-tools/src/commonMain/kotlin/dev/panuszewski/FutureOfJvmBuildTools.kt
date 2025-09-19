@@ -25,20 +25,20 @@ val FutureOfJvmBuildTools = Storyboard.build(
     format = SceneFormat.Default,
     decorator = LIGHT_THEME,
 ) {
-//    FirstSlide()
-//
-//    section("The Future of JVM Build Tools") {
-//        Title(animateToPresent = false)
-//        Agenda()
-//        Title(animateToPresent = true)
-//        Overview()
-//    }
-//
-//    section("Maven") {
-//        SectionTitle(animateToHeader = true)
-//        Maven()
-//        MavenTransitionOnChart()
-//    }
+    FirstSlide()
+
+    section("The Future of JVM Build Tools") {
+        Title(animateToPresent = false)
+        Agenda()
+        Title(animateToPresent = true)
+        Overview()
+    }
+
+    section("Maven") {
+        SectionTitle(animateToHeader = true)
+        Maven()
+        MavenTransitionOnChart()
+    }
 
     section("Gradle") {
         SectionTitle(animateToHeader = true)
@@ -46,18 +46,18 @@ val FutureOfJvmBuildTools = Storyboard.build(
         GradleTransitionOnChart()
     }
 
-//    section("Amper") {
-//        SectionTitle(animateToHeader = true)
-//        Amper()
-//        AmperTransitionOnChart()
-//    }
-//
-//    section("Wrapping up!") {
-//        SectionTitle(animateToHeader = true)
-//        WrappingUp()
-//    }
-//
-//    ThankYouSlide()
-//    LastSlide()
+    section("Amper") {
+        SectionTitle(animateToHeader = true)
+        Amper()
+        AmperTransitionOnChart()
+    }
+
+    section("Wrapping up!") {
+        SectionTitle(animateToHeader = true)
+        WrappingUp()
+    }
+
+    ThankYouSlide()
+    LastSlide()
 }
 
