@@ -1,10 +1,6 @@
 package dev.panuszewski.scenes.gradle
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.MaterialTheme
@@ -15,19 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.easel.rememberSharedContentState
-import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.template.SceneExit
-import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.BuildToolChart
 import dev.panuszewski.components.BuildToolItem
+import dev.panuszewski.components.TitleScaffold
 import dev.panuszewski.template.ResourceImage
 import dev.panuszewski.template.SlideDirection.FROM_LEFT
 import dev.panuszewski.template.SlideDirection.FROM_RIGHT
 import dev.panuszewski.template.code1
-import dev.panuszewski.template.h4
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.amper
 import talks.future_of_jvm_build_tools.generated.resources.gradle
@@ -39,22 +31,7 @@ fun StoryboardBuilder.GradleTransitionOnChart() {
         stateCount = 3,
         exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(Modifier.height(16.dp))
-
-            h4 {
-                when (transition.currentState) {
-                    is Frame.State<*> -> GRADLE_TITLE = "Gradle"
-                    else -> {}
-                }
-
-                AnimatedContent(targetState = GRADLE_TITLE) { text ->
-                    Text(text)
-                }
-            }
+        TitleScaffold("Gradle") {
 
             BuildToolChart(
                 itemsVisibleSince = 1,
