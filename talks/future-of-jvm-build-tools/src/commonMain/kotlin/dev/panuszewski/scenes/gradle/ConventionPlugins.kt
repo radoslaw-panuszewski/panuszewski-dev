@@ -43,9 +43,9 @@ import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.typesafe_conventions
 
 fun StoryboardBuilder.ConventionPlugins() {
-    val buildGradleKtsBeforeSplitPane = buildGradleKts.take(6)
-    val buildGradleKtsOnSplitPane = buildGradleKts.drop(buildGradleKtsBeforeSplitPane.size - 1).take(4)
-    val buildGradleKtsInSmallIde = buildGradleKts.takeLast(4)
+    val buildGradleKtsBeforeSplitPane = BUILD_GRADLE_KTS.take(6)
+    val buildGradleKtsOnSplitPane = BUILD_GRADLE_KTS.drop(buildGradleKtsBeforeSplitPane.size - 1).take(4)
+    val buildGradleKtsInSmallIde = BUILD_GRADLE_KTS.takeLast(4)
 
     val ideAppears = 1
     val grimacingEmojiVisible = buildGradleKtsBeforeSplitPane.size
@@ -270,7 +270,7 @@ fun StoryboardBuilder.ConventionPlugins() {
     }
 }
 
-val buildGradleKts = buildCodeSamples {
+private val BUILD_GRADLE_KTS = buildCodeSamples {
     val pluginsBlock by tag()
     val pluginsBlockNewline by tag()
     val mavenPublishDeclarative by tag()

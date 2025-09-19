@@ -25,14 +25,14 @@ import kotlin.collections.set
 
 @Composable
 fun <T : Any> AnimatedHorizontalTree(
-    roots: List<TreeElement<T>>,
+    tree: List<TreeElement<T>>,
     content: @Composable (node: TreeElement<T>) -> Unit,
 ) {
     SharedTransitionLayout {
         AnimatedContent(
             transitionSpec = { fadeIn() togetherWith fadeOut() },
-            targetState = roots
-        ) { targetRoots ->
+            targetState = tree
+        ) { roots ->
 
             var offset by remember { mutableStateOf(Offset.Zero) }
             val placements = remember { mutableStateMapOf<TreeElement<T>, Rect>() }
@@ -42,7 +42,7 @@ fun <T : Any> AnimatedHorizontalTree(
                 modifier = Modifier.fillMaxSize()
             ) {
                 HorizontalTree(
-                    roots = targetRoots,
+                    roots = roots,
                     getChildren = { it.children },
                     modifier = Modifier.onPlaced { offset = it.positionInParent() },
                 ) { item ->
@@ -81,19 +81,27 @@ data class TreeElement<T : Any>(
     val value: T,
     val color: Color? = null,
     val children: List<TreeElement<T>> = emptyList(),
+    val isRoot: Boolean,
 )
 
 fun <T : Any> buildTree(block: TreeBuilder<T>.() -> Unit): List<TreeElement<T>> {
-    val builder = TreeBuilder<T>()
+    val builder = TreeBuilder<T>(isRoot = true)
     builder.apply(block)
     return builder.nodes
 }
 
-class TreeBuilder<T : Any> {
+class TreeBuilder<T : Any>(
+    val isRoot: Boolean = false
+) {
     val nodes = mutableListOf<TreeElement<T>>()
 
     fun reusableNode(value: T, color: Color? = null, block: TreeBuilder<T>.() -> Unit = {}): TreeElement<T> {
-        val element = TreeElement(value = value, color = color, children = TreeBuilder<T>().apply(block).nodes)
+        val element = TreeElement(
+            value = value,
+            color = color,
+            children = TreeBuilder<T>().apply(block).nodes,
+            isRoot = isRoot
+        )
         return element
     }
 

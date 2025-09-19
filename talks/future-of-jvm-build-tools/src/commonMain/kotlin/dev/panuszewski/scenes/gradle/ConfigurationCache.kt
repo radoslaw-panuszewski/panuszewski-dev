@@ -95,7 +95,7 @@ fun StoryboardBuilder.ConfigurationCache() {
                         SlideFromBottomAnimatedVisibility({ it.toState() in treeAppears until treeDisappears }) {
                             val primaryVariantColor = primaryVariantColor
 
-                            val roots = when {
+                            val tree = when {
                                 currentState.toState() >= treeAppears + 5 -> buildTree {
                                     val configuration =
                                         reusableNode("Configuration", primaryVariantColor) { node("Task graph", NICE_BLUE) }
@@ -130,7 +130,7 @@ fun StoryboardBuilder.ConfigurationCache() {
                                 }
                             }
 
-                            AnimatedHorizontalTree(roots) { node ->
+                            AnimatedHorizontalTree(tree) { node ->
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
