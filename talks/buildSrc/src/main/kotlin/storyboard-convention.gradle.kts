@@ -25,3 +25,17 @@ kotlin {
         }
     }
 }
+
+tasks {
+    named<Zip>("jvmDistZip") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    named<Tar>("jvmDistTar") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    named<Sync>("installJvmDist") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}

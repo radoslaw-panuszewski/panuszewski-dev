@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
-import dev.panuszewski.template.BoxMovementSpec
-import dev.panuszewski.template.FadeInOutAnimatedVisibility
-import dev.panuszewski.template.TextMovementSpec
+import dev.panuszewski.template.extensions.BoxMovementSpec
+import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
+import dev.panuszewski.template.extensions.TextMovementSpec
 
 @Composable
 context(animatedVisibilityScope: AnimatedVisibilityScope, _: SharedTransitionScope)

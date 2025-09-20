@@ -14,14 +14,3 @@ kotlin {
     }
 }
 
-println("Hello from configuration phase!")
-
-tasks {
-    register("sayHello") {
-        outputs.cacheIf { true }
-        doLast {
-            println("Hello from execution phase!")
-            outputs.files.singleFile.writeText("Hello")
-        }
-    }
-}

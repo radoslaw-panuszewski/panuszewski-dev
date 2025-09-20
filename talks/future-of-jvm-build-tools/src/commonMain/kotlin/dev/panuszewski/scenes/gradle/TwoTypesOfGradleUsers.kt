@@ -21,19 +21,19 @@ import dev.panuszewski.components.GuyChangingHats
 import dev.panuszewski.components.Hat
 import dev.panuszewski.components.Hat.BASEBALL_CAP
 import dev.panuszewski.components.Hat.TOP_HAT
-import dev.panuszewski.components.IDE
-import dev.panuszewski.components.IdeState
-import dev.panuszewski.components.TitleScaffold
-import dev.panuszewski.components.addFile
-import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.SlideFromTopAnimatedVisibility
-import dev.panuszewski.template.Text
-import dev.panuszewski.template.body1
-import dev.panuszewski.template.buildCodeSamples
-import dev.panuszewski.template.safeGet
-import dev.panuszewski.template.startWith
-import dev.panuszewski.template.tag
-import dev.panuszewski.template.withPrimaryColor
+import dev.panuszewski.template.components.IDE
+import dev.panuszewski.template.components.IdeState
+import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.components.addFile
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
+import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.extensions.body1
+import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.safeGet
+import dev.panuszewski.template.extensions.startWith
+import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.theme.withPrimaryColor
 
 fun StoryboardBuilder.TwoTypesOfGradleUsers() {
     val bigEmojisAppear = 1

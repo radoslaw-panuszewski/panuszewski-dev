@@ -15,16 +15,13 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.Text
-import dev.panuszewski.template.appendWithSecondaryColor
+import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.theme.appendWithSecondaryColor
 
 fun StoryboardBuilder.Agenda() {
     scene(stateCount = 3) {

@@ -10,13 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.panuszewski.components.IDE
-import dev.panuszewski.components.IDE_STATE
-import dev.panuszewski.components.TitleScaffold
-import dev.panuszewski.template.RevealSequentially
-import dev.panuszewski.template.Text
-import dev.panuszewski.template.withPrimaryColor
-import dev.panuszewski.template.withStateTransition
+import dev.panuszewski.template.components.IDE
+import dev.panuszewski.template.components.IDE_STATE
+import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.theme.withPrimaryColor
+import dev.panuszewski.template.extensions.withStateTransition
 
 fun StoryboardBuilder.AmperPrinciples() {
     scene(stateCount = 5) {

@@ -6,10 +6,9 @@ import androidx.compose.ui.Modifier
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
-import dev.panuszewski.template.ResourceImage
+import dev.panuszewski.template.components.ResourceImage
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.first_slide_green
-import talks.future_of_jvm_build_tools.generated.resources.first_slide_original
 
 fun StoryboardBuilder.FirstSlide() {
     scene(

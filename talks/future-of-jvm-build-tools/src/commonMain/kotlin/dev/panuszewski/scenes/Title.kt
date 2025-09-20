@@ -20,8 +20,8 @@ import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.MagicAnnotatedString
-import dev.panuszewski.template.safeGet
+import dev.panuszewski.template.components.MagicAnnotatedString
+import dev.panuszewski.template.extensions.safeGet
 
 val TITLE = listOf(
     buildAnnotatedString {

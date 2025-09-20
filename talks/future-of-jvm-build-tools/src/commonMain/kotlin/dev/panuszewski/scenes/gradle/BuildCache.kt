@@ -16,14 +16,14 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.components.TitleScaffold
-import dev.panuszewski.template.FadeOutAnimatedVisibility
-import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.SlideFromTopAnimatedVisibility
-import dev.panuszewski.template.Text
-import dev.panuszewski.template.appendWithPrimaryColor
-import dev.panuszewski.template.h6
-import dev.panuszewski.template.toCode
+import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
+import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.theme.appendWithPrimaryColor
+import dev.panuszewski.template.extensions.h6
+import dev.panuszewski.template.extensions.toCode
 
 fun StoryboardBuilder.BuildCache() {
 

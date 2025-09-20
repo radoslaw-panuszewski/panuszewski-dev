@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.SlideDirection
+import dev.panuszewski.template.extensions.SlideDirection
 
 @Composable
 context(sceneScope: SceneScope<Int>, boxScope: BoxScope, chartContext: BuildToolChartContext)

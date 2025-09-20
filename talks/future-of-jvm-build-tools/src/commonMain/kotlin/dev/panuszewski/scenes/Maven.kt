@@ -25,17 +25,17 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.text.splitByTags
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.CodeSample
-import dev.panuszewski.template.Foldable
-import dev.panuszewski.template.MagicString
-import dev.panuszewski.template.ScrollableMagicCodeSample
-import dev.panuszewski.template.SlideFromLeftAnimatedVisibility
-import dev.panuszewski.template.SlideFromRightAnimatedVisibility
-import dev.panuszewski.template.buildCodeSamples
-import dev.panuszewski.template.expand
-import dev.panuszewski.template.fold
-import dev.panuszewski.template.startWith
-import dev.panuszewski.template.tag
+import dev.panuszewski.template.components.CodeSample
+import dev.panuszewski.template.extensions.Foldable
+import dev.panuszewski.template.components.MagicString
+import dev.panuszewski.template.components.ScrollableMagicCodeSample
+import dev.panuszewski.template.extensions.SlideFromLeftAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromRightAnimatedVisibility
+import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.expand
+import dev.panuszewski.template.extensions.fold
+import dev.panuszewski.template.extensions.startWith
+import dev.panuszewski.template.extensions.tag
 
 private val STATE_COUNT: Int get() = BUILD_POM.size + CONSUMER_POM.size + BUILD_POM_ALTERNATIVE_SYNTAX.size
 

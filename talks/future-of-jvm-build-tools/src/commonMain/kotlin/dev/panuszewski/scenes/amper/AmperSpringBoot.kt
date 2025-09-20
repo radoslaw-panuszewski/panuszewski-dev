@@ -12,20 +12,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.panuszewski.components.IDE
-import dev.panuszewski.components.IDE_STATE
-import dev.panuszewski.components.IdeState
-import dev.panuszewski.components.Terminal
-import dev.panuszewski.components.TitleScaffold
-import dev.panuszewski.components.addDirectory
-import dev.panuszewski.components.addFile
-import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.buildCodeSamples
-import dev.panuszewski.template.precompose
-import dev.panuszewski.template.safeGet
-import dev.panuszewski.template.startWith
-import dev.panuszewski.template.tag
-import dev.panuszewski.template.withStateTransition
+import dev.panuszewski.template.components.IDE
+import dev.panuszewski.template.components.IDE_STATE
+import dev.panuszewski.template.components.IdeState
+import dev.panuszewski.template.components.Terminal
+import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.components.addDirectory
+import dev.panuszewski.template.components.addFile
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.precompose
+import dev.panuszewski.template.extensions.safeGet
+import dev.panuszewski.template.extensions.startWith
+import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.extensions.withStateTransition
 import kotlin.math.max
 
 fun StoryboardBuilder.AmperSpringBoot() {

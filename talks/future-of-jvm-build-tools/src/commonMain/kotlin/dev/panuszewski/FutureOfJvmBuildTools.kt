@@ -16,9 +16,8 @@ import dev.panuszewski.scenes.gradle.Gradle
 import dev.panuszewski.scenes.gradle.GradleTransitionOnChart
 import dev.panuszewski.scenes.amper.Amper
 import dev.panuszewski.scenes.amper.AmperTransitionOnChart
-import dev.panuszewski.template.DARK_THEME
-import dev.panuszewski.template.LIGHT_THEME
-import dev.panuszewski.template.SectionTitle
+import dev.panuszewski.template.theme.LIGHT_THEME
+import dev.panuszewski.template.components.SectionTitle
 
 val FutureOfJvmBuildTools = Storyboard.build(
     title = "The Future of JVM Build Tools",

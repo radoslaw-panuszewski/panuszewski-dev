@@ -30,10 +30,10 @@ import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.easel.template.RevealEach
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.BoxMovementSpec
+import dev.panuszewski.template.extensions.BoxMovementSpec
 import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
-import dev.panuszewski.template.BULLET_1
-import dev.panuszewski.template.TextMovementSpec
+import dev.panuszewski.template.theme.BULLET_1
+import dev.panuszewski.template.extensions.TextMovementSpec
 
 fun StoryboardBuilder.Kotlin2_1(startState: Int = 0) {
     scene(stateCount = 4 - startState) {

@@ -3,19 +3,17 @@ package dev.panuszewski.scenes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
-import dev.panuszewski.components.TitleScaffold
-import dev.panuszewski.template.NICE_BLUE
-import dev.panuszewski.template.RevealSequentially
-import dev.panuszewski.template.appendWithColor
-import dev.panuszewski.template.appendWithPrimaryColor
-import dev.panuszewski.template.appendWithSecondaryColor
-import dev.panuszewski.template.appendWithSecondaryVariantColor
-import dev.panuszewski.template.withStateTransition
+import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.theme.NICE_BLUE
+import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.theme.appendWithColor
+import dev.panuszewski.template.theme.appendWithPrimaryColor
+import dev.panuszewski.template.theme.appendWithSecondaryColor
+import dev.panuszewski.template.theme.appendWithSecondaryVariantColor
+import dev.panuszewski.template.extensions.withStateTransition
 
 fun StoryboardBuilder.WrappingUp() {
     scene(

@@ -9,7 +9,7 @@ import dev.bnorm.storyboard.Storyboard
 import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
 import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_2
 import dev.panuszewski.scenes.KotlinTimeline
-import dev.panuszewski.template.DARK_THEME
+import dev.panuszewski.template.theme.DARK_THEME
 
 val KotlinNewFeatures = Storyboard.build(
     title = "What's new after Kotlin 2.0?",

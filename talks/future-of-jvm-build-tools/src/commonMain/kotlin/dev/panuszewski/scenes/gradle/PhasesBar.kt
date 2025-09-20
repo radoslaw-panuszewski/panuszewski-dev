@@ -24,8 +24,8 @@ import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.scenes.gradle.GradlePhase.CONFIGURATION
 import dev.panuszewski.scenes.gradle.GradlePhase.EXECUTION
 import dev.panuszewski.scenes.gradle.GradlePhase.INITIALIZATION
-import dev.panuszewski.template.AnimatedVisibility
-import dev.panuszewski.template.MagicString
+import dev.panuszewski.template.extensions.AnimatedVisibility
+import dev.panuszewski.template.components.MagicString
 
 enum class GradlePhase { INITIALIZATION, CONFIGURATION, EXECUTION }
 

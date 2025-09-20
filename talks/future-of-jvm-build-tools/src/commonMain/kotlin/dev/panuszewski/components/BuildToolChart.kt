@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.text.rememberTextMeasurer
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.drawAxes
+import dev.panuszewski.template.extensions.drawAxes
 
 @Composable
 fun SceneScope<Int>.BuildToolChart(

@@ -12,12 +12,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import dev.panuszewski.components.Hat.BASEBALL_CAP
 import dev.panuszewski.components.Hat.TOP_HAT
-import dev.panuszewski.template.h1
-import dev.panuszewski.template.h6
+import dev.panuszewski.template.extensions.h1
+import dev.panuszewski.template.extensions.h6
 
 @Composable
 fun GuyChangingHats(modifier: Modifier = Modifier, name: String?, hat: Hat) {

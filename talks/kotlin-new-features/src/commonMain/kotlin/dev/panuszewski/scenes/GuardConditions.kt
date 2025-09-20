@@ -22,14 +22,14 @@ import dev.bnorm.storyboard.easel.rememberSharedContentState
 import dev.bnorm.storyboard.easel.sharedBounds
 import dev.bnorm.storyboard.easel.sharedElement
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.BoxMovementSpec
-import dev.panuszewski.template.FadeInOutAnimatedVisibility
+import dev.panuszewski.template.extensions.BoxMovementSpec
+import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
-import dev.panuszewski.template.MagicCodeSample
-import dev.panuszewski.template.TextMovementSpec
-import dev.panuszewski.template.buildCodeSamples
-import dev.panuszewski.template.code1
-import dev.panuszewski.template.tag
+import dev.panuszewski.template.components.MagicCodeSample
+import dev.panuszewski.template.extensions.TextMovementSpec
+import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.code1
+import dev.panuszewski.template.extensions.tag
 
 fun StoryboardBuilder.GuardConditions() {
     scene(stateCount = SAMPLES.size + 1) {

@@ -5,14 +5,14 @@ import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.components.TitleScaffold
-import dev.panuszewski.template.MagicCodeSample
-import dev.panuszewski.template.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.buildAndRememberCodeSamples
-import dev.panuszewski.template.code2
-import dev.panuszewski.template.safeGet
-import dev.panuszewski.template.startWith
-import dev.panuszewski.template.tag
+import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.components.MagicCodeSample
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.buildAndRememberCodeSamples
+import dev.panuszewski.template.extensions.code2
+import dev.panuszewski.template.extensions.safeGet
+import dev.panuszewski.template.extensions.startWith
+import dev.panuszewski.template.extensions.tag
 
 fun StoryboardBuilder.ExplainingConfigExecutionDifference() {
     scene(5) {

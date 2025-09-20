@@ -2,9 +2,9 @@ package dev.panuszewski.scenes.gradle
 
 import androidx.compose.animation.core.createChildTransition
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.panuszewski.components.TitleScaffold
+import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.scenes.gradle.GradlePhase.*
-import dev.panuszewski.template.withStateTransition
+import dev.panuszewski.template.extensions.withStateTransition
 
 fun StoryboardBuilder.CharacterizingPhases() {
     scene(6) {
