@@ -5,6 +5,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import dev.panuszewski.template.theme.code1
 import dev.panuszewski.template.theme.code2
 import dev.panuszewski.template.theme.code3
@@ -15,6 +16,12 @@ fun Text(content: @Composable AnnotatedString.Builder.() -> Unit) {
     builder.content()
     Text(builder.toAnnotatedString())
 }
+
+fun String.annotate(tagStyles: Map<String, String> = emptyMap()): AnnotatedString =
+    buildAnnotatedString {
+        // TODO let AI implement it :P
+        append(this@annotate)
+    }
 
 @Composable
 fun h1(content: @Composable () -> Unit) {

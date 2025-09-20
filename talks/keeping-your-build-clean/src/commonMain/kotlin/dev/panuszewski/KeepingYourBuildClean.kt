@@ -1,19 +1,24 @@
 package dev.panuszewski
 
-import dev.bnorm.storyboard.SceneFormat
+import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
-import dev.bnorm.storyboard.easel.template.section
-import dev.panuszewski.components.TitleWithAgenda
-import dev.panuszewski.template.theme.LIGHT_THEME
-import dev.panuszewski.template.components.SectionTitle
+import dev.panuszewski.template.components.TitleWithAgenda
+import dev.panuszewski.template.theme.DARK_THEME
+
+private const val TITLE = "Keeping Your Build Clean"
 
 val KeepingYourBuildClean = Storyboard.build(
-    title = "Keeping Your Build Clean",
-    format = SceneFormat.Default,
-    decorator = LIGHT_THEME,
+    title = TITLE,
+    format = Default,
+    decorator = DARK_THEME,
 ) {
-    section("Keeping Your Build Clean") {
-        TitleWithAgenda()
-    }
+    TitleWithAgenda(
+        title = TITLE,
+        agenda = listOf(
+            "First agenda item",
+            "Second agenda item",
+            "Third agenda item",
+        )
+    )
 }
 
