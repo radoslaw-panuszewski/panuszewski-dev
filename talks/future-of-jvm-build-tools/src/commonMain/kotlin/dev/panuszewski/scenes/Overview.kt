@@ -25,6 +25,7 @@ import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.extensions.SlideDirection.FROM_LEFT
 import dev.panuszewski.template.extensions.SlideDirection.FROM_RIGHT
 import dev.panuszewski.template.extensions.code1
+import dev.panuszewski.template.theme.code1
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.amper
 import talks.future_of_jvm_build_tools.generated.resources.gradle

@@ -3,6 +3,7 @@ package dev.panuszewski
 import dev.bnorm.storyboard.SceneFormat
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.template.section
+import dev.panuszewski.components.TitleWithAgenda
 import dev.panuszewski.template.theme.LIGHT_THEME
 import dev.panuszewski.template.components.SectionTitle
 
@@ -12,7 +13,7 @@ val KeepingYourBuildClean = Storyboard.build(
     decorator = LIGHT_THEME,
 ) {
     section("Keeping Your Build Clean") {
-        SectionTitle()
+        TitleWithAgenda()
     }
 }
 

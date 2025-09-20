@@ -10,7 +10,7 @@ import dev.panuszewski.scenes.Maven
 import dev.panuszewski.scenes.MavenTransitionOnChart
 import dev.panuszewski.scenes.Overview
 import dev.panuszewski.scenes.ThankYouSlide
-import dev.panuszewski.scenes.Title
+import dev.panuszewski.scenes.FutureOfJvmBuildToolsTitle
 import dev.panuszewski.scenes.WrappingUp
 import dev.panuszewski.scenes.gradle.Gradle
 import dev.panuszewski.scenes.gradle.GradleTransitionOnChart
@@ -24,12 +24,12 @@ val FutureOfJvmBuildTools = Storyboard.build(
     format = SceneFormat.Default,
     decorator = LIGHT_THEME,
 ) {
-    FirstSlide()
+//    FirstSlide()
 
     section("The Future of JVM Build Tools") {
-        Title(animateToPresent = false)
+        FutureOfJvmBuildToolsTitle(animateToPresent = false)
         Agenda()
-        Title(animateToPresent = true)
+        FutureOfJvmBuildToolsTitle(animateToPresent = true)
         Overview()
     }
 

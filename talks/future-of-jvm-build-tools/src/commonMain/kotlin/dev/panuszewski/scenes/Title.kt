@@ -36,7 +36,7 @@ val TITLE = listOf(
     }
 )
 
-fun StoryboardBuilder.Title(animateToPresent: Boolean) {
+fun StoryboardBuilder.FutureOfJvmBuildToolsTitle(animateToPresent: Boolean) {
     scene(
         stateCount = if (animateToPresent) 2 else 1,
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
