@@ -4,6 +4,7 @@ import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
 import dev.panuszewski.scenes.WhyWouldYouCareScene
 import dev.panuszewski.template.components.TitleWithAgenda
+import dev.panuszewski.template.theme.DARK_THEME
 import dev.panuszewski.template.theme.LIGHT_THEME
 
 private const val TITLE = "Keeping Your Build Clean"
@@ -11,7 +12,7 @@ private const val TITLE = "Keeping Your Build Clean"
 val KeepingYourBuildClean = Storyboard.build(
     title = TITLE,
     format = Default,
-    decorator = LIGHT_THEME,
+    decorator = DARK_THEME,
 ) {
     TitleWithAgenda(
         title = TITLE,

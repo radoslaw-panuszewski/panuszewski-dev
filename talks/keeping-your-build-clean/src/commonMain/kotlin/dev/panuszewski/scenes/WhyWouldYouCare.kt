@@ -1,9 +1,6 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
@@ -32,7 +29,6 @@ fun StoryboardBuilder.WhyWouldYouCareScene() {
                         files = files,
                         selectedFile = "build.gradle.kts",
                     ),
-                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 132.dp, bottom = 32.dp)
                 )
             }
         }

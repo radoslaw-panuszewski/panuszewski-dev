@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
+import dev.panuszewski.template.extensions.h4
 
 @Composable
 fun SceneScope<*>.TitleScaffold(title: String?, content: @Composable () -> Unit) {
@@ -17,7 +18,7 @@ fun SceneScope<*>.TitleScaffold(title: String?, content: @Composable () -> Unit)
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(16.dp))
-        AnimatedTitle(title)
+        h4 { AnimatedTitle(title) }
         Spacer(Modifier.height(32.dp))
         content()
     }

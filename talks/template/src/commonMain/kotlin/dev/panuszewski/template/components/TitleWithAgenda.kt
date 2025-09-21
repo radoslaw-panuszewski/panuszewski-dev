@@ -24,10 +24,9 @@ fun StoryboardBuilder.TitleWithAgenda(title: String, agenda: List<String>) =
 fun StoryboardBuilder.TitleWithAgenda(title: AnnotatedString, agenda: List<AnnotatedString>) {
     scene(stateCount = 5) {
         SlidingTitleScaffold(title) {
-            Box(modifier = Modifier.offset(y = -50.dp)) {
+            Box {
                 transition.SlideFromBottomAnimatedVisibility({ it.toState() == 2 }) {
                     Column(
-                        Modifier.padding(vertical = 32.dp, horizontal = 32.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         horizontalAlignment = Alignment.Start,
                     ) {
