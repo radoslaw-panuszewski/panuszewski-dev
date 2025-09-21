@@ -1,10 +1,7 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
@@ -12,7 +9,7 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.components.IDE
 import dev.panuszewski.template.components.IdeState
-import dev.panuszewski.template.components.SlidingTitle
+import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
@@ -20,12 +17,7 @@ import dev.panuszewski.template.extensions.startWith
 
 fun StoryboardBuilder.WhyWouldYouCareScene() {
     scene(stateCount = 3) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            SlidingTitle("Why would you care?")
-
+        SlidingTitleScaffold("Why would you care?") {
             transition.SlideFromBottomAnimatedVisibility({ it.toState() >= 2 }) {
                 val files = buildList {
                     addFile(

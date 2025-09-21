@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Important:** Remember to always update CLAUDE.md after performing a task if you learned something new!
+
 ## Development Priorities
 
 **Prefer modifying talks over library:** When implementing features or fixes, try to modify code in the `talks/` directory first. Only modify the `storyboard/` library if there's no other way to achieve the goal. The storyboard library is a local fork that may be contributed upstream, so changes should be well-considered.
@@ -96,6 +98,7 @@ Available grammar generation tasks in storyboard-text:
 ### The workflow
 1. **Start by asking clarifying questions**: Be specific, concise and actionable
 2. **Write the code**: Do all the changes needed to accomplish the task. Follow the guidelines fron the **Writing code** section
+3. **ALWAYS Launch Presentation After Changes**: MANDATORY - After making ANY code changes to presentation components, scenes, or layouts, immediately run the presentation to verify the changes work correctly. This is critical for catching issues early.
 4. **Launch Presentation**: Start the desktop presentation application to display the current presentation state. Inform the user that the presentation is now running and they should interact with it to test functionality, visual appearance, transitions, and overall user experience.
 5. **User Testing Phase**: Allow the user to freely explore and test the presentation. Do not interrupt this process. Wait patiently for the user to close the application when they are finished testing.
 6. **Feedback Collection**: Once the user closes the presentation app, ask them directly: 'How does the presentation look? Are you satisfied with the current state, or are there issues that need to be addressed?' Listen carefully to their response and probe for specific details about any problems they encountered.
@@ -172,3 +175,18 @@ fun sendEvent() {
     // ...
 }
 ```
+
+## Lessons Learned
+
+### Component Refactoring Best Practices
+- **SlidingTitleScaffold Implementation**: When creating reusable scaffold components, follow the pattern of providing both String and AnnotatedString variants for flexibility, similar to existing components like TitleScaffold and AnimatedTitle
+- **Box Layout for Sliding Animations**: Use Box layout with absolute positioning for sliding title animations, and position content using padding (not offset) to ensure elements stay within screen bounds. The 248.dp top padding works well for SlidingTitle positioning
+- **Component Extraction**: When extracting reusable components from duplicated scene logic, create separate files for better organization and maintainability. Move complex layouts like SlidingTitleScaffold to their own files rather than keeping them in utility files
+- **Scene Refactoring**: When updating scenes to use new scaffold components, remove manual Box layouts and positioning code. The scaffold should handle all layout concerns, leaving scenes to focus only on content and state management
+
+### Critical Layout Mistakes and Fixes
+- **MISTAKE: Wrong SlidingTitleScaffold Layout**: Initially implemented SlidingTitleScaffold with Column and fixed padding, which broke the sliding title animation positioning. Titles appeared in top-left corner and moved out of bounds instead of sliding properly
+- **ROOT CAUSE**: Failed to study original implementations carefully. Original scenes used `Box(contentAlignment = Alignment.Center)` as the base layout, then positioned content with `offset()` or `padding()` relative to the center
+- **CORRECT APPROACH**: SlidingTitleScaffold should use `Box(contentAlignment = Alignment.Center)` to maintain the same layout structure as original scenes. Content positioning (offsets/padding) should remain in the scene implementations, not in the scaffold
+- **KEY LESSON**: When extracting reusable components, preserve the EXACT same layout structure and positioning logic as the original implementations. Do not change the fundamental layout approach (center-based vs absolute positioning) when creating scaffolds
+- **TESTING REQUIREMENT**: Always run presentations immediately after layout changes to catch visual regressions. Compilation success does not guarantee correct visual behavior
