@@ -15,28 +15,43 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Placeable.PlacementScope
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.animateTextStyle
 import dev.panuszewski.template.extensions.annotate
 
 @Composable
-fun SceneScope<Int>.SlidingTitleScaffold(title: String, content: @Composable () -> Unit) {
-    SlidingTitleScaffold(title.annotate(), content)
+fun SceneScope<Int>.SlidingTitleScaffold(
+    title: String,
+    slideToTopAt: Int = 1,
+    slideBackAtTheEnd: Int = Int.MAX_VALUE,
+    content: @Composable () -> Unit
+) {
+    SlidingTitleScaffold(title.annotate(), slideToTopAt, slideBackAtTheEnd, content)
 }
 
 @Composable
-fun SceneScope<Int>.SlidingTitleScaffold(title: AnnotatedString, content: @Composable () -> Unit) {
-
+fun SceneScope<Int>.SlidingTitleScaffold(
+    title: AnnotatedString,
+    slideToTopAt: Int = 1,
+    slideBackAt: Int = Int.MAX_VALUE,
+    content: @Composable () -> Unit
+) {
+    val isLargeTitle = transition.createChildTransition {
+        it.toState() !in slideToTopAt until slideBackAt
+    }
+    val contentVisible = transition.createChildTransition {
+        it.toState() in slideToTopAt + 1 until slideBackAt - 1
+    }
     val durationMillis = 500
-    val isLargeTitle = transition.createChildTransition { it.toState(end = 4) in listOf(0, 4) }
+
     val titleTextStyle by isLargeTitle.animateTextStyle(
         targetValueByState = { isLarge ->
             if (isLarge) MaterialTheme.typography.h2 else MaterialTheme.typography.h4
@@ -70,18 +85,20 @@ fun SceneScope<Int>.SlidingTitleScaffold(title: AnnotatedString, content: @Compo
                 }.measureAndPlace()
 
                 subcompose("Body") {
-                    Box(
-                        contentAlignment = Alignment.TopCenter,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(
-                                start = 32.dp,
-                                end = 32.dp,
-                                top = titleHeight.toDp() + 48.dp,
-                                bottom = 32.dp,
-                            ),
-                    ) {
-                        content()
+                    contentVisible.SlideFromBottomAnimatedVisibility {
+                        Box(
+                            contentAlignment = Alignment.TopCenter,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    start = 32.dp,
+                                    end = 32.dp,
+                                    top = titleHeight.toDp() + 48.dp,
+                                    bottom = 32.dp,
+                                ),
+                        ) {
+                            content()
+                        }
                     }
                 }.measureAndPlace()
             }
