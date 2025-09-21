@@ -7,7 +7,6 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
@@ -21,12 +20,6 @@ fun Text(content: @Composable AnnotatedString.Builder.() -> Unit) {
     builder.content()
     Text(builder.toAnnotatedString())
 }
-
-fun String.annotate(tagStyles: Map<String, String> = emptyMap()): AnnotatedString =
-    buildAnnotatedString {
-        // TODO let AI implement it :P
-        append(this@annotate)
-    }
 
 @Composable
 context(_: SceneScope<Int>)
