@@ -99,10 +99,7 @@ Available grammar generation tasks in storyboard-text:
 4. **Launch Presentation**: Start the desktop presentation application to display the current presentation state. Inform the user that the presentation is now running and they should interact with it to test functionality, visual appearance, transitions, and overall user experience.
 5. **User Testing Phase**: Allow the user to freely explore and test the presentation. Do not interrupt this process. Wait patiently for the user to close the application when they are finished testing.
 6. **Feedback Collection**: Once the user closes the presentation app, ask them directly: 'How does the presentation look? Are you satisfied with the current state, or are there issues that need to be addressed?' Listen carefully to their response and probe for specific details about any problems they encountered.
-7. **Decision Point**: Based on their feedback:
-    - If satisfied: Acknowledge their approval and conclude the review process
-    - If issues exist: Proceed to step 5
-8. **Issue Documentation and System Prompt Update**: When issues are identified:
+7. **Update CLAUDE.md with lessons learned**: When issues are identified:
     - Document the specific problems mentioned by the user
     - Analyze how these issues affect the presentation's visual appearance, functionality, and user experience
     - Update the `CLUADE.md` with:
@@ -110,7 +107,6 @@ Available grammar generation tasks in storyboard-text:
         * Detailed explanation of how these mistakes impacted the presentation
         * Specific instructions on how to avoid these issues in future iterations
         * Any relevant best practices or constraints that should be followed
-9. **Re-iterate the implementation**: After updating the system prompt, address the identified issues, using with the user's specific feedback and the updated guidance.
 
 ## Writing code
 - Do not put any comments in the code
@@ -140,6 +136,9 @@ Available grammar generation tasks in storyboard-text:
 - When implementing sliding title scenes, use Box layout with absolute positioning for the title animation, and position other elements using padding to ensure they stay within screen bounds
 - For sliding title animations, animate both text style (h2 to h4) and vertical offset simultaneously to achieve smooth transitions
 - Do not add the `*Scene` suffix to scene function names
+- When refactoring code duplication in scenes, create reusable `@Composable` functions with `SceneScope<Int>` receiver instead of trying to wrap entire scene logic. This allows the component to access `transition` and other scene context while remaining reusable
+- Use specific generic types like `SceneScope<Int>` rather than generic `<R>` parameters when the concrete type is known across the codebase
+- Extract only the UI logic into reusable composables, not the entire scene structure. Scenes should remain independent but can share common composable components
 
 ### Order of functions in a file
 

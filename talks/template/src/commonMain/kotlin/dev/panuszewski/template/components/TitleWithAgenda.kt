@@ -21,7 +21,6 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.animateTextStyle
-import dev.panuszewski.template.extensions.withStateTransition
 
 fun StoryboardBuilder.TitleWithAgenda(title: String, agenda: List<String>) =
     TitleWithAgenda(
@@ -35,27 +34,7 @@ fun StoryboardBuilder.TitleWithAgenda(title: AnnotatedString, agenda: List<Annot
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            val durationMillis = 500
-            val isLargeTitle = transition.createChildTransition { it.toState(end = 4) in listOf(0, 4) }
-
-            val titleTextStyle by isLargeTitle.animateTextStyle(
-                targetValueByState = { isLarge ->
-                    if (isLarge) MaterialTheme.typography.h2 else MaterialTheme.typography.h4
-                },
-                transitionSpec = { tween(durationMillis) }
-            )
-
-            val titleVerticalOffset by isLargeTitle.animateDp(
-                targetValueByState = { isLarge -> if (isLarge) 0.dp else -200.dp },
-                transitionSpec = { tween(durationMillis) }
-            )
-
-            ProvideTextStyle(titleTextStyle) {
-                AnimatedTitle(
-                    title = title,
-                    modifier = Modifier.offset(y = titleVerticalOffset)
-                )
-            }
+            SlidingTitle(title)
 
             Box(modifier = Modifier.offset(y = -50.dp)) {
                 transition.SlideFromBottomAnimatedVisibility({ it.toState() == 2 }) {
