@@ -1,11 +1,16 @@
 package dev.panuszewski.template.extensions
 
+import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import dev.bnorm.storyboard.Frame
+import dev.bnorm.storyboard.SceneScope
+import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.theme.code1
 import dev.panuszewski.template.theme.code2
 import dev.panuszewski.template.theme.code3
@@ -22,6 +27,16 @@ fun String.annotate(tagStyles: Map<String, String> = emptyMap()): AnnotatedStrin
         // TODO let AI implement it :P
         append(this@annotate)
     }
+
+@Composable
+context(_: SceneScope<Int>)
+private fun Transition<out Frame<Int>>.annotatedStringTransition(texts: List<AnnotatedString>) =
+    createChildTransition { texts.safeGet(it.toState()) }
+
+@Composable
+context(_: SceneScope<Int>)
+private fun Transition<out Frame<Int>>.stringTransition(texts: List<String>) =
+    createChildTransition { texts.safeGet(it.toState()) }
 
 @Composable
 fun h1(content: @Composable () -> Unit) {

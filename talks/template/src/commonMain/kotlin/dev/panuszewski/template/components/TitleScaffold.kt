@@ -1,14 +1,14 @@
 package dev.panuszewski.template.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import dev.bnorm.storyboard.Frame
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
-
-private var SHARED_TITLE: String? = null
 
 @Composable
 fun SceneScope<*>.TitleScaffold(title: String?, content: @Composable () -> Unit) {
@@ -16,14 +16,9 @@ fun SceneScope<*>.TitleScaffold(title: String?, content: @Composable () -> Unit)
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        when (transition.currentState) {
-            is Frame.State<*> if title != null -> SHARED_TITLE = title
-            else -> {}
-        }
-        if (SHARED_TITLE == null) {
-            SHARED_TITLE = title
-        }
-        SHARED_TITLE?.let { Title(it) }
+        Spacer(Modifier.height(16.dp))
+        AnimatedTitle(title)
+        Spacer(Modifier.height(32.dp))
         content()
     }
 }

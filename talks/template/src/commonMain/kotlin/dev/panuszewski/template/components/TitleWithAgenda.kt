@@ -31,44 +31,41 @@ fun StoryboardBuilder.TitleWithAgenda(title: String, agenda: List<String>) =
 
 fun StoryboardBuilder.TitleWithAgenda(title: AnnotatedString, agenda: List<AnnotatedString>) {
     scene(stateCount = 5) {
-        withStateTransition {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                val durationMillis = 500
-                val isLargeTitle = createChildTransition { it in listOf(0, 4) }
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            val durationMillis = 500
+            val isLargeTitle = transition.createChildTransition { it.toState(end = 4) in listOf(0, 4) }
 
-                val titleTextStyle by isLargeTitle.animateTextStyle(
-                    targetValueByState = { isLarge ->
-                        if (isLarge) MaterialTheme.typography.h2 else MaterialTheme.typography.h4
-                    },
-                    transitionSpec = { tween(durationMillis) }
+            val titleTextStyle by isLargeTitle.animateTextStyle(
+                targetValueByState = { isLarge ->
+                    if (isLarge) MaterialTheme.typography.h2 else MaterialTheme.typography.h4
+                },
+                transitionSpec = { tween(durationMillis) }
+            )
+
+            val titleVerticalOffset by isLargeTitle.animateDp(
+                targetValueByState = { isLarge -> if (isLarge) 0.dp else -200.dp },
+                transitionSpec = { tween(durationMillis) }
+            )
+
+            ProvideTextStyle(titleTextStyle) {
+                AnimatedTitle(
+                    title = title,
+                    modifier = Modifier.offset(y = titleVerticalOffset)
                 )
+            }
 
-                val titleVerticalOffset by isLargeTitle.animateDp(
-                    targetValueByState = { isLarge -> if (isLarge) -16.dp else -200.dp },
-                    transitionSpec = { tween(durationMillis) }
-                )
-
-                ProvideTextStyle(titleTextStyle) {
-                    Text(
-                        text = title,
-                        modifier = Modifier
-                            .offset(y = titleVerticalOffset)
-                    )
-                }
-
-                Box(modifier = Modifier.offset(y = -50.dp)) {
-                    transition.SlideFromBottomAnimatedVisibility({ it.toState() == 2 }) {
-                        Column(
-                            Modifier.padding(vertical = 32.dp, horizontal = 32.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalAlignment = Alignment.Start,
-                        ) {
-                            for (agendaItem in agenda) {
-                                Text(agendaItem)
-                            }
+            Box(modifier = Modifier.offset(y = -50.dp)) {
+                transition.SlideFromBottomAnimatedVisibility({ it.toState() == 2 }) {
+                    Column(
+                        Modifier.padding(vertical = 32.dp, horizontal = 32.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        for (agendaItem in agenda) {
+                            Text(agendaItem)
                         }
                     }
                 }
