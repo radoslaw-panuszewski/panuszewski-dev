@@ -49,6 +49,8 @@ import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.extensions.code2
 import dev.panuszewski.template.extensions.code3
 import dev.panuszewski.template.theme.withColor
+import dev.panuszewski.template.theme.LocalIdeColors
+import dev.panuszewski.template.theme.IdeColorScheme
 
 var IDE_STATE: IdeState = IdeState(emptyList())
 
@@ -64,6 +66,7 @@ data class IdeState(
 
 @Composable
 fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
+    val ideColors = LocalIdeColors.current
     with(ideState) {
         val selectedFile = files.find { it.path == selectedFile }
         val enlargedFile = files.find { it.path == enlargedFile }
@@ -109,7 +112,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
         Column(
             modifier = modifier
                 .border(
-                    color = Color.Black,
+                    color = ideColors.border,
                     width = 1.dp,
                     shape = RoundedCornerShape(8.dp)
                 )
@@ -120,7 +123,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFE2E2E2))
+                    .background(ideColors.toolbar)
                     .padding(vertical = 6.dp, horizontal = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -148,13 +151,13 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(16.dp))
             }
 
-            Divider(Modifier.background(Color(0xFFA6A7A6)))
+            Divider(Modifier.background(ideColors.toolbarBorder))
 
             // Main content
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFFEFFFE))
+                    .background(ideColors.background)
             ) {
                 // Project files panel (left) - animated width based on mode
                 AnimatedVisibility(visible = !fileTreeHidden, enter = fadeIn(), exit = fadeOut()) {
@@ -162,8 +165,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .width(leftPanelWidth.value)
                             .fillMaxHeight()
-                            .background(Color(0xFFF3F3F3))
-                            .border(width = 1.dp, color = Color(0xFFDDDDDD))
+                            .background(ideColors.fileTreeBackground)
+                            .border(width = 1.dp, color = ideColors.fileTreeBorder)
                     ) {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             // Render the file tree
@@ -176,6 +179,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                         currentOpenFile = selectedFile,
                                         enlargedFile = enlargedFile,
                                         highlightedFile = highlightedFile,
+                                        ideColors = ideColors,
                                         modifier = Modifier.animateItem()
                                     )
                                 }
@@ -204,7 +208,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                     // Tab for left pane
                                     Box(
                                         modifier = Modifier
-                                            .background(if (leftPaneFile == selectedFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
+                                            .background(if (leftPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
                                             .fillMaxWidth(),
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -212,7 +216,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                             Text(
                                                 text = leftPaneFile.path,
                                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                                                color = Color(0xFF2C2C2C)
+                                                color = ideColors.textPrimary
                                             )
                                         }
                                     }
@@ -232,10 +236,10 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(Color(0xFFEEEEEE)),
+                                        .background(ideColors.paneBackground),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("No file in left pane", color = Color.Gray)
+                                    Text("No file in left pane", color = ideColors.textPrimary)
                                 }
                             }
                         }
@@ -245,7 +249,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .width(1.dp)
-                                .background(Color(0xFFCCCCCC))
+                                .background(ideColors.paneSeparator)
                                 .padding(vertical = 8.dp)
                         )
 
@@ -261,7 +265,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                     // Tab for right pane
                                     Box(
                                         modifier = Modifier
-                                            .background(if (rightPaneFile == selectedFile) Color(0xFFD2E4FF) else Color(0xFFF2F2F2))
+                                            .background(if (rightPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
                                             .fillMaxWidth(),
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -269,7 +273,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                             Text(
                                                 text = rightPaneFile.path,
                                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                                                color = Color(0xFF2C2C2C)
+                                                color = ideColors.textPrimary
                                             )
                                         }
                                     }
@@ -289,10 +293,10 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(Color(0xFFEEEEEE)),
+                                        .background(ideColors.paneBackground),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("No file in right pane", color = Color.Gray)
+                                    Text("No file in right pane", color = ideColors.textPrimary)
                                 }
                             }
                         }
@@ -326,7 +330,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("No file selected")
+                                Text("No file selected", color = ideColors.textPrimary)
                             }
                         }
                     }
@@ -344,6 +348,7 @@ private fun FileTreeItem(
     currentOpenFile: ProjectFile?,
     enlargedFile: ProjectFile?,
     highlightedFile: ProjectFile?,
+    ideColors: IdeColorScheme,
     modifier: Modifier = Modifier,
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
@@ -360,9 +365,9 @@ private fun FileTreeItem(
             .fillMaxWidth()
             .background(
                 when {
-                    isHighlighted -> NICE_ORANGE
+                    isHighlighted -> ideColors.highlightedFileBackground
                     isEnlarged -> Color.Transparent
-                    isSelected -> Color(0xFFD2E4FF)
+                    isSelected -> ideColors.selectedFileBackground
                     else -> Color.Transparent
                 }
             )
@@ -380,9 +385,9 @@ private fun FileTreeItem(
                 .size(iconSize)
                 .background(
                     color = when {
-                        node.isFolder -> Color(0xFFFFC107) // Folder color
-                        node.file.language == Language.Kotlin -> Color(0xFF2196F3) // Kotlin file color
-                        else -> Color(0xFF9E9E9E) // Other file color
+                        node.isFolder -> ideColors.folderIcon
+                        node.file.language == Language.Kotlin -> ideColors.kotlinFileIcon
+                        else -> ideColors.genericFileIcon
                     },
                     shape = RoundedCornerShape(2.dp)
                 )
@@ -408,10 +413,10 @@ private fun FileTreeItem(
                     else -> FontWeight.Normal
                 },
                 color = when {
-                    isEnlarged -> Color.Black
-                    isSelected -> Color(0xFF2C5BB7)
-                    node.isFolder -> Color(0xFF6F5502)
-                    else -> Color.Black
+                    isEnlarged -> ideColors.textPrimary
+                    isSelected -> ideColors.textSecondary
+                    node.isFolder -> ideColors.textPrimary
+                    else -> ideColors.textPrimary
                 }
             )
             ProvideTextStyle(textStyle) {
@@ -444,6 +449,7 @@ private fun FileTreeItem(
                 currentOpenFile = currentOpenFile,
                 enlargedFile = enlargedFile,
                 highlightedFile = highlightedFile,
+                ideColors = ideColors,
                 modifier = modifier
             )
         }
@@ -452,10 +458,11 @@ private fun FileTreeItem(
 
 @Composable
 private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
+    val ideColors = LocalIdeColors.current
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(ideColors.codePanelBackground)
     ) {
         code2 {
             file.content?.ScrollableMagicCodeSample(

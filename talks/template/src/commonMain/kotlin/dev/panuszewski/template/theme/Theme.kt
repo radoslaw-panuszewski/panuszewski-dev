@@ -22,10 +22,78 @@ val NICE_ORANGE = Color(0xFFFF8A04)
 val NICE_BLUE = Color(0xFF0A7CFA)
 val NICE_GREEN = Color(0xFF389E2D)
 
+data class IdeColorScheme(
+    val toolbar: Color,
+    val toolbarBorder: Color,
+    val background: Color,
+    val fileTreeBackground: Color,
+    val fileTreeBorder: Color,
+    val selectedFileBackground: Color,
+    val highlightedFileBackground: Color,
+    val tabBackground: Color,
+    val selectedTabBackground: Color,
+    val codePanelBackground: Color,
+    val border: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val folderIcon: Color,
+    val kotlinFileIcon: Color,
+    val genericFileIcon: Color,
+    val paneBackground: Color,
+    val paneSeparator: Color
+)
+
+val LightIdeColors = IdeColorScheme(
+    toolbar = Color(0xFFE2E2E2),
+    toolbarBorder = Color(0xFFA6A7A6),
+    background = Color(0xFFFEFFFE),
+    fileTreeBackground = Color(0xFFF3F3F3),
+    fileTreeBorder = Color(0xFFDDDDDD),
+    selectedFileBackground = Color(0xFFD2E4FF),
+    highlightedFileBackground = NICE_ORANGE,
+    tabBackground = Color(0xFFF2F2F2),
+    selectedTabBackground = Color(0xFFD2E4FF),
+    codePanelBackground = Color.White,
+    border = Color.Black,
+    textPrimary = Color(0xFF2C2C2C),
+    textSecondary = Color(0xFF2C5BB7),
+    folderIcon = Color(0xFFFFC107),
+    kotlinFileIcon = Color(0xFF2196F3),
+    genericFileIcon = Color(0xFF9E9E9E),
+    paneBackground = Color(0xFFEEEEEE),
+    paneSeparator = Color(0xFFCCCCCC)
+)
+
+val DarkIdeColors = IdeColorScheme(
+    toolbar = Color(0xFF2B2D30),
+    toolbarBorder = Color(0xFF5C5E61),
+    background = Color(0xFF1E1F22),
+    fileTreeBackground = Color(0xFF242629),
+    fileTreeBorder = Color(0xFF5C5E61),
+    selectedFileBackground = Color(0xFF2D4F7C),
+    highlightedFileBackground = NICE_ORANGE,
+    tabBackground = Color(0xFF393B40),
+    selectedTabBackground = Color(0xFF2D4F7C),
+    codePanelBackground = Color(0xFF1E1F22),
+    border = Color(0xFF5C5E61),
+    textPrimary = Color(0xFFBCBEC4),
+    textSecondary = Color(0xFF6FAFFF),
+    folderIcon = Color(0xFFDCB67A),
+    kotlinFileIcon = Color(0xFF7F52FF),
+    genericFileIcon = Color(0xFF9AA7B0),
+    paneBackground = Color(0xFF313438),
+    paneSeparator = Color(0xFF5C5E61)
+)
+
+val LocalIdeColors = compositionLocalOf { LightIdeColors }
+
 val DARK_THEME = SceneDecorator { content ->
     MaterialTheme(DARK_COLORS, Typography()) {
         Surface {
-            CompositionLocalProvider(LocalCodeStyle provides INTELLIJ_DARK_CODE_STYLE) {
+            CompositionLocalProvider(
+                LocalCodeStyle provides INTELLIJ_DARK_CODE_STYLE,
+                LocalIdeColors provides DarkIdeColors
+            ) {
                 content()
             }
         }
@@ -45,7 +113,10 @@ val DARK_COLORS = darkColors(
 val LIGHT_THEME = SceneDecorator { content ->
     MaterialTheme(LIGHT_COLORS, Typography()) {
         Surface {
-            CompositionLocalProvider(LocalCodeStyle provides INTELLIJ_LIGHT_CODE_STYLE) {
+            CompositionLocalProvider(
+                LocalCodeStyle provides INTELLIJ_LIGHT_CODE_STYLE,
+                LocalIdeColors provides LightIdeColors
+            ) {
                 content()
             }
         }
