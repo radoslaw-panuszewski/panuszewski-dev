@@ -92,3 +92,84 @@ Available grammar generation tasks in storyboard-text:
 - Gradle with Kotlin DSL
 - WASM target for web deployment
 - Maven publishing for library distribution
+
+### The workflow
+1. **Start by asking clarifying questions**: Be specific, concise and actionable
+2. **Write the code**: Do all the changes needed to accomplish the task. Follow the guidelines fron the **Writing code** section
+4. **Launch Presentation**: Start the desktop presentation application to display the current presentation state. Inform the user that the presentation is now running and they should interact with it to test functionality, visual appearance, transitions, and overall user experience.
+5. **User Testing Phase**: Allow the user to freely explore and test the presentation. Do not interrupt this process. Wait patiently for the user to close the application when they are finished testing.
+6. **Feedback Collection**: Once the user closes the presentation app, ask them directly: 'How does the presentation look? Are you satisfied with the current state, or are there issues that need to be addressed?' Listen carefully to their response and probe for specific details about any problems they encountered.
+7. **Decision Point**: Based on their feedback:
+    - If satisfied: Acknowledge their approval and conclude the review process
+    - If issues exist: Proceed to step 5
+8. **Issue Documentation and System Prompt Update**: When issues are identified:
+    - Document the specific problems mentioned by the user
+    - Analyze how these issues affect the presentation's visual appearance, functionality, and user experience
+    - Update the `CLUADE.md` with:
+        * Clear descriptions of the mistakes that were made
+        * Detailed explanation of how these mistakes impacted the presentation
+        * Specific instructions on how to avoid these issues in future iterations
+        * Any relevant best practices or constraints that should be followed
+9. **Re-iterate the implementation**: After updating the system prompt, address the identified issues, using with the user's specific feedback and the updated guidance.
+
+## Writing code
+- Do not put any comments in the code
+- Do not use negative offsets unless absolutely necessary, prefer spacers instead
+- Always check the reference implementation in future-of-jvm-build-tools
+- Extract reusable composable functions if applicable
+- If you extract a reusable composable function, move most of the logic there - the scene should only call the composable and provide data (like the title and agenda content)
+- If the reusable part of the logic has a fixed number of states, extract it as reusable scene, not composable function. The reusable scene (which is an extension function with StoryboardBuilder receiver) should accept data as parameters.
+- Extract common patterns to template subproject
+- The future-of-jvm-build-tools talk is a baseline, treat is as a reference implementation. The appearance (like margins, text size, colors, etc.) and behavior (transitions between scenes) should work the same as in the reference implementation. However, you can refactor the code to improve its
+  readability and extensibility.
+- Use TitleScaffold in every scene, unless instructed otherwise
+- Implement scene boundaries using titles displayed at the top, allowing multiple related titles to be grouped when contextually appropriate
+- Ensure consistent navigation and flow patterns across all scenes
+- Refactor existing components when necessary, always preserving their usability in existing talks
+- Write clean, maintainable Compose code following established project patterns
+- Ensure all animations and transitions are smooth and purposeful
+- Implement proper state management for complex scene transitions
+- Create modular, testable components that can be easily reused
+- Prefer helpers like `SlideFromTopAnimatedVisibility`, `FadeOutAnimatedVisibility`, `FadeInOutAnimatedVisibility` over specifying the transitions manually to `AnimatedVisibility`. If you discover a new repeating pattern, extract a new similar helper
+- Use `RevealSequentially` for bulletpoint lists
+- If you implement animation when element B appears under element A with spacer between them, you don't need to wrap the spacer in `AnimatedVisibility`
+- Never write lambda like this `{ fullHeight -> fullHeight }`, just use `{ it }` instead
+- Prefer `it in listOf(0, 4)` over `it == 0 || it == 4`
+- Always keep scenes in separate `*.kt` files
+- Prefer padding over offset for positioning elements unless offset is absolutely necessary (e.g., for sliding animations). Using offset can cause elements to be positioned outside screen bounds
+- When implementing sliding title scenes, use Box layout with absolute positioning for the title animation, and position other elements using padding to ensure they stay within screen bounds
+- For sliding title animations, animate both text style (h2 to h4) and vertical offset simultaneously to achieve smooth transitions
+- Do not add the `*Scene` suffix to scene function names
+
+### Order of functions in a file
+
+When extracting private methods, always follow the principle that call order of the private functions should match the order of their appearance in the code.
+
+It should look like this:
+```kotlin
+fun doSomething() {
+    firstOperation()
+    secondOperation()
+}
+
+fun firstOperation() {
+    connectToDatabase()
+    fetchData()
+}
+
+fun connectToDatabase() {
+    // ...
+}
+
+fun fetchData() {
+    // ...
+}
+
+fun secondOperation() {
+    sendEvent()
+}
+
+fun sendEvent() {
+    // ...
+}
+```

@@ -2,7 +2,7 @@ package dev.panuszewski
 
 import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
-import dev.panuszewski.template.components.BigTitle
+import dev.panuszewski.scenes.WhyWouldYouCareScene
 import dev.panuszewski.template.components.TitleWithAgenda
 import dev.panuszewski.template.theme.LIGHT_THEME
 
@@ -21,6 +21,5 @@ val KeepingYourBuildClean = Storyboard.build(
             "Third agenda item",
         )
     )
-    BigTitle("Why would you care?")
+    WhyWouldYouCareScene()
 }
-
