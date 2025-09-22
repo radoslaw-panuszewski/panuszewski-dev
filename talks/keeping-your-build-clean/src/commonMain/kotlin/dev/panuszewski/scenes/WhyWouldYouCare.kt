@@ -9,12 +9,15 @@ import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 
-fun StoryboardBuilder.WhyWouldYouCareScene() {
+fun StoryboardBuilder.WhyWouldYouCare() {
     scene(stateCount = BUILD_GRADLE_KTS.size + 2) {
+        BUILD_GRADLE_KTS.precompose()
+
         SlidingTitleScaffold("Why would you care?") {
             val files = buildList {
                 addFile(
