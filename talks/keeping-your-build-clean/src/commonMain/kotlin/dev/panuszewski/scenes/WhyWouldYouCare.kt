@@ -1,6 +1,7 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,28 +32,21 @@ fun StoryboardBuilder.WhyBother() {
 
     val ideAppears = 2
     val fileTreeHiddenSince = ideAppears + 1
-    val ideShrinksToShowGroovy = fileTreeHiddenSince + 1
+    val ideShrinksToShowGroovy = fileTreeHiddenSince
     val bulletpointsAppear = ideShrinksToShowGroovy + 1
 
     val (
         imperativeCodeBulletpoint,
+        groovyBulletpoint,
         crossConfigurationBulletpoint,
         mixedConcernsBulletpoint,
         noTypeSafetyBulletpoint,
-        groovyBulletpoint,
     ) =
         subsequentNumbers5(since = bulletpointsAppear)
 
     scene(stateCount = 100) {
         withStateTransition {
             BUILD_GRADLE_KTS.precompose()
-
-            val ideStartPadding by animateDp {
-                when {
-                    it >= ideShrinksToShowGroovy -> 260.dp
-                    else -> 0.dp
-                }
-            }
 
             SlidingTitleScaffold("Why bother?") {
                 val files = buildList {
@@ -87,13 +81,31 @@ fun StoryboardBuilder.WhyBother() {
                     }
                 }
 
+                val ideStartPadding by animateDp {
+                    when {
+                        it >= ideShrinksToShowGroovy -> 260.dp
+                        else -> 0.dp
+                    }
+                }
+
+                val fileTreeWidth by animateDp {
+                    val value = when {
+                        it >= fileTreeHiddenSince -> 0.dp
+                        else -> 275.dp
+                    }
+                    value
+                }
+
+                val fileTreeHidden = currentState >= fileTreeHiddenSince
+
                 IDE(
                     IdeState(
                         files = files,
                         selectedFile = "build.gradle",
-                        fileTreeHidden = currentState >= fileTreeHiddenSince
+                        fileTreeHidden = fileTreeHidden,
                     ),
-                    modifier = Modifier.padding(start = ideStartPadding)
+                    modifier = Modifier.padding(start = ideStartPadding),
+                    fileTreeWidth = fileTreeWidth
                 )
             }
         }
@@ -111,6 +123,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val crossConfig1 by tag()
     val crossConfig2 by tag()
     val mixedConcerns by tag()
+    val bottom by tag()
 
     """
     ${allCode}buildscript {

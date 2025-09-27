@@ -2,12 +2,21 @@ package dev.panuszewski.template.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.fadeIn
+import dev.bnorm.storyboard.Frame
+import dev.bnorm.storyboard.toState
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +32,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -32,17 +43,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.lerp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.MagicText
 import dev.panuszewski.template.theme.NICE_ORANGE
@@ -65,7 +81,7 @@ data class IdeState(
 )
 
 @Composable
-fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPosition: Int? = null) {
+fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPosition: Int? = null, fileTreeWidth: Dp? = null) {
     val ideColors = LocalIdeColors.current
     with(ideState) {
         val selectedFile = files.find { it.path == selectedFile }
@@ -86,13 +102,6 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPositio
         // Track expanded state of folders
         val expandedFolders = remember { mutableStateMapOf<String, Boolean>() }
 
-        val leftPanelWidth = animateDpAsState(
-            targetValue = when {
-                fileTreeHidden -> 0.dp
-                else -> 275.dp
-            },
-            animationSpec = tween(durationMillis = 300),
-        )
 
         // Determine if the file is moving to left or right pane
         val isMovingToLeftPane = selectedFile != null && selectedFile == leftPaneFile
@@ -153,35 +162,48 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPositio
 
             Divider(Modifier.background(ideColors.toolbarBorder))
 
-            // Main content
+            // File tree animated visibility synchronized with scene timing
+            val showFileTree = !fileTreeHidden
+        println("DEBUG: IDE fileTreeHidden=$fileTreeHidden, showFileTree=$showFileTree")
+
+
             Row(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(ideColors.background)
             ) {
-                // Project files panel (left) - animated width based on mode
-                AnimatedVisibility(visible = !fileTreeHidden, enter = fadeIn(), exit = fadeOut()) {
-                    Box(
-                        modifier = Modifier
-                            .width(leftPanelWidth.value)
-                            .fillMaxHeight()
-                            .background(ideColors.fileTreeBackground)
-                            .border(width = 1.dp, color = ideColors.fileTreeBorder)
-                    ) {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            // Render the file tree
-                            fileTree.forEach { node ->
-                                item {
-                                    FileTreeItem(
-                                        node = node,
-                                        depth = 0,
-                                        expandedFolders = expandedFolders,
-                                        currentOpenFile = selectedFile,
-                                        enlargedFile = enlargedFile,
-                                        highlightedFile = highlightedFile,
-                                        ideColors = ideColors,
-                                        modifier = Modifier.animateItem()
-                                    )
+                // File tree panel with scene-controlled animated width
+                val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 275.dp else 0.dp)
+                println("DEBUG: IDE actualFileTreeWidth=$actualFileTreeWidth, showFileTree=$showFileTree")
+
+                Box(
+                    modifier = Modifier
+                        .width(actualFileTreeWidth)
+                        .fillMaxHeight()
+                        .clipToBounds()
+                ) {
+                    if (actualFileTreeWidth > 0.dp) {
+                        Box(
+                            modifier = Modifier
+                                .width(275.dp)
+                                .fillMaxHeight()
+                                .background(ideColors.fileTreeBackground)
+                                .border(width = 1.dp, color = ideColors.fileTreeBorder)
+                        ) {
+                            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                                fileTree.forEach { node ->
+                                    item {
+                                        FileTreeItem(
+                                            node = node,
+                                            depth = 0,
+                                            expandedFolders = expandedFolders,
+                                            currentOpenFile = selectedFile,
+                                            enlargedFile = enlargedFile,
+                                            highlightedFile = highlightedFile,
+                                            ideColors = ideColors,
+                                            modifier = Modifier.animateItem()
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -189,11 +211,39 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPositio
                 }
 
                 // Code display area
-                if (isSplitPaneMode) {
-                    // Split-pane mode
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CodeDisplayArea(
+                        isSplitPaneMode = isSplitPaneMode,
+                        leftPaneFile = leftPaneFile,
+                        rightPaneFile = rightPaneFile,
+                        selectedFile = selectedFile,
+                        codePanelOffset = codePanelOffset,
+                        ideColors = ideColors,
+                        overrideScrollPosition = overrideScrollPosition
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CodeDisplayArea(
+    isSplitPaneMode: Boolean,
+    leftPaneFile: ProjectFile?,
+    rightPaneFile: ProjectFile?,
+    selectedFile: ProjectFile?,
+    codePanelOffset: State<Float>,
+    ideColors: IdeColorScheme,
+    overrideScrollPosition: Int?
+) {
+    if (isSplitPaneMode) {
+        // Split-pane mode
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
                     ) {
                         // Left pane
                         Box(
@@ -336,9 +386,6 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPositio
                     }
                 }
             }
-        }
-    }
-}
 
 @Composable
 private fun FileTreeItem(
