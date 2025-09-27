@@ -60,6 +60,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     println "I'm Groovy lol"
     
     dependencies {
+        implementation project(':first-library')
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
     }${allCode}
     """

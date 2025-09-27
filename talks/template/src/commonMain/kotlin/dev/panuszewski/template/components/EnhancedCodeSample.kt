@@ -130,11 +130,47 @@ private fun extractWarningRanges(codeSample: CodeSample): Map<IntRange, Color> {
         for (annotation in annotations) {
             if (annotation.item == warningTag.id) {
                 val range = annotation.start..<annotation.end
-                ranges[range] = Color.Yellow
+                val adjustedRanges = createRangesSkippingIndentation(processedString.text, range)
+                for (adjustedRange in adjustedRanges) {
+                    ranges[adjustedRange] = Color.Yellow
+                }
             }
         }
     }
 
     return ranges
+}
+
+private fun createRangesSkippingIndentation(text: String, range: IntRange): List<IntRange> {
+    if (range.isEmpty()) return listOf(range)
+
+    val result = mutableListOf<IntRange>()
+    var currentPos = range.first
+
+    while (currentPos <= range.last && currentPos < text.length) {
+        // Find the start of the current line (skip indentation)
+        var lineStart = currentPos
+        while (lineStart <= range.last && lineStart < text.length &&
+               (text[lineStart] == ' ' || text[lineStart] == '\t')) {
+            lineStart++
+        }
+
+        // Find the end of the current line
+        var lineEnd = lineStart
+        while (lineEnd <= range.last && lineEnd < text.length && text[lineEnd] != '\n') {
+            lineEnd++
+        }
+
+        // Add this line's range if it has content
+        if (lineStart <= lineEnd && lineStart <= range.last) {
+            result.add(lineStart..minOf(lineEnd - 1, range.last))
+        }
+
+        // Move to the next line
+        currentPos = lineEnd + 1
+    }
+
+    // If no ranges were created, return the original range
+    return result.ifEmpty { listOf(range) }
 }
 
