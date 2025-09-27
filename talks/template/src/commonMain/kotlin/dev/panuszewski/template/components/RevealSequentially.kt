@@ -40,21 +40,25 @@ fun Transition<Int>.RevealSequentially(
             Content()
         }
     }
-    return since + scope.composables.size
+    return since + scope.items.size
 }
 
 class RevealSequentiallyScope(
     private val since: Int,
     private val until: Int
 ) {
-    val composables = mutableListOf<RevealedItem>()
+    val items = mutableListOf<RevealedItem>()
+
+    fun item(item: RevealedItem) {
+        items.add(item)
+    }
 
     fun item(stateCount: Int = 1, content: @Composable () -> Unit) {
-        composables.add(RevealedItem(stateCount, content))
+        items.add(RevealedItem(stateCount, content))
     }
 
     fun textItem(stateCount: Int = 1, content: @Composable AnnotatedString.Builder.() -> Unit) {
-        composables.add(RevealedItem(stateCount) { Text(content) })
+        items.add(RevealedItem(stateCount) { Text(content) })
     }
 
     @Composable
@@ -62,7 +66,7 @@ class RevealSequentiallyScope(
         // Calculate cumulative state positions for each item
         var cumulativeState = since
 
-        for (revealedItem in composables) {
+        for (revealedItem in items) {
             val itemStartState = cumulativeState
             val nextItemStartState = cumulativeState + revealedItem.stateCount
 
@@ -76,6 +80,6 @@ class RevealSequentiallyScope(
 }
 
 data class RevealedItem(
-    val stateCount: Int,
+    val stateCount: Int = 1,
     val composable: @Composable () -> Unit,
 )

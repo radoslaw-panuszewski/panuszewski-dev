@@ -15,6 +15,7 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IDE
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.components.RevealedItem
 import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
@@ -32,7 +33,6 @@ fun StoryboardBuilder.WhyBother() {
     val ideAppears = 2
 
     val (
-        ideScrolls,
         ideShrinks,
         bulletpointsAppear
     ) =
@@ -47,6 +47,8 @@ fun StoryboardBuilder.WhyBother() {
     ) =
         subsequentNumbers(since = bulletpointsAppear)
 
+    val longBulletpoint = groovyBulletpoint + 2
+
     scene(stateCount = 100) {
         withStateTransition {
             BUILD_GRADLE_KTS.precompose()
@@ -57,7 +59,7 @@ fun StoryboardBuilder.WhyBother() {
                         name = "build.gradle",
                         content = createChildTransition {
                             when {
-                                it == ideScrolls -> BUILD_GRADLE_KTS[6]
+                                it == longBulletpoint -> BUILD_GRADLE_KTS[6]
                                 it == mixedConcernsBulletpoint -> BUILD_GRADLE_KTS[5]
                                 it == crossConfigurationBulletpoint -> BUILD_GRADLE_KTS[4]
                                 it == imperativeCodeBulletpoint -> BUILD_GRADLE_KTS[3]
@@ -74,14 +76,15 @@ fun StoryboardBuilder.WhyBother() {
                     modifier = Modifier.padding(top = 32.dp).align(TopStart),
                 ) {
                     RevealSequentially(since = bulletpointsAppear) {
-                        val bulletpoints = sortedMapOf<Int, ComposableLambda>(
-                            noTypeSafetyBulletpoint to { Text("$BULLET_1 No type safety") },
-                            imperativeCodeBulletpoint to { Text("$BULLET_1 Imperative code") },
-                            crossConfigurationBulletpoint to { Text("$BULLET_1 Cross configuration") },
-                            mixedConcernsBulletpoint to { Text("$BULLET_1 Mixed concerns") },
-                            groovyBulletpoint to { Text("$BULLET_1 Groovy 🤢") },
+                        val bulletpoints = sortedMapOf(
+                            noTypeSafetyBulletpoint to RevealedItem { Text("$BULLET_1 No type safety") },
+                            imperativeCodeBulletpoint to RevealedItem { Text("$BULLET_1 Imperative code") },
+                            crossConfigurationBulletpoint to RevealedItem { Text("$BULLET_1 Cross configuration") },
+                            mixedConcernsBulletpoint to RevealedItem { Text("$BULLET_1 Mixed concerns") },
+                            groovyBulletpoint to RevealedItem(2) { Text("$BULLET_1 Groovy 🤢") },
+                            longBulletpoint to RevealedItem { Text("$BULLET_1 Looooong") },
                         )
-                        bulletpoints.forEach { item(content = it.value) }
+                        bulletpoints.forEach { item(it.value) }
                     }
                 }
 
@@ -125,32 +128,32 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val crossConfig2 by tag()
     val mixedConcerns by tag()
     val bottom by tag()
+    val long by tag()
 
-    """
-    ${allCode}buildscript {
-        classpath(${noTypesafe1}'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'${noTypesafe1})
+    $$"""
+    $${allCode}buildscript {
+        classpath($${noTypesafe1}'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
     }
     
-    ${crossConfig1}allprojects${crossConfig1} {
-        ${imperative1}apply plugin: 'kotlin'${imperative1}
+    $${crossConfig1}allprojects$${crossConfig1} {
+        $${imperative1}apply plugin: 'kotlin'$${imperative1}
     }
         
-    ${crossConfig2}subprojects${crossConfig2}
-        ${imperative2}.findAll { it.name.endsWith('-library') }
-        .forEach { it.apply plugin: 'java-library' }${imperative2}
+    $${crossConfig2}subprojects$${crossConfig2}
+        $${imperative2}.findAll { it.name.endsWith('-library') }
+        .forEach { it.apply plugin: 'java-library' }$${imperative2}
     
-    ${mixedConcerns}dependencies {
-        implementation ${noTypesafe2}project(':first-library')${noTypesafe2}
+    $${mixedConcerns}dependencies {
+        implementation $${noTypesafe2}project(':first-library')$${noTypesafe2}
     }
     
     tasks.register('sayHello') {
         doLast {
-            ${imperative3}println 'lol'${imperative3}
+            $${imperative3}println 'lol'$${imperative3}
         }
-    }${mixedConcerns}${allCode}
+    }$${mixedConcerns}$${allCode}
     
-    
-    def random = new Random((buildscript.ext.weirdNumber as long) * 1337)
+    $${long}def random = new Random((buildscript.ext.weirdNumber as long) * 1337)
 
     def glitch = { key, fallback ->
         def env = System.getenv(key as String)
@@ -167,7 +170,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
             flip  : { -> [true,false,false,true][random.nextInt(4)] },
             chaos : UUID.randomUUID().toString().replace('-',''),
         ]
-        dynamicVersion = { base -> "${'$'}{'$'}{base}.${'$'}{'$'}{random.nextInt(10)}.${'$'}{'$'}{(System.currentTimeMillis() % 1000)}" }
+        dynamicVersion = { base -> "${base}.${random.nextInt(10)}.${(System.currentTimeMillis() % 1000)}" }
         computedGroup = (glitch('GROUP','com.example') + "." + nonsense.colors[random.nextInt(nonsense.colors.size())]).toLowerCase()
     }
     
@@ -217,9 +220,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
     
     dependencies {
-        implementation platform("org.springframework.boot:spring-boot-dependencies:${'$'}{'$'}{glitch('SBOM','3.3.3')}")
+        implementation platform("org.springframework.boot:spring-boot-dependencies:${glitch('SBOM','3.3.3')}")
         implementation 'org.apache.commons:commons-lang3:3.15.0'
-        implementation "com.google.guava:guava:${'$'}{'$'}{['33.3.1-jre','32.1.3-jre','31.1-jre'][random.nextInt(3)]}"
+        implementation "com.google.guava:guava:${['33.3.1-jre','32.1.3-jre','31.1-jre'][random.nextInt(3)]}"
         compileOnly 'org.projectlombok:lombok:1.18.34'
         annotationProcessor 'org.projectlombok:lombok:1.18.34'
         testImplementation 'org.junit.jupiter:junit-jupiter:5.11.1'
@@ -272,37 +275,37 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         group = 'diagnostics'
         description = 'Prints questionable internal state.'
         doLast {
-            println "group      : ${'$'}{'$'}{project.group}"
-            println "version    : ${'$'}{'$'}{project.version}"
-            println "java       : ${'$'}{'$'}{java.toolchain.languageVersion}"
-            println "colors     : ${'$'}{'$'}{ext.nonsense.colors}"
-            println "answer     : ${'$'}{'$'}{ext.nonsense.answer}"
-            println "flip()     : ${'$'}{'$'}{ext.nonsense.flip()}"
-            println "chaos      : ${'$'}{'$'}{ext.nonsense.chaos}"
-            println "computed   : ${'$'}{'$'}{ext.dynamicVersion('0.0')}"
-            println "repos      : ${'$'}{'$'}{repositories.collect{it.class.simpleName}}"
+            println "group      : ${project.group}"
+            println "version    : ${project.version}"
+            println "java       : ${java.toolchain.languageVersion}"
+            println "colors     : ${ext.nonsense.colors}"
+            println "answer     : ${ext.nonsense.answer}"
+            println "flip()     : ${ext.nonsense.flip()}"
+            println "chaos      : ${ext.nonsense.chaos}"
+            println "computed   : ${ext.dynamicVersion('0.0')}"
+            println "repos      : ${repositories.collect{it.class.simpleName}}"
         }
     }
     
     abstract class EchoTask extends DefaultTask {
         @Input String message = '...'
-        @TaskAction void speak() { println "[Echo] ${'$'}{'$'}message" }
+        @TaskAction void speak() { println "[Echo] $message" }
     }
 
     (1..(3 + random.nextInt(3))).each { idx ->
-        tasks.register("echo${'$'}{'$'}{idx}", EchoTask) { t ->
+        tasks.register("echo${idx}", EchoTask) { t ->
             t.group = 'echo'
-            t.message = "Echo number ${'$'}{'$'}{idx} @ ${'$'}{'$'}{new Date()}"
+            t.message = "Echo number ${idx} @ ${new Date()}"
         }
     }
 
     ['alpha','beta','gamma','delta'].each { n ->
-        tasks.register("mangle_${'$'}{'$'}{n}") {
+        tasks.register("mangle_${n}") {
             dependsOn tasks.withType(EchoTask)
-            doFirst { println "[mangle:${'$'}{'$'}{n}] first @ ${'$'}{'$'}{System.nanoTime()}" }
+            doFirst { println "[mangle:${n}] first @ ${System.nanoTime()}" }
             doLast {
                 def r = (0..<random.nextInt(7)+1).collect { UUID.randomUUID().toString().substring(0,8)}
-                println "[mangle:${'$'}{'$'}{n}] data => ${'$'}{'$'}{r}"
+                println "[mangle:${n}] data => ${r}"
             }
         }
     }
@@ -322,7 +325,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     testTask.systemProperty 'chaos', ext.nonsense.chaos
 
     tasks.register('flipCoin') {
-        doLast { println "Heads? ${'$'}{'$'}{ext.nonsense.flip()}" }
+        doLast { println "Heads? ${ext.nonsense.flip()}" }
     }
 
     ['build','check','assemble'].each { nm ->
@@ -334,7 +337,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
 
     ext.metaClass.dynamic = 'enabled'
     ext.metaClass.methodMissing = { String name, args ->
-        println "You called ${'$'}{'$'}{name} with ${'$'}{'$'}{args?.toList()} for no good reason."
+        println "You called ${name} with ${args?.toList()} for no good reason."
     }
     project.metaClass.getObscure = { String k ->
         return [k, k.reverse()].join(':')
@@ -367,7 +370,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         repositories {
             maven {
                 name = 'localChaos'
-                url = uri("${'$'}{'$'}{buildDir}/repo/${'$'}{'$'}{ext.nonsense.chaos}")
+                url = uri("${buildDir}/repo/${ext.nonsense.chaos}")
             }
         }
     }
@@ -379,12 +382,12 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
 
     gradle.taskGraph.whenReady { graph ->
-        println "Task graph has ${'$'}{'$'}{graph.allTasks.size()} tasks. Version=${'$'}{'$'}{project.version}"
+        println "Task graph has ${graph.allTasks.size()} tasks. Version=${project.version}"
     }
 
     tasks.register('leakProps') {
         doLast {
-            println "PROPS:"; project.properties.keySet().sort().each { println " - ${'$'}{'$'}it" }
+            println "PROPS:"; project.properties.keySet().sort().each { println " - $it" }
         }
     }
 
@@ -394,7 +397,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
 
     tasks.register('dumpsterDive', Copy) {
         from configurations.runtimeClasspath
-        into layout.buildDirectory.dir("dumpster/${'$'}{'$'}{System.currentTimeMillis()}")
+        into layout.buildDirectory.dir("dumpster/${System.currentTimeMillis()}")
         include { details -> details.file.name.endsWith('.jar') }
     }
 
@@ -403,45 +406,45 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     tasks.register('generateGarbage') {
         outputs.dir generatedDir
         doLast {
-            def pkg = "p${'$'}{'$'}{random.nextInt(100)}.q${'$'}{'$'}{random.nextInt(100)}.r${'$'}{'$'}{random.nextInt(100)}"
-            def f = new File(generatedDir, "${'$'}{'$'}{pkg.replace('.','/')}/Noise${'$'}{'$'}{random.nextInt(999)}.java")
+            def pkg = "p${random.nextInt(100)}.q${random.nextInt(100)}.r${random.nextInt(100)}"
+            def f = new File(generatedDir, "${pkg.replace('.','/')}/Noise${random.nextInt(999)}.java")
             f.parentFile.mkdirs()
             f.text = ""${'$'}{'"'}
-            package ${'$'}{'$'}{pkg};
-            public class Noise${'$'}{'$'}{random.nextInt(999)} { public static String say(){ return \"${'$'}{'$'}{UUID.randomUUID()}\"; } }
+            package ${pkg};
+            public class Noise${random.nextInt(999)} { public static String say(){ return \"${UUID.randomUUID()}\"; } }
                 ""${'$'}{'"'}.stripIndent()
-                println "Generated: ${'$'}{'$'}{f}"
+                println "Generated: ${f}"
             }
-            }
-    ${bottom} ${bottom}
-            compileJava.dependsOn tasks.named('generateGarbage')
+        }
+    }
+    compileJava.dependsOn tasks.named('generateGarbage')$${bottom} $${bottom}
 
-            idea {
-                module { inheritOutputDirs = false; outputDir file("${'$'}{'$'}{buildDir}/idea-out") }
-            }
+    idea {
+        module { inheritOutputDirs = false; outputDir file("${buildDir}/idea-out") }
+    }
 
-            eclipse {
-                classpath { plusConfigurations += [configurations.jank] }
-            }
+    eclipse {
+        classpath { plusConfigurations += [configurations.jank] }
+    }
 
-            ['mangle_alpha','mangle_beta','mangle_gamma','mangle_delta'].collate(2).each { pair ->
-                tasks.named(pair[0]).configure { finalizedBy pair[1] }
-            }
+    ['mangle_alpha','mangle_beta','mangle_gamma','mangle_delta'].collate(2).each { pair ->
+        tasks.named(pair[0]).configure { finalizedBy pair[1] }
+    }
 
-            tasks.register('yell') {
-                doFirst { println 'WHY ARE WE SHOUTING' }
-                doLast { println 'BECAUSE CONFIG IS LOUD' }
-            }
+    tasks.register('yell') {
+        doFirst { println 'WHY ARE WE SHOUTING' }
+        doLast { println 'BECAUSE CONFIG IS LOUD' }
+    }
 
-            def sillyBanner = (0..<random.nextInt(10)+5).collect { '*' }.join('')
+    def sillyBanner = (0..<random.nextInt(10)+5).collect { '*' }.join('')$${long}
     """
         .trimIndent()
         .toCodeSample(language = Language.Groovy)
-        .startWith { this }
+        .startWith { hide(long) }
         .then { underline(allCode) }
         .then { resetUnderline(allCode).focus(noTypesafe1, noTypesafe2, noTypesafe3) }
         .then { focus(imperative1, imperative2, imperative3) }
         .then { focus(crossConfig1, crossConfig2) }
         .then { focus(mixedConcerns, scroll = false) }
-        .then { focus(bottom, focusedStyle = null, unfocusedStyle = null) }
+        .then { reveal(long).focus(bottom, focusedStyle = null, unfocusedStyle = null) }
 }

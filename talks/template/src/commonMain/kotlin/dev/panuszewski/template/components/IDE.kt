@@ -149,7 +149,6 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier, fileTreeWidth: Dp? = 
 
             // File tree animated visibility synchronized with scene timing
             val showFileTree = !fileTreeHidden
-        println("DEBUG: IDE fileTreeHidden=$fileTreeHidden, showFileTree=$showFileTree")
 
 
             Row(
@@ -159,7 +158,6 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier, fileTreeWidth: Dp? = 
             ) {
                 // File tree panel with scene-controlled animated width
                 val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 275.dp else 0.dp)
-                println("DEBUG: IDE actualFileTreeWidth=$actualFileTreeWidth, showFileTree=$showFileTree")
 
                 Box(
                     modifier = Modifier
