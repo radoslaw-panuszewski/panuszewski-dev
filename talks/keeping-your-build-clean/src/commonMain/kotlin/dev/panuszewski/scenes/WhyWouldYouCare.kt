@@ -40,7 +40,8 @@ fun StoryboardBuilder.WhyBother() {
         mixedConcernsBulletpoint,
         noTypeSafetyBulletpoint,
         groovyBulletpoint,
-    ) = subsequentNumbers5(since = bulletpointsAppear)
+    ) =
+        subsequentNumbers5(since = bulletpointsAppear)
 
     scene(stateCount = 100) {
         withStateTransition {
