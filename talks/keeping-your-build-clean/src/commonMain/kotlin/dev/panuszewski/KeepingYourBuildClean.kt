@@ -2,8 +2,7 @@ package dev.panuszewski
 
 import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
-import dev.panuszewski.scenes.WhyWouldYouCare
-import dev.panuszewski.template.components.TitleWithAgenda
+import dev.panuszewski.scenes.WhyBother
 import dev.panuszewski.template.theme.DARK_THEME
 
 private const val TITLE = "Keeping Your Build Clean"
@@ -22,5 +21,5 @@ val KeepingYourBuildClean = Storyboard.build(
 //        )
 //    )
 
-    WhyWouldYouCare()
+    WhyBother()
 }

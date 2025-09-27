@@ -137,6 +137,12 @@ class CodeSample private constructor(
     fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag, focusedStyle = focusedStyle, unfocusedStyle = unfocusedStyle)
 
+    fun underline(tag: TextTag): CodeSample =
+        changeTagType(tag, TagType.WARNING)
+
+    fun resetUnderline(tag: TextTag): CodeSample =
+        changeTagType(tag, TagType.NORMAL)
+
     fun changeTagType(tag: TextTag, newType: TagType): CodeSample {
         val updatedWarningTags = when (newType) {
             TagType.WARNING -> {

@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,6 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
@@ -31,10 +31,10 @@ import dev.panuszewski.template.extensions.annotate
 fun SceneScope<Int>.SlidingTitleScaffold(
     title: String,
     slideToTopAt: Int = 1,
-    slideBackAtTheEnd: Int = Int.MAX_VALUE,
-    content: @Composable () -> Unit
+    slideBackAt: Int = Int.MAX_VALUE,
+    content: @Composable BoxScope.() -> Unit
 ) {
-    SlidingTitleScaffold(title.annotate(), slideToTopAt, slideBackAtTheEnd, content)
+    SlidingTitleScaffold(title.annotate(), slideToTopAt, slideBackAt, content)
 }
 
 @Composable
@@ -42,7 +42,7 @@ fun SceneScope<Int>.SlidingTitleScaffold(
     title: AnnotatedString,
     slideToTopAt: Int = 1,
     slideBackAt: Int = Int.MAX_VALUE,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     val isLargeTitle = transition.createChildTransition {
         it.toState() !in slideToTopAt until slideBackAt

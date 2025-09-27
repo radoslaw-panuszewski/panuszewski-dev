@@ -47,22 +47,27 @@ class RevealSequentiallyScope(
     private val since: Int,
     private val until: Int
 ) {
-    val composables = mutableListOf<@Composable () -> Unit>()
+    val composables = mutableListOf<RevealedItem>()
 
-    fun item(content: @Composable () -> Unit) {
-        composables.add(content)
+    fun item(stateCount: Int = 1, content: @Composable () -> Unit) {
+        composables.add(RevealedItem(stateCount, content))
     }
 
-    fun textItem(content: @Composable AnnotatedString.Builder.() -> Unit) {
-        composables.add { Text(content) }
+    fun textItem(stateCount: Int = 1, content: @Composable AnnotatedString.Builder.() -> Unit) {
+        composables.add(RevealedItem(stateCount) { Text(content) })
     }
 
     @Composable
     fun Transition<Int>.Content() {
-        for ((index, composable) in composables.withIndex()) {
+        for ((index, revealedItem) in composables.withIndex()) {
             SlideFromTopAnimatedVisibility({ index + since <= it && it < since + composables.size && it < until }) {
-                composable()
+                revealedItem.composable()
             }
         }
     }
 }
+
+data class RevealedItem(
+    val stateCount: Int,
+    val composable: @Composable () -> Unit,
+)
