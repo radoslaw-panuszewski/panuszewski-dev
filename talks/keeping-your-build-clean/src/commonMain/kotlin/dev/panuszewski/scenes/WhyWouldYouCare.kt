@@ -9,7 +9,7 @@ import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.extensions.TagType
+import dev.panuszewski.template.extensions.TagType.NORMAL
 import dev.panuszewski.template.extensions.TagType.WARNING
 import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.safeGet
@@ -40,30 +40,31 @@ fun StoryboardBuilder.WhyWouldYouCare() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
-    val warning by tag(WARNING)
+    val allCode by tag(NORMAL)
 
     """
-    ${warning}plugins {
-        id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+    ${allCode}buildscript {
+        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
     }
     
-    repositories {
-        mavenCentral()
+    allprojects {
+        apply plugin: 'kotlin'
     }
+        
+    subprojects
+        .findAll {it.name.endsWith('-library') }
+        .forEach {
+            it.apply plugin: 'java-library'
+        }
+    
+    println "I'm Groovy lol"
     
     dependencies {
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    }
-    
-    test {
-        useJUnitPlatform()
-    }
-    
-    kotlin {
-        jvmToolchain(25)
-    }${warning}
+    }${allCode}
     """
         .trimIndent()
         .toCodeSample(language = Language.Groovy)
         .startWith { this }
+        .then { changeTagType(allCode, WARNING) }
 }

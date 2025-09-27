@@ -224,3 +224,25 @@ fun sendEvent() {
 - **CORRECT APPROACH**: SlidingTitleScaffold should use `Box(contentAlignment = Alignment.Center)` to maintain the same layout structure as original scenes. Content positioning (offsets/padding) should remain in the scene implementations, not in the scaffold
 - **KEY LESSON**: When extracting reusable components, preserve the EXACT same layout structure and positioning logic as the original implementations. Do not change the fundamental layout approach (center-based vs absolute positioning) when creating scaffolds
 - **TESTING REQUIREMENT**: Always run presentations immediately after layout changes to catch visual regressions. Compilation success does not guarantee correct visual behavior
+
+### Critical Compose State Management Bug: CodeSample equals/hashCode
+- **CRITICAL BUG DISCOVERED**: The `CodeSample.equals()` and `hashCode()` methods were missing the `warningTags` property, causing Compose to treat CodeSample instances with different warning tags as equal. This prevented UI recomposition when only warning tags changed.
+- **SYMPTOMS**: Warning underlines created with `changeTagType(tag, WARNING)` would never appear in the UI during scene transitions, even though debug logs showed the warning tags were being added correctly
+- **ROOT CAUSE**: When properties are missing from `equals()` and `hashCode()`, Compose's state management system cannot detect changes to those properties, preventing recomposition
+- **FIX REQUIRED**: Added `warningTags` to both `equals()` and `hashCode()` methods:
+  ```kotlin
+  override fun equals(other: Any?): Boolean {
+      // ... existing checks ...
+      if (warningTags != other.warningTags) return false  // ✅ Added
+      return true
+  }
+
+  override fun hashCode(): Int {
+      // ... existing fields ...
+      result = 31 * result + warningTags.hashCode()  // ✅ Added
+      return result
+  }
+  ```
+- **DEBUGGING TECHNIQUE**: Use debug output to compare CodeSample instance hash codes - if instances with different properties have the same hash code, check for missing properties in equals/hashCode
+- **COMPOSE GOLDEN RULE**: ALL properties that affect UI rendering MUST be included in both `equals()` and `hashCode()` methods. Missing properties cause silent state management failures that are extremely difficult to debug
+- **PREVENTION**: When adding new properties to data classes used in Compose state, immediately add them to equals/hashCode. Consider using Kotlin data classes which auto-generate these methods correctly

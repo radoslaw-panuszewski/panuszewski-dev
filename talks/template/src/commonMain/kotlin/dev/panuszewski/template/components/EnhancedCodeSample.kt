@@ -126,6 +126,7 @@ private fun extractWarningRanges(codeSample: CodeSample): Map<IntRange, Color> {
     for (warningTag in codeSample.warningTags) {
         // Find annotations for this specific warning tag
         val annotations = processedString.getStringAnnotations(warningTag.annotationStringTag, 0, processedString.length)
+
         for (annotation in annotations) {
             if (annotation.item == warningTag.id) {
                 val range = annotation.start..<annotation.end

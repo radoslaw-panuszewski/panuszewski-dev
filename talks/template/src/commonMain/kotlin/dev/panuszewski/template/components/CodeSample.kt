@@ -12,6 +12,7 @@ import dev.bnorm.storyboard.text.highlight.CodeScope
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.text.replaceAllByTag
+import dev.panuszewski.template.extensions.TagType
 import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.extensions.toCode
 import kotlin.collections.iterator
@@ -136,6 +137,34 @@ class CodeSample private constructor(
     fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag, focusedStyle = focusedStyle, unfocusedStyle = unfocusedStyle)
 
+    fun changeTagType(tag: TextTag, newType: TagType): CodeSample {
+        val updatedWarningTags = when (newType) {
+            TagType.WARNING -> {
+                // Add tag to warning tags if not already present
+                if (tag in warningTags) {
+                    warningTags
+                } else {
+                    warningTags + tag
+                }
+            }
+            else -> {
+                // Remove tag from warning tags if present
+                warningTags - tag
+            }
+        }
+
+        return copy(warningTags = updatedWarningTags)
+    }
+
+    fun changeTagType(tags: List<TextTag>, newType: TagType): CodeSample {
+        if (tags.isEmpty()) return this
+        var result = this
+        for (tag in tags) {
+            result = result.changeTagType(tag, newType)
+        }
+        return result
+    }
+
     fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         focus(tags.asList(), scroll, focusedStyle, unfocusedStyle)
 
@@ -174,6 +203,7 @@ class CodeSample private constructor(
         if (styled != other.styled) return false
         if (scrollTag != other.scrollTag) return false
         if (data != other.data) return false
+        if (warningTags != other.warningTags) return false
         return true
     }
 
@@ -184,6 +214,7 @@ class CodeSample private constructor(
         result = 31 * result + styled.hashCode()
         result = 31 * result + (scrollTag?.hashCode() ?: 0)
         result = 31 * result + (data?.hashCode() ?: 0)
+        result = 31 * result + warningTags.hashCode()
         return result
     }
 }
@@ -213,6 +244,9 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })
     fun CodeSample.hide(data: Any?): CodeSample = hide(tags.filter { data == it.data })
     fun CodeSample.reveal(data: Any?): CodeSample = reveal(tags.filter { data == it.data })
+
+    fun CodeSample.changeTagType(tag: TextTag, newType: TagType): CodeSample = this.changeTagType(tag, newType)
+    fun CodeSample.changeTagType(data: Any?, newType: TagType): CodeSample = this.changeTagType(tags.filter { data == it.data }, newType)
 
     fun CodeSample.then(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         return listOf(this, transformer(this))
