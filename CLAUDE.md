@@ -74,6 +74,40 @@ Available grammar generation tasks in storyboard-text:
 - `:generateXmlGrammarSource`
 - (Other language-specific tasks as needed)
 
+### Adding Simple Language Support
+For basic syntax highlighting using regex patterns (like strings and numbers):
+1. **Create the highlighter file**: Follow the pattern in `Hocon.kt` and `Toml.kt` by creating a new file like `Groovy.kt`
+2. **Define regex patterns**: Use simple regex for basic elements (strings, numbers, keywords)
+3. **Register the language**: Add the new language to the `Language` enum and the `String.highlight()` function in `Language.kt`
+4. **Pattern examples**:
+   - Single quotes: `"""('.*?')""".toRegex()`
+   - Double quotes: `"""(".*?")""".toRegex()`
+   - Numbers: `"""\b(\d+(?:\.\d+)?)\b""".toRegex()`
+
+### Critical Regex Highlighting Pitfalls
+- **MISTAKE: Overlapping Pattern Matches**: When multiple regex patterns match the same text (e.g., numbers inside quoted strings), later patterns can override earlier ones, causing incorrect highlighting
+- **ROOT CAUSE**: The `forEachOccurrence` function applies all matches sequentially. If string patterns match `'2.2.20'` and number patterns match `2.2` and `20` within the same text, the number highlighting overrides the string highlighting
+- **CORRECT APPROACH**: Track ranges that have already been styled and prevent overlapping patterns from overriding previous styling:
+  ```kotlin
+  val stringRanges = mutableSetOf<IntRange>()
+
+  // Apply string highlighting first and track ranges
+  SINGLE_QUOTE_STRING_REGEX.forEachOccurrence(text) { range ->
+      addStyle(codeStyle.string, range)
+      stringRanges.add(range)
+  }
+
+  // Only apply number highlighting if not inside a string
+  NUMBER_REGEX.findAll(text).forEach { match ->
+      val range = match.groups[1]?.rangeCompat
+      if (range != null && !isInsideAnyRange(range, stringRanges)) {
+          addStyle(codeStyle.number, range)
+      }
+  }
+  ```
+- **KEY LESSON**: Always consider pattern precedence when implementing syntax highlighting. Strings should generally take precedence over numbers, keywords over identifiers, etc.
+- **TESTING REQUIREMENT**: Test with realistic code samples that contain overlapping patterns (like `'2.2.20'`) to ensure correct highlighting behavior
+
 ## Architecture Notes
 
 ### Storyboard Concepts
