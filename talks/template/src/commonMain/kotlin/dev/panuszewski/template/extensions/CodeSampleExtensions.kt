@@ -16,8 +16,11 @@ import dev.panuszewski.template.components.CodeSamplesBuilder
 import dev.panuszewski.template.theme.INTELLIJ_DARK_CODE_STYLE
 import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.TagType.NORMAL
 
-fun TextTagScope.tag() = tag("")
+enum class TagType { NORMAL, WARNING }
+
+fun TextTagScope.tag(data: TagType? = NORMAL) = tag("", data)
 
 fun CodeSample.startWith(transformer: CodeSample.() -> CodeSample) = listOf(transformer())
 

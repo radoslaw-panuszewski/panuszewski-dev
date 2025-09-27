@@ -28,7 +28,8 @@ class CodeSample private constructor(
     val text: AnnotatedString,
     val language: Language,
     val title: String?,
-    val splitMethod: (AnnotatedString) -> List<AnnotatedString>
+    val splitMethod: (AnnotatedString) -> List<AnnotatedString>,
+    val warningTags: List<TextTag> = emptyList()
 ) {
     constructor(text: AnnotatedString, language: Language, title: String? = null, splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() })
             : this(emptyList(), FOCUSED_STYLE, UNFOCUSED_STYLE, emptyMap(), emptyMap(), null, null, text, language, title, splitMethod)
@@ -73,6 +74,27 @@ class CodeSample private constructor(
         private val UNFOCUSED_STYLE = SpanStyle(color = Color(0xFF555555))
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
         private val EMPTY = AnnotatedString("")
+
+        internal fun create(
+            text: AnnotatedString,
+            language: Language,
+            title: String? = null,
+            splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
+            warningTags: List<TextTag> = emptyList()
+        ): CodeSample = CodeSample(
+            focus = emptyList(),
+            focusedStyle = FOCUSED_STYLE,
+            unfocusedStyle = UNFOCUSED_STYLE,
+            replaced = emptyMap(),
+            styled = emptyMap(),
+            scrollTag = null,
+            data = null,
+            text = text,
+            language = language,
+            title = title,
+            splitMethod = splitMethod,
+            warningTags = warningTags
+        )
     }
 
     private fun copy(
@@ -87,7 +109,8 @@ class CodeSample private constructor(
         language: Language = this.language,
         title: String? = this.title,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = this.splitMethod,
-    ): CodeSample = CodeSample(focus, focusedStyle, unfocusedStyle, replaced, styled, scrollTag, data, text, language, title, splitMethod)
+        warningTags: List<TextTag> = this.warningTags,
+    ): CodeSample = CodeSample(focus, focusedStyle, unfocusedStyle, replaced, styled, scrollTag, data, text, language, title, splitMethod, warningTags)
 
     fun collapse(tag: TextTag): CodeSample = copy(replaced = replaced + (tag to ELLIPSIS))
     fun collapse(vararg tags: TextTag): CodeSample = collapse(tags.asList())
@@ -174,7 +197,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         title: String? = null,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
-        return CodeSample(extractTags(this), language, title, splitMethod)
+        val warningTags = tags.filter { it.data == dev.panuszewski.template.extensions.TagType.WARNING }
+        return CodeSample.create(extractTags(this), language, title, splitMethod, warningTags)
     }
 
     fun AnnotatedString.toCodeSample(
@@ -182,7 +206,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         title: String? = null,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
-        return CodeSample(this, language, title, splitMethod)
+        val warningTags = tags.filter { it.data == dev.panuszewski.template.extensions.TagType.WARNING }
+        return CodeSample.create(this, language, title, splitMethod, warningTags)
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })

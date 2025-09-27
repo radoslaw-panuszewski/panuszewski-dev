@@ -9,6 +9,8 @@ import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.TagType
+import dev.panuszewski.template.extensions.TagType.WARNING
 import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
@@ -38,8 +40,10 @@ fun StoryboardBuilder.WhyWouldYouCare() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
+    val warning by tag(WARNING)
+
     """
-    plugins {
+    ${warning}plugins {
         id 'org.jetbrains.kotlin.jvm' version '2.2.20'
     }
     
@@ -57,7 +61,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     
     kotlin {
         jvmToolchain(25)
-    }    
+    }${warning}
     """
         .trimIndent()
         .toCodeSample(language = Language.Groovy)

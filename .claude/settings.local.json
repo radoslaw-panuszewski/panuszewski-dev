@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew:*)"
+      "Bash(./gradlew:*)",
+      "Read(//Users/radoslaw.panuszewski/IdeaProjects/**)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
