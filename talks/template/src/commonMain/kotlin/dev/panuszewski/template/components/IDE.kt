@@ -65,7 +65,7 @@ data class IdeState(
 )
 
 @Composable
-fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
+fun IDE(ideState: IdeState, modifier: Modifier = Modifier, overrideScrollPosition: Int? = null) {
     val ideColors = LocalIdeColors.current
     with(ideState) {
         val selectedFile = files.find { it.path == selectedFile }
@@ -228,7 +228,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                         targetState = leftPaneFile,
                                         transitionSpec = { fadeIn() togetherWith fadeOut() }
                                     ) { file ->
-                                        CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                        CodePanel(file = file, modifier = Modifier.padding(16.dp), overrideScrollPosition = overrideScrollPosition)
                                     }
                                 }
                             } else {
@@ -285,7 +285,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                         targetState = rightPaneFile,
                                         transitionSpec = { fadeIn() togetherWith fadeOut() }
                                     ) { file ->
-                                        CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                        CodePanel(file = file, modifier = Modifier.padding(16.dp), overrideScrollPosition = overrideScrollPosition)
                                     }
                                 }
                             } else {
@@ -322,7 +322,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                     targetState = selectedFile,
                                     transitionSpec = { fadeIn() togetherWith fadeOut() }
                                 ) { file ->
-                                    CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                    CodePanel(file = file, modifier = Modifier.padding(16.dp), overrideScrollPosition = overrideScrollPosition)
                                 }
                             }
                         } else {
@@ -457,7 +457,7 @@ private fun FileTreeItem(
 }
 
 @Composable
-private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
+private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier, overrideScrollPosition: Int? = null) {
     val ideColors = LocalIdeColors.current
     Box(
         modifier = modifier
@@ -467,6 +467,7 @@ private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
         code2 {
             file.content?.ScrollableEnhancedMagicCodeSample(
                 scrollMargin = 8,
+                overrideScrollPosition = overrideScrollPosition,
                 skipIndentationInWarnings = true
             ) ?: file.staticContent?.MagicAnnotatedString()
         }

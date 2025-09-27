@@ -94,12 +94,13 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
         tween(DefaultMoveDurationMillis, delayMillis = DefaultFadeDurationMillis, easing = EaseInOut)
     },
     scrollMargin: Int = 0,
+    overrideScrollPosition: Int? = null,
     showWarningUnderlines: Boolean = true,
     skipIndentationInWarnings: Boolean = true,
 ) {
     val state = rememberScrollState()
     val lineHeight = with(LocalDensity.current) { LocalTextStyle.current.lineHeight.toPx() }
-    val scrollPosition by animateFloat(scrollTransitionSpec, "ScrollAnimation") { (it.Scroll() - scrollMargin) * lineHeight }
+    val scrollPosition by animateFloat(scrollTransitionSpec, "ScrollAnimation") { ((overrideScrollPosition ?: it.Scroll()) - scrollMargin) * lineHeight }
     state.dispatchRawDelta(scrollPosition - state.value)
 
     Box(
