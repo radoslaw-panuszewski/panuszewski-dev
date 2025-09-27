@@ -24,7 +24,7 @@ val FutureOfJvmBuildTools = Storyboard.build(
     format = SceneFormat.Default,
     decorator = LIGHT_THEME,
 ) {
-//    FirstSlide()
+    FirstSlide()
 
     section("The Future of JVM Build Tools") {
         FutureOfJvmBuildToolsTitle(animateToPresent = false)

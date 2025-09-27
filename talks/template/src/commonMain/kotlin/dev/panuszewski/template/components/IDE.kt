@@ -414,7 +414,7 @@ private fun FileTreeItem(
                 },
                 color = when {
                     isEnlarged -> ideColors.textPrimary
-                    isSelected -> ideColors.textSecondary
+                    isSelected -> ideColors.textPrimary
                     node.isFolder -> ideColors.textPrimary
                     else -> ideColors.textPrimary
                 }
