@@ -59,10 +59,18 @@ class RevealSequentiallyScope(
 
     @Composable
     fun Transition<Int>.Content() {
-        for ((index, revealedItem) in composables.withIndex()) {
-            SlideFromTopAnimatedVisibility({ index + since <= it && it < since + composables.size && it < until }) {
+        // Calculate cumulative state positions for each item
+        var cumulativeState = since
+
+        for (revealedItem in composables) {
+            val itemStartState = cumulativeState
+            val nextItemStartState = cumulativeState + revealedItem.stateCount
+
+            SlideFromTopAnimatedVisibility({ it in itemStartState..< until }) {
                 revealedItem.composable()
             }
+
+            cumulativeState = nextItemStartState
         }
     }
 }
