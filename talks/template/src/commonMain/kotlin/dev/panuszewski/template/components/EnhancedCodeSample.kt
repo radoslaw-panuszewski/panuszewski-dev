@@ -6,7 +6,6 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +29,6 @@ import dev.bnorm.storyboard.text.magic.MagicText
 import dev.bnorm.storyboard.toDpSize
 import dev.panuszewski.template.components.spans.SquigglyUnderlineSpanPainter
 import dev.panuszewski.template.components.spans.rememberSquigglyUnderlineAnimator
-import dev.panuszewski.template.extensions.TagType
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -91,16 +88,15 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
     scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = {
-        tween(DefaultMoveDurationMillis, delayMillis = DefaultFadeDurationMillis, easing = EaseInOut)
+        tween(20000, easing = EaseInOut)
     },
     scrollMargin: Int = 0,
-    overrideScrollPosition: Int? = null,
     showWarningUnderlines: Boolean = true,
     skipIndentationInWarnings: Boolean = true,
 ) {
     val state = rememberScrollState()
     val lineHeight = with(LocalDensity.current) { LocalTextStyle.current.lineHeight.toPx() }
-    val scrollPosition by animateFloat(scrollTransitionSpec, "ScrollAnimation") { ((overrideScrollPosition ?: it.Scroll()) - scrollMargin) * lineHeight }
+    val scrollPosition by animateFloat(scrollTransitionSpec, "ScrollAnimation") { (it.Scroll() - scrollMargin) * lineHeight }
     state.dispatchRawDelta(scrollPosition - state.value)
 
     Box(
