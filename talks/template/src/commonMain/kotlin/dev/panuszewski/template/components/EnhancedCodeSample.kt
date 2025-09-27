@@ -41,6 +41,7 @@ fun Transition<CodeSample>.EnhancedMagicCodeSample(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
     showWarningUnderlines: Boolean = true,
+    skipIndentationInWarnings: Boolean = true,
 ) {
     val style = LocalTextStyle.current
     val measurer = rememberTextMeasurer()
@@ -57,7 +58,7 @@ fun Transition<CodeSample>.EnhancedMagicCodeSample(
     val transition = createChildTransition { codeSample -> codeSample.Split() }
 
     if (showWarningUnderlines) {
-        val warningRanges = extractWarningRanges(currentState)
+        val warningRanges = extractWarningRanges(currentState, skipIndentationInWarnings)
         val sample = currentState.String()
 
         MagicText(
@@ -94,6 +95,7 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
     },
     scrollMargin: Int = 0,
     showWarningUnderlines: Boolean = true,
+    skipIndentationInWarnings: Boolean = true,
 ) {
     val state = rememberScrollState()
     val lineHeight = with(LocalDensity.current) { LocalTextStyle.current.lineHeight.toPx() }
@@ -113,12 +115,13 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
             fadeDurationMillis = fadeDurationMillis,
             delayDurationMillis = delayDurationMillis,
             showWarningUnderlines = showWarningUnderlines,
+            skipIndentationInWarnings = skipIndentationInWarnings,
         )
     }
 }
 
 @Composable
-private fun extractWarningRanges(codeSample: CodeSample): Map<IntRange, Color> {
+private fun extractWarningRanges(codeSample: CodeSample, skipIndentation: Boolean = true): Map<IntRange, Color> {
     val ranges = mutableMapOf<IntRange, Color>()
     val processedString = codeSample.String()
 
@@ -130,9 +133,14 @@ private fun extractWarningRanges(codeSample: CodeSample): Map<IntRange, Color> {
         for (annotation in annotations) {
             if (annotation.item == warningTag.id) {
                 val range = annotation.start..<annotation.end
-                val adjustedRanges = createRangesSkippingIndentation(processedString.text, range)
-                for (adjustedRange in adjustedRanges) {
-                    ranges[adjustedRange] = Color.Yellow
+
+                if (skipIndentation) {
+                    val adjustedRanges = createRangesSkippingIndentation(processedString.text, range)
+                    for (adjustedRange in adjustedRanges) {
+                        ranges[adjustedRange] = Color.Yellow
+                    }
+                } else {
+                    ranges[range] = Color.Yellow
                 }
             }
         }

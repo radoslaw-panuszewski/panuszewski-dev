@@ -466,8 +466,8 @@ private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
     ) {
         code2 {
             file.content?.ScrollableEnhancedMagicCodeSample(
-//                scrollTransitionSpec = { tween(durationMillis = 1000, delayMillis = 0) },
-                scrollMargin = 8
+                scrollMargin = 8,
+                skipIndentationInWarnings = false
             ) ?: file.staticContent?.MagicAnnotatedString()
         }
     }
