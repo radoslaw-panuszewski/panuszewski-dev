@@ -40,15 +40,14 @@ fun StoryboardBuilder.WhyBother() {
         subsequentNumbers(since = ideAppears + 1)
 
     val (
+        groovyBulletpoint,
+        noTypeSafetyBulletpoint,
         imperativeCodeBulletpoint,
         crossConfigurationBulletpoint,
         mixedConcernsBulletpoint,
-        noTypeSafetyBulletpoint,
-        groovyBulletpoint,
+        ideBackToNormal
     ) =
         subsequentNumbers(since = bulletpointsAppear)
-
-    val ideBackToNormal = groovyBulletpoint + 1
 
     scene(stateCount = ideBackToNormal + 1) {
         withStateTransition {
@@ -97,14 +96,13 @@ fun StoryboardBuilder.WhyBother() {
                                     crossConfigurationBulletpoint -> BUILD_GRADLE_KTS[4]
                                     imperativeCodeBulletpoint -> BUILD_GRADLE_KTS[3]
                                     noTypeSafetyBulletpoint -> BUILD_GRADLE_KTS[2]
-                                    groovyBulletpoint -> BUILD_GRADLE_KTS[1]
+                                    groovyBulletpoint -> BUILD_GRADLE_KTS[0]
                                     else -> BUILD_GRADLE_KTS[0]
                                 }
                             }
                         )
                     },
                     selectedFile = "build.gradle",
-                    fileTreeHidden = currentState >= ideShrinks,
                     fileTreeWidth = fileTreeWidth,
                 )
 
