@@ -18,18 +18,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.easel.LocalStoryboard
+import dev.bnorm.storyboard.text.TextTag
 import dev.bnorm.storyboard.text.magic.DefaultDelayDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultFadeDurationMillis
 import dev.bnorm.storyboard.text.magic.DefaultMoveDurationMillis
 import dev.bnorm.storyboard.text.magic.MagicText
 import dev.bnorm.storyboard.toDpSize
+import dev.panuszewski.template.components.spans.SpanDrawInstructions
 import dev.panuszewski.template.components.spans.SquigglyUnderlineSpanPainter
-import dev.panuszewski.template.components.spans.rememberSquigglyUnderlineAnimator
-import kotlin.time.Duration.Companion.seconds
+import dev.panuszewski.template.components.spans.SquigglyUnderlineAnimator
+
+private data class UnderlineDrawKey(
+    val sampleHash: Int,
+    val rangesHash: Int
+)
+
+private val drawInstructionsCache = mutableMapOf<UnderlineDrawKey, SpanDrawInstructions>()
 
 @Composable
 fun Transition<CodeSample>.EnhancedMagicCodeSample(
@@ -42,35 +51,41 @@ fun Transition<CodeSample>.EnhancedMagicCodeSample(
 ) {
     val style = LocalTextStyle.current
     val measurer = rememberTextMeasurer()
-    val animator = rememberSquigglyUnderlineAnimator(2.seconds)
-    val painter = remember(animator) {
+    val painter = remember {
         SquigglyUnderlineSpanPainter(
             width = 1.sp,
             wavelength = 6.sp,
             bottomOffset = 0.sp,
-            animator = animator
+            animator = SquigglyUnderlineAnimator.NoOp
         )
     }
 
     val transition = createChildTransition { codeSample -> codeSample.Split() }
 
     if (showWarningUnderlines) {
-        val warningRanges = extractWarningRanges(currentState, skipIndentationInWarnings)
         val sample = currentState.String()
+        val warningRanges = extractWarningRanges(sample, currentState.warningTags, skipIndentationInWarnings)
+
+        val cacheKey = UnderlineDrawKey(sample.hashCode(), warningRanges.hashCode())
+        val drawInstructions = if (warningRanges.isNotEmpty()) {
+            drawInstructionsCache.getOrPut(cacheKey) {
+                val textLayoutResult = measurer.measure(sample, style = style)
+                painter.drawInstructionsFor(textLayoutResult, warningRanges)
+            }
+        } else {
+            null
+        }
 
         MagicText(
             transition = transition,
             modifier = modifier.drawBehind {
-                if (warningRanges.isNotEmpty()) {
-                    val result = measurer.measure(sample, style = style)
-                    with(painter.drawInstructionsFor(result, warningRanges)) { draw() }
-                }
+                drawInstructions?.let { with(it) { draw() } }
             },
             moveDurationMillis = moveDurationMillis,
             fadeDurationMillis = fadeDurationMillis,
             delayDurationMillis = delayDurationMillis
         )
-    } else {
+    } else{
         MagicText(
             transition = transition,
             modifier = modifier,
@@ -87,9 +102,7 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = {
-        tween(5000, easing = EaseInOut)
-    },
+    scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = { tween(0) },
     scrollMargin: Int = 0,
     showWarningUnderlines: Boolean = true,
     skipIndentationInWarnings: Boolean = true,
@@ -118,12 +131,17 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
 }
 
 @Composable
-private fun extractWarningRanges(codeSample: CodeSample, skipIndentation: Boolean = true): Map<IntRange, Color> {
+private fun extractWarningRanges(processedString: AnnotatedString, warningTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
+    return remember(processedString.hashCode(), warningTags.hashCode(), skipIndentation) {
+        extractWarningRangesImpl(processedString, warningTags, skipIndentation)
+    }
+}
+
+private fun extractWarningRangesImpl(processedString: AnnotatedString, warningTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
     val ranges = mutableMapOf<IntRange, Color>()
-    val processedString = codeSample.String()
 
     // Use the warning tags that were stored during CodeSample creation
-    for (warningTag in codeSample.warningTags) {
+    for (warningTag in warningTags) {
         // Find annotations for this specific warning tag
         val annotations = processedString.getStringAnnotations(warningTag.annotationStringTag, 0, processedString.length)
 

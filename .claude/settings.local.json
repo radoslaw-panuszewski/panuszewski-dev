@@ -3,7 +3,9 @@
     "allow": [
       "Bash(./gradlew:*)",
       "Read(//Users/radoslaw.panuszewski/IdeaProjects/**)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pkill:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

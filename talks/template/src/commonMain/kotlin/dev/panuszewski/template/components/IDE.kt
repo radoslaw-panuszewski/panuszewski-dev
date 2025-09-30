@@ -496,7 +496,7 @@ private fun CodePanel(file: ProjectFile, modifier: Modifier = Modifier) {
         code2 {
             file.content?.ScrollableEnhancedMagicCodeSample(
                 scrollMargin = 8,
-                skipIndentationInWarnings = true
+                skipIndentationInWarnings = true,
             ) ?: file.staticContent?.MagicAnnotatedString()
         }
     }

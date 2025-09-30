@@ -133,19 +133,19 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     $${allCode}buildscript {
         classpath($${noTypesafe1}'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
     }
-    
+
     $${crossConfig1}allprojects$${crossConfig1} {
         $${imperative1}apply plugin: 'kotlin'$${imperative1}
     }
-        
+
     $${crossConfig2}subprojects$${crossConfig2}
         $${imperative2}.findAll { it.name.endsWith('-library') }
         .forEach { it.apply plugin: 'java-library' }$${imperative2}
-    
+
     $${mixedConcerns}dependencies {
         implementation $${noTypesafe2}project(':first-library')$${noTypesafe2}
     }
-    
+
     tasks.register('sayHello') {
         doLast {
             $${imperative3}println 'lol'$${imperative3}
@@ -153,7 +153,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }$${mixedConcerns}$${allCode}
     """
         .trimIndent()
-        .toCodeSample(language = Language.Groovy)
+        .toCodeSample(language = Language.Groovy, splitMethod = { listOf(it) })
         .startWith { this }
         .then { focus(allCode) }
         .then { focus(noTypesafe1, noTypesafe2, noTypesafe3) }

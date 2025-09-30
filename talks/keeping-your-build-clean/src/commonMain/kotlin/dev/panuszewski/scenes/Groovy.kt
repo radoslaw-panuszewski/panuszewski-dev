@@ -20,6 +20,7 @@ import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
@@ -32,6 +33,7 @@ fun StoryboardBuilder.Groovy() {
 
     scene(100) {
         withStateTransition {
+            BUILD_GRADLE_KTS.precompose()
             val ideTopPadding by animateDp {
                 when {
                     it >= ideBackToNormal -> 0.dp
@@ -80,19 +82,19 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     $${allCode}buildscript {
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
     }
-    
+
     allprojects {
         apply plugin: 'kotlin'
     }
-        
+
     subprojects
         .findAll { it.name.endsWith('-library') }
         .forEach { it.apply plugin: 'java-library' }
-    
+
     dependencies {
         implementation project(':first-library')
     }
-    
+
     tasks.register('sayHello') {
         doLast {
             println 'lol'
