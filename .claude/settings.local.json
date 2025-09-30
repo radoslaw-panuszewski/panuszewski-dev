@@ -5,7 +5,8 @@
       "Read(//Users/radoslaw.panuszewski/IdeaProjects/**)",
       "Bash(find:*)",
       "Bash(pkill:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Read(//Users/radoslaw.panuszewski/**)"
     ],
     "deny": [],
     "ask": []

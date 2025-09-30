@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -43,7 +42,6 @@ fun StoryboardBuilder.Groovy() {
             }
 
             TitleScaffold("Groovy 🤢") {
-
                 Column(
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,10 +74,12 @@ fun StoryboardBuilder.Groovy() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
-    val allCode by tag()
+    val nothing by tag()
+    val groovy by tag()
+    val kotlin by tag()
 
     $$"""
-    $${allCode}buildscript {
+    $${nothing}$${nothing}$${groovy}buildscript {
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
     }
 
@@ -99,10 +99,32 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         doLast {
             println 'lol'
         }
-    }$${allCode}
+    }$${groovy}$${kotlin}buildscript {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
+    }
+
+    allprojects {
+        apply(plugin = "kotlin")
+    }
+
+    subprojects
+        .filter { it.name.endsWith("-library") }
+        .forEach { it.apply(plugin = "java-library") }
+
+    dependencies {
+        implementation(project(":first-library"))
+    }
+
+    tasks.register("sayHello") {
+        doLast {
+            println("lol")
+        }
+    }$${kotlin}
     """
         .trimIndent()
         .toCodeSample(language = Language.Groovy)
-        .startWith { this }
-        .then { underline(allCode) }
+        .startWith { hide(kotlin) }
+        .then { underline(groovy).focus(nothing) }
+        .then { unfocus().resetUnderline(groovy) }
+        .then { hide(groovy).reveal(kotlin).changeLanguage(Language.KotlinDsl) }
 }

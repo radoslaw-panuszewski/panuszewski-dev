@@ -10,7 +10,8 @@ enum class Language {
     Properties,
     Toml,
     Hocon,
-    Groovy
+    Groovy,
+    KotlinDsl
 }
 
 fun String.highlight(
@@ -27,5 +28,6 @@ fun String.highlight(
         Language.Toml -> highlightToml(this, codeStyle)
         Language.Hocon -> highlightHocon(this, codeStyle)
         Language.Groovy -> highlightGroovy(this, codeStyle)
+        Language.KotlinDsl -> highlightKotlinDsl(this, codeStyle)
     }
 }
