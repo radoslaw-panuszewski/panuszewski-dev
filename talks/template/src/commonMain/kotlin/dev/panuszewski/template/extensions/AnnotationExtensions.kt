@@ -4,14 +4,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 
-fun String.annotate(tagStyles: Map<String, SpanStyle> = emptyMap()): AnnotatedString =
+fun String.annotate(vararg tagStyles: Pair<String, SpanStyle>): AnnotatedString =
     buildAnnotatedString {
         val tagMatches = findTagMatches(this@annotate)
         val tagStack = mutableListOf<TagInfo>()
         var currentIndex = 0
         tagMatches.forEach { tagMatch ->
             appendTextBeforeTag(this@annotate, currentIndex, tagMatch.startIndex)
-            currentIndex = processTag(tagMatch, tagStack, tagStyles)
+            currentIndex = processTag(tagMatch, tagStack, tagStyles.toMap())
         }
         appendRemainingText(this@annotate, currentIndex)
     }

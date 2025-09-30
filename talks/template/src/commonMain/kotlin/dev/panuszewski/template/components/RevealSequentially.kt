@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -57,7 +58,11 @@ class RevealSequentiallyScope(
         items.add(RevealedItem(stateCount, content))
     }
 
-    fun textItem(stateCount: Int = 1, content: @Composable AnnotatedString.Builder.() -> Unit) {
+    fun stringItem(content: String, stateCount: Int = 1) {
+        items.add(RevealedItem(stateCount) { Text(content) })
+    }
+
+    fun annotatedStringItem(stateCount: Int = 1, content: @Composable AnnotatedString.Builder.() -> Unit) {
         items.add(RevealedItem(stateCount) { Text(content) })
     }
 

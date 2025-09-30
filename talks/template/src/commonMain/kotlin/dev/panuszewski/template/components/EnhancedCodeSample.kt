@@ -88,7 +88,7 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
     scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = {
-        tween(10000, easing = EaseInOut)
+        tween(5000, easing = EaseInOut)
     },
     scrollMargin: Int = 0,
     showWarningUnderlines: Boolean = true,

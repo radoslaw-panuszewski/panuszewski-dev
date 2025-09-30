@@ -27,27 +27,27 @@ fun StoryboardBuilder.WrappingUp() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     RevealSequentially {
-                        textItem {
+                        annotatedStringItem {
                             append("Maven 4 will support ")
                             appendWithPrimaryColor("alternative POM syntaxes")
                         }
-                        textItem {
+                        annotatedStringItem {
                             appendWithSecondaryVariantColor("Configuration cache")
                             append(" can save you a lot of time!")
                         }
-                        textItem {
+                        annotatedStringItem {
                             appendWithSecondaryColor("Declarative Gradle")
                             append(" is what Gradle needs the most")
                         }
-                        textItem {
+                        annotatedStringItem {
                             append("Play around with ")
                             appendWithColor(NICE_BLUE, "Amper")
                             append(" and see how simple your build can be 😉")
                         }
-                        textItem {
+                        annotatedStringItem {
                             append("The overall direction is towards improving toolability 🛠️")
                         }
-                        textItem {
+                        annotatedStringItem {
                             append("Remember that most this stuff is experimental! 🧪")
                         }
                     }

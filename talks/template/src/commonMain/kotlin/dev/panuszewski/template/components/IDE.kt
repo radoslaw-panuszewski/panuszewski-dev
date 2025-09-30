@@ -63,10 +63,11 @@ data class IdeState(
     val fileTreeHidden: Boolean = false,
     val enlargedFile: String? = null,
     val highlightedFile: String? = null,
+    val fileTreeWidth: Dp? = null
 )
 
 @Composable
-fun IDE(ideState: IdeState, modifier: Modifier = Modifier, fileTreeWidth: Dp? = null) {
+fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
     val ideColors = LocalIdeColors.current
     with(ideState) {
         val selectedFile = files.find { it.path == selectedFile }

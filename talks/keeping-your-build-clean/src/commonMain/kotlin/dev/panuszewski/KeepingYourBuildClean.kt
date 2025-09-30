@@ -2,6 +2,7 @@ package dev.panuszewski
 
 import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
+import dev.panuszewski.scenes.Groovy
 import dev.panuszewski.scenes.WhyBother
 import dev.panuszewski.template.theme.DARK_THEME
 
@@ -22,4 +23,5 @@ val KeepingYourBuildClean = Storyboard.build(
 //    )
 
     WhyBother()
+    Groovy()
 }
