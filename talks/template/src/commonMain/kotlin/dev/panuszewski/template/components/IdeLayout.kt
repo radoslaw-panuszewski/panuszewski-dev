@@ -16,6 +16,19 @@ import dev.panuszewski.template.extensions.withStateTransition
 
 @Composable
 fun SceneScope<Int>.IdeLayout(
+    topPanelOpenAt: IntRange,
+    topPanel: ComposableLambda,
+    leftPanelOpenAt: IntRange,
+    leftPanel: ComposableLambda,
+) = IdeLayout(
+    topPanelOpenAt = topPanelOpenAt.toList(),
+    topPanel = topPanel,
+    leftPanelOpenAt = leftPanelOpenAt.toList(),
+    leftPanel = leftPanel,
+)
+
+@Composable
+fun SceneScope<Int>.IdeLayout(
     topPanelOpenAt: List<Int>,
     leftPanelOpenAt: List<Int>,
     topPanel: ComposableLambda,
@@ -24,14 +37,14 @@ fun SceneScope<Int>.IdeLayout(
     withStateTransition {
         val ideTopPadding by animateDp { if (it in topPanelOpenAt) 260.dp else 0.dp }
         val ideStartPadding by animateDp { if (it in leftPanelOpenAt) 260.dp else 0.dp }
-        val fileTreeWidth by animateDp { if (it in leftPanelOpenAt) 275.dp else 0.dp }
+        val fileTreeWidth by animateDp { if (it in leftPanelOpenAt) 0.dp else 275.dp }
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.TopCenter)) {
                 topPanel()
             }
 
-            Box(Modifier.align(Alignment.CenterStart)) {
+            Box(Modifier.align(Alignment.TopStart)) {
                 leftPanel()
             }
 

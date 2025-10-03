@@ -1,6 +1,5 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
@@ -22,9 +21,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.bnorm.storyboard.toState
-import dev.panuszewski.template.components.IDE
 import dev.panuszewski.template.components.IDE_STATE
+import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.RevealSequentially
@@ -55,71 +53,12 @@ fun StoryboardBuilder.Groovy() {
         withStateTransition {
             BUILD_GRADLE_KTS.precompose()
 
-            val ideTopPadding by animateDp {
-                when {
-                    it >= ideExpandsVertically -> 0.dp
-                    it >= ideShrinksVertically -> 260.dp
-                    else -> 0.dp
-                }
-            }
-
-            val ideStartPadding by animateDp {
-                when {
-                    it >= ideExpandsHorizontally -> 0.dp
-                    it >= ideShrinksHorizontally -> 260.dp
-                    else -> 0.dp
-                }
-            }
-
-            val fileTreeWidth by animateDp {
-                when {
-                    it >= ideExpandsHorizontally -> 275.dp
-                    it >= ideShrinksHorizontally -> 0.dp
-                    else -> 275.dp
-                }
-            }
-
             val title = when {
                 currentState >= titleChanges -> "Kotlin DSL ❤️"
                 else -> "Groovy"
             }
 
             TitleScaffold(title) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    RevealSequentially(since = bulletpointsAppear) {
-                        stringItem("Dynamic typing")
-                        stringItem("Poor IDE support")
-                        stringItem("Hard to debug")
-                    }
-                }
-
-                if (currentState >= ideShrinksHorizontally - 1) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(top = 32.dp).align(TopStart),
-                    ) {
-                        h6 {
-                            createChildTransition {
-                                when {
-                                    it >= groovyCrossedOut -> buildAnnotatedString {
-                                        append(BULLET_1)
-                                        withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
-                                    }
-                                    else -> "$BULLET_1 Groovy".annotate()
-                                }
-                            }.MagicAnnotatedString()
-
-                            Text("$BULLET_1 No type safety")
-                            Text("$BULLET_1 Imperative code")
-                            Text("$BULLET_1 Cross configuration")
-                            Text("$BULLET_1 Mixed concerns")
-                        }
-                    }
-                }
 
                 val fileName = if (currentState >= titleChanges) "build.gradle.kts" else "build.gradle"
 
@@ -131,12 +70,49 @@ fun StoryboardBuilder.Groovy() {
                         )
                     },
                     selectedFile = fileName,
-                    fileTreeWidth = fileTreeWidth,
                 )
 
-                IDE(
-                    IDE_STATE,
-                    modifier = Modifier.padding(top = ideTopPadding, start = ideStartPadding),
+                IdeLayout(
+                    topPanelOpenAt = ideShrinksVertically until ideExpandsVertically,
+                    topPanel = @Composable {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            RevealSequentially(since = bulletpointsAppear) {
+                                stringItem("Dynamic typing")
+                                stringItem("Poor IDE support")
+                                stringItem("Hard to debug")
+                            }
+                        }
+                    },
+                    leftPanelOpenAt = ideShrinksHorizontally until ideExpandsHorizontally,
+                    leftPanel = @Composable {
+                        if (currentState >= ideShrinksHorizontally - 1) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.padding(top = 32.dp).align(TopStart),
+                            ) {
+                                h6 {
+                                    createChildTransition {
+                                        when {
+                                            it >= groovyCrossedOut -> buildAnnotatedString {
+                                                append(BULLET_1)
+                                                withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
+                                            }
+                                            else -> "$BULLET_1 Groovy".annotate()
+                                        }
+                                    }.MagicAnnotatedString()
+
+                                    Text("$BULLET_1 No type safety")
+                                    Text("$BULLET_1 Imperative code")
+                                    Text("$BULLET_1 Cross configuration")
+                                    Text("$BULLET_1 Mixed concerns")
+                                }
+                            }
+                        }
+                    }
                 )
 
                 Box(Modifier.align(Alignment.Center)) {
