@@ -42,7 +42,8 @@ private val SETTINGS_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample()
         .startWith { hide(typesafeProjectAccessors) }
-        .then { reveal(typesafeProjectAccessors) }
+        .then { reveal(typesafeProjectAccessors).focus(typesafeProjectAccessors) }
+        .then { unfocus() }
         .switchTo("build.gradle.kts")
 }
 
@@ -85,7 +86,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .forEach { it.apply(plugin = "java-library") }
     
     dependencies {
-        ${nonTypesafeConfiguration1}"implementation"${nonTypesafeConfiguration1}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeProjectDependency}project(":first-library")${nonTypesafeProjectDependency})
+        ${nonTypesafeConfiguration1}"implementation"${nonTypesafeConfiguration1}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeProjectDependency}project(":first-library")${nonTypesafeProjectDependency}${typesafeProjectDependency}projects.firstLibrary${typesafeProjectDependency})
         ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeExternalDependency})
     }
     
@@ -97,11 +98,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(declarativePlugin, typesafeTask, typesafeConfiguration1, typesafeConfiguration2) }
+        .startWith { hide(declarativePlugin, typesafeTask, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
         .then { focus(nonTypesafeTask) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(nonTypesafeProjectDependency) }
-        .switchTo("settings.gradle.kts")
         .then { focus(nonTypesafeExternalDependency) }
         .then { unfocus() }
         .then { focus(imperativePlugin) }
@@ -110,4 +110,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { unfocus().hide(nonTypesafeTask).reveal(typesafeTask) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).focusNoStyling(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
+        .then { focus(nonTypesafeProjectDependency) }
+        .switchTo("settings.gradle.kts")
+        .then { this }
+        .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).focusNoStyling(nonTypesafeProjectDependency) }
 }
