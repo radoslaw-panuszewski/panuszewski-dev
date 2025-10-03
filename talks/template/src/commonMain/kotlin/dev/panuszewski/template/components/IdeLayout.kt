@@ -67,6 +67,7 @@ fun buildFileStateMapping(
     var globalState = 0
     
     mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+    fileStates[currentFile] = 1
     
     while (true) {
         val currentFileSamples = allCodeSamples[currentFile] ?: break
