@@ -123,41 +123,63 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
 
     $$"""
     $${nothing}$${nothing}$${groovy}buildscript {
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
+        repositories {
+            gradlePluginPortal()
+        }
+        dependencies {
+            classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
+        }
     }
-
+    
     allprojects {
-        apply plugin: 'kotlin'
+        apply plugin: 'org.jetbrains.kotlin.jvm'
+    
+        kotlin {
+            explicitApi()
+        }
     }
-
+    
     subprojects
         .findAll { it.name.endsWith('-library') }
         .forEach { it.apply plugin: 'java-library' }
-
+    
     dependencies {
         implementation project(':first-library')
+        implementation 'org.mongodb:mongodb-driver-sync:5.6.0'
     }
-
+    
     tasks.register('sayHello') {
         doLast {
             println 'lol'
         }
-    }$${groovy}$${kotlin}buildscript {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
-    }
+    }$${groovy}$${kotlin}import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
+    buildscript {
+        repositories {
+            gradlePluginPortal()
+        }
+        dependencies {
+            classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
+        }
+    }
+    
     allprojects {
-        apply(plugin = "kotlin")
+        apply(plugin = "org.jetbrains.kotlin.jvm")
+    
+        configure<KotlinJvmExtension> {
+            explicitApi()
+        }
     }
-
+    
     subprojects
         .filter { it.name.endsWith("-library") }
         .forEach { it.apply(plugin = "java-library") }
-
+    
     dependencies {
-        implementation(project(":first-library"))
+        "implementation"(project(":first-library"))
+        "implementation"("org.mongodb:mongodb-driver-sync:5.6.0")
     }
-
+    
     tasks.register("sayHello") {
         doLast {
             println("lol")

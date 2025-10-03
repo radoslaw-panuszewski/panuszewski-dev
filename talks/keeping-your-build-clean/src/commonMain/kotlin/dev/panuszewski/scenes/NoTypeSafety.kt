@@ -36,30 +36,40 @@ fun StoryboardBuilder.NoTypeSafety() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
-    val kotlin by tag()
+    """
+    import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
-    $$"""
-    $${kotlin}buildscript {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
+    buildscript {
+        repositories {
+            gradlePluginPortal()
+        }
+        dependencies {
+            classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
+        }
     }
-
+    
     allprojects {
-        apply(plugin = "kotlin")
+        apply(plugin = "org.jetbrains.kotlin.jvm")
+    
+        configure<KotlinJvmExtension> {
+            explicitApi()
+        }
     }
-
+    
     subprojects
         .filter { it.name.endsWith("-library") }
         .forEach { it.apply(plugin = "java-library") }
-
+    
     dependencies {
-        implementation(project(":first-library"))
+        "implementation"(project(":first-library"))
+        "implementation"("org.mongodb:mongodb-driver-sync:5.6.0")
     }
-
+    
     tasks.register("sayHello") {
         doLast {
             println("lol")
         }
-    }$${kotlin}
+    }
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
