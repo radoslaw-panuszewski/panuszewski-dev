@@ -2,12 +2,9 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +18,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.MagicAnnotatedString
@@ -29,7 +25,6 @@ import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.precompose
@@ -61,18 +56,20 @@ fun StoryboardBuilder.Groovy() {
             TitleScaffold(title) {
                 val fileName = if (currentState >= titleChanges) "build.gradle.kts" else "build.gradle"
 
-                IdeLayout(
+                val files = buildList {
+                    addFile(
+                        name = fileName,
+                        content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it - ideExpandsVertically) }
+                    )
+                }
+
+                IdeLayout {
                     ideState = IdeState(
-                        files = buildList {
-                            addFile(
-                                name = fileName,
-                                content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it - ideExpandsVertically) }
-                            )
-                        },
+                        files = files,
                         selectedFile = fileName,
-                    ),
-                    topPanelOpenAt = ideShrinksVertically until ideExpandsVertically,
-                    topPanel = @Composable {
+                    )
+
+                    topPanel(openAt = ideShrinksVertically until ideExpandsVertically) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,9 +81,9 @@ fun StoryboardBuilder.Groovy() {
                                 stringItem("Hard to debug")
                             }
                         }
-                    },
-                    leftPanelOpenAt = ideShrinksHorizontally until ideExpandsHorizontally,
-                    leftPanel = @Composable {
+                    }
+
+                    leftPanel(openAt = ideShrinksHorizontally until ideExpandsHorizontally) {
                         if (currentState >= ideShrinksHorizontally - 1) {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -110,12 +107,12 @@ fun StoryboardBuilder.Groovy() {
                                 }
                             }
                         }
-                    },
-                    centerEmojiVisibleAt = listOf(vomitEmojiAppears),
-                    centerEmoji = @Composable {
+                    }
+
+                    centerEmoji(visibleAt = vomitEmojiAppears) {
                         Text(text = "🤢")
                     }
-                )
+                }
             }
         }
     }
