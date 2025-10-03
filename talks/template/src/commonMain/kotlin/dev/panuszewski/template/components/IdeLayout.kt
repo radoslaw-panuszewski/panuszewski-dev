@@ -64,13 +64,11 @@ fun buildFileStateMapping(
     val fileStates = mutableMapOf<String, Int>().apply {
         allCodeSamples.keys.forEach { put(it, 0) }
     }
-    var justSwitched = false
     var globalState = 0
     
     mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
     
     while (true) {
-        globalState++
         val currentFileSamples = allCodeSamples[currentFile] ?: break
         val currentFileState = fileStates[currentFile] ?: 0
         
@@ -80,8 +78,7 @@ fun buildFileStateMapping(
         val switchMarker = sample?.data as? SwitchToFile
         
         if (switchMarker != null) {
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
-            
+            globalState++
             val previousFile = currentFile
             currentFile = switchMarker.fileName
             if (currentFile !in fileStates) {
@@ -105,13 +102,12 @@ fun buildFileStateMapping(
                 }
             }
             
-            justSwitched = true
-        } else {
-            if (!justSwitched) {
-                fileStates[currentFile] = currentFileState + 1
-            }
-            justSwitched = false
             mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+            fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
+        } else {
+            globalState++
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+            fileStates[currentFile] = currentFileState + 1
         }
         
         if (globalState > 100) break
