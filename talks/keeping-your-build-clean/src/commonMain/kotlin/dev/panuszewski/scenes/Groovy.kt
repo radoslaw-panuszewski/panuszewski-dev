@@ -134,8 +134,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     allprojects {
         apply plugin: 'org.jetbrains.kotlin.jvm'
     
-        kotlin {
-            explicitApi()
+        compileKotlin {
+            compilerOptions {
+                explicitApiMode = Strict
+            }
         }
     }
     
@@ -152,9 +154,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         doLast {
             println 'lol'
         }
-    }$${groovy}$${kotlin}import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
-
-    buildscript {
+    }$${groovy}$${kotlin}buildscript {
         repositories {
             gradlePluginPortal()
         }
@@ -166,8 +166,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     allprojects {
         apply(plugin = "org.jetbrains.kotlin.jvm")
     
-        configure<KotlinJvmExtension> {
-            explicitApi()
+        tasks.named<KotlinCompile>("compileKotlin") {
+            compilerOptions {
+                explicitApiMode = Strict
+            }
         }
     }
     

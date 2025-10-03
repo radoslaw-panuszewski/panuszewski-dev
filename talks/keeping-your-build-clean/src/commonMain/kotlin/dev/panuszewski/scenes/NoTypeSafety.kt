@@ -37,8 +37,6 @@ fun StoryboardBuilder.NoTypeSafety() {
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
-    import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
-
     buildscript {
         repositories {
             gradlePluginPortal()
@@ -51,8 +49,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     allprojects {
         apply(plugin = "org.jetbrains.kotlin.jvm")
     
-        configure<KotlinJvmExtension> {
-            explicitApi()
+        tasks.named<KotlinCompile>("compileKotlin") {
+            compilerOptions {
+                explicitApiMode = Strict
+            }
         }
     }
     

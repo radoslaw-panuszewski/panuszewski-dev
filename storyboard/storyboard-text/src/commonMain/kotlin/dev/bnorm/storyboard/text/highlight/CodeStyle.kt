@@ -21,6 +21,7 @@ class CodeStyle private constructor(
     val typeParameters: SpanStyle,
     val namedArgument: SpanStyle,
     val label: SpanStyle,
+    val dsl: SpanStyle,
 ) {
     companion object {
         fun build(
@@ -44,6 +45,7 @@ class CodeStyle private constructor(
                     typeParameters = base,
                     namedArgument = base,
                     label = base,
+                    dsl = base,
                 )
             ).apply(builder).build()
         }
@@ -65,6 +67,7 @@ class CodeStyle private constructor(
         var typeParameters: SpanStyle = base.typeParameters
         var namedArgument: SpanStyle = base.namedArgument
         var label: SpanStyle = base.label
+        var dsl: SpanStyle = base.dsl
 
         fun build(): CodeStyle {
             return CodeStyle(
@@ -83,6 +86,7 @@ class CodeStyle private constructor(
                 typeParameters = typeParameters,
                 namedArgument = namedArgument,
                 label = label,
+                dsl = dsl,
             )
         }
     }

@@ -354,7 +354,7 @@ private fun CodeDisplayArea(
                                     targetState = selectedFile,
                                     transitionSpec = { fadeIn() togetherWith fadeOut() }
                                 ) { file ->
-                                    CodePanel(file = file, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
+                                    CodePanel(file = file, modifier = Modifier.padding(top = 16.dp))
                                 }
                             }
                         } else {
