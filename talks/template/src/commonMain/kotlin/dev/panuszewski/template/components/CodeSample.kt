@@ -233,6 +233,8 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 
 data class SwitchToFile(val fileName: String)
 
+val DIRECTORY: List<CodeSample> = emptyList()
+
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
         language: Language = Language.Kotlin,

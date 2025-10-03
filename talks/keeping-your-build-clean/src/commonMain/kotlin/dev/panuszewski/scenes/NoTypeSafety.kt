@@ -2,6 +2,7 @@ package dev.panuszewski.scenes
 
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
@@ -15,18 +16,13 @@ fun StoryboardBuilder.NoTypeSafety() {
         withStateTransition {
             TitleScaffold("No type safety") {
                 val ideState = buildIdeStateWithMapping(
-                    primaryFile = "build.gradle.kts" to BUILD_GRADLE_KTS,
-                    otherFiles = mapOf(
+                    files = listOf(
+                        "build.gradle.kts" to BUILD_GRADLE_KTS,
                         "settings.gradle.kts" to SETTINGS_GRADLE_KTS,
-                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML
+                        ".gradle" to DIRECTORY,
+                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML,
                     ),
-                    globalTransition = this@withStateTransition,
-                    directories = listOf(".gradle"),
-                    filesOrder = listOf(
-                        "build.gradle.kts",
-                        "settings.gradle.kts",
-                        ".gradle",
-                    )
+                    globalTransition = this@withStateTransition
                 )
                 
                 IdeLayout {
