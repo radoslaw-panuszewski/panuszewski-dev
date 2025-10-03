@@ -55,32 +55,66 @@ data class FileStateMapping(
     val fileStates: Map<String, Int>
 )
 
-fun buildFileStateMapping(initialFile: String, codeSamples: List<CodeSample>): List<FileStateMapping> {
+fun buildFileStateMapping(
+    initialFile: String,
+    allCodeSamples: Map<String, List<CodeSample>>
+): List<FileStateMapping> {
     val mappings = mutableListOf<FileStateMapping>()
     var currentFile = initialFile
-    val fileStates = mutableMapOf(currentFile to 0)
+    val fileStates = mutableMapOf<String, Int>().apply {
+        allCodeSamples.keys.forEach { put(it, 0) }
+    }
     var justSwitched = false
+    var globalState = 0
     
     mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
     
-    for ((index, sample) in codeSamples.drop(1).withIndex()) {
-        val switchMarker = sample.data as? SwitchToFile
+    while (true) {
+        globalState++
+        val currentFileSamples = allCodeSamples[currentFile] ?: break
+        val currentFileState = fileStates[currentFile] ?: 0
+        
+        if (currentFileState >= currentFileSamples.size) break
+        
+        val sample = currentFileSamples.getOrNull(currentFileState)
+        val switchMarker = sample?.data as? SwitchToFile
         
         if (switchMarker != null) {
             mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
             
+            val previousFile = currentFile
             currentFile = switchMarker.fileName
             if (currentFile !in fileStates) {
                 fileStates[currentFile] = 0
             }
+            
+            fileStates[previousFile] = currentFileState + 1
+            
+            while (true) {
+                val newFileState = fileStates[currentFile] ?: 0
+                val newFileSamples = allCodeSamples[currentFile] ?: break
+                if (newFileState >= newFileSamples.size) break
+                
+                val newSample = newFileSamples.getOrNull(newFileState)
+                val newSwitchMarker = newSample?.data as? SwitchToFile
+                
+                if (newSwitchMarker != null) {
+                    fileStates[currentFile] = newFileState + 1
+                } else {
+                    break
+                }
+            }
+            
             justSwitched = true
         } else {
             if (!justSwitched) {
-                fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
+                fileStates[currentFile] = currentFileState + 1
             }
             justSwitched = false
             mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
         }
+        
+        if (globalState > 100) break
     }
     
     return mappings
@@ -94,8 +128,8 @@ fun buildIdeStateWithMapping(
     globalTransition: Transition<Int>
 ): IdeState {
     val allCodeSamples = mapOf(primaryFile.first to primaryFile.second) + otherFiles
-    val mapping = remember(primaryFile.second) {
-        buildFileStateMapping(initialFile, primaryFile.second)
+    val mapping = remember(allCodeSamples) {
+        buildFileStateMapping(initialFile, allCodeSamples)
     }
     
     val files = remember(allCodeSamples, mapping) {
