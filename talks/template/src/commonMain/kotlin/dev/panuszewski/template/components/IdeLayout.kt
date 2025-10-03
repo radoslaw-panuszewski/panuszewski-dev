@@ -119,14 +119,13 @@ fun buildFileStateMapping(
 
 @Composable
 fun buildIdeStateWithMapping(
-    initialFile: String,
     primaryFile: Pair<String, List<CodeSample>>,
     otherFiles: Map<String, List<CodeSample>>,
     globalTransition: Transition<Int>
 ): IdeState {
     val allCodeSamples = mapOf(primaryFile.first to primaryFile.second) + otherFiles
     val mapping = remember(allCodeSamples) {
-        buildFileStateMapping(initialFile, allCodeSamples)
+        buildFileStateMapping(primaryFile.first, allCodeSamples)
     }
     
     val files = remember(allCodeSamples, mapping) {
@@ -152,7 +151,7 @@ fun buildIdeStateWithMapping(
     }
     
     val selectedFile = globalTransition.createChildTransition { globalState ->
-        mapping.getOrNull(globalState)?.selectedFile ?: initialFile
+        mapping.getOrNull(globalState)?.selectedFile ?: primaryFile.first
     }.targetState
     
     return IdeState(

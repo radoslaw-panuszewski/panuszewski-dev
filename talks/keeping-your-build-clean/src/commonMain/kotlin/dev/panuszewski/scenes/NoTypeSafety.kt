@@ -15,7 +15,6 @@ fun StoryboardBuilder.NoTypeSafety() {
         withStateTransition {
             TitleScaffold("No type safety") {
                 val ideState = buildIdeStateWithMapping(
-                    initialFile = "build.gradle.kts",
                     primaryFile = "build.gradle.kts" to BUILD_GRADLE_KTS,
                     otherFiles = mapOf(
                         "settings.gradle.kts" to SETTINGS_GRADLE_KTS
@@ -42,8 +41,7 @@ private val SETTINGS_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample()
         .startWith { hide(typesafeProjectAccessors) }
-        .then { reveal(typesafeProjectAccessors).focus(typesafeProjectAccessors) }
-        .then { unfocus() }
+        .then { reveal(typesafeProjectAccessors) }
         .switchTo("build.gradle.kts")
 }
 
