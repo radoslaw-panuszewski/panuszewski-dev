@@ -2,6 +2,8 @@
 
 This file provides guidance to GitHub Copilot when working with code in this repository.
 
+**Important:** Always ask clarifying questions if you don't understand something!
+
 **Important:** Remember to always update `copilot-instructions.md` and `CLAUDE.md` after performing a task if you learned something new!
 
 ## Development Priorities

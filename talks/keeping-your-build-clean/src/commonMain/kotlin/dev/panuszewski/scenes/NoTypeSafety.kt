@@ -108,6 +108,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { focus(nonTypesafeTask) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(nonTypesafeProjectDependency) }
+        .switchTo("settings.gradle.kts")
         .then { focus(nonTypesafeExternalDependency) }
         .then { unfocus() }
         .then { focus(imperativePlugin) }

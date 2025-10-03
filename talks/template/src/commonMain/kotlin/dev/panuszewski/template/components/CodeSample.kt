@@ -231,6 +231,8 @@ class CodeSample private constructor(
 fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
     CodeSamplesBuilder().builder()
 
+data class SwitchToFile(val fileName: String)
+
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
         language: Language = Language.Kotlin,
@@ -263,6 +265,10 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.then(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         return this + transformer(this.last())
+    }
+
+    fun List<CodeSample>.switchTo(fileName: String): List<CodeSample> {
+        return this + last().attach(SwitchToFile(fileName))
     }
 
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {

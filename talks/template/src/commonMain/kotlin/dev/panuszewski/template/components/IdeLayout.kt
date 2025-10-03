@@ -57,6 +57,23 @@ fun SceneScope<Int>.IdeLayout(
             IDE_STATE = scope.ideState!!
         }
 
+        val currentState = transition.targetState
+        val selectedFile = IDE_STATE.files.find { file ->
+            file.content?.targetState?.data is SwitchToFile == false
+        }?.let { file ->
+            val codeSample = file.content?.targetState
+            val switchMarker = codeSample?.data as? SwitchToFile
+            if (switchMarker != null) {
+                switchMarker.fileName
+            } else {
+                IDE_STATE.selectedFile
+            }
+        } ?: IDE_STATE.selectedFile
+
+        val actualSelectedFile = IDE_STATE.files.firstOrNull { it.content?.targetState?.data is SwitchToFile }
+            ?.let { (it.content?.targetState?.data as? SwitchToFile)?.fileName }
+            ?: IDE_STATE.selectedFile
+
         val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt) 260.dp else 0.dp }
         val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt) 260.dp else 0.dp }
         val fileTreeWidth by animateDp { if (it in scope.leftPanelOpenAt) 0.dp else 275.dp }
@@ -75,7 +92,10 @@ fun SceneScope<Int>.IdeLayout(
             }
 
             IDE(
-                ideState = IDE_STATE.copy(fileTreeWidth = fileTreeWidth),
+                ideState = IDE_STATE.copy(
+                    fileTreeWidth = fileTreeWidth,
+                    selectedFile = actualSelectedFile
+                ),
                 modifier = Modifier.padding(top = ideTopPadding, start = ideStartPadding),
             )
 
