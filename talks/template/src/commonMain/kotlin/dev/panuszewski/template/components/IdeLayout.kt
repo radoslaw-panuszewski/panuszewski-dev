@@ -20,34 +20,22 @@ import dev.panuszewski.template.extensions.withStateTransition
 
 @Composable
 fun SceneScope<Int>.IdeLayout(
+    ideState: IdeState? = null,
     topPanelOpenAt: IntRange? = null,
     topPanel: ComposableLambda? = null,
     leftPanelOpenAt: IntRange? = null,
     leftPanel: ComposableLambda? = null,
     centerEmojiVisibleAt: List<Int>? = null,
     centerEmoji: ComposableLambda? = null,
-) = IdeLayout(
-    topPanelOpenAt = topPanelOpenAt?.toList(),
-    topPanel = topPanel,
-    leftPanelOpenAt = leftPanelOpenAt?.toList(),
-    leftPanel = leftPanel,
-    centerEmojiVisibleAt = centerEmojiVisibleAt,
-    centerEmoji = centerEmoji,
-)
-
-@Composable
-fun SceneScope<Int>.IdeLayout(
-    topPanelOpenAt: List<Int>? = null,
-    leftPanelOpenAt: List<Int>? = null,
-    topPanel: ComposableLambda? = null,
-    leftPanel: ComposableLambda? = null,
-    centerEmojiVisibleAt: List<Int>? = null,
-    centerEmoji: ComposableLambda? = null,
-) {
+) =
     withStateTransition {
-        val ideTopPadding by animateDp { if (it in topPanelOpenAt.orEmpty()) 260.dp else 0.dp }
-        val ideStartPadding by animateDp { if (it in leftPanelOpenAt.orEmpty()) 260.dp else 0.dp }
-        val fileTreeWidth by animateDp { if (it in leftPanelOpenAt.orEmpty()) 0.dp else 275.dp }
+        if (ideState != null) {
+            IDE_STATE = ideState
+        }
+
+        val ideTopPadding by animateDp { if (it in topPanelOpenAt?.toList().orEmpty()) 260.dp else 0.dp }
+        val ideStartPadding by animateDp { if (it in leftPanelOpenAt?.toList().orEmpty()) 260.dp else 0.dp }
+        val fileTreeWidth by animateDp { if (it in leftPanelOpenAt?.toList().orEmpty()) 0.dp else 275.dp }
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.TopCenter)) {
@@ -72,4 +60,3 @@ fun SceneScope<Int>.IdeLayout(
             }
         }
     }
-}

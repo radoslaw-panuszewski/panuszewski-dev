@@ -61,17 +61,16 @@ fun StoryboardBuilder.Groovy() {
             TitleScaffold(title) {
                 val fileName = if (currentState >= titleChanges) "build.gradle.kts" else "build.gradle"
 
-                IDE_STATE = IdeState(
-                    files = buildList {
-                        addFile(
-                            name = fileName,
-                            content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it - ideExpandsVertically) }
-                        )
-                    },
-                    selectedFile = fileName,
-                )
-
                 IdeLayout(
+                    ideState = IdeState(
+                        files = buildList {
+                            addFile(
+                                name = fileName,
+                                content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it - ideExpandsVertically) }
+                            )
+                        },
+                        selectedFile = fileName,
+                    ),
                     topPanelOpenAt = ideShrinksVertically until ideExpandsVertically,
                     topPanel = @Composable {
                         Column(
