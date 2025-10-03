@@ -59,7 +59,6 @@ fun StoryboardBuilder.Groovy() {
             }
 
             TitleScaffold(title) {
-
                 val fileName = if (currentState >= titleChanges) "build.gradle.kts" else "build.gradle"
 
                 IDE_STATE = IdeState(
@@ -112,16 +111,12 @@ fun StoryboardBuilder.Groovy() {
                                 }
                             }
                         }
+                    },
+                    centerEmojiVisibleAt = listOf(vomitEmojiAppears),
+                    centerEmoji = @Composable {
+                        Text(text = "🤢")
                     }
                 )
-
-                Box(Modifier.align(Alignment.Center)) {
-                    FadeInOutAnimatedVisibility({ it == vomitEmojiAppears }) {
-                        ProvideTextStyle(MaterialTheme.typography.h1) {
-                            Text(text = "🤢")
-                        }
-                    }
-                }
             }
         }
     }
