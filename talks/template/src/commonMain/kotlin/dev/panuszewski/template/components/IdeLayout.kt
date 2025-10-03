@@ -1,6 +1,8 @@
 package dev.panuszewski.template.components
 
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,12 +10,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
 import dev.panuszewski.template.extensions.ComposableLambda
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
+import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.withStateTransition
 
 class IdeLayoutScope internal constructor() {
@@ -46,6 +50,86 @@ class IdeLayoutScope internal constructor() {
     }
 }
 
+data class FileStateMapping(
+    val selectedFile: String,
+    val fileStates: Map<String, Int>
+)
+
+fun buildFileStateMapping(initialFile: String, codeSamples: List<CodeSample>): List<FileStateMapping> {
+    val mappings = mutableListOf<FileStateMapping>()
+    var currentFile = initialFile
+    val fileStates = mutableMapOf(currentFile to 0)
+    var justSwitched = false
+    
+    mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+    
+    for ((index, sample) in codeSamples.drop(1).withIndex()) {
+        val switchMarker = sample.data as? SwitchToFile
+        
+        if (switchMarker != null) {
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+            
+            currentFile = switchMarker.fileName
+            if (currentFile !in fileStates) {
+                fileStates[currentFile] = 0
+            }
+            justSwitched = true
+        } else {
+            if (!justSwitched) {
+                fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
+            }
+            justSwitched = false
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+        }
+    }
+    
+    return mappings
+}
+
+@Composable
+fun buildIdeStateWithMapping(
+    initialFile: String,
+    primaryFile: Pair<String, List<CodeSample>>,
+    otherFiles: Map<String, List<CodeSample>>,
+    globalTransition: Transition<Int>
+): IdeState {
+    val allCodeSamples = mapOf(primaryFile.first to primaryFile.second) + otherFiles
+    val mapping = remember(primaryFile.second) {
+        buildFileStateMapping(initialFile, primaryFile.second)
+    }
+    
+    val files = remember(allCodeSamples, mapping) {
+        allCodeSamples.map { (filePath, codeSamples) ->
+            val name = filePath.substringAfterLast('/')
+            Pair(filePath, name)
+        }
+    }.map { (filePath, name) ->
+        val fileTransition = globalTransition.createChildTransition { globalState ->
+            val fileStateMap = mapping.getOrNull(globalState)
+            val codeSamples = allCodeSamples[filePath] ?: emptyList()
+            val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
+            mappedState.coerceIn(0, codeSamples.lastIndex.coerceAtLeast(0))
+        }
+        
+        ProjectFile(
+            name = name,
+            path = filePath,
+            content = fileTransition.createChildTransition { state ->
+                allCodeSamples[filePath]?.safeGet(state)
+            } as Transition<CodeSample>?
+        )
+    }
+    
+    val selectedFile = globalTransition.createChildTransition { globalState ->
+        mapping.getOrNull(globalState)?.selectedFile ?: initialFile
+    }.targetState
+    
+    return IdeState(
+        files = files,
+        selectedFile = selectedFile
+    )
+}
+
 @Composable
 fun SceneScope<Int>.IdeLayout(
     builder: IdeLayoutScope.() -> Unit
@@ -56,23 +140,6 @@ fun SceneScope<Int>.IdeLayout(
         if (scope.ideState != null) {
             IDE_STATE = scope.ideState!!
         }
-
-        val currentState = transition.targetState
-        val selectedFile = IDE_STATE.files.find { file ->
-            file.content?.targetState?.data is SwitchToFile == false
-        }?.let { file ->
-            val codeSample = file.content?.targetState
-            val switchMarker = codeSample?.data as? SwitchToFile
-            if (switchMarker != null) {
-                switchMarker.fileName
-            } else {
-                IDE_STATE.selectedFile
-            }
-        } ?: IDE_STATE.selectedFile
-
-        val actualSelectedFile = IDE_STATE.files.firstOrNull { it.content?.targetState?.data is SwitchToFile }
-            ?.let { (it.content?.targetState?.data as? SwitchToFile)?.fileName }
-            ?: IDE_STATE.selectedFile
 
         val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt) 260.dp else 0.dp }
         val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt) 260.dp else 0.dp }
@@ -92,10 +159,7 @@ fun SceneScope<Int>.IdeLayout(
             }
 
             IDE(
-                ideState = IDE_STATE.copy(
-                    fileTreeWidth = fileTreeWidth,
-                    selectedFile = actualSelectedFile
-                ),
+                ideState = IDE_STATE.copy(fileTreeWidth = fileTreeWidth),
                 modifier = Modifier.padding(top = ideTopPadding, start = ideStartPadding),
             )
 

@@ -264,7 +264,13 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     }
 
     fun List<CodeSample>.then(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
-        return this + transformer(this.last())
+        val lastSample = this.last()
+        val cleanedSample = if (lastSample.data is SwitchToFile) {
+            lastSample.attach(null)
+        } else {
+            lastSample
+        }
+        return this + transformer(cleanedSample)
     }
 
     fun List<CodeSample>.switchTo(fileName: String): List<CodeSample> {

@@ -1,14 +1,11 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.animation.core.createChildTransition
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IdeLayout
-import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.TitleScaffold
-import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.extensions.safeGet
+import dev.panuszewski.template.components.buildIdeStateWithMapping
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
@@ -17,22 +14,17 @@ fun StoryboardBuilder.NoTypeSafety() {
     scene(100) {
         withStateTransition {
             TitleScaffold("No type safety") {
-                val files = buildList {
-                    addFile(
-                        name = "build.gradle.kts",
-                        content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it) }
-                    )
-                    addFile(
-                        name = "settings.gradle.kts",
-                        content = createChildTransition { SETTINGS_GRADLE_KTS.safeGet(it) }
-                    )
-                }
-
+                val ideState = buildIdeStateWithMapping(
+                    initialFile = "build.gradle.kts",
+                    primaryFile = "build.gradle.kts" to BUILD_GRADLE_KTS,
+                    otherFiles = mapOf(
+                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS
+                    ),
+                    globalTransition = this@withStateTransition
+                )
+                
                 IdeLayout {
-                    ideState = IdeState(
-                        files = files,
-                        selectedFile = "build.gradle.kts",
-                    )
+                    this.ideState = ideState
                 }
             }
         }
@@ -43,14 +35,15 @@ private val SETTINGS_GRADLE_KTS = buildCodeSamples {
     val typesafeProjectAccessors by tag()
 
     """
-    rootProject.name = "example-project"    
+    ${typesafeProjectAccessors}enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
     
-    ${typesafeProjectAccessors}enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")${typesafeProjectAccessors}
+    ${typesafeProjectAccessors}rootProject.name = "example-project"        
     """
         .trimIndent()
         .toCodeSample()
         .startWith { hide(typesafeProjectAccessors) }
         .then { reveal(typesafeProjectAccessors) }
+        .switchTo("build.gradle.kts")
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
