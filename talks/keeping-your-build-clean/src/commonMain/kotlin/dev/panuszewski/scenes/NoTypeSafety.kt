@@ -17,9 +17,16 @@ fun StoryboardBuilder.NoTypeSafety() {
                 val ideState = buildIdeStateWithMapping(
                     primaryFile = "build.gradle.kts" to BUILD_GRADLE_KTS,
                     otherFiles = mapOf(
-                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS
+                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS,
+                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML
                     ),
-                    globalTransition = this@withStateTransition
+                    globalTransition = this@withStateTransition,
+                    directories = listOf(".gradle"),
+                    filesOrder = listOf(
+                        "build.gradle.kts",
+                        "settings.gradle.kts",
+                        ".gradle",
+                    )
                 )
                 
                 IdeLayout {
@@ -28,6 +35,15 @@ fun StoryboardBuilder.NoTypeSafety() {
             }
         }
     }
+}
+
+private val LIBS_VERSIONS_TOML = buildCodeSamples {
+    """
+        
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.Toml)
+        .startWith { this }
 }
 
 private val SETTINGS_GRADLE_KTS = buildCodeSamples {

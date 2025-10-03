@@ -121,19 +121,21 @@ fun buildFileStateMapping(
 fun buildIdeStateWithMapping(
     primaryFile: Pair<String, List<CodeSample>>,
     otherFiles: Map<String, List<CodeSample>>,
-    globalTransition: Transition<Int>
+    globalTransition: Transition<Int>,
+    directories: List<String> = emptyList(),
+    filesOrder: List<String> = emptyList()
 ): IdeState {
     val allCodeSamples = mapOf(primaryFile.first to primaryFile.second) + otherFiles
     val mapping = remember(allCodeSamples) {
         buildFileStateMapping(primaryFile.first, allCodeSamples)
     }
     
-    val files = remember(allCodeSamples, mapping) {
+    val contentFilesMap = remember(allCodeSamples, mapping) {
         allCodeSamples.map { (filePath, codeSamples) ->
             val name = filePath.substringAfterLast('/')
-            Pair(filePath, name)
-        }
-    }.map { (filePath, name) ->
+            filePath to Pair(filePath, name)
+        }.toMap()
+    }.mapValues { (filePath, pathNamePair) ->
         val fileTransition = globalTransition.createChildTransition { globalState ->
             val fileStateMap = mapping.getOrNull(globalState)
             val codeSamples = allCodeSamples[filePath] ?: emptyList()
@@ -142,7 +144,7 @@ fun buildIdeStateWithMapping(
         }
         
         ProjectFile(
-            name = name,
+            name = pathNamePair.second,
             path = filePath,
             content = fileTransition.createChildTransition { state ->
                 allCodeSamples[filePath]?.safeGet(state)
@@ -150,12 +152,30 @@ fun buildIdeStateWithMapping(
         )
     }
     
+    val directoryFilesMap = directories.associateWith { dirPath ->
+        ProjectFile(
+            name = dirPath.substringAfterLast('/'),
+            path = dirPath,
+            isDirectory = true
+        )
+    }
+    
+    val allItemsMap = directoryFilesMap + contentFilesMap
+    
+    val allFiles = if (filesOrder.isNotEmpty()) {
+        val orderedFiles = filesOrder.mapNotNull { allItemsMap[it] }
+        val unlistedFiles = allItemsMap.values.filter { it.path !in filesOrder }
+        orderedFiles + unlistedFiles
+    } else {
+        allItemsMap.values.toList()
+    }
+    
     val selectedFile = globalTransition.createChildTransition { globalState ->
         mapping.getOrNull(globalState)?.selectedFile ?: primaryFile.first
     }.targetState
     
     return IdeState(
-        files = files,
+        files = allFiles,
         selectedFile = selectedFile
     )
 }
