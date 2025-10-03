@@ -1,6 +1,5 @@
 package dev.panuszewski.template.components
 
-import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
@@ -30,8 +29,8 @@ import dev.bnorm.storyboard.text.magic.DefaultMoveDurationMillis
 import dev.bnorm.storyboard.text.magic.MagicText
 import dev.bnorm.storyboard.toDpSize
 import dev.panuszewski.template.components.spans.SpanDrawInstructions
-import dev.panuszewski.template.components.spans.SquigglyUnderlineSpanPainter
 import dev.panuszewski.template.components.spans.SquigglyUnderlineAnimator
+import dev.panuszewski.template.components.spans.SquigglyUnderlineSpanPainter
 
 private data class UnderlineDrawKey(
     val sampleHash: Int,
@@ -102,7 +101,7 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = { tween(0) },
+    scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = { tween(1000) },
     scrollMargin: Int = 0,
     showWarningUnderlines: Boolean = true,
     skipIndentationInWarnings: Boolean = true,

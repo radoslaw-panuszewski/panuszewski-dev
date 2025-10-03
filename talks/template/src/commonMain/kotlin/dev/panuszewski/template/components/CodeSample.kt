@@ -177,6 +177,9 @@ class CodeSample private constructor(
     fun focus(tag: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         focus(listOf(tag), scroll, focusedStyle, unfocusedStyle)
 
+    fun focusNoStyling(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
+        focus(tags.asList(), scroll, null, null)
+
     fun unfocus(unscroll: Boolean = true): CodeSample =
         copy(focus = emptyList(), scrollTag = if (unscroll) null else scrollTag)
 
