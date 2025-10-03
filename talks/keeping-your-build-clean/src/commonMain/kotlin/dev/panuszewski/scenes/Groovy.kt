@@ -84,27 +84,25 @@ fun StoryboardBuilder.Groovy() {
                     }
 
                     leftPanel(openAt = ideShrinksHorizontally until ideExpandsHorizontally) {
-                        if (currentState >= ideShrinksHorizontally - 1) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(16.dp),
-                                modifier = Modifier.padding(top = 32.dp).align(TopStart),
-                            ) {
-                                h6 {
-                                    createChildTransition {
-                                        when {
-                                            it >= groovyCrossedOut -> buildAnnotatedString {
-                                                append(BULLET_1)
-                                                withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
-                                            }
-                                            else -> "$BULLET_1 Groovy".annotate()
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(top = 32.dp).align(TopStart),
+                        ) {
+                            h6 {
+                                createChildTransition {
+                                    when {
+                                        it >= groovyCrossedOut -> buildAnnotatedString {
+                                            append(BULLET_1)
+                                            withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
                                         }
-                                    }.MagicAnnotatedString()
+                                        else -> "$BULLET_1 Groovy".annotate()
+                                    }
+                                }.MagicAnnotatedString()
 
-                                    Text("$BULLET_1 No type safety")
-                                    Text("$BULLET_1 Imperative code")
-                                    Text("$BULLET_1 Cross configuration")
-                                    Text("$BULLET_1 Mixed concerns")
-                                }
+                                Text("$BULLET_1 No type safety")
+                                Text("$BULLET_1 Imperative code")
+                                Text("$BULLET_1 Cross configuration")
+                                Text("$BULLET_1 Mixed concerns")
                             }
                         }
                     }

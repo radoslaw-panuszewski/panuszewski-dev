@@ -18,20 +18,20 @@ import dev.panuszewski.template.extensions.withStateTransition
 
 class IdeLayoutScope internal constructor() {
     var ideState: IdeState? = null
-    var topPanelOpenAt: IntRange? = null
+    var topPanelOpenAt: List<Int> = emptyList()
     var topPanelContent: ComposableLambda? = null
-    var leftPanelOpenAt: IntRange? = null
+    var leftPanelOpenAt: List<Int> = emptyList()
     var leftPanelContent: ComposableLambda? = null
-    var centerEmojiVisibleAt: List<Int>? = null
+    var centerEmojiVisibleAt: List<Int> = emptyList()
     var centerEmojiContent: ComposableLambda? = null
 
     fun topPanel(openAt: IntRange, content: ComposableLambda) {
-        topPanelOpenAt = openAt
+        topPanelOpenAt = openAt.toList()
         topPanelContent = content
     }
 
     fun leftPanel(openAt: IntRange, content: ComposableLambda) {
-        leftPanelOpenAt = openAt
+        leftPanelOpenAt = openAt.toList()
         leftPanelContent = content
     }
 
@@ -57,17 +57,21 @@ fun SceneScope<Int>.IdeLayout(
             IDE_STATE = scope.ideState!!
         }
 
-        val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt?.toList().orEmpty()) 260.dp else 0.dp }
-        val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt?.toList().orEmpty()) 260.dp else 0.dp }
-        val fileTreeWidth by animateDp { if (it in scope.leftPanelOpenAt?.toList().orEmpty()) 0.dp else 275.dp }
+        val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt) 260.dp else 0.dp }
+        val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt) 260.dp else 0.dp }
+        val fileTreeWidth by animateDp { if (it in scope.leftPanelOpenAt) 0.dp else 275.dp }
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.TopCenter)) {
-                scope.topPanelContent?.invoke()
+                FadeInOutAnimatedVisibility({ it in scope.topPanelOpenAt }) {
+                    scope.topPanelContent?.invoke()
+                }
             }
 
             Box(Modifier.align(Alignment.TopStart)) {
-                scope.leftPanelContent?.invoke()
+                FadeInOutAnimatedVisibility({ it in scope.leftPanelOpenAt }) {
+                    scope.leftPanelContent?.invoke()
+                }
             }
 
             IDE(
