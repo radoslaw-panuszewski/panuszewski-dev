@@ -1,6 +1,5 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.material.Text
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.DIRECTORY
@@ -23,18 +22,14 @@ fun StoryboardBuilder.ImperativeCode() {
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
     )
-    val emojiAppears = calculateTotalStates(files)
+    val totalStates = calculateTotalStates(files)
 
-    scene(100) {
+    scene(totalStates) {
         withStateTransition {
             TitleScaffold("Imperative code") {
                 IDE_STATE = buildIdeStateWithMapping(files)
 
-                IdeLayout {
-                    centerEmoji(visibleAt = emojiAppears) {
-                        Text("😬")
-                    }
-                }
+                IdeLayout { }
             }
         }
     }
@@ -98,6 +93,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(topWhen, bottomWhen, monday) }
         .then { reveal(postgres, cassandra) }
         .then { reveal(masochistIfTop, masochistIfBottom) }
+        .showEmoji("😬")
+        .hideEmoji()
         .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 //        .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
 //        .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }

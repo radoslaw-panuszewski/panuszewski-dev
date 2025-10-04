@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -70,7 +71,8 @@ class IdeLayoutScope internal constructor() {
 
 data class FileStateMapping(
     val selectedFile: String,
-    val fileStates: Map<String, Int>
+    val fileStates: Map<String, Int>,
+    val emoji: String? = null
 )
 
 fun buildFileStateMapping(
@@ -83,8 +85,9 @@ fun buildFileStateMapping(
         allCodeSamples.keys.forEach { put(it, 0) }
     }
     var globalState = 0
+    var currentEmoji: String? = null
     
-    mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+    mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji))
     fileStates[currentFile] = 1
     
     while (true) {
@@ -95,6 +98,8 @@ fun buildFileStateMapping(
         
         val sample = currentFileSamples.getOrNull(currentFileState)
         val switchMarker = sample?.data as? SwitchToFile
+        val showEmojiMarker = sample?.data as? ShowEmoji
+        val hideEmojiMarker = sample?.data === HideEmoji
         
         if (switchMarker != null) {
             globalState++
@@ -121,11 +126,21 @@ fun buildFileStateMapping(
                 }
             }
             
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
+        } else if (showEmojiMarker != null) {
+            globalState++
+            currentEmoji = showEmojiMarker.emoji
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (hideEmojiMarker) {
+            globalState++
+            currentEmoji = null
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji))
+            fileStates[currentFile] = currentFileState + 1
         } else {
             globalState++
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap()))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji))
             fileStates[currentFile] = currentFileState + 1
         }
         
@@ -347,9 +362,15 @@ fun Transition<Int>.buildIdeStateWithMapping(
         mapping[clampedState].selectedFile
     }.targetState
     
+    val emoji = createChildTransition { globalState ->
+        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+        mapping[clampedState].emoji
+    }.targetState
+    
     return IdeState(
         files = allFiles,
-        selectedFile = selectedFile
+        selectedFile = selectedFile,
+        emoji = emoji
     )
 }
 
@@ -387,9 +408,9 @@ fun SceneScope<Int>.IdeLayout(
             )
 
             Box(Modifier.align(Alignment.Center)) {
-                FadeInOutAnimatedVisibility({ it in scope.centerEmojiVisibleAt }) {
+                FadeInOutAnimatedVisibility({ IDE_STATE.emoji != null }) {
                     ProvideTextStyle(MaterialTheme.typography.h1) {
-                        scope.centerEmojiContent?.invoke()
+                        Text(IDE_STATE.emoji ?: "")
                     }
                 }
             }

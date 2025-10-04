@@ -237,6 +237,10 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 
 data class SwitchToFile(val fileName: String)
 
+data class ShowEmoji(val emoji: String)
+
+object HideEmoji
+
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
 data class Directory(val isInitiallyHidden: Boolean = false)
@@ -288,6 +292,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.switchTo(fileName: String): List<CodeSample> {
         return this + last().attach(SwitchToFile(fileName))
+    }
+
+    fun List<CodeSample>.showEmoji(emoji: String): List<CodeSample> {
+        return this + last().attach(ShowEmoji(emoji))
+    }
+
+    fun List<CodeSample>.hideEmoji(): List<CodeSample> {
+        return this + last().attach(HideEmoji)
     }
 
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {

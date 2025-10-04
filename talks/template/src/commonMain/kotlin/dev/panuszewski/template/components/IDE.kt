@@ -69,7 +69,8 @@ data class IdeState(
     val fileTreeHidden: Boolean = false,
     val enlargedFile: String? = null,
     val highlightedFile: String? = null,
-    val fileTreeWidth: Dp? = null
+    val fileTreeWidth: Dp? = null,
+    val emoji: String? = null
 )
 
 @Composable
