@@ -248,3 +248,117 @@ fun sendEvent() {
 - **DEBUGGING TECHNIQUE**: Use debug output to compare CodeSample instance hash codes - if instances with different properties have the same hash code, check for missing properties in equals/hashCode
 - **COMPOSE GOLDEN RULE**: ALL properties that affect UI rendering MUST be included in both `equals()` and `hashCode()` methods. Missing properties cause silent state management failures that are extremely difficult to debug
 - **PREVENTION**: When adding new properties to data classes used in Compose state, immediately add them to equals/hashCode. Consider using Kotlin data classes which auto-generate these methods correctly
+
+### AnimatedVisibility and Hidden File Animations: The Complete Solution
+- **PROBLEM**: Hidden files in the IDE file tree (like `.gradle/libs.versions.toml`) need to animate both when appearing (forward navigation) and disappearing (backward navigation). AnimatedVisibility requires seeing the transition from `visible=false` to `visible=true` (and vice versa) while the item is still in the composition tree.
+- **ROOT CAUSE #1 - No Backward Animation**: When navigating backward, the file was removed from the `allFiles` list (controlled by IdeLayout) before AnimatedVisibility could play the exit animation. The file needs to stay in the tree for the duration of the animation (300ms).
+- **ROOT CAUSE #2 - No Forward Animation on First Appearance**: When the file first appeared, `visibilityTransition.targetState` was immediately true, so AnimatedVisibility never saw the `false→true` transition needed to trigger the enter animation.
+- **ROOT CAUSE #3 - Visibility State Not Observable**: The `visiblePaths` Set was passed as a plain value to FileTreeItem, so when it changed, the composable didn't recompose to update the AnimatedVisibility's `visible` parameter.
+
+#### The Complete Solution (Multi-Part Fix)
+
+**Part 1: Add visibilityTransition to ProjectFile** (IDE.kt)
+```kotlin
+data class ProjectFile(
+    // ... existing fields ...
+    val visibilityTransition: Transition<Boolean>? = null,  // ✅ Added
+)
+```
+- Allows IdeLayout to pass visibility state directly to the IDE component via the file object
+
+**Part 2: Create Delayed Visibility Transition** (IdeLayout.kt)
+```kotlin
+val keepVisible = remember { mutableStateOf(false) }
+val hasAppeared = remember { mutableStateOf(false) }
+
+LaunchedEffect(visibilityTransition.targetState, visibilityTransition.currentState) {
+    if (visibilityTransition.targetState && !hasAppeared.value) {
+        // First appearance: delay 50ms for enter animation
+        hasAppeared.value = false
+        delay(50)
+        hasAppeared.value = true
+    } else if (!visibilityTransition.targetState) {
+        if (visibilityTransition.currentState) {
+            // Transition started: keep file in tree
+            keepVisible.value = true
+        } else {
+            // Transition complete: wait 350ms for exit animation
+            delay(350)
+            keepVisible.value = false
+        }
+    }
+}
+
+// Keep file in allFiles during animations
+val shouldInclude = visibilityTransition.targetState || 
+                   visibilityTransition.currentState || 
+                   keepVisible.value
+
+// Create delayed visibility for AnimatedVisibility
+val delayedVisibilityTransition = createChildTransition { 
+    visibilityTransition.targetState && hasAppeared.value
+}
+```
+
+**Part 3: Pass State Object Instead of Value** (IDE.kt)
+```kotlin
+// ❌ WRONG: Passing snapshot value
+FileTreeItem(visiblePaths = visiblePaths.value)
+
+// ✅ CORRECT: Passing State object
+FileTreeItem(visiblePathsState = visiblePaths)
+
+// In FileTreeItem signature
+private fun FileTreeItem(
+    visiblePathsState: State<Set<String>>  // State, not Set
+)
+
+// Reading the value inside composable scope
+val isVisible = childNode.path in visiblePathsState.value
+```
+
+**Part 4: Use Transition-Based Visibility for Hidden Files** (IDE.kt)
+```kotlin
+val useVisibilityTransition = childNode.file?.visibilityTransition != null
+val isVisible = if (useVisibilityTransition) {
+    // Use transition targetState directly for hidden files
+    childNode.file!!.visibilityTransition!!.targetState
+} else {
+    // Use visiblePaths mechanism for other files
+    childNode.path in visiblePathsState.value
+}
+
+AnimatedVisibility(
+    visible = isVisible,
+    enter = expandVertically(tween(300)) + fadeIn(tween(300)),
+    exit = shrinkVertically(tween(300)) + fadeOut(tween(300))
+) {
+    // Child content
+}
+```
+
+#### Key Insights and Timing
+- **50ms delay on first appearance**: Allows AnimatedVisibility to see `false→true` transition
+- **Keep file in tree while `currentState == true`**: Compose transition system manages this duration
+- **Additional 350ms delay after transition complete**: Ensures AnimatedVisibility finishes exit animation (300ms) before file removal
+- **Transition targetState changes immediately**: This drives the AnimatedVisibility, triggering animations in both directions
+- **File stays in tree longer than needed**: Better to delay removal than interrupt animation
+
+#### Why This Works
+1. **Forward (first time)**: File added with `hasAppeared=false` → 50ms delay → `hasAppeared=true` → AnimatedVisibility sees `false→true` → expand + fade in
+2. **Backward**: `targetState=false` → AnimatedVisibility sees `true→false` → shrink + fade out → file kept in tree by `keepVisible` → removed after animation completes  
+3. **Forward (subsequent)**: `hasAppeared` already true → AnimatedVisibility immediately sees `false→true` transition from previous removal → expand + fade in
+
+#### Common Mistakes to Avoid
+- ❌ Don't pass `visiblePaths.value` (snapshot) - pass the `State` object
+- ❌ Don't remove files from tree immediately when target becomes false
+- ❌ Don't rely on a single mechanism (`visiblePaths`) for both regular and hidden files
+- ❌ Don't skip the initial delay on first appearance
+- ❌ Don't forget to add both `enter` AND `exit` animations to AnimatedVisibility
+
+#### Debugging Technique
+When AnimatedVisibility animations don't work:
+1. Add `println()` statements to track: `targetState`, `currentState`, `isVisible`, and whether item is in the composition tree
+2. Verify the timing: Item must be IN TREE when `visible` changes
+3. Check State observation: Ensure State objects are passed, not snapshots
+4. Verify animation duration matches delay values (exit animation 300ms + buffer = 350ms delay)
