@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +21,7 @@ import dev.panuszewski.template.extensions.ComposableLambda
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.withStateTransition
+import kotlinx.coroutines.delay
 
 class IdeLayoutScope internal constructor() {
     var ideState: IdeState? = null
@@ -163,8 +166,32 @@ fun Transition<Int>.buildIdeStateWithMapping(
                     globalState >= appearAtState
                 }
                 
-                if (!visibilityTransition.targetState) {
+                val keepVisible = remember { mutableStateOf(false) }
+                val hasAppeared = remember { mutableStateOf(false) }
+                
+                LaunchedEffect(visibilityTransition.targetState, visibilityTransition.currentState) {
+                    if (visibilityTransition.targetState && !hasAppeared.value) {
+                        hasAppeared.value = false
+                        delay(50)
+                        hasAppeared.value = true
+                    } else if (!visibilityTransition.targetState) {
+                        if (visibilityTransition.currentState) {
+                            keepVisible.value = true
+                        } else {
+                            delay(350)
+                            keepVisible.value = false
+                        }
+                    }
+                }
+                
+                val shouldInclude = visibilityTransition.targetState || visibilityTransition.currentState || keepVisible.value
+                
+                if (!shouldInclude) {
                     return@mapNotNull null
+                }
+                
+                val delayedVisibilityTransition = createChildTransition { 
+                    visibilityTransition.targetState && hasAppeared.value
                 }
                 
                 val fileTransition = createChildTransition { globalState ->
@@ -178,7 +205,8 @@ fun Transition<Int>.buildIdeStateWithMapping(
                     path = filePath,
                     content = fileTransition.createChildTransition { state ->
                         value.codeSamples.safeGet(state)
-                    } as Transition<CodeSample>?
+                    } as Transition<CodeSample>?,
+                    visibilityTransition = delayedVisibilityTransition
                 )
             }
             value === DIRECTORY -> {

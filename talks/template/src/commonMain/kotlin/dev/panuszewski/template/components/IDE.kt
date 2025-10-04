@@ -9,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -91,26 +92,29 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
         val fileTree = remember(files) { buildFileTree(files) }
         
         val allFilePaths = remember(files) { files.map { it.path }.toSet() }
-        val seenFilePaths = remember { mutableStateOf(setOf<String>()) }
+        val previousFilePaths = remember { mutableStateOf(setOf<String>()) }
         
         val newlyAddedPaths = remember(allFilePaths) {
-            val added = allFilePaths - seenFilePaths.value
-            seenFilePaths.value = allFilePaths
-            added
+            allFilePaths - previousFilePaths.value
+        }
+        
+        val removedPaths = remember(allFilePaths) {
+            previousFilePaths.value - allFilePaths
         }
         
         val visiblePaths = remember { mutableStateOf(setOf<String>()) }
         
         LaunchedEffect(allFilePaths) {
-            val currentVisible = visiblePaths.value
-            val shouldBeVisible = allFilePaths - newlyAddedPaths
-            
-            visiblePaths.value = shouldBeVisible
-            
             if (newlyAddedPaths.isNotEmpty()) {
+                visiblePaths.value = allFilePaths - newlyAddedPaths
                 kotlinx.coroutines.delay(50)
                 visiblePaths.value = allFilePaths
+            } else if (removedPaths.isNotEmpty()) {
+                visiblePaths.value = allFilePaths
+            } else {
+                visiblePaths.value = allFilePaths
             }
+            previousFilePaths.value = allFilePaths
         }
 
         // Track expanded state of folders
@@ -215,7 +219,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                         enlargedFile = enlargedFile,
                                         highlightedFile = highlightedFile,
                                         ideColors = ideColors,
-                                        visiblePaths = visiblePaths.value
+                                        visiblePathsState = visiblePaths
                                     )
                                 }
                             }
@@ -408,7 +412,7 @@ private fun FileTreeItem(
     highlightedFile: ProjectFile?,
     ideColors: IdeColorScheme,
     modifier: Modifier = Modifier,
-    visiblePaths: Set<String> = emptySet()
+    visiblePathsState: State<Set<String>>
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
@@ -501,12 +505,22 @@ private fun FileTreeItem(
     // Render children if expanded
     if (node.isFolder && isExpanded) {
         node.children.forEach { childNode ->
-            val isVisible = childNode.path in visiblePaths
+            val useVisibilityTransition = childNode.file?.visibilityTransition != null
+            val isVisible = if (useVisibilityTransition) {
+                childNode.file!!.visibilityTransition!!.targetState
+            } else {
+                childNode.path in visiblePathsState.value
+            }
             androidx.compose.animation.AnimatedVisibility(
                 visible = isVisible,
                 enter = expandVertically(
                     animationSpec = tween(durationMillis = 300)
                 ) + fadeIn(
+                    animationSpec = tween(durationMillis = 300)
+                ),
+                exit = shrinkVertically(
+                    animationSpec = tween(durationMillis = 300)
+                ) + fadeOut(
                     animationSpec = tween(durationMillis = 300)
                 )
             ) {
@@ -519,7 +533,7 @@ private fun FileTreeItem(
                     highlightedFile = highlightedFile,
                     ideColors = ideColors,
                     modifier = modifier,
-                    visiblePaths = visiblePaths
+                    visiblePathsState = visiblePathsState
                 )
             }
         }
@@ -552,6 +566,7 @@ data class ProjectFile(
     val staticContent: Transition<AnnotatedString>? = null,
     val language: Language = Language.Kotlin,
     val children: List<ProjectFile> = emptyList(),
+    val visibilityTransition: Transition<Boolean>? = null,
 )
 
 // Represents a node in the file tree
