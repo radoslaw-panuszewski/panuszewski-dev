@@ -480,7 +480,12 @@ fun SceneScope<Int>.IdeLayout(
         val fileTreeWidthOverride by animateDp { 
             if (it in scope.leftPanelOpenAt) 0.dp else 275.dp
         }
-        val fileTreeWidth = if (IDE_STATE.fileTreeHidden) 0.dp else fileTreeWidthOverride
+        
+        val fileTreeHiddenWidth by androidx.compose.animation.core.animateDpAsState(
+            targetValue = if (IDE_STATE.fileTreeHidden) 0.dp else 275.dp
+        )
+        
+        val fileTreeWidth = if (fileTreeWidthOverride == 0.dp) 0.dp else fileTreeHiddenWidth
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.TopCenter)) {
