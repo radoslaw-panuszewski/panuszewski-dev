@@ -211,16 +211,45 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                     items = fileTree,
                                     key = { node -> node.path }
                                 ) { node ->
-                                    FileTreeItem(
-                                        node = node,
-                                        depth = 0,
-                                        expandedFolders = expandedFolders,
-                                        currentOpenFile = selectedFile,
-                                        enlargedFile = enlargedFile,
-                                        highlightedFile = highlightedFile,
-                                        ideColors = ideColors,
-                                        visiblePathsState = visiblePaths
-                                    )
+                                    val useVisibilityTransition = node.file?.visibilityTransition != null && !node.isFolder
+                                    if (useVisibilityTransition) {
+                                        val isVisible = node.file!!.visibilityTransition!!.targetState
+                                        androidx.compose.animation.AnimatedVisibility(
+                                            visible = isVisible,
+                                            enter = expandVertically(
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + fadeIn(
+                                                animationSpec = tween(durationMillis = 300)
+                                            ),
+                                            exit = shrinkVertically(
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + fadeOut(
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        ) {
+                                            FileTreeItem(
+                                                node = node,
+                                                depth = 0,
+                                                expandedFolders = expandedFolders,
+                                                currentOpenFile = selectedFile,
+                                                enlargedFile = enlargedFile,
+                                                highlightedFile = highlightedFile,
+                                                ideColors = ideColors,
+                                                visiblePathsState = visiblePaths
+                                            )
+                                        }
+                                    } else {
+                                        FileTreeItem(
+                                            node = node,
+                                            depth = 0,
+                                            expandedFolders = expandedFolders,
+                                            currentOpenFile = selectedFile,
+                                            enlargedFile = enlargedFile,
+                                            highlightedFile = highlightedFile,
+                                            ideColors = ideColors,
+                                            visiblePathsState = visiblePaths
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -422,119 +451,171 @@ private fun FileTreeItem(
     val iconSize by animateDpAsState(targetValue = if (isEnlarged) 20.dp else 16.dp)
     val spacerWidth by animateDpAsState(targetValue = if (isEnlarged) 12.dp else 8.dp)
 
-    // Render this node
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                when {
-                    isHighlighted -> ideColors.highlightedFileBackground
-                    isEnlarged -> Color.Transparent
-                    isSelected -> ideColors.selectedFileBackground
-                    else -> Color.Transparent
-                }
+    val hasVisibilityTransition = node.file?.visibilityTransition != null && node.isFolder
+    
+    if (hasVisibilityTransition) {
+        val isVisible = node.file!!.visibilityTransition!!.targetState
+        androidx.compose.animation.AnimatedVisibility(
+            visible = isVisible,
+            enter = expandVertically(
+                animationSpec = tween(durationMillis = 300)
+            ) + fadeIn(
+                animationSpec = tween(durationMillis = 300)
+            ),
+            exit = shrinkVertically(
+                animationSpec = tween(durationMillis = 300)
+            ) + fadeOut(
+                animationSpec = tween(durationMillis = 300)
             )
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Indentation based on depth
-        Spacer(modifier = Modifier.width((depth * 16).dp))
+        ) {
+            FileTreeItemContent(
+                node, depth, isExpanded, isSelected, isEnlarged, isHighlighted,
+                iconSize, spacerWidth, expandedFolders, currentOpenFile, enlargedFile,
+                highlightedFile, ideColors, modifier, visiblePathsState
+            )
+        }
+    } else {
+        FileTreeItemContent(
+            node, depth, isExpanded, isSelected, isEnlarged, isHighlighted,
+            iconSize, spacerWidth, expandedFolders, currentOpenFile, enlargedFile,
+            highlightedFile, ideColors, modifier, visiblePathsState
+        )
+    }
+}
 
-        Spacer(modifier = Modifier.width(16.dp))
-
-        // File/folder icon
-        Box(
-            modifier = Modifier
-                .size(iconSize)
+@Composable
+private fun FileTreeItemContent(
+    node: FileTreeNode,
+    depth: Int,
+    isExpanded: Boolean,
+    isSelected: Boolean,
+    isEnlarged: Boolean,
+    isHighlighted: Boolean,
+    iconSize: Dp,
+    spacerWidth: Dp,
+    expandedFolders: MutableMap<String, Boolean>,
+    currentOpenFile: ProjectFile?,
+    enlargedFile: ProjectFile?,
+    highlightedFile: ProjectFile?,
+    ideColors: IdeColorScheme,
+    modifier: Modifier = Modifier,
+    visiblePathsState: State<Set<String>>
+) {
+    Column {
+        // Render this node
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
                 .background(
-                    color = when {
-                        node.isFolder -> ideColors.folderIcon
-                        node.file.language == Language.Kotlin -> ideColors.kotlinFileIcon
-                        else -> ideColors.genericFileIcon
-                    },
-                    shape = RoundedCornerShape(2.dp)
-                )
-        )
-
-        Spacer(modifier = Modifier.width(spacerWidth))
-
-        // File/folder name with different styling based on type
-        val progress by animateFloatAsState(
-            targetValue = if (isEnlarged) 1f else 0f,
-            label = "textStyleAnimation"
-        )
-        val textStyle = lerp(
-            MaterialTheme.typography.body2,
-            MaterialTheme.typography.h6,
-            progress
-        )
-
-        ProvideTextStyle(textStyle) {
-            val textStyle = TextStyle(
-                fontWeight = when {
-                    node.isFolder -> FontWeight.Medium
-                    else -> FontWeight.Normal
-                },
-                color = when {
-                    isEnlarged -> ideColors.textPrimary
-                    isSelected -> ideColors.textPrimary
-                    node.isFolder -> ideColors.textPrimary
-                    else -> ideColors.textPrimary
-                }
-            )
-            ProvideTextStyle(textStyle) {
-                MagicText(text = buildAnnotatedString {
-                    if (node.name.contains(".")) {
-                        val beforeExtension = node.name.substringBeforeLast(".")
-                        val afterExtension = node.name.substringAfterLast(".")
-                        append(beforeExtension)
-                        append(".")
-                        if (afterExtension == "dcl") {
-                            withColor(Color(0xFFFF8A04)) { append(afterExtension) }
-                        } else {
-                            append(afterExtension)
-                        }
-                    } else {
-                        append(node.name)
+                    when {
+                        isHighlighted -> ideColors.highlightedFileBackground
+                        isEnlarged -> Color.Transparent
+                        isSelected -> ideColors.selectedFileBackground
+                        else -> Color.Transparent
                     }
-                })
+                )
+                .padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Indentation based on depth
+            Spacer(modifier = Modifier.width((depth * 16).dp))
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // File/folder icon
+            Box(
+                modifier = Modifier
+                    .size(iconSize)
+                    .background(
+                        color = when {
+                            node.isFolder -> ideColors.folderIcon
+                            node.file.language == Language.Kotlin -> ideColors.kotlinFileIcon
+                            else -> ideColors.genericFileIcon
+                        },
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
+
+            Spacer(modifier = Modifier.width(spacerWidth))
+
+            // File/folder name with different styling based on type
+            val progress by animateFloatAsState(
+                targetValue = if (isEnlarged) 1f else 0f,
+                label = "textStyleAnimation"
+            )
+            val textStyle = lerp(
+                MaterialTheme.typography.body2,
+                MaterialTheme.typography.h6,
+                progress
+            )
+
+            ProvideTextStyle(textStyle) {
+                val textStyle = TextStyle(
+                    fontWeight = when {
+                        node.isFolder -> FontWeight.Medium
+                        else -> FontWeight.Normal
+                    },
+                    color = when {
+                        isEnlarged -> ideColors.textPrimary
+                        isSelected -> ideColors.textPrimary
+                        node.isFolder -> ideColors.textPrimary
+                        else -> ideColors.textPrimary
+                    }
+                )
+                ProvideTextStyle(textStyle) {
+                    MagicText(text = buildAnnotatedString {
+                        if (node.name.contains(".")) {
+                            val beforeExtension = node.name.substringBeforeLast(".")
+                            val afterExtension = node.name.substringAfterLast(".")
+                            append(beforeExtension)
+                            append(".")
+                            if (afterExtension == "dcl") {
+                                withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                            } else {
+                                append(afterExtension)
+                            }
+                        } else {
+                            append(node.name)
+                        }
+                    })
+                }
             }
         }
-    }
 
-    // Render children if expanded
-    if (node.isFolder && isExpanded) {
-        node.children.forEach { childNode ->
-            val useVisibilityTransition = childNode.file?.visibilityTransition != null
-            val isVisible = if (useVisibilityTransition) {
-                childNode.file!!.visibilityTransition!!.targetState
-            } else {
-                childNode.path in visiblePathsState.value
-            }
-            androidx.compose.animation.AnimatedVisibility(
-                visible = isVisible,
-                enter = expandVertically(
-                    animationSpec = tween(durationMillis = 300)
-                ) + fadeIn(
-                    animationSpec = tween(durationMillis = 300)
-                ),
-                exit = shrinkVertically(
-                    animationSpec = tween(durationMillis = 300)
-                ) + fadeOut(
-                    animationSpec = tween(durationMillis = 300)
-                )
-            ) {
-                FileTreeItem(
-                    node = childNode,
-                    depth = depth + 1,
-                    expandedFolders = expandedFolders,
-                    currentOpenFile = currentOpenFile,
-                    enlargedFile = enlargedFile,
-                    highlightedFile = highlightedFile,
-                    ideColors = ideColors,
-                    modifier = modifier,
-                    visiblePathsState = visiblePathsState
-                )
+        // Render children if expanded
+        if (node.isFolder && isExpanded) {
+            node.children.forEach { childNode ->
+                val useVisibilityTransition = childNode.file?.visibilityTransition != null
+                val isVisible = if (useVisibilityTransition) {
+                    childNode.file!!.visibilityTransition!!.targetState
+                } else {
+                    childNode.path in visiblePathsState.value
+                }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = isVisible,
+                    enter = expandVertically(
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    exit = shrinkVertically(
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeOut(
+                        animationSpec = tween(durationMillis = 300)
+                    )
+                ) {
+                    FileTreeItem(
+                        node = childNode,
+                        depth = depth + 1,
+                        expandedFolders = expandedFolders,
+                        currentOpenFile = currentOpenFile,
+                        enlargedFile = enlargedFile,
+                        highlightedFile = highlightedFile,
+                        ideColors = ideColors,
+                        modifier = modifier,
+                        visiblePathsState = visiblePathsState
+                    )
+                }
             }
         }
     }

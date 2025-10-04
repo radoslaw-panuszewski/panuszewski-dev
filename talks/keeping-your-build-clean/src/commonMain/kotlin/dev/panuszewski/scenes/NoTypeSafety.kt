@@ -19,9 +19,9 @@ fun StoryboardBuilder.NoTypeSafety() {
                 val ideState = buildIdeStateWithMapping(
                     files = listOf(
                         "build.gradle.kts" to BUILD_GRADLE_KTS,
+                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS,
                         ".gradle" to DIRECTORY,
                         ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.hidden(),
-                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS
                     )
                 )
                 

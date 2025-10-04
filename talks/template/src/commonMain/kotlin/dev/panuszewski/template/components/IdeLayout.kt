@@ -158,6 +158,22 @@ fun Transition<Int>.buildIdeStateWithMapping(
         visibilityMap
     }
     
+    val directoryVisibilityMap = remember(fileVisibilityMap, files) {
+        val dirMap = mutableMapOf<String, Int>()
+        for ((filePath, _) in files) {
+            if (filePath.contains('/')) {
+                val dirPath = filePath.substringBeforeLast('/')
+                if (filePath in fileVisibilityMap.keys) {
+                    val childAppearAt = fileVisibilityMap[filePath]!!
+                    if (dirPath !in dirMap || childAppearAt < dirMap[dirPath]!!) {
+                        dirMap[dirPath] = childAppearAt
+                    }
+                }
+            }
+        }
+        dirMap
+    }
+    
     val allFiles = files.mapNotNull { (filePath, value) ->
         when {
             value is HiddenFile -> {
@@ -210,11 +226,54 @@ fun Transition<Int>.buildIdeStateWithMapping(
                 )
             }
             value === DIRECTORY -> {
-                ProjectFile(
-                    name = filePath.substringAfterLast('/'),
-                    path = filePath,
-                    isDirectory = true
-                )
+                val appearAtState = directoryVisibilityMap[filePath]
+                
+                if (appearAtState != null) {
+                    val visibilityTransition = createChildTransition { globalState ->
+                        globalState >= appearAtState
+                    }
+                    
+                    val keepVisible = remember { mutableStateOf(false) }
+                    val hasAppeared = remember { mutableStateOf(false) }
+                    
+                    LaunchedEffect(visibilityTransition.targetState, visibilityTransition.currentState) {
+                        if (visibilityTransition.targetState && !hasAppeared.value) {
+                            hasAppeared.value = false
+                            delay(50)
+                            hasAppeared.value = true
+                        } else if (!visibilityTransition.targetState) {
+                            if (visibilityTransition.currentState) {
+                                keepVisible.value = true
+                            } else {
+                                delay(350)
+                                keepVisible.value = false
+                            }
+                        }
+                    }
+                    
+                    val shouldInclude = visibilityTransition.targetState || visibilityTransition.currentState || keepVisible.value
+                    
+                    if (!shouldInclude) {
+                        return@mapNotNull null
+                    }
+                    
+                    val delayedVisibilityTransition = createChildTransition { 
+                        visibilityTransition.targetState && hasAppeared.value
+                    }
+                    
+                    ProjectFile(
+                        name = filePath.substringAfterLast('/'),
+                        path = filePath,
+                        isDirectory = true,
+                        visibilityTransition = delayedVisibilityTransition
+                    )
+                } else {
+                    ProjectFile(
+                        name = filePath.substringAfterLast('/'),
+                        path = filePath,
+                        isDirectory = true
+                    )
+                }
             }
             value is List<*> -> {
                 val codeSamples = value as List<CodeSample>
