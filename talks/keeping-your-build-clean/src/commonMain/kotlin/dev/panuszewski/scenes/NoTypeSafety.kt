@@ -143,26 +143,16 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     apply(plugin = "org.jetbrains.kotlin.jvm")${imperativePlugin}${declarativePlugin}plugins {
         ${nonTypesafePlugin}id("org.jetbrains.kotlin.jvm")${nonTypesafePlugin}${typesafePlugin}alias(libs.plugins.kotlin.jvm)${typesafePlugin}
     }${declarativePlugin}
- 
-    subprojects
-        .filter { it.name.endsWith("-library") }
-        .forEach { it.apply(plugin = "java-library") }
     
     dependencies {
         ${nonTypesafeConfiguration1}"implementation"${nonTypesafeConfiguration1}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeProjectDependency}project(":first-library")${nonTypesafeProjectDependency}${typesafeProjectDependency}projects.firstLibrary${typesafeProjectDependency})
         ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeExternalDependency}${typesafeExternalDependency}libs.mongodb.driver.sync${typesafeExternalDependency})
     }
-    
-    tasks.register("sayHello") {
-        doLast {
-            println("lol")
-        }
-    }
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(declarativePlugin, typesafePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
-        .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
+        .then { focusNoScroll(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { unfocus() }
         .then { focus(imperativePlugin) }
         .then { unfocus().hide(imperativePlugin).reveal(declarativePlugin) }
