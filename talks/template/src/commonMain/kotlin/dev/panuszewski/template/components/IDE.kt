@@ -1,10 +1,12 @@
 package dev.panuszewski.template.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -22,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -32,8 +35,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.lerp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,6 +89,29 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
 
         // Build the file tree
         val fileTree = remember(files) { buildFileTree(files) }
+        
+        val allFilePaths = remember(files) { files.map { it.path }.toSet() }
+        val seenFilePaths = remember { mutableStateOf(setOf<String>()) }
+        
+        val newlyAddedPaths = remember(allFilePaths) {
+            val added = allFilePaths - seenFilePaths.value
+            seenFilePaths.value = allFilePaths
+            added
+        }
+        
+        val visiblePaths = remember { mutableStateOf(setOf<String>()) }
+        
+        LaunchedEffect(allFilePaths) {
+            val currentVisible = visiblePaths.value
+            val shouldBeVisible = allFilePaths - newlyAddedPaths
+            
+            visiblePaths.value = shouldBeVisible
+            
+            if (newlyAddedPaths.isNotEmpty()) {
+                kotlinx.coroutines.delay(50)
+                visiblePaths.value = allFilePaths
+            }
+        }
 
         // Track expanded state of folders
         val expandedFolders = remember { mutableStateMapOf<String, Boolean>() }
@@ -175,19 +203,20 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                 .border(width = 1.dp, color = ideColors.fileTreeBorder)
                         ) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                                fileTree.forEach { node ->
-                                    item {
-                                        FileTreeItem(
-                                            node = node,
-                                            depth = 0,
-                                            expandedFolders = expandedFolders,
-                                            currentOpenFile = selectedFile,
-                                            enlargedFile = enlargedFile,
-                                            highlightedFile = highlightedFile,
-                                            ideColors = ideColors,
-                                            modifier = Modifier.animateItem()
-                                        )
-                                    }
+                                items(
+                                    items = fileTree,
+                                    key = { node -> node.path }
+                                ) { node ->
+                                    FileTreeItem(
+                                        node = node,
+                                        depth = 0,
+                                        expandedFolders = expandedFolders,
+                                        currentOpenFile = selectedFile,
+                                        enlargedFile = enlargedFile,
+                                        highlightedFile = highlightedFile,
+                                        ideColors = ideColors,
+                                        visiblePaths = visiblePaths.value
+                                    )
                                 }
                             }
                         }
@@ -379,6 +408,7 @@ private fun FileTreeItem(
     highlightedFile: ProjectFile?,
     ideColors: IdeColorScheme,
     modifier: Modifier = Modifier,
+    visiblePaths: Set<String> = emptySet()
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
@@ -471,16 +501,27 @@ private fun FileTreeItem(
     // Render children if expanded
     if (node.isFolder && isExpanded) {
         node.children.forEach { childNode ->
-            FileTreeItem(
-                node = childNode,
-                depth = depth + 1,
-                expandedFolders = expandedFolders,
-                currentOpenFile = currentOpenFile,
-                enlargedFile = enlargedFile,
-                highlightedFile = highlightedFile,
-                ideColors = ideColors,
-                modifier = modifier
-            )
+            val isVisible = childNode.path in visiblePaths
+            androidx.compose.animation.AnimatedVisibility(
+                visible = isVisible,
+                enter = expandVertically(
+                    animationSpec = tween(durationMillis = 300)
+                ) + fadeIn(
+                    animationSpec = tween(durationMillis = 300)
+                )
+            ) {
+                FileTreeItem(
+                    node = childNode,
+                    depth = depth + 1,
+                    expandedFolders = expandedFolders,
+                    currentOpenFile = currentOpenFile,
+                    enlargedFile = enlargedFile,
+                    highlightedFile = highlightedFile,
+                    ideColors = ideColors,
+                    modifier = modifier,
+                    visiblePaths = visiblePaths
+                )
+            }
         }
     }
 }
