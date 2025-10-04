@@ -145,17 +145,18 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(declarativePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
+        .then { unfocus() }
         .then { focus(imperativePlugin) }
         .then { unfocus().hide(imperativePlugin).reveal(declarativePlugin) }
-        .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
-        .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).focusNoStyling(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
-        .then { focus(nonTypesafeProjectDependency) }
+        .then { focusNoScroll(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
+        .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).unfocus() }
+        .then { focusNoScroll(nonTypesafeProjectDependency) }
         .switchTo("settings.gradle.kts")
         .then { this }
-        .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).focusNoStyling(nonTypesafeProjectDependency) }
-        .then { focus(nonTypesafeExternalDependency) }
+        .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }
+        .then { focusNoScroll(nonTypesafeExternalDependency) }
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
-        .then { hide(nonTypesafeExternalDependency).reveal(typesafeExternalDependency).focusNoStyling(nonTypesafeExternalDependency) }
+        .then { hide(nonTypesafeExternalDependency).reveal(typesafeExternalDependency).unfocus() }
         .then { unfocus() }
 }

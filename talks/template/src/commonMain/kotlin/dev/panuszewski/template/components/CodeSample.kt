@@ -180,6 +180,10 @@ class CodeSample private constructor(
     fun focusNoStyling(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
         focus(tags.asList(), scroll, null, null)
 
+    fun focusNoScroll(vararg tags: TextTag, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+        focus(tags.asList(), false, focusedStyle, unfocusedStyle)
+
+
     fun unfocus(unscroll: Boolean = true): CodeSample =
         copy(focus = emptyList(), scrollTag = if (unscroll) null else scrollTag)
 
