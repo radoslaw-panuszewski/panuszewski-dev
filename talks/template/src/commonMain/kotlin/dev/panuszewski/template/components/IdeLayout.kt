@@ -138,6 +138,7 @@ fun Transition<Int>.buildIdeStateWithMapping(
             when (value) {
                 is List<*> -> if (value !== DIRECTORY) path to (value as List<CodeSample>) else null
                 is InitiallyHiddenFile -> path to value.codeSamples
+                INITIALLY_HIDDEN_DIRECTORY -> null
                 else -> null
             }
         }
@@ -160,10 +161,15 @@ fun Transition<Int>.buildIdeStateWithMapping(
     
     val directoryVisibilityMap = remember(fileVisibilityMap, files) {
         val dirMap = mutableMapOf<String, Int>()
+        val hiddenDirectories = files
+            .filter { (_, value) -> value === INITIALLY_HIDDEN_DIRECTORY }
+            .map { (path, _) -> path }
+            .toSet()
+        
         for ((filePath, _) in files) {
             if (filePath.contains('/')) {
                 val dirPath = filePath.substringBeforeLast('/')
-                if (filePath in fileVisibilityMap.keys) {
+                if (dirPath in hiddenDirectories && filePath in fileVisibilityMap.keys) {
                     val childAppearAt = fileVisibilityMap[filePath]!!
                     if (dirPath !in dirMap || childAppearAt < dirMap[dirPath]!!) {
                         dirMap[dirPath] = childAppearAt
@@ -225,7 +231,7 @@ fun Transition<Int>.buildIdeStateWithMapping(
                     visibilityTransition = delayedVisibilityTransition
                 )
             }
-            value === DIRECTORY -> {
+            value === DIRECTORY || value === INITIALLY_HIDDEN_DIRECTORY -> {
                 val appearAtState = directoryVisibilityMap[filePath]
                 
                 if (appearAtState != null) {

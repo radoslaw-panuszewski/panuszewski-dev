@@ -233,7 +233,11 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 
 data class SwitchToFile(val fileName: String)
 
-val DIRECTORY: List<CodeSample> = emptyList()
+object DIRECTORY {
+    fun initiallyHidden() = INITIALLY_HIDDEN_DIRECTORY
+}
+
+object INITIALLY_HIDDEN_DIRECTORY
 
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 

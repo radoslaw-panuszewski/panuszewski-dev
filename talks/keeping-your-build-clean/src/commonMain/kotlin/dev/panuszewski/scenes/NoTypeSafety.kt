@@ -20,7 +20,7 @@ fun StoryboardBuilder.NoTypeSafety() {
                     files = listOf(
                         "build.gradle.kts" to BUILD_GRADLE_KTS,
                         "settings.gradle.kts" to SETTINGS_GRADLE_KTS.initiallyHidden(),
-                        ".gradle" to DIRECTORY,
+                        ".gradle" to DIRECTORY.initiallyHidden(),
                         ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.initiallyHidden(),
                     )
                 )
