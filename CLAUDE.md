@@ -2,7 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Important:** Remember to always update `copilot-instructions.md` and `CLAUDE.md` after performing a task if you learned something new!
+**Important:** Always ask clarifying questions if you don't understand something!
+
+**Important:** The user will refer to `copilot-instructions.md` and `CLAUDE.md` as "instruction files" and will sometimes ask you to update them with lessons learned.
 
 ## Development Priorities
 
@@ -360,3 +362,125 @@ When AnimatedVisibility animations don't work:
 2. Verify the timing: Item must be IN TREE when `visible` changes
 3. Check State observation: Ensure State objects are passed, not snapshots
 4. Verify animation duration matches delay values (exit animation 300ms + buffer = 350ms delay)
+
+### Animating Folders with Hidden Children
+- **PROBLEM**: When a folder should appear/disappear together with its hidden children, wrapping both the folder and children separately in AnimatedVisibility causes them to appear at the same position, overlapping each other. The folder row and child items need to maintain their parent-child positioning while animating together.
+- **ROOT CAUSE**: Separate AnimatedVisibility wrappers at different tree levels break the layout hierarchy. The folder gets wrapped at the root level, and children get wrapped inside the folder, causing independent animations that lose the spatial relationship.
+- **WRONG APPROACH**: 
+  ```kotlin
+  // ❌ At root level
+  AnimatedVisibility(folder visible) {
+      FileTreeItem(folder)  // Folder row only
+  }
+  
+  // ❌ Inside folder's children rendering
+  AnimatedVisibility(child visible) {
+      FileTreeItem(child)  // Child item
+  }
+  ```
+  This causes folder and child to appear at same position, overlapping.
+
+#### The Correct Solution: Wrap Folder + Children Together
+
+**Implementation Strategy**:
+1. **Detect folders with visibility transitions**: Check if folder has `visibilityTransition` property
+2. **Wrap entire folder content**: Use Column to group folder row + all children
+3. **Extract content rendering**: Separate the rendering logic to avoid code duplication
+
+**Code Structure** (IDE.kt):
+```kotlin
+@Composable
+private fun FileTreeItem(...) {
+    val hasVisibilityTransition = node.file?.visibilityTransition != null && node.isFolder
+    
+    if (hasVisibilityTransition) {
+        val isVisible = node.file!!.visibilityTransition!!.targetState
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = expandVertically(tween(300)) + fadeIn(tween(300)),
+            exit = shrinkVertically(tween(300)) + fadeOut(tween(300))
+        ) {
+            FileTreeItemContent(...)  // Renders folder row + children together
+        }
+    } else {
+        FileTreeItemContent(...)  // Normal rendering
+    }
+}
+
+@Composable
+private fun FileTreeItemContent(...) {
+    Column {  // ✅ Groups folder row and children together
+        Row { /* Folder row */ }
+        
+        // Render children
+        if (node.isFolder && isExpanded) {
+            node.children.forEach { child ->
+                // Child rendering with own AnimatedVisibility if needed
+            }
+        }
+    }
+}
+```
+
+**Directory Visibility Mapping** (IdeLayout.kt):
+```kotlin
+val directoryVisibilityMap = remember(fileVisibilityMap, files) {
+    val dirMap = mutableMapOf<String, Int>()
+    for ((filePath, _) in files) {
+        if (filePath.contains('/')) {
+            val dirPath = filePath.substringBeforeLast('/')
+            if (filePath in fileVisibilityMap.keys) {
+                val childAppearAt = fileVisibilityMap[filePath]!!
+                // Use earliest appearance time among all hidden children
+                if (dirPath !in dirMap || childAppearAt < dirMap[dirPath]!!) {
+                    dirMap[dirPath] = childAppearAt
+                }
+            }
+        }
+    }
+    dirMap
+}
+```
+
+**Apply Visibility Transition to Directories**:
+```kotlin
+value === DIRECTORY -> {
+    val appearAtState = directoryVisibilityMap[filePath]
+    
+    if (appearAtState != null) {
+        // Same visibility transition logic as hidden files
+        val visibilityTransition = createChildTransition { globalState ->
+            globalState >= appearAtState
+        }
+        
+        // Same keepVisible and hasAppeared logic...
+        
+        ProjectFile(
+            name = filePath.substringAfterLast('/'),
+            path = filePath,
+            isDirectory = true,
+            visibilityTransition = delayedVisibilityTransition  // ✅ Added
+        )
+    } else {
+        // Regular directory without visibility transition
+        ProjectFile(name, path, isDirectory = true)
+    }
+}
+```
+
+#### Key Insights
+- **Folder visibility based on children**: Directory appears when its earliest hidden child becomes visible
+- **Single animation unit**: Folder row + children wrapped together in one AnimatedVisibility
+- **Maintain tree structure**: Column layout preserves parent-child spatial relationship
+- **Exclude folders from root-level wrapping**: Only wrap folders at FileTreeItem level, not in LazyColumn items
+
+#### Common Mistakes
+- ❌ Wrapping folder and children in separate AnimatedVisibility blocks
+- ❌ Not using Column to group folder row and children together
+- ❌ Wrapping folders at both root level AND FileTreeItem level
+- ❌ Forgetting to exclude folders from root-level AnimatedVisibility wrapping (`&& !node.isFolder`)
+
+#### When to Use This Pattern
+- Folders with hidden children that should appear/disappear together
+- File tree structures where parent visibility depends on child visibility
+- Any hierarchical UI where parent and children should animate as a unit while maintaining their spatial relationship
