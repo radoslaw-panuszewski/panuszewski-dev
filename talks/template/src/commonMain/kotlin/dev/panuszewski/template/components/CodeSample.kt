@@ -249,6 +249,10 @@ object CloseLeftPane
 
 object CloseRightPane
 
+object HideFileTree
+
+object ShowFileTree
+
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
 data class Directory(val isInitiallyHidden: Boolean = false)
@@ -324,6 +328,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.closeRightPane(): List<CodeSample> {
         return this + last().attach(CloseRightPane)
+    }
+
+    fun List<CodeSample>.hideFileTree(): List<CodeSample> {
+        return this + last().attach(HideFileTree)
+    }
+
+    fun List<CodeSample>.showFileTree(): List<CodeSample> {
+        return this + last().attach(ShowFileTree)
     }
 
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
