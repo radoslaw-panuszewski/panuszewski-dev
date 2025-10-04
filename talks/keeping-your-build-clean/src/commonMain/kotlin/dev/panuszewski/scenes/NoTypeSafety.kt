@@ -118,15 +118,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(declarativePlugin, typesafeTask, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
-        .then { focus(nonTypesafeTask) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
-        .then { focus(nonTypesafeProjectDependency) }
-        .then { focus(nonTypesafeExternalDependency) }
-        .then { unfocus() }
         .then { focus(imperativePlugin) }
         .then { unfocus().hide(imperativePlugin).reveal(declarativePlugin) }
-        .then { focus(nonTypesafeTask) }
-        .then { unfocus().hide(nonTypesafeTask).reveal(typesafeTask) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).focusNoStyling(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(nonTypesafeProjectDependency) }
