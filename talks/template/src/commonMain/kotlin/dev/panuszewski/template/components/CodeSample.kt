@@ -233,11 +233,13 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 
 data class SwitchToFile(val fileName: String)
 
-object DIRECTORY {
-    fun initiallyHidden() = INITIALLY_HIDDEN_DIRECTORY
+data class Directory(
+    val initiallyHidden: Boolean = false,
+) {
+    fun initiallyHidden() = copy(initiallyHidden = true)
 }
 
-object INITIALLY_HIDDEN_DIRECTORY
+val DIRECTORY = Directory()
 
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
@@ -249,7 +251,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         title: String? = null,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
-        val warningTags = tags.filter { it.data == dev.panuszewski.template.extensions.TagType.WARNING }
+        val warningTags = tags.filter { it.data == TagType.WARNING }
         return CodeSample.create(extractTags(this), language, title, splitMethod, warningTags)
     }
 
@@ -258,7 +260,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         title: String? = null,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
-        val warningTags = tags.filter { it.data == dev.panuszewski.template.extensions.TagType.WARNING }
+        val warningTags = tags.filter { it.data == TagType.WARNING }
         return CodeSample.create(this, language, title, splitMethod, warningTags)
     }
 
