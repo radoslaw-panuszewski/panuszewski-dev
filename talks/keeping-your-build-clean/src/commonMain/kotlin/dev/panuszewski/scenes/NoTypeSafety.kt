@@ -19,6 +19,7 @@ import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeStateWithMapping
+import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.h6
@@ -29,19 +30,19 @@ import dev.panuszewski.template.theme.BULLET_1
 
 fun StoryboardBuilder.NoTypeSafety() {
 
-    val topPanelOpens = BUILD_GRADLE_KTS.size + SETTINGS_GRADLE_KTS.size + LIBS_VERSIONS_TOML.size
+    val files = listOf(
+        "build.gradle.kts" to BUILD_GRADLE_KTS,
+        "settings.gradle.kts" to SETTINGS_GRADLE_KTS.initiallyHidden(),
+        ".gradle" to DIRECTORY.initiallyHidden(),
+        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.initiallyHidden(),
+    )
 
-    scene(100) {
+    val topPanelOpens = calculateTotalStates(files) - 1
+
+    scene(topPanelOpens + 2) {
         withStateTransition {
             TitleScaffold("No type safety") {
-                IDE_STATE = buildIdeStateWithMapping(
-                    files = listOf(
-                        "build.gradle.kts" to BUILD_GRADLE_KTS,
-                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS.initiallyHidden(),
-                        ".gradle" to DIRECTORY.initiallyHidden(),
-                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.initiallyHidden(),
-                    )
-                )
+                IDE_STATE = buildIdeStateWithMapping(files = files)
 
                 IdeLayout {
                     leftPanel(openAt = topPanelOpens) {

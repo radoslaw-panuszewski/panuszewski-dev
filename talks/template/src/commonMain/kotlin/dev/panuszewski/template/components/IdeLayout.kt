@@ -135,6 +135,25 @@ fun buildFileStateMapping(
     return mappings
 }
 
+fun calculateTotalStates(files: List<Pair<String, Any>>): Int {
+    require(files.isNotEmpty()) { "files list must not be empty" }
+    
+    val primaryFilePath = files.first().first
+    val allCodeSamples = files
+        .mapNotNull { (path, value) ->
+            when (value) {
+                is List<*> -> path to (value as List<CodeSample>)
+                is InitiallyHiddenFile -> path to value.codeSamples
+                is Directory -> null
+                else -> null
+            }
+        }
+        .toMap()
+    
+    val mapping = buildFileStateMapping(primaryFilePath, allCodeSamples)
+    return mapping.size
+}
+
 @Composable
 fun Transition<Int>.buildIdeStateWithMapping(
     files: List<Pair<String, Any>>
