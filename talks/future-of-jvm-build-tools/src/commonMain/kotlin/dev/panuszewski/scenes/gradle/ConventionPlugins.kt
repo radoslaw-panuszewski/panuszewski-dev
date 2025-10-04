@@ -205,7 +205,7 @@ fun StoryboardBuilder.ConventionPlugins() {
                                         addFile(
                                             name = "wtf-app.gradle.kts",
                                             path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
-                                            content = createChildTransition { wtfApp.safeGet(it.toState() - fileTreeHiddenSince) }
+                                            content = createChildTransition { WTF_APP_GRADLE_KTS.safeGet(it.toState() - fileTreeHiddenSince) }
                                         )
                                     }
                                 }
@@ -353,7 +353,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { unfocus() }
 }
 
-val wtfApp = buildCodeSamples {
+val WTF_APP_GRADLE_KTS = buildCodeSamples {
     val todo by tag()
     val imperativeCode by tag()
     val javaPlugin by tag()

@@ -48,7 +48,7 @@ fun StoryboardBuilder.NoTypeSafety() {
     scene(topPanelCloses + 1) {
         withStateTransition {
             TitleScaffold("No type safety") {
-                IDE_STATE = buildIdeStateWithMapping(files = files)
+                IDE_STATE = buildIdeStateWithMapping(files)
 
                 IdeLayout {
                     leftPanel(openAt = topPanelOpens until topPanelCloses) {
@@ -89,7 +89,7 @@ private val LIBS_VERSIONS_TOML = buildCodeSamples {
 
     """
     ${libraries}[libraries]
-    mongodb-driver-sync = "org.mongodb:mongodb-driver-sync:5.6.0"
+    mongodb-driver-sync = "org.springframework.boot:spring-boot-starter-web:3.5.6"
     
     ${libraries}${todo}// TODO${todo}
     """
@@ -146,7 +146,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     
     dependencies {
         ${nonTypesafeConfiguration1}"implementation"${nonTypesafeConfiguration1}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeProjectDependency}project(":first-library")${nonTypesafeProjectDependency}${typesafeProjectDependency}projects.firstLibrary${typesafeProjectDependency})
-        ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeExternalDependency}${typesafeExternalDependency}libs.mongodb.driver.sync${typesafeExternalDependency})
+        ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.springframework.boot:spring-boot-starter-web:3.5.6"${nonTypesafeExternalDependency}${typesafeExternalDependency}libs.spring.boot.web${typesafeExternalDependency})
     }
     """
         .trimIndent()

@@ -155,6 +155,10 @@ fun calculateTotalStates(files: List<Pair<String, Any>>): Int {
 }
 
 @Composable
+fun Transition<Int>.buildIdeStateWithMapping(vararg files: Pair<String, Any>) =
+    buildIdeStateWithMapping(files.toList())
+
+@Composable
 fun Transition<Int>.buildIdeStateWithMapping(
     files: List<Pair<String, Any>>
 ): IdeState {

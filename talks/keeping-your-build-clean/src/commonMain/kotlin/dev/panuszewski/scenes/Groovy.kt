@@ -146,7 +146,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     
     dependencies {
         implementation project(':first-library')
-        implementation 'org.mongodb:mongodb-driver-sync:5.6.0'
+        implementation 'org.springframework.boot:spring-boot-starter-web:3.5.6'
     }
     
     tasks.register('sayHello') {
@@ -178,7 +178,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     
     dependencies {
         "implementation"(project(":first-library"))
-        "implementation"("org.mongodb:mongodb-driver-sync:5.6.0")
+        "implementation"("org.springframework.boot:spring-boot-starter-web:3.5.6")
     }
     
     tasks.register("sayHello") {
