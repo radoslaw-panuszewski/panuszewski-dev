@@ -7,6 +7,7 @@ import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeStateWithMapping
+import dev.panuszewski.template.components.hidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
@@ -20,7 +21,7 @@ fun StoryboardBuilder.NoTypeSafety() {
                         "build.gradle.kts" to BUILD_GRADLE_KTS,
                         "settings.gradle.kts" to SETTINGS_GRADLE_KTS,
                         ".gradle" to DIRECTORY,
-                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML,
+                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.hidden(),
                     )
                 )
                 
@@ -33,12 +34,21 @@ fun StoryboardBuilder.NoTypeSafety() {
 }
 
 private val LIBS_VERSIONS_TOML = buildCodeSamples {
+    val todo by tag()
+    val libraries by tag()
+
     """
-        
+    ${libraries}[libraries]
+    mongodb-driver-sync = "org.mongodb:mongodb-driver-sync:5.6.0"
+    
+    ${libraries}${todo}// TODO${todo}
     """
         .trimIndent()
         .toCodeSample(language = Language.Toml)
-        .startWith { this }
+        .startWith { hide(libraries) }
+        .then { reveal(libraries) }
+        .then { hide(todo) }
+        .switchTo("build.gradle.kts")
 }
 
 private val SETTINGS_GRADLE_KTS = buildCodeSamples {
@@ -96,7 +106,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     
     dependencies {
         ${nonTypesafeConfiguration1}"implementation"${nonTypesafeConfiguration1}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeProjectDependency}project(":first-library")${nonTypesafeProjectDependency}${typesafeProjectDependency}projects.firstLibrary${typesafeProjectDependency})
-        ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeExternalDependency})
+        ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeExternalDependency}${typesafeExternalDependency}libs.mongodb.driver.sync${typesafeExternalDependency})
     }
     
     tasks.register("sayHello") {
@@ -123,4 +133,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .switchTo("settings.gradle.kts")
         .then { this }
         .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).focusNoStyling(nonTypesafeProjectDependency) }
+        .then { focus(nonTypesafeExternalDependency) }
+        .switchTo(".gradle/libs.versions.toml")
+        .then { this }
+        .then { hide(nonTypesafeExternalDependency).reveal(typesafeExternalDependency).focusNoStyling(nonTypesafeExternalDependency) }
 }

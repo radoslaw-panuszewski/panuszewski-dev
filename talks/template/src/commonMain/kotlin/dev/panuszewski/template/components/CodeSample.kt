@@ -235,6 +235,10 @@ data class SwitchToFile(val fileName: String)
 
 val DIRECTORY: List<CodeSample> = emptyList()
 
+data class HiddenFile(val codeSamples: List<CodeSample>)
+
+fun List<CodeSample>.hidden() = HiddenFile(this)
+
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
         language: Language = Language.Kotlin,

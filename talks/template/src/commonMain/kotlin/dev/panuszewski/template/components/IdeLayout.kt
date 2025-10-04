@@ -119,40 +119,92 @@ fun buildFileStateMapping(
 
 @Composable
 fun Transition<Int>.buildIdeStateWithMapping(
-    files: List<Pair<String, List<CodeSample>>>
+    files: List<Pair<String, Any>>
 ): IdeState {
     require(files.isNotEmpty()) { "files list must not be empty" }
     
     val primaryFilePath = files.first().first
+    val hiddenFilesMap = files
+        .mapNotNull { (path, value) -> 
+            if (value is HiddenFile) path to value.codeSamples else null 
+        }
+        .toMap()
+    
     val allCodeSamples = files
-        .filter { it.second !== DIRECTORY }
-        .associate { it.first to it.second }
+        .mapNotNull { (path, value) ->
+            when (value) {
+                is List<*> -> if (value !== DIRECTORY) path to (value as List<CodeSample>) else null
+                is HiddenFile -> path to value.codeSamples
+                else -> null
+            }
+        }
+        .toMap()
     
     val mapping = remember(allCodeSamples) {
         buildFileStateMapping(primaryFilePath, allCodeSamples)
     }
     
-    val allFiles = files.map { (filePath, codeSamples) ->
-        if (codeSamples === DIRECTORY) {
-            ProjectFile(
-                name = filePath.substringAfterLast('/'),
-                path = filePath,
-                isDirectory = true
-            )
-        } else {
-            val fileTransition = createChildTransition { globalState ->
-                val fileStateMap = mapping.getOrNull(globalState)
-                val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
-                mappedState.coerceIn(0, codeSamples.lastIndex.coerceAtLeast(0))
+    val fileVisibilityMap = remember(hiddenFilesMap, mapping) {
+        val visibilityMap = mutableMapOf<String, Int>()
+        for ((index, fileMapping) in mapping.withIndex()) {
+            val selectedFile = fileMapping.selectedFile
+            if (selectedFile in hiddenFilesMap.keys && selectedFile !in visibilityMap) {
+                visibilityMap[selectedFile] = index
             }
-            
-            ProjectFile(
-                name = filePath.substringAfterLast('/'),
-                path = filePath,
-                content = fileTransition.createChildTransition { state ->
-                    codeSamples.safeGet(state)
-                } as Transition<CodeSample>?
-            )
+        }
+        visibilityMap
+    }
+    
+    val allFiles = files.mapNotNull { (filePath, value) ->
+        when {
+            value is HiddenFile -> {
+                val appearAtState = fileVisibilityMap[filePath] ?: return@mapNotNull null
+                val visibilityTransition = createChildTransition { globalState ->
+                    globalState >= appearAtState
+                }
+                
+                if (!visibilityTransition.targetState) {
+                    return@mapNotNull null
+                }
+                
+                val fileTransition = createChildTransition { globalState ->
+                    val fileStateMap = mapping.getOrNull(globalState)
+                    val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
+                    mappedState.coerceIn(0, value.codeSamples.lastIndex.coerceAtLeast(0))
+                }
+                
+                ProjectFile(
+                    name = filePath.substringAfterLast('/'),
+                    path = filePath,
+                    content = fileTransition.createChildTransition { state ->
+                        value.codeSamples.safeGet(state)
+                    } as Transition<CodeSample>?
+                )
+            }
+            value === DIRECTORY -> {
+                ProjectFile(
+                    name = filePath.substringAfterLast('/'),
+                    path = filePath,
+                    isDirectory = true
+                )
+            }
+            value is List<*> -> {
+                val codeSamples = value as List<CodeSample>
+                val fileTransition = createChildTransition { globalState ->
+                    val fileStateMap = mapping.getOrNull(globalState)
+                    val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
+                    mappedState.coerceIn(0, codeSamples.lastIndex.coerceAtLeast(0))
+                }
+                
+                ProjectFile(
+                    name = filePath.substringAfterLast('/'),
+                    path = filePath,
+                    content = fileTransition.createChildTransition { state ->
+                        codeSamples.safeGet(state)
+                    } as Transition<CodeSample>?
+                )
+            }
+            else -> null
         }
     }
     
