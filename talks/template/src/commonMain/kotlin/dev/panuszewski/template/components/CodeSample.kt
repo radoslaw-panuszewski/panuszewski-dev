@@ -253,6 +253,8 @@ object HideFileTree
 
 object ShowFileTree
 
+data class AdvanceTogetherWith(val fileName: String)
+
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
 data class Directory(val isInitiallyHidden: Boolean = false)
@@ -300,6 +302,17 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             lastSample
         }
         return this + transformer(cleanedSample)
+    }
+
+    fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> CodeSample): List<CodeSample> {
+        val lastSample = this.last()
+        val cleanedSample = if (lastSample.data is SwitchToFile) {
+            lastSample.attach(null)
+        } else {
+            lastSample
+        }
+        val markerSample = cleanedSample.attach(AdvanceTogetherWith(fileName))
+        return this + transformer(markerSample)
     }
 
     fun List<CodeSample>.switchTo(fileName: String): List<CodeSample> {

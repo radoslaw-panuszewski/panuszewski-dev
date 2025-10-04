@@ -112,8 +112,17 @@ fun buildFileStateMapping(
         val closeRightMarker = sample?.data === CloseRightPane
         val hideFileTreeMarker = sample?.data === HideFileTree
         val showFileTreeMarker = sample?.data === ShowFileTree
+        val advanceTogetherMarker = sample?.data as? AdvanceTogetherWith
         
-        if (switchMarker != null) {
+        if (advanceTogetherMarker != null) {
+            globalState++
+            val otherFile = advanceTogetherMarker.fileName
+            if (otherFile in fileStates) {
+                fileStates[otherFile] = (fileStates[otherFile] ?: 0) + 1
+            }
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (switchMarker != null) {
             globalState++
             val previousFile = currentFile
             currentFile = switchMarker.fileName
