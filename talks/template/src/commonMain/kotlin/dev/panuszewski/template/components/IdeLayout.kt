@@ -200,19 +200,20 @@ fun Transition<Int>.buildIdeStateWithMapping(
     val directoryVisibilityMap = remember(fileVisibilityMap, files) {
         val dirMap = mutableMapOf<String, Int>()
         val hiddenDirectories = files
-            .filter { (_, value) -> value is Directory && value.initiallyHidden }
+            .filter { (_, value) -> value is Directory && value.isInitiallyHidden }
             .map { (path, _) -> path }
             .toSet()
         
-        for ((filePath, _) in files) {
-            if (filePath.contains('/')) {
-                val dirPath = filePath.substringBeforeLast('/')
-                if (dirPath in hiddenDirectories && filePath in fileVisibilityMap.keys) {
-                    val childAppearAt = fileVisibilityMap[filePath]!!
-                    if (dirPath !in dirMap || childAppearAt < dirMap[dirPath]!!) {
-                        dirMap[dirPath] = childAppearAt
+        for ((filePath, appearAt) in fileVisibilityMap) {
+            var currentPath = filePath
+            while (currentPath.contains('/')) {
+                val parentPath = currentPath.substringBeforeLast('/')
+                if (parentPath in hiddenDirectories) {
+                    if (parentPath !in dirMap || appearAt < dirMap[parentPath]!!) {
+                        dirMap[parentPath] = appearAt
                     }
                 }
+                currentPath = parentPath
             }
         }
         dirMap

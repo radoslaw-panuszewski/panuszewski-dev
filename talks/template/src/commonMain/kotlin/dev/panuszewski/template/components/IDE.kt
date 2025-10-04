@@ -672,26 +672,24 @@ fun buildFileTree(files: List<ProjectFile>): List<FileTreeNode> {
         // Create a node for this file/folder
         val isFolder = file.isDirectory
 
-        // Determine the node name for files - include unmatched path parts if any
-        val nodeName = if (!isFolder) {
+        // Determine the node name - include unmatched path parts if any
+        val nodeName = run {
             val parentPath = findParentFolder(file.path, folders)
             if (parentPath != null) {
                 // Extract the part of the path that doesn't match the parent folder
-                val unmatchedPath = file.path.substring(parentPath.length + 1) // +1 to skip the slash
+                val unmatchedPath = file.path.substring(parentPath.length + 1)
                 if (unmatchedPath.contains("/")) {
-                    // If there are unmatched path parts, include them in the node name
                     unmatchedPath
                 } else {
-                    // Otherwise, just use the file name
                     file.name
                 }
             } else {
-                // No parent folder, use the file path as the node name
-                file.path
+                if (!isFolder && file.path.contains("/")) {
+                    file.path
+                } else {
+                    file.name
+                }
             }
-        } else {
-            // For folders, use the name as is
-            file.name
         }
 
         val node = FileTreeNode(nodeName, file.path, isFolder, file)

@@ -10,6 +10,7 @@ import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeStateWithMapping
 import dev.panuszewski.template.components.calculateTotalStates
+import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
@@ -18,8 +19,9 @@ fun StoryboardBuilder.ImperativeCode() {
 
     val files = listOf(
         "build.gradle.kts" to BUILD_GRADLE_KTS,
-        "buildSrc" to DIRECTORY,
-        "buildSrc/src/main/kotlin" to DIRECTORY
+        "buildSrc" to DIRECTORY.initiallyHidden(),
+        "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
+        "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
     )
     val emojiAppears = calculateTotalStates(files)
 
@@ -96,6 +98,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(topWhen, bottomWhen, monday) }
         .then { reveal(postgres, cassandra) }
         .then { reveal(masochistIfTop, masochistIfBottom) }
+        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 //        .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
 //        .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
 //        .then { unfocus() }
