@@ -296,20 +296,26 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.then(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         val lastSample = this.last()
-        val cleanedSample = if (lastSample.data is SwitchToFile) {
-            lastSample.attach(null)
-        } else {
-            lastSample
+        val cleanedSample = when (lastSample.data) {
+            is SwitchToFile, is ShowEmoji, is HideEmoji,
+            is OpenInLeftPane, is OpenInRightPane,
+            is CloseLeftPane, is CloseRightPane,
+            is HideFileTree, is ShowFileTree,
+            is AdvanceTogetherWith -> lastSample.attach(null)
+            else -> lastSample
         }
         return this + transformer(cleanedSample)
     }
 
     fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         val lastSample = this.last()
-        val cleanedSample = if (lastSample.data is SwitchToFile) {
-            lastSample.attach(null)
-        } else {
-            lastSample
+        val cleanedSample = when (lastSample.data) {
+            is SwitchToFile, is ShowEmoji, is HideEmoji,
+            is OpenInLeftPane, is OpenInRightPane,
+            is CloseLeftPane, is CloseRightPane,
+            is HideFileTree, is ShowFileTree,
+            is AdvanceTogetherWith -> lastSample.attach(null)
+            else -> lastSample
         }
         val markerSample = cleanedSample.attach(AdvanceTogetherWith(fileName))
         return this + transformer(markerSample)

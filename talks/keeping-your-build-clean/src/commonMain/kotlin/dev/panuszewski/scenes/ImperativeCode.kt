@@ -97,11 +97,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .hideEmoji()
         .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = true)
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
-        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
         .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
         .then { unfocus() }
         .then { reveal(someImperativeCode).focus(someImperativeCode) }
-        .then { this }
         .then { unfocus() }
 }
 
@@ -140,6 +138,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.Kotlin)
         .startWith { hide(javaPlugin, imperativeCode) }
         .hideFileTree()
-        .switchTo("build.gradle.kts")
+        .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(imperativeCode, javaPlugin) }
+        .switchTo("build.gradle.kts")
 }
