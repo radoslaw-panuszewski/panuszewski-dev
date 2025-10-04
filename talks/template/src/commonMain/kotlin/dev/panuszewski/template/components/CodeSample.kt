@@ -233,17 +233,14 @@ fun <R> buildCodeSamples(builder: CodeSamplesBuilder.() -> R): R =
 
 data class SwitchToFile(val fileName: String)
 
-data class Directory(
-    val initiallyHidden: Boolean = false,
-) {
-    fun initiallyHidden() = copy(initiallyHidden = true)
-}
+data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
+
+data class Directory(val initiallyHidden: Boolean = false)
 
 val DIRECTORY = Directory()
 
-data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
-
 fun List<CodeSample>.initiallyHidden() = InitiallyHiddenFile(this)
+fun Directory.initiallyHidden() = copy(initiallyHidden = true)
 
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(
