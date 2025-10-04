@@ -1,5 +1,6 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -8,6 +9,7 @@ import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -16,12 +18,14 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
+import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeStateWithMapping
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
@@ -38,14 +42,16 @@ fun StoryboardBuilder.NoTypeSafety() {
     )
 
     val topPanelOpens = calculateTotalStates(files) - 1
+    val noTypeSafetyCrossedOut = topPanelOpens + 1
+    val topPanelCloses = noTypeSafetyCrossedOut + 1
 
-    scene(topPanelOpens + 2) {
+    scene(topPanelCloses + 1) {
         withStateTransition {
             TitleScaffold("No type safety") {
                 IDE_STATE = buildIdeStateWithMapping(files = files)
 
                 IdeLayout {
-                    leftPanel(openAt = topPanelOpens) {
+                    leftPanel(openAt = topPanelOpens until topPanelCloses) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.padding(top = 32.dp).align(TopStart),
@@ -55,7 +61,16 @@ fun StoryboardBuilder.NoTypeSafety() {
                                     append(BULLET_1)
                                     withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
                                 }
-                                Text("$BULLET_1 No type safety")
+                                createChildTransition {
+                                    when {
+                                        it >= noTypeSafetyCrossedOut -> buildAnnotatedString {
+                                            append(BULLET_1)
+                                            withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("No type safety") }
+                                        }
+                                        else -> "$BULLET_1 No type safety".annotate()
+                                    }
+                                }.MagicAnnotatedString()
+
                                 Text("$BULLET_1 Imperative code")
                                 Text("$BULLET_1 Cross configuration")
                                 Text("$BULLET_1 Mixed concerns")
@@ -104,6 +119,8 @@ private val SETTINGS_GRADLE_KTS = buildCodeSamples {
 private val BUILD_GRADLE_KTS = buildCodeSamples {
     val imperativePlugin by tag()
     val declarativePlugin by tag()
+    val nonTypesafePlugin by tag()
+    val typesafePlugin by tag()
     val nonTypesafeConfiguration1 by tag()
     val nonTypesafeConfiguration2 by tag()
     val typesafeConfiguration1 by tag()
@@ -124,7 +141,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
     
     apply(plugin = "org.jetbrains.kotlin.jvm")${imperativePlugin}${declarativePlugin}plugins {
-        id("org.jetbrains.kotlin.jvm")
+        ${nonTypesafePlugin}id("org.jetbrains.kotlin.jvm")${nonTypesafePlugin}${typesafePlugin}alias(libs.plugins.kotlin.jvm)${typesafePlugin}
     }${declarativePlugin}
  
     subprojects
@@ -144,7 +161,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(declarativePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
+        .startWith { hide(declarativePlugin, typesafePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { unfocus() }
         .then { focus(imperativePlugin) }
@@ -155,9 +172,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .switchTo("settings.gradle.kts")
         .then { this }
         .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }
-        .then { focusNoScroll(nonTypesafeExternalDependency) }
+        .then { focusNoScroll(nonTypesafePlugin, nonTypesafeExternalDependency) }
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
-        .then { hide(nonTypesafeExternalDependency).reveal(typesafeExternalDependency).unfocus() }
+        .then { hide(nonTypesafePlugin, nonTypesafeExternalDependency).reveal(typesafePlugin, typesafeExternalDependency).unfocus() }
         .then { unfocus() }
 }
