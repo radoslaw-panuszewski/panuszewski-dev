@@ -21,8 +21,7 @@ fun StoryboardBuilder.NoTypeSafety() {
                         "settings.gradle.kts" to SETTINGS_GRADLE_KTS,
                         ".gradle" to DIRECTORY,
                         ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML,
-                    ),
-                    globalTransition = this@withStateTransition
+                    )
                 )
                 
                 IdeLayout {

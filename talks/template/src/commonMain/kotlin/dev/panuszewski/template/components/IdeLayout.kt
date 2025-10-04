@@ -118,9 +118,8 @@ fun buildFileStateMapping(
 }
 
 @Composable
-fun buildIdeStateWithMapping(
-    files: List<Pair<String, List<CodeSample>>>,
-    globalTransition: Transition<Int>
+fun Transition<Int>.buildIdeStateWithMapping(
+    files: List<Pair<String, List<CodeSample>>>
 ): IdeState {
     require(files.isNotEmpty()) { "files list must not be empty" }
     
@@ -141,7 +140,7 @@ fun buildIdeStateWithMapping(
                 isDirectory = true
             )
         } else {
-            val fileTransition = globalTransition.createChildTransition { globalState ->
+            val fileTransition = createChildTransition { globalState ->
                 val fileStateMap = mapping.getOrNull(globalState)
                 val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
                 mappedState.coerceIn(0, codeSamples.lastIndex.coerceAtLeast(0))
@@ -157,7 +156,7 @@ fun buildIdeStateWithMapping(
         }
     }
     
-    val selectedFile = globalTransition.createChildTransition { globalState ->
+    val selectedFile = createChildTransition { globalState ->
         mapping.getOrNull(globalState)?.selectedFile ?: primaryFilePath
     }.targetState
     
@@ -201,7 +200,7 @@ fun SceneScope<Int>.IdeLayout(
             )
 
             Box(Modifier.align(Alignment.Center)) {
-                FadeInOutAnimatedVisibility({ it in scope.centerEmojiVisibleAt.orEmpty() }) {
+                FadeInOutAnimatedVisibility({ it in scope.centerEmojiVisibleAt }) {
                     ProvideTextStyle(MaterialTheme.typography.h1) {
                         scope.centerEmojiContent?.invoke()
                     }
