@@ -14,6 +14,14 @@ fun highlightKotlinDsl(text: String, codeStyle: CodeStyle) = buildAnnotatedStrin
         highlightedRanges.add(range)
     }
 
+    VERSION_CATALOG_ACCESSOR_REGEX.findAll(text).forEach { match ->
+        val range = match.groups[1]?.rangeCompat
+        if (range != null && !isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
+            addStyle(codeStyle.property, range)
+            highlightedRanges.add(range)
+        }
+    }
+
     DSL_KEYWORD_REGEX.findAll(text).forEach { match ->
         val range = match.groups[1]?.rangeCompat
         if (range != null && !isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
@@ -59,6 +67,8 @@ private fun overlapsAny(range: IntRange, ranges: Set<IntRange>): Boolean {
 }
 
 private val DOUBLE_QUOTE_STRING_REGEX = """(".*?")""".toRegex()
+
+private val VERSION_CATALOG_ACCESSOR_REGEX = """\b(libs\.[a-zA-Z][a-zA-Z0-9]*(?:\.[a-zA-Z][a-zA-Z0-9]*)*)\b""".toRegex()
 
 private val DSL_KEYWORD_REGEX = """\b(projects|firstLibrary|compileKotlin|explicitApiMode|Strict|buildscript|allprojects|subprojects|dependencies|tasks)\b""".toRegex()
 
