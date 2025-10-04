@@ -235,9 +235,9 @@ data class SwitchToFile(val fileName: String)
 
 val DIRECTORY: List<CodeSample> = emptyList()
 
-data class HiddenFile(val codeSamples: List<CodeSample>)
+data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
-fun List<CodeSample>.hidden() = HiddenFile(this)
+fun List<CodeSample>.initiallyHidden() = InitiallyHiddenFile(this)
 
 class CodeSamplesBuilder : TextTagScope.Default() {
     fun String.toCodeSample(

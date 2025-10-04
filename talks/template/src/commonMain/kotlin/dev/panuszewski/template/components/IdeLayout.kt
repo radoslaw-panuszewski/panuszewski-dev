@@ -127,9 +127,9 @@ fun Transition<Int>.buildIdeStateWithMapping(
     require(files.isNotEmpty()) { "files list must not be empty" }
     
     val primaryFilePath = files.first().first
-    val hiddenFilesMap = files
+    val initiallyHiddenFilesMap = files
         .mapNotNull { (path, value) -> 
-            if (value is HiddenFile) path to value.codeSamples else null 
+            if (value is InitiallyHiddenFile) path to value.codeSamples else null
         }
         .toMap()
     
@@ -137,7 +137,7 @@ fun Transition<Int>.buildIdeStateWithMapping(
         .mapNotNull { (path, value) ->
             when (value) {
                 is List<*> -> if (value !== DIRECTORY) path to (value as List<CodeSample>) else null
-                is HiddenFile -> path to value.codeSamples
+                is InitiallyHiddenFile -> path to value.codeSamples
                 else -> null
             }
         }
@@ -147,11 +147,11 @@ fun Transition<Int>.buildIdeStateWithMapping(
         buildFileStateMapping(primaryFilePath, allCodeSamples)
     }
     
-    val fileVisibilityMap = remember(hiddenFilesMap, mapping) {
+    val fileVisibilityMap = remember(initiallyHiddenFilesMap, mapping) {
         val visibilityMap = mutableMapOf<String, Int>()
         for ((index, fileMapping) in mapping.withIndex()) {
             val selectedFile = fileMapping.selectedFile
-            if (selectedFile in hiddenFilesMap.keys && selectedFile !in visibilityMap) {
+            if (selectedFile in initiallyHiddenFilesMap.keys && selectedFile !in visibilityMap) {
                 visibilityMap[selectedFile] = index
             }
         }
@@ -176,7 +176,7 @@ fun Transition<Int>.buildIdeStateWithMapping(
     
     val allFiles = files.mapNotNull { (filePath, value) ->
         when {
-            value is HiddenFile -> {
+            value is InitiallyHiddenFile -> {
                 val appearAtState = fileVisibilityMap[filePath] ?: return@mapNotNull null
                 val visibilityTransition = createChildTransition { globalState ->
                     globalState >= appearAtState

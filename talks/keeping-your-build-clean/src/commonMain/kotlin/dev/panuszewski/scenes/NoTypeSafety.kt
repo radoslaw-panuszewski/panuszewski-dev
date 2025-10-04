@@ -7,7 +7,7 @@ import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeStateWithMapping
-import dev.panuszewski.template.components.hidden
+import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
@@ -19,9 +19,9 @@ fun StoryboardBuilder.NoTypeSafety() {
                 val ideState = buildIdeStateWithMapping(
                     files = listOf(
                         "build.gradle.kts" to BUILD_GRADLE_KTS,
-                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS.hidden(),
+                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS.initiallyHidden(),
                         ".gradle" to DIRECTORY,
-                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.hidden(),
+                        ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.initiallyHidden(),
                     )
                 )
                 
@@ -131,4 +131,5 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
         .then { hide(nonTypesafeExternalDependency).reveal(typesafeExternalDependency).focusNoStyling(nonTypesafeExternalDependency) }
+        .then { unfocus() }
 }
