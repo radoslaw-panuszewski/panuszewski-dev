@@ -241,6 +241,14 @@ data class ShowEmoji(val emoji: String)
 
 object HideEmoji
 
+data class OpenInLeftPane(val fileName: String, val switchTo: Boolean)
+
+data class OpenInRightPane(val fileName: String, val switchTo: Boolean)
+
+object CloseLeftPane
+
+object CloseRightPane
+
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
 data class Directory(val isInitiallyHidden: Boolean = false)
@@ -300,6 +308,22 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.hideEmoji(): List<CodeSample> {
         return this + last().attach(HideEmoji)
+    }
+
+    fun List<CodeSample>.openInLeftPane(fileName: String, switchTo: Boolean = false): List<CodeSample> {
+        return this + last().attach(OpenInLeftPane(fileName, switchTo))
+    }
+
+    fun List<CodeSample>.openInRightPane(fileName: String, switchTo: Boolean = false): List<CodeSample> {
+        return this + last().attach(OpenInRightPane(fileName, switchTo))
+    }
+
+    fun List<CodeSample>.closeLeftPane(): List<CodeSample> {
+        return this + last().attach(CloseLeftPane)
+    }
+
+    fun List<CodeSample>.closeRightPane(): List<CodeSample> {
+        return this + last().attach(CloseRightPane)
     }
 
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {

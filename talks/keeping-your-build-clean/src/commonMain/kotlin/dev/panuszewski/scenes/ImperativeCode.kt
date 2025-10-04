@@ -95,7 +95,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(masochistIfTop, masochistIfBottom) }
         .showEmoji("😬")
         .hideEmoji()
-        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = true)
 //        .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
 //        .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
 //        .then { unfocus() }
