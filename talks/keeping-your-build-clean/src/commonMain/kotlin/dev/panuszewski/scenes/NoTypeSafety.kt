@@ -19,7 +19,7 @@ fun StoryboardBuilder.NoTypeSafety() {
                 val ideState = buildIdeStateWithMapping(
                     files = listOf(
                         "build.gradle.kts" to BUILD_GRADLE_KTS,
-                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS,
+                        "settings.gradle.kts" to SETTINGS_GRADLE_KTS.hidden(),
                         ".gradle" to DIRECTORY,
                         ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.hidden(),
                     )
@@ -118,7 +118,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(declarativePlugin, typesafeTask, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
-        .switchTo(".gradle/libs.versions.toml")
         .then { focus(nonTypesafeTask) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(nonTypesafeProjectDependency) }
