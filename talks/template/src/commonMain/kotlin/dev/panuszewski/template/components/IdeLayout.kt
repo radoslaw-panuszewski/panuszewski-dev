@@ -232,8 +232,9 @@ fun Transition<Int>.buildIdeStateWithMapping(
                 }
                 
                 val fileTransition = createChildTransition { globalState ->
-                    val fileStateMap = mapping.getOrNull(globalState)
-                    val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
+                    val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+                    val fileStateMap = mapping[clampedState]
+                    val mappedState = fileStateMap.fileStates[filePath] ?: 0
                     mappedState.coerceIn(0, value.codeSamples.lastIndex.coerceAtLeast(0))
                 }
                 
@@ -299,8 +300,9 @@ fun Transition<Int>.buildIdeStateWithMapping(
             value is List<*> -> {
                 val codeSamples = value as List<CodeSample>
                 val fileTransition = createChildTransition { globalState ->
-                    val fileStateMap = mapping.getOrNull(globalState)
-                    val mappedState = fileStateMap?.fileStates?.get(filePath) ?: 0
+                    val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+                    val fileStateMap = mapping[clampedState]
+                    val mappedState = fileStateMap.fileStates[filePath] ?: 0
                     mappedState.coerceIn(0, codeSamples.lastIndex.coerceAtLeast(0))
                 }
                 
@@ -317,7 +319,8 @@ fun Transition<Int>.buildIdeStateWithMapping(
     }
     
     val selectedFile = createChildTransition { globalState ->
-        mapping.getOrNull(globalState)?.selectedFile ?: primaryFilePath
+        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+        mapping[clampedState].selectedFile
     }.targetState
     
     return IdeState(
