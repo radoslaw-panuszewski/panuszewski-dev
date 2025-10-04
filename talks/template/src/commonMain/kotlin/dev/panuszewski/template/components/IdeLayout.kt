@@ -32,24 +32,39 @@ class IdeLayoutScope internal constructor() {
     var centerEmojiVisibleAt: List<Int> = emptyList()
     var centerEmojiContent: ComposableLambda? = null
 
-    fun topPanel(openAt: IntRange, content: ComposableLambda) {
-        topPanelOpenAt = openAt.toList()
+    fun topPanel(openAt: List<Int>, content: ComposableLambda) {
+        topPanelOpenAt = openAt
         topPanelContent = content
     }
 
-    fun leftPanel(openAt: IntRange, content: ComposableLambda) {
-        leftPanelOpenAt = openAt.toList()
+    fun topPanel(openAt: Int, content: ComposableLambda) {
+        topPanel(listOf(openAt), content)
+    }
+
+    fun topPanel(openAt: IntRange, content: ComposableLambda) {
+        topPanel(openAt.toList(), content)
+    }
+
+    fun leftPanel(openAt: List<Int>, content: ComposableLambda) {
+        leftPanelOpenAt = openAt
         leftPanelContent = content
     }
 
-    fun centerEmoji(visibleAt: Int, content: ComposableLambda) {
-        centerEmojiVisibleAt = listOf(visibleAt)
-        centerEmojiContent = content
+    fun leftPanel(openAt: Int, content: ComposableLambda) {
+        leftPanel(listOf(openAt), content)
+    }
+
+    fun leftPanel(openAt: IntRange, content: ComposableLambda) {
+        leftPanel(openAt.toList(), content)
     }
 
     fun centerEmoji(visibleAt: List<Int>, content: ComposableLambda) {
         centerEmojiVisibleAt = visibleAt
         centerEmojiContent = content
+    }
+
+    fun centerEmoji(visibleAt: Int, content: ComposableLambda) {
+        centerEmoji(listOf(visibleAt), content)
     }
 }
 

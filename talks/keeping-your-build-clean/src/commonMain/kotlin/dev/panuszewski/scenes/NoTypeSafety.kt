@@ -1,22 +1,40 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
+import androidx.compose.ui.Alignment.Companion.TopStart
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.DIRECTORY
+import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeStateWithMapping
 import dev.panuszewski.template.components.initiallyHidden
+import dev.panuszewski.template.extensions.Text
+import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.theme.BULLET_1
 
 fun StoryboardBuilder.NoTypeSafety() {
+
+    val topPanelOpens = BUILD_GRADLE_KTS.size + SETTINGS_GRADLE_KTS.size + LIBS_VERSIONS_TOML.size
+
     scene(100) {
         withStateTransition {
             TitleScaffold("No type safety") {
-                val ideState = buildIdeStateWithMapping(
+                IDE_STATE = buildIdeStateWithMapping(
                     files = listOf(
                         "build.gradle.kts" to BUILD_GRADLE_KTS,
                         "settings.gradle.kts" to SETTINGS_GRADLE_KTS.initiallyHidden(),
@@ -24,9 +42,25 @@ fun StoryboardBuilder.NoTypeSafety() {
                         ".gradle/libs.versions.toml" to LIBS_VERSIONS_TOML.initiallyHidden(),
                     )
                 )
-                
+
                 IdeLayout {
-                    this.ideState = ideState
+                    leftPanel(openAt = topPanelOpens) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(top = 32.dp).align(TopStart),
+                        ) {
+                            h6 {
+                                Text {
+                                    append(BULLET_1)
+                                    withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
+                                }
+                                Text("$BULLET_1 No type safety")
+                                Text("$BULLET_1 Imperative code")
+                                Text("$BULLET_1 Cross configuration")
+                                Text("$BULLET_1 Mixed concerns")
+                            }
+                        }
+                    }
                 }
             }
         }

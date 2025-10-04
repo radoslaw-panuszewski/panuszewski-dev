@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
@@ -18,6 +17,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.MagicAnnotatedString
@@ -56,18 +56,17 @@ fun StoryboardBuilder.Groovy() {
             TitleScaffold(title) {
                 val fileName = if (currentState >= titleChanges) "build.gradle.kts" else "build.gradle"
 
-                val files = buildList {
-                    addFile(
-                        name = fileName,
-                        content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it - ideExpandsVertically) }
-                    )
-                }
+                IDE_STATE = IdeState(
+                    files = buildList {
+                        addFile(
+                            name = fileName,
+                            content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it - ideExpandsVertically) }
+                        )
+                    },
+                    selectedFile = fileName,
+                )
 
                 IdeLayout {
-                    ideState = IdeState(
-                        files = files,
-                        selectedFile = fileName,
-                    )
 
                     topPanel(openAt = ideShrinksVertically until ideExpandsVertically) {
                         Column(

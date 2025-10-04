@@ -20,7 +20,7 @@ import dev.panuszewski.template.extensions.TagType.NORMAL
 
 enum class TagType { NORMAL, WARNING }
 
-fun TextTagScope.tag(data: TagType? = NORMAL) = tag("", data)
+fun TextTagScope.tag(tagType: TagType? = NORMAL) = tag("", tagType)
 
 fun CodeSample.startWith(transformer: CodeSample.() -> CodeSample) = listOf(transformer())
 
