@@ -69,8 +69,6 @@ private val SETTINGS_GRADLE_KTS = buildCodeSamples {
 private val BUILD_GRADLE_KTS = buildCodeSamples {
     val imperativePlugin by tag()
     val declarativePlugin by tag()
-    val nonTypesafeTask by tag()
-    val typesafeTask by tag()
     val nonTypesafeConfiguration1 by tag()
     val nonTypesafeConfiguration2 by tag()
     val typesafeConfiguration1 by tag()
@@ -93,13 +91,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     apply(plugin = "org.jetbrains.kotlin.jvm")${imperativePlugin}${declarativePlugin}plugins {
         id("org.jetbrains.kotlin.jvm")
     }${declarativePlugin}
-
-    tasks.${nonTypesafeTask}named<KotlinCompile>("compileKotlin")${nonTypesafeTask}${typesafeTask}compileKotlin${typesafeTask} {
-        compilerOptions {
-            explicitApiMode = Strict
-        }
-    }
-    
+ 
     subprojects
         .filter { it.name.endsWith("-library") }
         .forEach { it.apply(plugin = "java-library") }
@@ -117,7 +109,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(declarativePlugin, typesafeTask, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
+        .startWith { hide(declarativePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
         .then { focus(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(imperativePlugin) }
         .then { unfocus().hide(imperativePlugin).reveal(declarativePlugin) }
