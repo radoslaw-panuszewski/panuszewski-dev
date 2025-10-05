@@ -690,7 +690,7 @@ fun SceneScope<Int>.IdeLayout(
         val ideTopPadding by animateDp { 
             if (it in scope.topPanelOpenAt || isTopPanelOpen) {
                 if (scope.topPanelAdaptive && topPanelHeight > 0) {
-                    (topPanelHeight / 2).dp
+                    (topPanelHeight / 2).dp + 32.dp
                 } else {
                     260.dp
                 }
