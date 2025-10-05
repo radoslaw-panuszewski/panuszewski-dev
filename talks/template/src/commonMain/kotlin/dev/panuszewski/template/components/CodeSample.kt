@@ -313,7 +313,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + transformer(cleanedSample)
     }
     
-    fun List<CodeSample>.thenDo(operations: ChainableOperations.() -> ChainableOperations): List<CodeSample> {
+    fun List<CodeSample>.thenPerform(operations: ChainableOperations.() -> ChainableOperations): List<CodeSample> {
         return this + last().attach(ChainableOperations().operations().toChainedOperations())
     }
 

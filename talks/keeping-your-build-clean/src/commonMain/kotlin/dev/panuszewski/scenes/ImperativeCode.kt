@@ -2,7 +2,6 @@ package dev.panuszewski.scenes
 
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.panuszewski.template.components.ChainableOperations
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
@@ -142,6 +141,6 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
         .thenTogetherWith("build.gradle.kts") { this }
+        .thenPerform { closeLeftPane().showFileTree() }
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
-        .thenDo { closeLeftPane().showFileTree() }
 }

@@ -345,7 +345,7 @@ private fun CodeDisplayArea(
                                         ) {
                                             code3 {
                                                 Text(
-                                                    text = displayLeftPaneFile.value!!.path,
+                                                    text = displayLeftPaneFile.value!!.name,
                                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
@@ -409,7 +409,7 @@ private fun CodeDisplayArea(
                                         ) {
                                             code3 {
                                                 Text(
-                                                    text = displayRightPaneFile.value!!.path,
+                                                    text = displayRightPaneFile.value!!.name,
                                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
