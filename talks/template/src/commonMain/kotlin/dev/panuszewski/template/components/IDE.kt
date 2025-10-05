@@ -59,6 +59,7 @@ import dev.panuszewski.template.extensions.code3
 import dev.panuszewski.template.theme.withColor
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.IdeColorScheme
+import kotlinx.coroutines.delay
 
 var IDE_STATE: IdeState = IdeState(emptyList())
 
@@ -297,6 +298,27 @@ private fun CodeDisplayArea(
         label = "rightPaneWeight"
     )
     
+    val displayLeftPaneFile = remember { mutableStateOf(leftPaneFile) }
+    val displayRightPaneFile = remember { mutableStateOf(rightPaneFile) }
+    
+    LaunchedEffect(leftPaneFile) {
+        if (leftPaneFile != null) {
+            displayLeftPaneFile.value = leftPaneFile
+        } else {
+            delay(300)
+            displayLeftPaneFile.value = null
+        }
+    }
+    
+    LaunchedEffect(rightPaneFile) {
+        if (rightPaneFile != null) {
+            displayRightPaneFile.value = rightPaneFile
+        } else {
+            delay(300)
+            displayRightPaneFile.value = null
+        }
+    }
+    
     if (isSplitPaneMode) {
         // Split-pane mode
         Row(
@@ -312,18 +334,18 @@ private fun CodeDisplayArea(
                                     .clip(RectangleShape)
                                     .graphicsLayer { alpha = leftPaneWeight }
                             ) {
-                                if (leftPaneFile != null) {
+                                if (displayLeftPaneFile.value != null) {
                                     Column {
                                         // Tab for left pane
                                         Box(
                                             modifier = Modifier
-                                                .background(if (leftPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
+                                                .background(if (displayLeftPaneFile.value == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
                                                 .fillMaxWidth(),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             code3 {
                                                 Text(
-                                                    text = leftPaneFile.path,
+                                                    text = displayLeftPaneFile.value!!.path,
                                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
@@ -334,10 +356,12 @@ private fun CodeDisplayArea(
 
                                         // File content
                                         AnimatedContent(
-                                            targetState = leftPaneFile,
+                                            targetState = displayLeftPaneFile.value,
                                             transitionSpec = { fadeIn() togetherWith fadeOut() }
                                         ) { file ->
-                                            CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                            if (file != null) {
+                                                CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                            }
                                         }
                                     }
                                 } else {
@@ -374,18 +398,18 @@ private fun CodeDisplayArea(
                                     .clip(RectangleShape)
                                     .graphicsLayer { alpha = rightPaneWeight }
                             ) {
-                                if (rightPaneFile != null) {
+                                if (displayRightPaneFile.value != null) {
                                     Column {
                                         // Tab for right pane
                                         Box(
                                             modifier = Modifier
-                                                .background(if (rightPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
+                                                .background(if (displayRightPaneFile.value == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
                                                 .fillMaxWidth(),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             code3 {
                                                 Text(
-                                                    text = rightPaneFile.path,
+                                                    text = displayRightPaneFile.value!!.path,
                                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
@@ -396,10 +420,12 @@ private fun CodeDisplayArea(
 
                                         // File content
                                         AnimatedContent(
-                                            targetState = rightPaneFile,
+                                            targetState = displayRightPaneFile.value,
                                             transitionSpec = { fadeIn() togetherWith fadeOut() }
                                         ) { file ->
-                                            CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                            if (file != null) {
+                                                CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                            }
                                         }
                                     }
                                 } else {
