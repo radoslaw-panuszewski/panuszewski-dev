@@ -571,5 +571,25 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
         return this
     }
     
+    fun openTopPanel(): ChainableOperations {
+        operations.add(OpenTopPanel)
+        return this
+    }
+    
+    fun closeTopPanel(): ChainableOperations {
+        operations.add(CloseTopPanel)
+        return this
+    }
+    
+    fun openLeftPanel(): ChainableOperations {
+        operations.add(OpenLeftPanel)
+        return this
+    }
+    
+    fun closeLeftPanel(): ChainableOperations {
+        operations.add(CloseLeftPanel)
+        return this
+    }
+    
     fun toChainedOperations(): ChainedOperations = ChainedOperations(operations.toList())
 }

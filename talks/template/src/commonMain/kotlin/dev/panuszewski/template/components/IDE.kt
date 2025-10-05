@@ -74,7 +74,9 @@ data class IdeState(
     val highlightedFile: String? = null,
     val fileTreeWidth: Dp? = null,
     val emoji: String? = null,
-    val errorText: String? = null
+    val errorText: String? = null,
+    val topPanelOpen: Boolean = false,
+    val leftPanelOpen: Boolean = false
 )
 
 @Composable

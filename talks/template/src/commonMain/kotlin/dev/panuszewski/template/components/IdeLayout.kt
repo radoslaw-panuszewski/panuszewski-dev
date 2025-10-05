@@ -76,7 +76,9 @@ data class FileStateMapping(
     val leftPaneFile: String? = null,
     val rightPaneFile: String? = null,
     val fileTreeHidden: Boolean = false,
-    val errorText: String? = null
+    val errorText: String? = null,
+    val topPanelOpen: Boolean = false,
+    val leftPanelOpen: Boolean = false
 )
 
 fun buildFileStateMapping(
@@ -94,8 +96,10 @@ fun buildFileStateMapping(
     var rightPaneFile: String? = null
     var fileTreeHidden = false
     var errorText: String? = null
+    var topPanelOpen = false
+    var leftPanelOpen = false
     
-    mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+    mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
     fileStates[currentFile] = 1
     
     while (true) {
@@ -118,6 +122,10 @@ fun buildFileStateMapping(
         val openErrorMarker = sample?.data as? OpenErrorWindow
         val closeErrorMarker = sample?.data === CloseErrorWindow
         val advanceTogetherMarker = sample?.data as? AdvanceTogetherWith
+        val openTopPanelMarker = sample?.data === OpenTopPanel
+        val closeTopPanelMarker = sample?.data === CloseTopPanel
+        val openLeftPanelMarker = sample?.data === OpenLeftPanel
+        val closeLeftPanelMarker = sample?.data === CloseLeftPanel
         
         if (chainedOps != null) {
             globalState++
@@ -173,9 +181,21 @@ fun buildFileStateMapping(
                     CloseErrorWindow -> {
                         errorText = null
                     }
+                    OpenTopPanel -> {
+                        topPanelOpen = true
+                    }
+                    CloseTopPanel -> {
+                        topPanelOpen = false
+                    }
+                    OpenLeftPanel -> {
+                        leftPanelOpen = true
+                    }
+                    CloseLeftPanel -> {
+                        leftPanelOpen = false
+                    }
                 }
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (advanceTogetherMarker != null) {
             globalState++
@@ -183,7 +203,7 @@ fun buildFileStateMapping(
             if (otherFile in fileStates) {
                 fileStates[otherFile] = (fileStates[otherFile] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (switchMarker != null) {
             globalState++
@@ -222,7 +242,7 @@ fun buildFileStateMapping(
                 }
             }
             
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (openLeftMarker != null) {
             globalState++
@@ -234,7 +254,7 @@ fun buildFileStateMapping(
             if (openLeftMarker.switchTo) {
                 currentFile = openLeftMarker.fileName
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (openRightMarker != null) {
             globalState++
@@ -246,7 +266,7 @@ fun buildFileStateMapping(
             if (openRightMarker.switchTo) {
                 currentFile = openRightMarker.fileName
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeLeftMarker) {
             globalState++
@@ -254,7 +274,7 @@ fun buildFileStateMapping(
             if (rightPaneFile != null) {
                 currentFile = rightPaneFile!!
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeRightMarker) {
             globalState++
@@ -262,41 +282,61 @@ fun buildFileStateMapping(
             if (leftPaneFile != null) {
                 currentFile = leftPaneFile!!
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (hideFileTreeMarker) {
             globalState++
             fileTreeHidden = true
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (showFileTreeMarker) {
             globalState++
             fileTreeHidden = false
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (openErrorMarker != null) {
             globalState++
             errorText = openErrorMarker.text
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (closeErrorMarker) {
             globalState++
             errorText = null
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (showEmojiMarker != null) {
             globalState++
             currentEmoji = showEmojiMarker.emoji
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else if (hideEmojiMarker) {
             globalState++
             currentEmoji = null
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (openTopPanelMarker) {
+            globalState++
+            topPanelOpen = true
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (closeTopPanelMarker) {
+            globalState++
+            topPanelOpen = false
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (openLeftPanelMarker) {
+            globalState++
+            leftPanelOpen = true
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (closeLeftPanelMarker) {
+            globalState++
+            leftPanelOpen = false
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         } else {
             globalState++
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, topPanelOpen = topPanelOpen, leftPanelOpen = leftPanelOpen))
             fileStates[currentFile] = currentFileState + 1
         }
         
@@ -558,6 +598,16 @@ fun Transition<Int>.buildIdeState(
         mapping[clampedState].errorText
     }.targetState
     
+    val topPanelOpen = createChildTransition { globalState ->
+        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+        mapping[clampedState].topPanelOpen
+    }.targetState
+    
+    val leftPanelOpen = createChildTransition { globalState ->
+        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+        mapping[clampedState].leftPanelOpen
+    }.targetState
+    
     return IdeState(
         files = allFiles,
         selectedFile = selectedFile,
@@ -565,7 +615,9 @@ fun Transition<Int>.buildIdeState(
         leftPaneFile = leftPaneFile,
         rightPaneFile = rightPaneFile,
         fileTreeHidden = fileTreeHidden,
-        errorText = errorText
+        errorText = errorText,
+        topPanelOpen = topPanelOpen,
+        leftPanelOpen = leftPanelOpen
     )
 }
 
@@ -580,10 +632,13 @@ fun SceneScope<Int>.IdeLayout(
             IDE_STATE = scope.ideState!!
         }
 
-        val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt) 260.dp else 0.dp }
-        val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt) 260.dp else 0.dp }
+        val isTopPanelOpen = IDE_STATE.topPanelOpen
+        val isLeftPanelOpen = IDE_STATE.leftPanelOpen
+        
+        val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt || isTopPanelOpen) 260.dp else 0.dp }
+        val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 260.dp else 0.dp }
         val fileTreeWidthOverride by animateDp { 
-            if (it in scope.leftPanelOpenAt) 0.dp else 275.dp
+            if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 0.dp else 275.dp
         }
         
         val fileTreeHiddenWidth by androidx.compose.animation.core.animateDpAsState(
@@ -594,13 +649,13 @@ fun SceneScope<Int>.IdeLayout(
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.TopCenter)) {
-                FadeInOutAnimatedVisibility({ it in scope.topPanelOpenAt }) {
+                FadeInOutAnimatedVisibility({ it in scope.topPanelOpenAt || isTopPanelOpen }) {
                     scope.topPanelContent?.invoke()
                 }
             }
 
             Box(Modifier.align(Alignment.TopStart)) {
-                FadeInOutAnimatedVisibility({ it in scope.leftPanelOpenAt }) {
+                FadeInOutAnimatedVisibility({ it in scope.leftPanelOpenAt || isLeftPanelOpen }) {
                     scope.leftPanelContent?.invoke()
                 }
             }
