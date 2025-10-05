@@ -19,10 +19,10 @@ fun StoryboardBuilder.ImperativeCode() {
     val files = listOf(
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "buildSrc" to DIRECTORY.initiallyHidden(),
-        "buildSrc/build.gradle.kts" to BUILD_SRC_BUILDSCRIPT.initiallyHidden(),
-        "buildSrc/settings.gradle.kts" to BUILD_SRC_SETTINGS.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
+        "buildSrc/settings.gradle.kts" to BUILD_SRC_SETTINGS.initiallyHidden(),
+        "buildSrc/build.gradle.kts" to BUILD_SRC_BUILDSCRIPT.initiallyHidden(),
     )
     val totalStates = calculateTotalStates(files)
 
