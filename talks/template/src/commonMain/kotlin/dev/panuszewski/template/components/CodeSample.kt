@@ -208,6 +208,46 @@ class CodeSample private constructor(
     fun changeLanguage(language: Language): CodeSample = copy(language = language)
 
     fun changeTitle(title: String?): CodeSample = copy(title = title)
+    
+    fun openErrorWindow(text: String): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenErrorWindow(text)))
+    }
+    
+    fun closeErrorWindow(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseErrorWindow))
+    }
+    
+    fun closeRightPane(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseRightPane))
+    }
+    
+    fun closeLeftPane(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseLeftPane))
+    }
+    
+    fun showFileTree(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ShowFileTree))
+    }
+    
+    fun hideFileTree(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(HideFileTree))
+    }
+    
+    fun showEmoji(emoji: String): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ShowEmoji(emoji)))
+    }
+    
+    fun hideEmoji(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(HideEmoji))
+    }
+    
+    fun openInLeftPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenInLeftPane(fileName, switchTo)))
+    }
+    
+    fun openInRightPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenInRightPane(fileName, switchTo)))
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -265,6 +305,61 @@ data class AdvanceTogetherWith(val fileName: String)
 
 data class ChainedOperations(val operations: List<Any>)
 
+class CodeSampleWithIdeOps(
+    val codeSample: CodeSample,
+    val ideOperations: MutableList<Any>
+) {
+    fun openErrorWindow(text: String): CodeSampleWithIdeOps {
+        ideOperations.add(OpenErrorWindow(text))
+        return this
+    }
+    
+    fun closeErrorWindow(): CodeSampleWithIdeOps {
+        ideOperations.add(CloseErrorWindow)
+        return this
+    }
+    
+    fun closeRightPane(): CodeSampleWithIdeOps {
+        ideOperations.add(CloseRightPane)
+        return this
+    }
+    
+    fun closeLeftPane(): CodeSampleWithIdeOps {
+        ideOperations.add(CloseLeftPane)
+        return this
+    }
+    
+    fun showFileTree(): CodeSampleWithIdeOps {
+        ideOperations.add(ShowFileTree)
+        return this
+    }
+    
+    fun hideFileTree(): CodeSampleWithIdeOps {
+        ideOperations.add(HideFileTree)
+        return this
+    }
+    
+    fun showEmoji(emoji: String): CodeSampleWithIdeOps {
+        ideOperations.add(ShowEmoji(emoji))
+        return this
+    }
+    
+    fun hideEmoji(): CodeSampleWithIdeOps {
+        ideOperations.add(HideEmoji)
+        return this
+    }
+    
+    fun openInLeftPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
+        ideOperations.add(OpenInLeftPane(fileName, switchTo))
+        return this
+    }
+    
+    fun openInRightPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
+        ideOperations.add(OpenInRightPane(fileName, switchTo))
+        return this
+    }
+}
+
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
 data class Directory(val isInitiallyHidden: Boolean = false)
@@ -300,11 +395,19 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun CodeSample.changeTagType(tag: TextTag, newType: TagType): CodeSample = this.changeTagType(tag, newType)
     fun CodeSample.changeTagType(data: Any?, newType: TagType): CodeSample = this.changeTagType(tags.filter { data == it.data }, newType)
 
-    fun CodeSample.then(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
-        return listOf(this, transformer(this))
+    fun CodeSample.then(transformer: CodeSample.() -> Any): List<CodeSample> {
+        val result = transformer(this)
+        return when (result) {
+            is CodeSampleWithIdeOps -> {
+                val sampleWithChainedOps = result.codeSample.attach(ChainedOperations(result.ideOperations))
+                listOf(this, sampleWithChainedOps)
+            }
+            is CodeSample -> listOf(this, result)
+            else -> throw IllegalArgumentException("Transformer must return CodeSample or CodeSampleWithIdeOps")
+        }
     }
 
-    fun List<CodeSample>.then(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
+    fun List<CodeSample>.then(transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()
         val cleanedSample = when (lastSample.data) {
             is SwitchToFile, is ShowEmoji, is HideEmoji,
@@ -315,7 +418,15 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
-        return this + transformer(cleanedSample)
+        val result = transformer(cleanedSample)
+        return when (result) {
+            is CodeSampleWithIdeOps -> {
+                val sampleWithChainedOps = result.codeSample.attach(ChainedOperations(result.ideOperations))
+                this + sampleWithChainedOps
+            }
+            is CodeSample -> this + result
+            else -> throw IllegalArgumentException("Transformer must return CodeSample or CodeSampleWithIdeOps")
+        }
     }
     
     fun List<CodeSample>.thenPerform(operations: ChainableOperations.() -> ChainableOperations): List<CodeSample> {
