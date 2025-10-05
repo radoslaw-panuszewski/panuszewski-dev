@@ -283,39 +283,24 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                 }
             }
 
-            val errorWindowHeight by animateDpAsState(
-                targetValue = if (errorText != null) 120.dp else 0.dp,
-                animationSpec = tween(durationMillis = 300),
-                label = "errorWindowHeight"
-            )
-
-            if (errorWindowHeight > 0.dp) {
-                Divider(Modifier.background(ideColors.toolbarBorder))
-                
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(errorWindowHeight)
-                        .clipToBounds()
-                ) {
-                    if (errorText != null) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(120.dp)
-                                .background(ideColors.background)
-                                .padding(16.dp)
-                        ) {
-                            val errorOpacity by animateFloatAsState(
-                                targetValue = if (errorText != null) 1f else 0f,
-                                animationSpec = tween(durationMillis = 200),
-                                label = "errorOpacity"
-                            )
-                            
+            AnimatedVisibility(
+                visible = errorText != null,
+                enter = expandVertically(tween(300)) + fadeIn(tween(200)),
+                exit = shrinkVertically(tween(300)) + fadeOut(tween(200))
+            ) {
+                Column {
+                    Divider(Modifier.background(ideColors.toolbarBorder))
+                    
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(ideColors.background)
+                            .padding(16.dp)
+                    ) {
+                        errorText?.let {
                             Text(
-                                text = errorText,
-                                color = Color(0xFFFF6B68),
-                                modifier = Modifier.graphicsLayer { alpha = errorOpacity }
+                                text = it,
+                                color = Color(0xFFFF6B68)
                             )
                         }
                     }
