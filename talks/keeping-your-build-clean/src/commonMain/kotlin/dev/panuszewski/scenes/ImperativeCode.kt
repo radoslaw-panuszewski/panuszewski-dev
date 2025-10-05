@@ -116,7 +116,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .openTopPanel("typesafe-conventions")
+        .openNamedPanel("typesafe-conventions")
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -186,7 +186,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
         .showEmoji("😩")
         .hideEmoji()
-        .openTopPanel("typesafe-conventions")
+        .openNamedPanel("typesafe-conventions")
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
