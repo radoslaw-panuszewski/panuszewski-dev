@@ -26,39 +26,40 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.lerp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.lerp
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.MagicText
 import dev.panuszewski.template.extensions.code2
 import dev.panuszewski.template.extensions.code3
-import dev.panuszewski.template.theme.withColor
-import dev.panuszewski.template.theme.LocalIdeColors
+import dev.panuszewski.template.extensions.endBorder
 import dev.panuszewski.template.theme.IdeColorScheme
+import dev.panuszewski.template.theme.LocalIdeColors
+import dev.panuszewski.template.theme.withColor
 import kotlinx.coroutines.delay
 
 var IDE_STATE: IdeState = IdeState(emptyList())
@@ -216,7 +217,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                 .width(275.dp)
                                 .fillMaxHeight()
                                 .background(ideColors.fileTreeBackground)
-                                .border(width = 1.dp, color = ideColors.fileTreeBorder)
+                                .endBorder(width = 1.dp, color = ideColors.fileTreeBorder)
                         ) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 items(
@@ -283,24 +284,53 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                 }
             }
 
+            Divider(Modifier.background(ideColors.toolbarBorder))
+
             AnimatedVisibility(
                 visible = errorText != null,
-                enter = expandVertically(tween(300)) + fadeIn(tween(200)),
-                exit = shrinkVertically(tween(300)) + fadeOut(tween(200))
+                enter = expandVertically(tween(300), expandFrom = Alignment.Bottom),
+                exit = shrinkVertically(tween(300), shrinkTowards = Alignment.Bottom),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column {
-                    Divider(Modifier.background(ideColors.toolbarBorder))
-                    
+                val contentAlpha = remember { mutableStateOf(0f) }
+                
+                LaunchedEffect(errorText) {
+                    if (errorText != null) {
+                        contentAlpha.value = 0f
+                        delay(300)
+                        contentAlpha.value = 1f
+                    } else {
+                        contentAlpha.value = 0f
+                    }
+                }
+                
+                val animatedAlpha by animateFloatAsState(
+                    targetValue = contentAlpha.value,
+                    animationSpec = tween(200),
+                    label = "contentAlpha"
+                )
+                
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ideColors.codePanelBackground)
+                ) {
+//                    Divider(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        color = ideColors.paneSeparator,
+//                        thickness = 1.dp
+//                    )
+//
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(ideColors.background)
                             .padding(16.dp)
                     ) {
                         errorText?.let {
                             Text(
                                 text = it,
-                                color = Color(0xFFFF6B68)
+                                color = Color(0xFFFF6B68),
+                                modifier = Modifier.graphicsLayer { alpha = animatedAlpha }
                             )
                         }
                     }
