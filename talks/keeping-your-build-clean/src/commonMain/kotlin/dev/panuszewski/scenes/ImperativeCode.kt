@@ -20,6 +20,7 @@ fun StoryboardBuilder.ImperativeCode() {
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "buildSrc" to DIRECTORY.initiallyHidden(),
         "buildSrc/build.gradle.kts" to BUILD_SRC_BUILDSCRIPT.initiallyHidden(),
+        "buildSrc/settings.gradle.kts" to BUILD_SRC_SETTINGS.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
     )
@@ -134,7 +135,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     }
     
     ${extractedCode}${todo}// TODO${todo}
-        """
+    """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(extractedCode) }
@@ -145,14 +146,60 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { closeLeftPane().showFileTree() }
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'") }
         .closeErrorWindow()
-        .switchTo("buildSrc/build.gradle.kts")
+        .switchTo("buildSrc/settings.gradle.kts")
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
-    """
-        
+    val pluginMarkerUsage1 by tag()
+    val pluginMarkerUsage2 by tag()
+    val pluginMarkerDeclaration by tag()
+    val pluginMarkerArgs by tag()
+    val pluginMarkerBody by tag()
+
+    $$"""
+    plugins {
+        `kotlin-dsl`
+    }$${pluginMarkerDeclaration}
+    
+    fun pluginMarker($${pluginMarkerArgs}provider: Provider<PluginDependency>$${pluginMarkerArgs}): String$${pluginMarkerDeclaration}$${pluginMarkerBody} {
+        val pluginId = provider.get().pluginId
+        val pluginVersion = provider.get().version
+        return "$pluginId:$pluginId.gradle.plugin:$pluginVersion"
+    }$${pluginMarkerBody}
+    
+    dependencies {
+        implementation($${pluginMarkerUsage1}pluginMarker($${pluginMarkerUsage1}libs.plugins.kotlin.jvm$${pluginMarkerUsage2})$${pluginMarkerUsage2})
+    }
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { this }
+        .startWith { hide(pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerDeclaration, pluginMarkerBody, pluginMarkerArgs) }
+        .then { reveal(pluginMarkerUsage1, pluginMarkerUsage2).focus(pluginMarkerUsage1, pluginMarkerUsage2) }
+        .then { reveal(pluginMarkerDeclaration).focus(pluginMarkerDeclaration) }
+        .then { reveal(pluginMarkerArgs).focus(pluginMarkerArgs) }
+        .then { reveal(pluginMarkerBody).unfocus() }
+
+}
+
+private val BUILD_SRC_SETTINGS = buildCodeSamples {
+    val versionCatalogDeclaration by tag()
+
+    """
+    dependencyResolutionManagement {
+        repositories {
+            mavenCentral()
+        }${versionCatalogDeclaration}
+        
+        versionCatalogs {
+            create("libs") {
+                from(files("../gradle/libs.versions.toml"))
+            }
+        }${versionCatalogDeclaration}
+    } 
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(versionCatalogDeclaration) }
+        .then { reveal(versionCatalogDeclaration) }
+        .switchTo("buildSrc/build.gradle.kts")
 }

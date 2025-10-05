@@ -87,6 +87,7 @@ private val LIBS_VERSIONS_TOML = buildCodeSamples {
     val todo by tag()
     val libraries by tag()
 
+    // TODO also add [plugins] block here!!!
     """
     ${libraries}[libraries]
     mongodb-driver-sync = "org.springframework.boot:spring-boot-starter-web:3.5.6"
