@@ -143,6 +143,5 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
         .thenTogetherWith("build.gradle.kts") { this }
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
-        .closeLeftPane()
-        .showFileTree()
+        .thenDo { closeLeftPane().showFileTree() }
 }
