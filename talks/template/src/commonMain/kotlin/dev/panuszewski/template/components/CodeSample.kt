@@ -251,6 +251,22 @@ class CodeSample private constructor(
     fun openInRightPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(OpenInRightPane(fileName, switchTo)))
     }
+    
+    fun openTopPanel(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenTopPanel))
+    }
+    
+    fun closeTopPanel(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseTopPanel))
+    }
+    
+    fun openLeftPanel(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenLeftPanel))
+    }
+    
+    fun closeLeftPanel(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseLeftPanel))
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -367,6 +383,26 @@ class CodeSampleWithIdeOps(
     
     fun openInRightPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
         ideOperations.add(OpenInRightPane(fileName, switchTo))
+        return this
+    }
+    
+    fun openTopPanel(): CodeSampleWithIdeOps {
+        ideOperations.add(OpenTopPanel)
+        return this
+    }
+    
+    fun closeTopPanel(): CodeSampleWithIdeOps {
+        ideOperations.add(CloseTopPanel)
+        return this
+    }
+    
+    fun openLeftPanel(): CodeSampleWithIdeOps {
+        ideOperations.add(OpenLeftPanel)
+        return this
+    }
+    
+    fun closeLeftPanel(): CodeSampleWithIdeOps {
+        ideOperations.add(CloseLeftPanel)
         return this
     }
 }
