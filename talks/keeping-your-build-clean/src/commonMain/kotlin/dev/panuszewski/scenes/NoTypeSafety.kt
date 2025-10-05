@@ -21,7 +21,7 @@ import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.components.buildIdeStateWithMapping
+import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.Text
@@ -48,7 +48,7 @@ fun StoryboardBuilder.NoTypeSafety() {
     scene(topPanelCloses + 1) {
         withStateTransition {
             TitleScaffold("No type safety") {
-                IDE_STATE = buildIdeStateWithMapping(files)
+                IDE_STATE = buildIdeState(files)
 
                 IdeLayout {
                     leftPanel(openAt = topPanelOpens until topPanelCloses) {

@@ -7,7 +7,7 @@ import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.components.buildIdeStateWithMapping
+import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
@@ -27,7 +27,7 @@ fun StoryboardBuilder.ImperativeCode() {
     scene(totalStates) {
         withStateTransition {
             TitleScaffold("Imperative code") {
-                IDE_STATE = buildIdeStateWithMapping(files)
+                IDE_STATE = buildIdeState(files)
 
                 IdeLayout { }
             }
@@ -113,26 +113,26 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     val implementation4 by tag()
 
     """
-        ${javaPlugin}plugins {
-            `java`
+    ${javaPlugin}plugins {
+        alias(libs.plugins.kotlin.jvm)
+    }
+    
+    ${javaPlugin}${imperativeCode}if (System.getenv("CI") == "true") {
+        apply(plugin = "maven-publish")
+    }
+    
+    dependencies {
+        when (today()) {
+            MONDAY -> ${implementation1}implementation${implementation1}(libs.mongodb)
+            TUESDAY -> ${implementation2}implementation${implementation2}(libs.postgres)
+            else -> ${implementation3}implementation${implementation3}(libs.cassandra)
         }
-        
-        ${javaPlugin}${imperativeCode}if (System.getenv("CI") == "true") {
-            apply(plugin = "maven-publish")
+        if (masochistModeEnabled()) {
+            ${implementation4}implementation${implementation4}(libs.groovy)
         }
-        
-        dependencies {
-            when (today()) {
-                MONDAY -> ${implementation1}implementation${implementation1}(libs.mongodb)
-                TUESDAY -> ${implementation2}implementation${implementation2}(libs.postgres)
-                else -> ${implementation3}implementation${implementation3}(libs.cassandra)
-            }
-            if (masochistModeEnabled()) {
-                ${implementation4}implementation${implementation4}(libs.groovy)
-            }
-        }
-        
-        ${imperativeCode}${todo}// TODO${todo}
+    }
+    
+    ${imperativeCode}${todo}// TODO${todo}
         """
         .trimIndent()
         .toCodeSample(language = Language.Kotlin)
@@ -140,5 +140,5 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .hideFileTree()
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(imperativeCode, javaPlugin) }
-        .switchTo("build.gradle.kts")
+        .thenTogetherWith("build.gradle.kts") { this }
 }

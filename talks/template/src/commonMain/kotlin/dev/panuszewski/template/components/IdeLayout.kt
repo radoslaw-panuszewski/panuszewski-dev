@@ -241,11 +241,11 @@ fun calculateTotalStates(files: List<Pair<String, Any>>): Int {
 }
 
 @Composable
-fun Transition<Int>.buildIdeStateWithMapping(vararg files: Pair<String, Any>) =
-    buildIdeStateWithMapping(files.toList())
+fun Transition<Int>.buildIdeState(vararg files: Pair<String, Any>) =
+    buildIdeState(files.toList())
 
 @Composable
-fun Transition<Int>.buildIdeStateWithMapping(
+fun Transition<Int>.buildIdeState(
     files: List<Pair<String, Any>>
 ): IdeState {
     require(files.isNotEmpty()) { "files list must not be empty" }
