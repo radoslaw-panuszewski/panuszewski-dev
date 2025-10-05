@@ -678,21 +678,23 @@ private fun FileTreeItemContent(
                     }
                 )
                 ProvideTextStyle(textStyle) {
-                    MagicText(text = buildAnnotatedString {
-                        if (node.name.contains(".")) {
-                            val beforeExtension = node.name.substringBeforeLast(".")
-                            val afterExtension = node.name.substringAfterLast(".")
-                            append(beforeExtension)
-                            append(".")
-                            if (afterExtension == "dcl") {
-                                withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                    androidx.compose.runtime.key(node.path) {
+                        MagicText(text = buildAnnotatedString {
+                            if (node.name.contains(".")) {
+                                val beforeExtension = node.name.substringBeforeLast(".")
+                                val afterExtension = node.name.substringAfterLast(".")
+                                append(beforeExtension)
+                                append(".")
+                                if (afterExtension == "dcl") {
+                                    withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                                } else {
+                                    append(afterExtension)
+                                }
                             } else {
-                                append(afterExtension)
+                                append(node.name)
                             }
-                        } else {
-                            append(node.name)
-                        }
-                    })
+                        })
+                    }
                 }
             }
         }
