@@ -85,8 +85,12 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
         val highlightedFile = files.find { it.path == highlightedFile }
 
         // Find files in left and right panes
-        val leftPaneFile = files.find { it.path == leftPaneFile }
+        var leftPaneFile = files.find { it.path == leftPaneFile }
         val rightPaneFile = files.find { it.path == rightPaneFile }
+
+        if (leftPaneFile == null && rightPaneFile == null) {
+            leftPaneFile = selectedFile
+        }
 
         // Determine the current mode
         val isSplitPaneMode = leftPaneFile != null || rightPaneFile != null
