@@ -380,14 +380,14 @@ private fun CodeDisplayArea(
                                         // Tab for left pane
                                         Box(
                                             modifier = Modifier
-                                                .background(if (displayLeftPaneFile.value == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
+                                                .background(ideColors.tabBackground)
                                                 .fillMaxWidth(),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             code3 {
                                                 Text(
                                                     text = displayLeftPaneFile.value!!.name,
-                                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp),
+                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
                                             }
@@ -401,7 +401,7 @@ private fun CodeDisplayArea(
                                             transitionSpec = { fadeIn() togetherWith fadeOut() }
                                         ) { file ->
                                             if (file != null) {
-                                                CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                                CodePanel(file = file, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
                                             }
                                         }
                                     }
@@ -444,14 +444,14 @@ private fun CodeDisplayArea(
                                         // Tab for right pane
                                         Box(
                                             modifier = Modifier
-                                                .background(if (displayRightPaneFile.value == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
+                                                .background(ideColors.tabBackground)
                                                 .fillMaxWidth(),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             code3 {
                                                 Text(
                                                     text = displayRightPaneFile.value!!.name,
-                                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp),
+                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
                                             }
@@ -465,7 +465,7 @@ private fun CodeDisplayArea(
                                             transitionSpec = { fadeIn() togetherWith fadeOut() }
                                         ) { file ->
                                             if (file != null) {
-                                                CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                                CodePanel(file = file, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp))
                                             }
                                         }
                                     }
