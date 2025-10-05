@@ -428,10 +428,6 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             else -> throw IllegalArgumentException("Transformer must return CodeSample or CodeSampleWithIdeOps")
         }
     }
-    
-    fun List<CodeSample>.thenPerform(operations: ChainableOperations.() -> ChainableOperations): List<CodeSample> {
-        return this + last().attach(ChainableOperations().operations().toChainedOperations())
-    }
 
     fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         val lastSample = this.last()

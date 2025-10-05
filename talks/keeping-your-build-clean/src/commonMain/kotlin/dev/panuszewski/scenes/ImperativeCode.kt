@@ -140,8 +140,8 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .hideFileTree()
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
-        .thenTogetherWith("build.gradle.kts") { this }
-        .thenPerform { closeLeftPane().showFileTree() }
+        .thenTogetherWith("build.gradle.kts") { hide(todo) }
+        .then { closeLeftPane().showFileTree() }
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'") }
         .closeErrorWindow()
 }
