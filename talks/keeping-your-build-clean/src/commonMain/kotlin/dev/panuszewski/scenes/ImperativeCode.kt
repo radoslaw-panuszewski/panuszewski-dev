@@ -19,6 +19,7 @@ fun StoryboardBuilder.ImperativeCode() {
     val files = listOf(
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "buildSrc" to DIRECTORY.initiallyHidden(),
+        "buildSrc/build.gradle.kts" to BUILD_SRC_BUILDSCRIPT.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
     )
@@ -144,4 +145,14 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { closeLeftPane().showFileTree() }
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'") }
         .closeErrorWindow()
+        .switchTo("buildSrc/build.gradle.kts")
+}
+
+private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
+    """
+        
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { this }
 }
