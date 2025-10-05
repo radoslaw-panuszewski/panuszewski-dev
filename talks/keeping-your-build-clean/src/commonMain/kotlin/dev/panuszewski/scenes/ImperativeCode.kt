@@ -121,7 +121,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
 
     """
     ${extractedCode}plugins {
-        alias(${libsPlugin}libs.plugins.kotlin.jvm${libsPlugin}${nonTypesafePlugin}"org.jetbrains.kotlin.jvm"${nonTypesafePlugin})
+        ${libsPlugin}alias(libs.plugins.kotlin.jvm)${libsPlugin}${nonTypesafePlugin}id("org.jetbrains.kotlin.jvm")${nonTypesafePlugin}
     }
     
     if (System.getenv("CI") == "true") {
@@ -130,12 +130,12 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     
     dependencies {
         when (today()) {
-            MONDAY -> implementation(${libsDep1}libs.mongodb${libsDep1}${nonTypesafeDep1}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeDep1})
-            TUESDAY -> implementation(${libsDep2}libs.postgres${libsDep2}${nonTypesafeDep2}"org.postgresql:postgresql:42.7.8"${nonTypesafeDep2})
-            else -> implementation(${libsDep3}libs.cassandra${libsDep3}${nonTypesafeDep3}"org.apache.cassandra:cassandra-all:5.0.5"${nonTypesafeDep3})
+            MONDAY -> implementation(${libsDep1}libs.mongodb${libsDep1}${nonTypesafeDep1}versionCatalogs.find("libs").get().findLibrary("mongodb").get()${nonTypesafeDep1})
+            TUESDAY -> implementation(${libsDep2}libs.postgres${libsDep2}${nonTypesafeDep2}versionCatalogs.find("libs").get().findLibrary("postgres").get()${nonTypesafeDep2})
+            else -> implementation(${libsDep3}libs.cassandra${libsDep3}${nonTypesafeDep3}versionCatalogs.find("libs").get().findLibrary("cassandra").get()${nonTypesafeDep3})
         }
         if (masochistModeEnabled()) {
-            implementation(${libsDep4}libs.groovy${libsDep4}${nonTypesafeDep4}"org.apache.groovy:groovy-all:5.0.1"${nonTypesafeDep4})
+            implementation(${libsDep4}libs.groovy${libsDep4}${nonTypesafeDep4}versionCatalogs.find("libs").get().findLibrary("groovy").get()${nonTypesafeDep4})
         }
     }
     
@@ -155,8 +155,10 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { this }
         .then { focus(libsPlugin) }
         .then { hide(libsPlugin).reveal(nonTypesafePlugin).unfocus() }
-        .then { focusNoStyling(libsDep1, libsDep2, libsDep3, libsDep4) }
-        .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus() }
+        .then { focusNoScroll(libsDep1, libsDep2, libsDep3, libsDep4) }
+        .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
+        .showEmoji("😩")
+        .hideEmoji()
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
