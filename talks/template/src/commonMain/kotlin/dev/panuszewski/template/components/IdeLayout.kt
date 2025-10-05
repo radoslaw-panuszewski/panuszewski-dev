@@ -12,10 +12,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
 import dev.panuszewski.template.extensions.ComposableLambda
@@ -30,6 +33,7 @@ class IdeLayoutScope internal constructor() {
     var topPanelOpenAt: List<Int> = emptyList()
     var topPanelContent: ComposableLambda? = null
     var topPanelName: String? = null
+    var topPanelAdaptive: Boolean = false
     var leftPanelOpenAt: List<Int> = emptyList()
     var leftPanelContent: ComposableLambda? = null
     var leftPanelName: String? = null
@@ -39,12 +43,14 @@ class IdeLayoutScope internal constructor() {
     fun topPanel(name: String, content: ComposableLambda) {
         topPanelContent = content
         topPanelName = name
+        topPanelAdaptive = false
     }
 
     fun topPanel(name: String, openAt: List<Int>, content: ComposableLambda) {
         topPanelOpenAt = openAt
         topPanelContent = content
         topPanelName = name
+        topPanelAdaptive = false
     }
 
     fun topPanel(name: String, openAt: Int, content: ComposableLambda) {
@@ -58,12 +64,14 @@ class IdeLayoutScope internal constructor() {
     fun topPanel(content: ComposableLambda) {
         topPanelContent = content
         topPanelName = "default"
+        topPanelAdaptive = false
     }
 
     fun topPanel(openAt: List<Int>, content: ComposableLambda) {
         topPanelOpenAt = openAt
         topPanelContent = content
         topPanelName = "default"
+        topPanelAdaptive = false
     }
 
     fun topPanel(openAt: Int, content: ComposableLambda) {
@@ -72,6 +80,27 @@ class IdeLayoutScope internal constructor() {
 
     fun topPanel(openAt: IntRange, content: ComposableLambda) {
         topPanel(openAt = openAt.toList(), content)
+    }
+
+    fun adaptiveTopPanel(name: String, content: ComposableLambda) {
+        topPanelContent = content
+        topPanelName = name
+        topPanelAdaptive = true
+    }
+
+    fun adaptiveTopPanel(name: String, openAt: List<Int>, content: ComposableLambda) {
+        topPanelOpenAt = openAt
+        topPanelContent = content
+        topPanelName = name
+        topPanelAdaptive = true
+    }
+
+    fun adaptiveTopPanel(name: String, openAt: Int, content: ComposableLambda) {
+        adaptiveTopPanel(name, listOf(openAt), content)
+    }
+
+    fun adaptiveTopPanel(name: String, openAt: IntRange, content: ComposableLambda) {
+        adaptiveTopPanel(name, openAt.toList(), content)
     }
 
     fun leftPanel(name: String, content: ComposableLambda) {
@@ -656,7 +685,19 @@ fun SceneScope<Int>.IdeLayout(
         val isTopPanelOpen = scope.topPanelName != null && scope.topPanelName in IDE_STATE.openPanels
         val isLeftPanelOpen = scope.leftPanelName != null && scope.leftPanelName in IDE_STATE.openPanels
         
-        val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt || isTopPanelOpen) 260.dp else 0.dp }
+        var topPanelHeight by remember { mutableIntStateOf(0) }
+        
+        val ideTopPadding by animateDp { 
+            if (it in scope.topPanelOpenAt || isTopPanelOpen) {
+                if (scope.topPanelAdaptive && topPanelHeight > 0) {
+                    (topPanelHeight / 2).dp
+                } else {
+                    260.dp
+                }
+            } else {
+                0.dp
+            }
+        }
         val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 260.dp else 0.dp }
         
         val fileTreeWidth by androidx.compose.animation.core.animateDpAsState(
@@ -664,7 +705,15 @@ fun SceneScope<Int>.IdeLayout(
         )
 
         Box(Modifier.fillMaxSize()) {
-            Box(Modifier.align(Alignment.TopCenter)) {
+            Box(
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .onSizeChanged { size ->
+                        if (scope.topPanelAdaptive) {
+                            topPanelHeight = size.height
+                        }
+                    }
+            ) {
                 SlideFromBottomAnimatedVisibility({ it in scope.topPanelOpenAt || isTopPanelOpen }) {
                     scope.topPanelContent?.invoke()
                 }

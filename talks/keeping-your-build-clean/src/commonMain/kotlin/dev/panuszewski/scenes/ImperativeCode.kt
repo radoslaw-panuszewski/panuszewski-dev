@@ -46,7 +46,7 @@ fun StoryboardBuilder.ImperativeCode() {
                 IDE_STATE = buildIdeState(files)
 
                 IdeLayout {
-                    topPanel("typesafe-conventions") {
+                    adaptiveTopPanel("typesafe-conventions") {
                         Box {
                             ResourceImage(
                                 resource = Res.drawable.typesafe_conventions,
