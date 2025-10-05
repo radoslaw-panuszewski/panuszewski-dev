@@ -93,7 +93,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openTopPanel()
         .closeTopPanel()
         .openLeftPanel()
-        .closeTopPanel()
+        .closeLeftPanel()
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }

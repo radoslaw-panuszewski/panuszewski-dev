@@ -637,15 +637,10 @@ fun SceneScope<Int>.IdeLayout(
         
         val ideTopPadding by animateDp { if (it in scope.topPanelOpenAt || isTopPanelOpen) 260.dp else 0.dp }
         val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 260.dp else 0.dp }
-        val fileTreeWidthOverride by animateDp { 
-            if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 0.dp else 275.dp
-        }
         
-        val fileTreeHiddenWidth by androidx.compose.animation.core.animateDpAsState(
+        val fileTreeWidth by androidx.compose.animation.core.animateDpAsState(
             targetValue = if (IDE_STATE.fileTreeHidden) 0.dp else 275.dp
         )
-        
-        val fileTreeWidth = if (fileTreeWidthOverride == 0.dp) 0.dp else fileTreeHiddenWidth
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.TopCenter)) {
