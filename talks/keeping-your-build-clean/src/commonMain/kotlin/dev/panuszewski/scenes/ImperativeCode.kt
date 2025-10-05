@@ -113,10 +113,15 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     val libsDep2 by tag()
     val libsDep3 by tag()
     val libsDep4 by tag()
+    val nonTypesafePlugin by tag()
+    val nonTypesafeDep1 by tag()
+    val nonTypesafeDep2 by tag()
+    val nonTypesafeDep3 by tag()
+    val nonTypesafeDep4 by tag()
 
     """
     ${extractedCode}plugins {
-        alias(${libsPlugin}libs.plugins.kotlin.jvm${libsPlugin})
+        alias(${libsPlugin}libs.plugins.kotlin.jvm${libsPlugin}${nonTypesafePlugin}"org.jetbrains.kotlin.jvm"${nonTypesafePlugin})
     }
     
     if (System.getenv("CI") == "true") {
@@ -125,12 +130,12 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     
     dependencies {
         when (today()) {
-            MONDAY -> implementation(${libsDep1}libs.mongodb${libsDep1})
-            TUESDAY -> implementation(${libsDep2}libs.postgres${libsDep2})
-            else -> implementation(${libsDep3}libs.cassandra${libsDep3})
+            MONDAY -> implementation(${libsDep1}libs.mongodb${libsDep1}${nonTypesafeDep1}"org.mongodb:mongodb-driver-sync:5.6.0"${nonTypesafeDep1})
+            TUESDAY -> implementation(${libsDep2}libs.postgres${libsDep2}${nonTypesafeDep2}"org.postgresql:postgresql:42.7.8"${nonTypesafeDep2})
+            else -> implementation(${libsDep3}libs.cassandra${libsDep3}${nonTypesafeDep3}"org.apache.cassandra:cassandra-all:5.0.5"${nonTypesafeDep3})
         }
         if (masochistModeEnabled()) {
-            implementation(${libsDep4}libs.groovy${libsDep4})
+            implementation(${libsDep4}libs.groovy${libsDep4}${nonTypesafeDep4}"org.apache.groovy:groovy-all:5.0.1"${nonTypesafeDep4})
         }
     }
     
@@ -138,7 +143,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(extractedCode) }
+        .startWith { hide(extractedCode, nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4) }
         .hideFileTree()
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
@@ -147,9 +152,15 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'") }
         .closeErrorWindow()
         .switchTo("buildSrc/settings.gradle.kts")
+        .then { this }
+        .then { focus(libsPlugin) }
+        .then { hide(libsPlugin).reveal(nonTypesafePlugin).unfocus() }
+        .then { focusNoStyling(libsDep1, libsDep2, libsDep3, libsDep4) }
+        .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus() }
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
+    val pluginDependency by tag()
     val pluginMarkerUsage1 by tag()
     val pluginMarkerUsage2 by tag()
     val pluginMarkerDeclaration by tag()
@@ -168,18 +179,31 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
         return "$pluginId:$pluginId.gradle.plugin:$pluginVersion"
     }$${pluginMarkerBody}
     
-    dependencies {
+    dependencies { $${pluginDependency}
         implementation($${pluginMarkerUsage1}pluginMarker($${pluginMarkerUsage1}libs.plugins.kotlin.jvm$${pluginMarkerUsage2})$${pluginMarkerUsage2})
-    }
+    $${pluginDependency}}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerDeclaration, pluginMarkerBody, pluginMarkerArgs) }
+        .startWith { hide(pluginDependency, pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerDeclaration, pluginMarkerBody, pluginMarkerArgs) }
+        .then { reveal(pluginDependency) }
+        .openErrorWindow("""
+            > Could not resolve all dependencies for configuration ':buildSrc:buildScriptClasspath'.
+               > Cannot convert the provided notation to an object of type Dependency: org.jetbrains.kotlin.jvm:2.2.20.
+                 The following types/formats are supported:
+                    - String or CharSequence values, for example 'org.gradle:gradle-core:1.0'.
+                    - Maps, for example [group: 'org.gradle', name: 'gradle-core', version: '1.0'].
+                    - FileCollections, for example files('some.jar', 'someOther.jar').
+                    - Projects, for example project(':some:project:path').
+                    - ClassPathNotation, for example gradleApi().
+
+        """.trimIndent())
+        .closeErrorWindow()
         .then { reveal(pluginMarkerUsage1, pluginMarkerUsage2).focus(pluginMarkerUsage1, pluginMarkerUsage2) }
         .then { reveal(pluginMarkerDeclaration).focus(pluginMarkerDeclaration) }
         .then { reveal(pluginMarkerArgs).focus(pluginMarkerArgs) }
         .then { reveal(pluginMarkerBody).unfocus() }
-
+        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 }
 
 private val BUILD_SRC_SETTINGS = buildCodeSamples {
