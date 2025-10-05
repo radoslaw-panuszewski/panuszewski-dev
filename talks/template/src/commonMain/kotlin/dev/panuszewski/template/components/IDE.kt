@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -309,7 +310,7 @@ private fun CodeDisplayArea(
                                     .weight(leftPaneWeight)
                                     .fillMaxHeight()
                                     .clip(RectangleShape)
-
+                                    .graphicsLayer { alpha = leftPaneWeight }
                             ) {
                                 if (leftPaneFile != null) {
                                     Column {
@@ -371,6 +372,7 @@ private fun CodeDisplayArea(
                                     .weight(rightPaneWeight)
                                     .fillMaxHeight()
                                     .clip(RectangleShape)
+                                    .graphicsLayer { alpha = rightPaneWeight }
                             ) {
                                 if (rightPaneFile != null) {
                                     Column {
