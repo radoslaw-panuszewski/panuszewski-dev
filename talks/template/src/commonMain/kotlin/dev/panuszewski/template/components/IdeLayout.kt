@@ -178,16 +178,16 @@ fun buildFileStateMapping(
     var fileTreeHidden = false
     var errorText: String? = null
     val openPanels = mutableSetOf<String>()
-    
+
     mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet()))
     fileStates[currentFile] = 1
-    
+
     while (true) {
         val currentFileSamples = allCodeSamples[currentFile] ?: break
         val currentFileState = fileStates[currentFile] ?: 0
-        
+
         if (currentFileState >= currentFileSamples.size) break
-        
+
         val sample = currentFileSamples.getOrNull(currentFileState)
         val chainedOps = sample?.data as? ChainedOperations
         val switchMarker = sample?.data as? SwitchToFile
@@ -204,7 +204,7 @@ fun buildFileStateMapping(
         val advanceTogetherMarker = sample?.data as? AdvanceTogetherWith
         val openPanelMarker = sample?.data as? OpenNamedPanel
         val closePanelMarker = sample?.data as? CloseNamedPanel
-        
+
         if (chainedOps != null) {
             globalState++
             for (operation in chainedOps.operations) {
@@ -284,30 +284,30 @@ fun buildFileStateMapping(
             if (currentFile !in fileStates) {
                 fileStates[currentFile] = 0
             }
-            
+
             if (previousFile == leftPaneFile) {
                 leftPaneFile = currentFile
             } else if (previousFile == rightPaneFile) {
                 rightPaneFile = currentFile
             }
-            
+
             fileStates[previousFile] = currentFileState + 1
-            
+
             while (true) {
                 val newFileState = fileStates[currentFile] ?: 0
                 val newFileSamples = allCodeSamples[currentFile] ?: break
                 if (newFileState >= newFileSamples.size) break
-                
+
                 val newSample = newFileSamples.getOrNull(newFileState)
                 val newSwitchMarker = newSample?.data as? SwitchToFile
-                
+
                 if (newSwitchMarker != null) {
                     fileStates[currentFile] = newFileState + 1
                 } else {
                     break
                 }
             }
-            
+
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet()))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (openLeftMarker != null) {
@@ -395,16 +395,16 @@ fun buildFileStateMapping(
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet()))
             fileStates[currentFile] = currentFileState + 1
         }
-        
+
         if (globalState > 100) break
     }
-    
+
     return mappings
 }
 
 fun calculateTotalStates(files: List<Pair<String, Any>>): Int {
     require(files.isNotEmpty()) { "files list must not be empty" }
-    
+
     val primaryFilePath = files.first().first
     val allCodeSamples = files
         .mapNotNull { (path, value) ->
@@ -416,7 +416,7 @@ fun calculateTotalStates(files: List<Pair<String, Any>>): Int {
             }
         }
         .toMap()
-    
+
     val mapping = buildFileStateMapping(primaryFilePath, allCodeSamples)
     return mapping.size
 }
@@ -430,14 +430,14 @@ fun Transition<Int>.buildIdeState(
     files: List<Pair<String, Any>>
 ): IdeState {
     require(files.isNotEmpty()) { "files list must not be empty" }
-    
+
     val primaryFilePath = files.first().first
     val initiallyHiddenFilesMap = files
-        .mapNotNull { (path, value) -> 
+        .mapNotNull { (path, value) ->
             if (value is InitiallyHiddenFile) path to value.codeSamples else null
         }
         .toMap()
-    
+
     val allCodeSamples = files
         .mapNotNull { (path, value) ->
             when (value) {
@@ -448,16 +448,16 @@ fun Transition<Int>.buildIdeState(
             }
         }
         .toMap()
-    
+
     println("DEBUG buildIdeState: allCodeSamples keys = ${allCodeSamples.keys}")
     allCodeSamples.forEach { (key, samples) ->
         println("DEBUG buildIdeState: $key has ${samples.size} samples")
     }
-    
+
     val mapping = remember(allCodeSamples) {
         buildFileStateMapping(primaryFilePath, allCodeSamples)
     }
-    
+
     val fileVisibilityMap = remember(initiallyHiddenFilesMap, mapping) {
         val visibilityMap = mutableMapOf<String, Int>()
         for ((index, fileMapping) in mapping.withIndex()) {
@@ -465,12 +465,12 @@ fun Transition<Int>.buildIdeState(
             if (selectedFile in initiallyHiddenFilesMap.keys && selectedFile !in visibilityMap) {
                 visibilityMap[selectedFile] = index
             }
-            
+
             val leftPaneFile = fileMapping.leftPaneFile
             if (leftPaneFile != null && leftPaneFile in initiallyHiddenFilesMap.keys && leftPaneFile !in visibilityMap) {
                 visibilityMap[leftPaneFile] = index
             }
-            
+
             val rightPaneFile = fileMapping.rightPaneFile
             if (rightPaneFile != null && rightPaneFile in initiallyHiddenFilesMap.keys && rightPaneFile !in visibilityMap) {
                 visibilityMap[rightPaneFile] = index
@@ -478,14 +478,14 @@ fun Transition<Int>.buildIdeState(
         }
         visibilityMap
     }
-    
+
     val directoryVisibilityMap = remember(fileVisibilityMap, files) {
         val dirMap = mutableMapOf<String, Int>()
         val hiddenDirectories = files
             .filter { (_, value) -> value is Directory && value.isInitiallyHidden }
             .map { (path, _) -> path }
             .toSet()
-        
+
         for ((filePath, appearAt) in fileVisibilityMap) {
             var currentPath = filePath
             while (currentPath.contains('/')) {
@@ -500,7 +500,7 @@ fun Transition<Int>.buildIdeState(
         }
         dirMap
     }
-    
+
     val allFiles = files.mapNotNull { (filePath, value) ->
         when {
             value is InitiallyHiddenFile -> {
@@ -508,10 +508,10 @@ fun Transition<Int>.buildIdeState(
                 val visibilityTransition = createChildTransition { globalState ->
                     globalState >= appearAtState
                 }
-                
+
                 val keepVisible = remember { mutableStateOf(false) }
                 val hasAppeared = remember { mutableStateOf(false) }
-                
+
                 LaunchedEffect(visibilityTransition.targetState, visibilityTransition.currentState) {
                     if (visibilityTransition.targetState && !hasAppeared.value) {
                         hasAppeared.value = false
@@ -526,24 +526,24 @@ fun Transition<Int>.buildIdeState(
                         }
                     }
                 }
-                
+
                 val shouldInclude = visibilityTransition.targetState || visibilityTransition.currentState || keepVisible.value
-                
+
                 if (!shouldInclude) {
                     return@mapNotNull null
                 }
-                
-                val delayedVisibilityTransition = createChildTransition { 
+
+                val delayedVisibilityTransition = createChildTransition {
                     visibilityTransition.targetState && hasAppeared.value
                 }
-                
+
                 val fileTransition = createChildTransition { globalState ->
                     val clampedState = globalState.coerceIn(0, mapping.lastIndex)
                     val fileStateMap = mapping[clampedState]
                     val mappedState = fileStateMap.fileStates[filePath] ?: 0
                     mappedState.coerceIn(0, value.codeSamples.lastIndex.coerceAtLeast(0))
                 }
-                
+
                 ProjectFile(
                     name = filePath.substringAfterLast('/'),
                     path = filePath,
@@ -555,15 +555,15 @@ fun Transition<Int>.buildIdeState(
             }
             value is Directory -> {
                 val appearAtState = directoryVisibilityMap[filePath]
-                
+
                 if (appearAtState != null) {
                     val visibilityTransition = createChildTransition { globalState ->
                         globalState >= appearAtState
                     }
-                    
+
                     val keepVisible = remember { mutableStateOf(false) }
                     val hasAppeared = remember { mutableStateOf(false) }
-                    
+
                     LaunchedEffect(visibilityTransition.targetState, visibilityTransition.currentState) {
                         if (visibilityTransition.targetState && !hasAppeared.value) {
                             hasAppeared.value = false
@@ -578,17 +578,17 @@ fun Transition<Int>.buildIdeState(
                             }
                         }
                     }
-                    
+
                     val shouldInclude = visibilityTransition.targetState || visibilityTransition.currentState || keepVisible.value
-                    
+
                     if (!shouldInclude) {
                         return@mapNotNull null
                     }
-                    
-                    val delayedVisibilityTransition = createChildTransition { 
+
+                    val delayedVisibilityTransition = createChildTransition {
                         visibilityTransition.targetState && hasAppeared.value
                     }
-                    
+
                     ProjectFile(
                         name = filePath.substringAfterLast('/'),
                         path = filePath,
@@ -611,7 +611,7 @@ fun Transition<Int>.buildIdeState(
                     val mappedState = fileStateMap.fileStates[filePath] ?: 0
                     mappedState.coerceIn(0, codeSamples.lastIndex.coerceAtLeast(0))
                 }
-                
+
                 ProjectFile(
                     name = filePath.substringAfterLast('/'),
                     path = filePath,
@@ -623,42 +623,42 @@ fun Transition<Int>.buildIdeState(
             else -> null
         }
     }
-    
+
     val selectedFile = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].selectedFile
     }.targetState
-    
+
     val emoji = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].emoji
     }.targetState
-    
+
     val leftPaneFile = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].leftPaneFile
     }.targetState
-    
+
     val rightPaneFile = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].rightPaneFile
     }.targetState
-    
+
     val fileTreeHidden = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].fileTreeHidden
     }.targetState
-    
+
     val errorText = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].errorText
     }.targetState
-    
+
     val openPanels = createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
         mapping[clampedState].openPanels
     }.targetState
-    
+
     return IdeState(
         files = allFiles,
         selectedFile = selectedFile,
@@ -678,16 +678,20 @@ fun SceneScope<Int>.IdeLayout(
     withStateTransition {
         val scope = IdeLayoutScope().apply(builder)
 
+        val ideStateHolder = remember { mutableStateOf(scope.ideState ?: IdeState(emptyList())) }
+
         if (scope.ideState != null) {
-            IDE_STATE = scope.ideState!!
+            ideStateHolder.value = scope.ideState!!
         }
 
-        val isTopPanelOpen = scope.topPanelName != null && scope.topPanelName in IDE_STATE.openPanels
-        val isLeftPanelOpen = scope.leftPanelName != null && scope.leftPanelName in IDE_STATE.openPanels
-        
+        val currentIdeState by ideStateHolder
+
+        val isTopPanelOpen = scope.topPanelName != null && scope.topPanelName in currentIdeState.openPanels
+        val isLeftPanelOpen = scope.leftPanelName != null && scope.leftPanelName in currentIdeState.openPanels
+
         var topPanelHeight by remember { mutableIntStateOf(0) }
-        
-        val ideTopPadding by animateDp { 
+
+        val ideTopPadding by animateDp {
             if (it in scope.topPanelOpenAt || isTopPanelOpen) {
                 if (scope.topPanelAdaptive && topPanelHeight > 0) {
                     (topPanelHeight / 2).dp + 32.dp
@@ -699,9 +703,9 @@ fun SceneScope<Int>.IdeLayout(
             }
         }
         val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 260.dp else 0.dp }
-        
+
         val fileTreeWidth by androidx.compose.animation.core.animateDpAsState(
-            targetValue = if (IDE_STATE.fileTreeHidden) 0.dp else 275.dp
+            targetValue = if (currentIdeState.fileTreeHidden) 0.dp else 275.dp
         )
 
         Box(Modifier.fillMaxSize()) {
@@ -726,14 +730,14 @@ fun SceneScope<Int>.IdeLayout(
             }
 
             IDE(
-                ideState = IDE_STATE.copy(fileTreeWidth = fileTreeWidth),
+                ideState = currentIdeState.copy(fileTreeWidth = fileTreeWidth),
                 modifier = Modifier.padding(top = ideTopPadding, start = ideStartPadding),
             )
 
             Box(Modifier.align(Alignment.Center)) {
-                FadeInOutAnimatedVisibility({ IDE_STATE.emoji != null }) {
+                FadeInOutAnimatedVisibility({ currentIdeState.emoji != null }) {
                     ProvideTextStyle(MaterialTheme.typography.h1) {
-                        Text(IDE_STATE.emoji ?: "")
+                        Text(currentIdeState.emoji ?: "")
                     }
                 }
             }

@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IDE
-import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.RevealedItem
@@ -86,7 +85,7 @@ fun StoryboardBuilder.WhyBother() {
                     }
                 }
 
-                IDE_STATE = IdeState(
+                val ideState = IdeState(
                     files = buildList {
                         addFile(
                             name = "build.gradle",
@@ -107,7 +106,7 @@ fun StoryboardBuilder.WhyBother() {
                 )
 
                 IDE(
-                    IDE_STATE,
+                    ideState,
                     modifier = Modifier.padding(start = ideStartPadding),
                 )
             }

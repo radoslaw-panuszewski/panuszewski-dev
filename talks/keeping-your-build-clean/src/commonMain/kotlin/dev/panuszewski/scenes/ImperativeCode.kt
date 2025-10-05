@@ -13,7 +13,6 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.components.DIRECTORY
-import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.TitleScaffold
@@ -43,9 +42,11 @@ fun StoryboardBuilder.ImperativeCode() {
     scene(totalStates) {
         withStateTransition {
             TitleScaffold("Imperative code") {
-                IDE_STATE = buildIdeState(files)
-
+                val ideState = buildIdeState(files)
+                
                 IdeLayout {
+                    this.ideState = ideState
+
                     adaptiveTopPanel("typesafe-conventions") {
                         Box {
                             ResourceImage(

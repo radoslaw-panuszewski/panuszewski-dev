@@ -62,8 +62,6 @@ import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.withColor
 import kotlinx.coroutines.delay
 
-var IDE_STATE: IdeState = IdeState(emptyList())
-
 data class IdeState(
     val files: List<ProjectFile>,
     val selectedFile: String? = null,

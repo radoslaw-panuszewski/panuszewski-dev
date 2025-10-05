@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.DIRECTORY
-import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
@@ -48,9 +47,11 @@ fun StoryboardBuilder.NoTypeSafety() {
     scene(topPanelCloses + 1) {
         withStateTransition {
             TitleScaffold("No type safety") {
-                IDE_STATE = buildIdeState(files)
-
+                val ideState = buildIdeState(files)
+                
                 IdeLayout {
+                    this.ideState = ideState
+                    
                     leftPanel(openAt = topPanelOpens until topPanelCloses) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(16.dp),

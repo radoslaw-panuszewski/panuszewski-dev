@@ -17,7 +17,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.MagicAnnotatedString
@@ -56,7 +55,7 @@ fun StoryboardBuilder.Groovy() {
             TitleScaffold(title) {
                 val fileName = if (currentState >= titleChanges) "build.gradle.kts" else "build.gradle"
 
-                IDE_STATE = IdeState(
+                val ideState = IdeState(
                     files = buildList {
                         addFile(
                             name = fileName,
@@ -65,8 +64,9 @@ fun StoryboardBuilder.Groovy() {
                     },
                     selectedFile = fileName,
                 )
-
+                
                 IdeLayout {
+                    this.ideState = ideState
 
                     topPanel(openAt = ideShrinksVertically until ideExpandsVertically) {
                         Column(
