@@ -76,7 +76,7 @@ class CodeSample private constructor(
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
         private val EMPTY = AnnotatedString("")
         private val ERROR_STYLE_LIGHT_THEME = SpanStyle(color = Color(0xFFF50100))
-        private val ERROR_STYLE_DARK_THEME = SpanStyle(color = Color(0xFFF55463))
+        private val ERROR_STYLE_DARK_THEME = SpanStyle(color = Color(0xFFFF6B68))
 
         internal fun create(
             text: AnnotatedString,
@@ -257,6 +257,10 @@ object HideFileTree
 
 object ShowFileTree
 
+data class OpenErrorWindow(val text: String)
+
+object CloseErrorWindow
+
 data class AdvanceTogetherWith(val fileName: String)
 
 data class ChainedOperations(val operations: List<Any>)
@@ -307,6 +311,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree,
+            is OpenErrorWindow, is CloseErrorWindow,
             is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
@@ -324,6 +329,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree,
+            is OpenErrorWindow, is CloseErrorWindow,
             is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
@@ -365,6 +371,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.showFileTree(): List<CodeSample> {
         return this + last().attach(ShowFileTree)
+    }
+
+    fun List<CodeSample>.openErrorWindow(text: String): List<CodeSample> {
+        return this + last().attach(OpenErrorWindow(text))
+    }
+
+    fun List<CodeSample>.closeErrorWindow(): List<CodeSample> {
+        return this + last().attach(CloseErrorWindow)
     }
 
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
@@ -410,6 +424,16 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
     
     fun openInRightPane(fileName: String, switchTo: Boolean = false): ChainableOperations {
         operations.add(OpenInRightPane(fileName, switchTo))
+        return this
+    }
+    
+    fun openErrorWindow(text: String): ChainableOperations {
+        operations.add(OpenErrorWindow(text))
+        return this
+    }
+    
+    fun closeErrorWindow(): ChainableOperations {
+        operations.add(CloseErrorWindow)
         return this
     }
     
