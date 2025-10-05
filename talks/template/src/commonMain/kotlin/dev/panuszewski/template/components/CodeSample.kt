@@ -288,6 +288,14 @@ data class ShowEmoji(val emoji: String)
 
 object HideEmoji
 
+object OpenTopPanel
+
+object CloseTopPanel
+
+object OpenLeftPanel
+
+object CloseLeftPanel
+
 data class OpenInLeftPane(val fileName: String, val switchTo: Boolean)
 
 data class OpenInRightPane(val fileName: String, val switchTo: Boolean)
@@ -457,6 +465,22 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.hideEmoji(): List<CodeSample> {
         return this + last().attach(HideEmoji)
+    }
+
+    fun List<CodeSample>.openTopPanel(): List<CodeSample> {
+        return this + last().attach(OpenTopPanel)
+    }
+
+    fun List<CodeSample>.closeTopPanel(): List<CodeSample> {
+        return this + last().attach(CloseTopPanel)
+    }
+
+    fun List<CodeSample>.openLeftPanel(): List<CodeSample> {
+        return this + last().attach(OpenLeftPanel)
+    }
+
+    fun List<CodeSample>.closeLeftPanel(): List<CodeSample> {
+        return this + last().attach(CloseLeftPanel)
     }
 
     fun List<CodeSample>.openInLeftPane(fileName: String, switchTo: Boolean = false): List<CodeSample> {
