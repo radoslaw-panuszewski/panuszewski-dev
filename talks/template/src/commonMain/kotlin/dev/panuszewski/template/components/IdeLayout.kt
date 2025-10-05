@@ -175,18 +175,20 @@ fun buildFileStateMapping(
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeLeftMarker) {
             globalState++
-            if (leftPaneFile != null) {
-                currentFile = leftPaneFile!!
-                leftPaneFile = null
+            if (rightPaneFile != null) {
+                currentFile = rightPaneFile!!
             }
+            leftPaneFile = null
+            rightPaneFile = null
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeRightMarker) {
             globalState++
-            if (rightPaneFile != null) {
-                currentFile = rightPaneFile!!
-                rightPaneFile = null
+            if (leftPaneFile != null) {
+                currentFile = leftPaneFile!!
             }
+            leftPaneFile = null
+            rightPaneFile = null
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (hideFileTreeMarker) {

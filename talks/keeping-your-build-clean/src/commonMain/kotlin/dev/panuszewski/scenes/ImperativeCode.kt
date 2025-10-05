@@ -88,8 +88,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = false)
-        .closeRightPane()
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -137,7 +135,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
     ${extractedCode}${todo}// TODO${todo}
         """
         .trimIndent()
-        .toCodeSample(language = Language.Kotlin)
+        .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(extractedCode) }
         .hideFileTree()
         .thenTogetherWith("build.gradle.kts") { this }
