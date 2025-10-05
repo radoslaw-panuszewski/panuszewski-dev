@@ -193,7 +193,19 @@ fun buildFileStateMapping(
                 fileStates[currentFile] = 0
             }
             
+            if (previousFile == leftPaneFile) {
+                leftPaneFile = currentFile
+            } else if (previousFile == rightPaneFile) {
+                rightPaneFile = currentFile
+            }
+            
             fileStates[previousFile] = currentFileState + 1
+            
+            println("DEBUG: Switching from $previousFile to $currentFile at globalState $globalState")
+            println("DEBUG: currentFile state = ${fileStates[currentFile]}, allCodeSamples contains key? ${currentFile in allCodeSamples}")
+            if (currentFile in allCodeSamples) {
+                println("DEBUG: allCodeSamples[$currentFile].size = ${allCodeSamples[currentFile]?.size}")
+            }
             
             while (true) {
                 val newFileState = fileStates[currentFile] ?: 0
@@ -340,6 +352,11 @@ fun Transition<Int>.buildIdeState(
             }
         }
         .toMap()
+    
+    println("DEBUG buildIdeState: allCodeSamples keys = ${allCodeSamples.keys}")
+    allCodeSamples.forEach { (key, samples) ->
+        println("DEBUG buildIdeState: $key has ${samples.size} samples")
+    }
     
     val mapping = remember(allCodeSamples) {
         buildFileStateMapping(primaryFilePath, allCodeSamples)

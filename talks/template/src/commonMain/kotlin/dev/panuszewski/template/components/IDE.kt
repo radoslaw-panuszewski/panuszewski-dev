@@ -84,6 +84,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
         val enlargedFile = files.find { it.path == enlargedFile }
         val highlightedFile = files.find { it.path == highlightedFile }
 
+        println("DEBUG IDE: selectedFile path = ${ideState.selectedFile}, found file = ${selectedFile?.path}, content transition = ${selectedFile?.content}")
+        
         // Find files in left and right panes
         var leftPaneFile = files.find { it.path == leftPaneFile }
         val rightPaneFile = files.find { it.path == rightPaneFile }
@@ -91,6 +93,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
         if (leftPaneFile == null && rightPaneFile == null) {
             leftPaneFile = selectedFile
         }
+        
+        println("DEBUG IDE: leftPaneFile = ${leftPaneFile?.path}, rightPaneFile = ${rightPaneFile?.path}")
 
         // Determine the current mode
         val isSplitPaneMode = leftPaneFile != null || rightPaneFile != null
