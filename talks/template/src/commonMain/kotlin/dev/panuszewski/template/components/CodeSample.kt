@@ -259,6 +259,8 @@ object ShowFileTree
 
 data class AdvanceTogetherWith(val fileName: String)
 
+data class ChainedOperations(val operations: List<Any>)
+
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
 
 data class Directory(val isInitiallyHidden: Boolean = false)
@@ -305,10 +307,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree,
-            is AdvanceTogetherWith -> lastSample.attach(null)
+            is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
         return this + transformer(cleanedSample)
+    }
+    
+    fun List<CodeSample>.thenDo(operations: ChainableOperations.() -> ChainableOperations): List<CodeSample> {
+        return this + last().attach(ChainableOperations().operations().toChainedOperations())
     }
 
     fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> CodeSample): List<CodeSample> {
@@ -318,7 +324,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree,
-            is AdvanceTogetherWith -> lastSample.attach(null)
+            is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
         val markerSample = cleanedSample.attach(AdvanceTogetherWith(fileName))
@@ -364,4 +370,48 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         return this.subList(fromIndex = 0, toIndex = lastIndex) + transformer(this.last())
     }
+}
+
+class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
+    fun closeRightPane(): ChainableOperations {
+        operations.add(CloseRightPane)
+        return this
+    }
+    
+    fun closeLeftPane(): ChainableOperations {
+        operations.add(CloseLeftPane)
+        return this
+    }
+    
+    fun showFileTree(): ChainableOperations {
+        operations.add(ShowFileTree)
+        return this
+    }
+    
+    fun hideFileTree(): ChainableOperations {
+        operations.add(HideFileTree)
+        return this
+    }
+    
+    fun showEmoji(emoji: String): ChainableOperations {
+        operations.add(ShowEmoji(emoji))
+        return this
+    }
+    
+    fun hideEmoji(): ChainableOperations {
+        operations.add(HideEmoji)
+        return this
+    }
+    
+    fun openInLeftPane(fileName: String, switchTo: Boolean = false): ChainableOperations {
+        operations.add(OpenInLeftPane(fileName, switchTo))
+        return this
+    }
+    
+    fun openInRightPane(fileName: String, switchTo: Boolean = false): ChainableOperations {
+        operations.add(OpenInRightPane(fileName, switchTo))
+        return this
+    }
+    
+    fun toChainedOperations(): ChainedOperations = ChainedOperations(operations.toList())
 }
