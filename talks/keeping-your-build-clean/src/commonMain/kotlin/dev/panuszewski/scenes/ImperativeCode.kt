@@ -31,7 +31,11 @@ fun StoryboardBuilder.ImperativeCode() {
             TitleScaffold("Imperative code") {
                 IDE_STATE = buildIdeState(files)
 
-                IdeLayout { }
+                IdeLayout {
+                    topPanel {
+
+                    }
+                }
             }
         }
     }
@@ -90,7 +94,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .then { openLeftPanel().hideFileTree() }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -160,6 +163,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
         .showEmoji("😩")
         .hideEmoji()
+        .openTopPanel()
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {

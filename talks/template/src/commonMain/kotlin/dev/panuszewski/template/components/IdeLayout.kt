@@ -33,6 +33,10 @@ class IdeLayoutScope internal constructor() {
     var centerEmojiVisibleAt: List<Int> = emptyList()
     var centerEmojiContent: ComposableLambda? = null
 
+    fun topPanel(content: ComposableLambda) {
+        topPanelContent = content
+    }
+
     fun topPanel(openAt: List<Int>, content: ComposableLambda) {
         topPanelOpenAt = openAt
         topPanelContent = content
@@ -44,6 +48,10 @@ class IdeLayoutScope internal constructor() {
 
     fun topPanel(openAt: IntRange, content: ComposableLambda) {
         topPanel(openAt.toList(), content)
+    }
+
+    fun leftPanel(content: ComposableLambda) {
+        leftPanelContent = content
     }
 
     fun leftPanel(openAt: List<Int>, content: ComposableLambda) {
@@ -220,12 +228,6 @@ fun buildFileStateMapping(
             }
             
             fileStates[previousFile] = currentFileState + 1
-            
-            println("DEBUG: Switching from $previousFile to $currentFile at globalState $globalState")
-            println("DEBUG: currentFile state = ${fileStates[currentFile]}, allCodeSamples contains key? ${currentFile in allCodeSamples}")
-            if (currentFile in allCodeSamples) {
-                println("DEBUG: allCodeSamples[$currentFile].size = ${allCodeSamples[currentFile]?.size}")
-            }
             
             while (true) {
                 val newFileState = fileStates[currentFile] ?: 0
