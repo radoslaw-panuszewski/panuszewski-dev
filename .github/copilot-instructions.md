@@ -484,3 +484,46 @@ value === DIRECTORY -> {
 - Folders with hidden children that should appear/disappear together
 - File tree structures where parent visibility depends on child visibility
 - Any hierarchical UI where parent and children should animate as a unit while maintaining their spatial relationship
+
+### Multi-File State Synchronization: Clearing Markers on File Switch
+- **PROBLEM**: When switching from one file back to another (e.g., from `wtf-app.gradle.kts` back to `build.gradle.kts`), the target file would immediately execute its next frame instead of waiting for the next state advance. This happened because marker frames (like `SWITCH_TO`, `EMOJI_SHOW`, etc.) accumulated and weren't being cleared properly.
+- **ROOT CAUSE**: The `IdeLayout` composable tracks multiple types of marker frames (file switches, emoji display, pane operations) by scanning through all files' frames. When switching back to a file, these markers from previous states remained in the frame lists, causing the system to think it was still in a "marker frame state" and skip to the next regular frame.
+- **SYMPTOMS**: 
+  - After `.switchTo("build.gradle.kts")` from another file, the `build.gradle.kts` would immediately execute its next `.then { ... }` frame
+  - The switch operation itself didn't consume a state, and the subsequent frame executed in the same state
+  - File highlighting in the file tree would appear at wrong times
+- **THE FIX**: Clear ALL marker-type frames when building the IDE state, not just the current one. This ensures that past markers don't interfere with current state logic:
+  ```kotlin
+  private fun buildIdeStateWithMapping(...) {
+      val markerFrameIndices = files.flatMap { (path, frames) ->
+          frames.indices.filter { i -> 
+              val frame = frames[i]
+              frame.code.isEmpty() && (
+                  frame.tags.any { it.id.startsWith("SWITCH_TO:") } ||
+                  frame.tags.any { it.id == "EMOJI_SHOW" } ||
+                  frame.tags.any { it.id == "EMOJI_HIDE" } ||
+                  frame.tags.any { it.id.startsWith("OPEN_LEFT_PANE:") } ||
+                  frame.tags.any { it.id.startsWith("OPEN_RIGHT_PANE:") } ||
+                  frame.tags.any { it.id == "CLOSE_LEFT_PANE" } ||
+                  frame.tags.any { it.id == "CLOSE_RIGHT_PANE" } ||
+                  frame.tags.any { it.id == "HIDE_FILE_TREE" } ||
+                  frame.tags.any { it.id == "SHOW_FILE_TREE" }
+              )
+          }.map { path to it }
+      }
+      
+      // Clear all marker frames from files
+      val cleanedFiles = files.mapValues { (path, frames) ->
+          frames.filterIndexed { index, _ ->
+              (path to index) !in markerFrameIndices
+          }
+      }
+  }
+  ```
+- **KEY INSIGHT**: Marker frames are "consumed" across ALL files simultaneously, not just in the active file. When you execute a switch operation in file A, that marker must be cleared from file A before processing file B's frames, otherwise the stale marker will interfere with file B's state logic.
+- **DEBUGGING TECHNIQUE**: 
+  - Add `println()` to track when frames are executed: "Executing frame X in file Y at state Z"
+  - Print the frame content and tags to identify marker frames
+  - Check if frames execute in unexpected states (e.g., two frames executing when only one state advance occurred)
+  - Verify that marker frames are properly removed from frame lists after being processed
+- **BEST PRACTICE**: When implementing new marker-based operations (emoji display, pane operations, etc.), always ensure they are added to the marker detection logic in `buildIdeStateWithMapping()` so they get properly cleared after execution
