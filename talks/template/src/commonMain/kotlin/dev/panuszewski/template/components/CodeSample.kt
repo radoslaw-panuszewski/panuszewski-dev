@@ -75,6 +75,8 @@ class CodeSample private constructor(
         private val UNFOCUSED_STYLE = SpanStyle(color = Color(0xFF555555))
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
         private val EMPTY = AnnotatedString("")
+        private val ERROR_STYLE_LIGHT_THEME = SpanStyle(color = Color(0xFFF50100))
+        private val ERROR_STYLE_DARK_THEME = SpanStyle(color = Color(0xFFF55463))
 
         internal fun create(
             text: AnnotatedString,
@@ -183,6 +185,8 @@ class CodeSample private constructor(
     fun focusNoScroll(vararg tags: TextTag, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         focus(tags.asList(), false, focusedStyle, unfocusedStyle)
 
+    fun highlightAsError(vararg tags: TextTag, scroll: Boolean = false) =
+        focus(tags.asList(), scroll, ERROR_STYLE_DARK_THEME, null)
 
     fun unfocus(unscroll: Boolean = true): CodeSample =
         copy(focus = emptyList(), scrollTag = if (unscroll) null else scrollTag)

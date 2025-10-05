@@ -88,6 +88,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = false)
+        .closeRightPane()
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -105,40 +107,42 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
 
 val WTF_APP_GRADLE_KTS = buildCodeSamples {
     val todo by tag()
-    val imperativeCode by tag()
-    val javaPlugin by tag()
-    val implementation1 by tag()
-    val implementation2 by tag()
-    val implementation3 by tag()
-    val implementation4 by tag()
+    val extractedCode by tag()
+    val libsPlugin by tag()
+    val libsDep1 by tag()
+    val libsDep2 by tag()
+    val libsDep3 by tag()
+    val libsDep4 by tag()
 
     """
-    ${javaPlugin}plugins {
-        alias(libs.plugins.kotlin.jvm)
+    ${extractedCode}plugins {
+        alias(${libsPlugin}libs.plugins.kotlin.jvm${libsPlugin})
     }
     
-    ${javaPlugin}${imperativeCode}if (System.getenv("CI") == "true") {
+    if (System.getenv("CI") == "true") {
         apply(plugin = "maven-publish")
     }
     
     dependencies {
         when (today()) {
-            MONDAY -> ${implementation1}implementation${implementation1}(libs.mongodb)
-            TUESDAY -> ${implementation2}implementation${implementation2}(libs.postgres)
-            else -> ${implementation3}implementation${implementation3}(libs.cassandra)
+            MONDAY -> implementation(${libsDep1}libs.mongodb${libsDep1})
+            TUESDAY -> implementation(${libsDep2}libs.postgres${libsDep2})
+            else -> implementation(${libsDep3}libs.cassandra${libsDep3})
         }
         if (masochistModeEnabled()) {
-            ${implementation4}implementation${implementation4}(libs.groovy)
+            implementation(${libsDep4}libs.groovy${libsDep4})
         }
     }
     
-    ${imperativeCode}${todo}// TODO${todo}
+    ${extractedCode}${todo}// TODO${todo}
         """
         .trimIndent()
         .toCodeSample(language = Language.Kotlin)
-        .startWith { hide(javaPlugin, imperativeCode) }
+        .startWith { hide(extractedCode) }
         .hideFileTree()
         .thenTogetherWith("build.gradle.kts") { this }
-        .thenTogetherWith("build.gradle.kts") { reveal(imperativeCode, javaPlugin) }
+        .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
         .thenTogetherWith("build.gradle.kts") { this }
+        .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
+        .closeLeftPane()
 }
