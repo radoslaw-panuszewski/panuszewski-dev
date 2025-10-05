@@ -164,6 +164,7 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
     fun pluginMarker($${pluginMarkerArgs}provider: Provider<PluginDependency>$${pluginMarkerArgs}): String$${pluginMarkerDeclaration}$${pluginMarkerBody} {
         val pluginId = provider.get().pluginId
         val pluginVersion = provider.get().version
+        
         return "$pluginId:$pluginId.gradle.plugin:$pluginVersion"
     }$${pluginMarkerBody}
     

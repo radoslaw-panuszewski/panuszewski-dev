@@ -14,6 +14,26 @@ fun highlightKotlinDsl(text: String, codeStyle: CodeStyle) = buildAnnotatedStrin
         highlightedRanges.add(range)
     }
 
+    stringRanges.forEach { stringRange ->
+        val stringContent = text.substring(stringRange)
+        STRING_INTERPOLATION_REGEX.findAll(stringContent).forEach { match ->
+            val dollarRange = match.groups[1]?.rangeCompat
+            val variableRange = match.groups[2]?.rangeCompat
+            
+            if (dollarRange != null) {
+                val absoluteDollarRange = (stringRange.first + dollarRange.first)..(stringRange.first + dollarRange.last)
+                addStyle(codeStyle.keyword, absoluteDollarRange)
+                highlightedRanges.add(absoluteDollarRange)
+            }
+            
+            if (variableRange != null) {
+                val absoluteVariableRange = (stringRange.first + variableRange.first)..(stringRange.first + variableRange.last)
+                addStyle(codeStyle.property, absoluteVariableRange)
+                highlightedRanges.add(absoluteVariableRange)
+            }
+        }
+    }
+
     GRADLE_PLUGIN_BACKTICK_REGEX.findAll(text).forEach { match ->
         val range = match.groups[1]?.rangeCompat
         if (range != null && !isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
@@ -82,8 +102,10 @@ private val VERSION_CATALOG_ACCESSOR_REGEX = """\b(libs\.[a-zA-Z][a-zA-Z0-9]*(?:
 
 private val DSL_KEYWORD_REGEX = """\b(versionCatalogs|MONDAY|TUESDAY|projects|firstLibrary|compileKotlin|explicitApiMode|Strict|buildscript|allprojects|subprojects|dependencies|tasks)\b""".toRegex()
 
-private val KOTLIN_KEYWORD_REGEX = """\b(package|import|class|interface|fun|object|val|var|typealias|constructor|by|companion|init|this|super|typeof|where|if|else|when|try|catch|finally|for|do|while|throw|return|continue|break|as|is|in|true|false|null|get|set|abstract|annotation|actual|const|crossinline|data|enum|expect|external|final|infix|inline|inner|internal|lateinit|noinline|open|operator|out|override|private|protected|public|reified|sealed|suspend|tailrec|vararg|dynamic)\b""".toRegex()
+private val KOTLIN_KEYWORD_REGEX = """\b(package|import|class|interface|fun|object|val|var|typealias|constructor|by|companion|init|this|super|typeof|where|if|else|when|try|catch|finally|for|do|while|throw|return|continue|break|as|is|in|true|false|null|abstract|annotation|actual|const|crossinline|data|enum|expect|external|final|infix|inline|inner|internal|lateinit|noinline|open|operator|out|override|private|protected|public|reified|sealed|suspend|tailrec|vararg|dynamic)\b""".toRegex()
 
 private val DSL_FUNCTION_REGEX = """\b(plugins|alias|explicitApi)(?=\s*(?:<[^>]+>)?\s*[(\{])""".toRegex()
 
 private val FUNCTION_CALL_REGEX = """\b(named|repositories|configure|classpath|apply|filter|forEach|endsWith|implementation|project|register)(?=\s*(?:<[^>]+>)?\s*[(\{])""".toRegex()
+
+private val STRING_INTERPOLATION_REGEX = """(\$)([a-zA-Z_][a-zA-Z0-9_]*)""".toRegex()
