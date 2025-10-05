@@ -293,13 +293,17 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 val contentAlpha = remember { mutableStateOf(0f) }
+                val currentErrorText = remember { mutableStateOf<String?>(null) }
                 
                 LaunchedEffect(errorText) {
                     if (errorText != null) {
+                        currentErrorText.value = errorText
                         contentAlpha.value = 0f
                         delay(300)
                         contentAlpha.value = 1f
                     } else {
+                        contentAlpha.value = 1f
+                        delay(300)
                         contentAlpha.value = 0f
                     }
                 }
@@ -326,7 +330,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        errorText?.let {
+                        currentErrorText.value?.let {
                             Text(
                                 text = it,
                                 color = Color(0xFFFF6B68),
