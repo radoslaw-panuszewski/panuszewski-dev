@@ -72,7 +72,8 @@ data class IdeState(
     val enlargedFile: String? = null,
     val highlightedFile: String? = null,
     val fileTreeWidth: Dp? = null,
-    val emoji: String? = null
+    val emoji: String? = null,
+    val errorText: String? = null
 )
 
 @Composable
@@ -186,12 +187,12 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
             // File tree animated visibility synchronized with scene timing
             val showFileTree = !fileTreeHidden
 
-
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(ideColors.background)
-            ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(ideColors.background)
+                ) {
                 // File tree panel with scene-controlled animated width
                 val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 275.dp else 0.dp)
 
@@ -273,6 +274,46 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                     )
                 }
             }
+
+            val errorWindowHeight by animateDpAsState(
+                targetValue = if (errorText != null) 120.dp else 0.dp,
+                animationSpec = tween(durationMillis = 300),
+                label = "errorWindowHeight"
+            )
+
+            if (errorWindowHeight > 0.dp) {
+                Divider(Modifier.background(ideColors.toolbarBorder))
+                
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(errorWindowHeight)
+                        .clipToBounds()
+                ) {
+                    if (errorText != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(120.dp)
+                                .background(ideColors.background)
+                                .padding(16.dp)
+                        ) {
+                            val errorOpacity by animateFloatAsState(
+                                targetValue = if (errorText != null) 1f else 0f,
+                                animationSpec = tween(durationMillis = 200),
+                                label = "errorOpacity"
+                            )
+                            
+                            Text(
+                                text = errorText,
+                                color = Color(0xFFFF6B68),
+                                modifier = Modifier.graphicsLayer { alpha = errorOpacity }
+                            )
+                        }
+                    }
+                }
+            }
+        }
         }
     }
 }
@@ -346,7 +387,7 @@ private fun CodeDisplayArea(
                                             code3 {
                                                 Text(
                                                     text = displayLeftPaneFile.value!!.name,
-                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
                                             }
@@ -410,7 +451,7 @@ private fun CodeDisplayArea(
                                             code3 {
                                                 Text(
                                                     text = displayRightPaneFile.value!!.name,
-                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
                                             }

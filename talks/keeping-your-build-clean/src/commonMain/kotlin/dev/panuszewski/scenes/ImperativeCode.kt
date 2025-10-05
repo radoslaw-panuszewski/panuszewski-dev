@@ -83,11 +83,25 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         if (masochistModeEnabled()) {
             ${masochistIfTop}implementation(libs.groovy)${masochistIfBottom}
         }${masochistIfBottom}${groovy}
+        
+        if (masochistModeEnabled()) {
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+            implementation(libs.groovy)
+        }
     }
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .closeRightPane()
+        .openErrorWindow("e: Unresolved reference 'libs'")
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -143,4 +157,5 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { this }
         .thenPerform { closeLeftPane().showFileTree() }
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
+        .openErrorWindow("e: Unresolved reference 'libs'")
 }
