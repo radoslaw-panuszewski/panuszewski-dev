@@ -120,18 +120,16 @@ fun buildFileStateMapping(
             for (operation in chainedOps.operations) {
                 when (operation) {
                     CloseLeftPane -> {
+                        leftPaneFile = null
                         if (rightPaneFile != null) {
                             currentFile = rightPaneFile!!
                         }
-                        leftPaneFile = null
-                        rightPaneFile = null
                     }
                     CloseRightPane -> {
+                        rightPaneFile = null
                         if (leftPaneFile != null) {
                             currentFile = leftPaneFile!!
                         }
-                        leftPaneFile = null
-                        rightPaneFile = null
                     }
                     HideFileTree -> {
                         fileTreeHidden = true
@@ -230,20 +228,18 @@ fun buildFileStateMapping(
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeLeftMarker) {
             globalState++
+            leftPaneFile = null
             if (rightPaneFile != null) {
                 currentFile = rightPaneFile!!
             }
-            leftPaneFile = null
-            rightPaneFile = null
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeRightMarker) {
             globalState++
+            rightPaneFile = null
             if (leftPaneFile != null) {
                 currentFile = leftPaneFile!!
             }
-            leftPaneFile = null
-            rightPaneFile = null
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (hideFileTreeMarker) {

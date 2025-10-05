@@ -284,6 +284,18 @@ private fun CodeDisplayArea(
     codePanelOffset: State<Float>,
     ideColors: IdeColorScheme
 ) {
+    val leftPaneWeight by animateFloatAsState(
+        targetValue = if (leftPaneFile != null) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "leftPaneWeight"
+    )
+    
+    val rightPaneWeight by animateFloatAsState(
+        targetValue = if (rightPaneFile != null) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "rightPaneWeight"
+    )
+    
     if (isSplitPaneMode) {
         // Split-pane mode
         Row(
@@ -291,107 +303,113 @@ private fun CodeDisplayArea(
                 .fillMaxSize()
                     ) {
                         // Left pane
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .clip(RectangleShape)
+                        if (leftPaneWeight > 0f) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(leftPaneWeight)
+                                    .fillMaxHeight()
+                                    .clip(RectangleShape)
 
-                        ) {
-                            if (leftPaneFile != null) {
-                                Column {
-                                    // Tab for left pane
-                                    Box(
-                                        modifier = Modifier
-                                            .background(if (leftPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
-                                            .fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        code3 {
-                                            Text(
-                                                text = leftPaneFile.path,
-                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                                                color = ideColors.textPrimary
-                                            )
+                            ) {
+                                if (leftPaneFile != null) {
+                                    Column {
+                                        // Tab for left pane
+                                        Box(
+                                            modifier = Modifier
+                                                .background(if (leftPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            code3 {
+                                                Text(
+                                                    text = leftPaneFile.path,
+                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                                    color = ideColors.textPrimary
+                                                )
+                                            }
+                                        }
+
+                                        Divider()
+
+                                        // File content
+                                        AnimatedContent(
+                                            targetState = leftPaneFile,
+                                            transitionSpec = { fadeIn() togetherWith fadeOut() }
+                                        ) { file ->
+                                            CodePanel(file = file, modifier = Modifier.padding(16.dp))
                                         }
                                     }
-
-                                    Divider()
-
-                                    // File content
-                                    AnimatedContent(
-                                        targetState = leftPaneFile,
-                                        transitionSpec = { fadeIn() togetherWith fadeOut() }
-                                    ) { file ->
-                                        CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                } else {
+                                    // Gray out the empty pane
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(ideColors.paneBackground),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("No file in left pane", color = ideColors.textPrimary)
                                     }
-                                }
-                            } else {
-                                // Gray out the empty pane
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(ideColors.paneBackground),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text("No file in left pane", color = ideColors.textPrimary)
                                 }
                             }
                         }
 
                         // Vertical separator
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(1.dp)
-                                .background(ideColors.paneSeparator)
-                                .padding(vertical = 8.dp)
-                        )
+                        if (leftPaneWeight > 0f && rightPaneWeight > 0f) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(1.dp)
+                                    .background(ideColors.paneSeparator)
+                                    .padding(vertical = 8.dp)
+                            )
+                        }
 
                         // Right pane
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .clip(RectangleShape)
-                        ) {
-                            if (rightPaneFile != null) {
-                                Column {
-                                    // Tab for right pane
-                                    Box(
-                                        modifier = Modifier
-                                            .background(if (rightPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
-                                            .fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        code3 {
-                                            Text(
-                                                text = rightPaneFile.path,
-                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                                                color = ideColors.textPrimary
-                                            )
+                        if (rightPaneWeight > 0f) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(rightPaneWeight)
+                                    .fillMaxHeight()
+                                    .clip(RectangleShape)
+                            ) {
+                                if (rightPaneFile != null) {
+                                    Column {
+                                        // Tab for right pane
+                                        Box(
+                                            modifier = Modifier
+                                                .background(if (rightPaneFile == selectedFile) ideColors.selectedTabBackground else ideColors.tabBackground)
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            code3 {
+                                                Text(
+                                                    text = rightPaneFile.path,
+                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                                    color = ideColors.textPrimary
+                                                )
+                                            }
+                                        }
+
+                                        Divider()
+
+                                        // File content
+                                        AnimatedContent(
+                                            targetState = rightPaneFile,
+                                            transitionSpec = { fadeIn() togetherWith fadeOut() }
+                                        ) { file ->
+                                            CodePanel(file = file, modifier = Modifier.padding(16.dp))
                                         }
                                     }
-
-                                    Divider()
-
-                                    // File content
-                                    AnimatedContent(
-                                        targetState = rightPaneFile,
-                                        transitionSpec = { fadeIn() togetherWith fadeOut() }
-                                    ) { file ->
-                                        CodePanel(file = file, modifier = Modifier.padding(16.dp))
+                                } else {
+                                    // Gray out the empty pane
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(ideColors.paneBackground),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("No file in right pane", color = ideColors.textPrimary)
                                     }
-                                }
-                            } else {
-                                // Gray out the empty pane
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(ideColors.paneBackground),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text("No file in right pane", color = ideColors.textPrimary)
                                 }
                             }
                         }
