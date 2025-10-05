@@ -75,8 +75,8 @@ data class IdeState(
     val fileTreeWidth: Dp? = null,
     val emoji: String? = null,
     val errorText: String? = null,
-    val topPanelOpen: Boolean = false,
-    val leftPanelOpen: Boolean = false
+    val openTopPanels: Set<String> = emptySet(),
+    val openLeftPanels: Set<String> = emptySet()
 )
 
 @Composable

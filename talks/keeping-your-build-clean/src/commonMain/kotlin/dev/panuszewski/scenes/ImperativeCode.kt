@@ -1,18 +1,32 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeLayout
+import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
+import talks.keeping_your_build_clean.generated.resources.Res
+import talks.keeping_your_build_clean.generated.resources.typesafe_conventions
 
 fun StoryboardBuilder.ImperativeCode() {
 
@@ -32,8 +46,16 @@ fun StoryboardBuilder.ImperativeCode() {
                 IDE_STATE = buildIdeState(files)
 
                 IdeLayout {
-                    topPanel {
-
+                    topPanel("typesafe-conventions") {
+                        Box {
+                            ResourceImage(
+                                resource = Res.drawable.typesafe_conventions,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.White)
+                                    .padding(8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -94,6 +116,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .openTopPanel("typesafe-conventions")
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -163,28 +186,26 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
         .showEmoji("😩")
         .hideEmoji()
-        .openTopPanel()
+        .openTopPanel("typesafe-conventions")
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
     val pluginDependency by tag()
     val pluginMarkerUsage1 by tag()
     val pluginMarkerUsage2 by tag()
-    val pluginMarkerDeclaration by tag()
-    val pluginMarkerArgs by tag()
-    val pluginMarkerBody by tag()
+    val pluginMarkerFunction by tag()
 
     $$"""
     plugins {
         `kotlin-dsl`
-    }$${pluginMarkerDeclaration}
+    }$${pluginMarkerFunction}
     
-    fun pluginMarker($${pluginMarkerArgs}provider: Provider<PluginDependency>$${pluginMarkerArgs}): String$${pluginMarkerDeclaration}$${pluginMarkerBody} {
+    fun pluginMarker(provider: Provider<PluginDependency>): String {
         val pluginId = provider.get().pluginId
         val pluginVersion = provider.get().version
         
         return "$pluginId:$pluginId.gradle.plugin:$pluginVersion"
-    }$${pluginMarkerBody}
+    }$${pluginMarkerFunction}
     
     dependencies { $${pluginDependency}
         implementation($${pluginMarkerUsage1}pluginMarker($${pluginMarkerUsage1}libs.plugins.kotlin.jvm$${pluginMarkerUsage2})$${pluginMarkerUsage2})
@@ -192,9 +213,10 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(pluginDependency, pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerDeclaration, pluginMarkerBody, pluginMarkerArgs) }
+        .startWith { hide(pluginDependency, pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerFunction) }
         .then { reveal(pluginDependency) }
-        .openErrorWindow("""
+        .openErrorWindow(
+            """
             > Could not resolve all dependencies for configuration ':buildSrc:buildScriptClasspath'.
                > Cannot convert the provided notation to an object of type Dependency: org.jetbrains.kotlin.jvm:2.2.20.
                  The following types/formats are supported:
@@ -203,13 +225,12 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
                     - FileCollections, for example files('some.jar', 'someOther.jar').
                     - Projects, for example project(':some:project:path').
                     - ClassPathNotation, for example gradleApi().
-
-        """.trimIndent())
+        """.trimIndent()
+        )
         .closeErrorWindow()
         .then { reveal(pluginMarkerUsage1, pluginMarkerUsage2).focus(pluginMarkerUsage1, pluginMarkerUsage2) }
-        .then { reveal(pluginMarkerDeclaration).focus(pluginMarkerDeclaration) }
-        .then { reveal(pluginMarkerArgs).focus(pluginMarkerArgs) }
-        .then { reveal(pluginMarkerBody).unfocus() }
+        .then { revealAndFocus(pluginMarkerFunction) }
+        .then { unfocus() }
         .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 }
 

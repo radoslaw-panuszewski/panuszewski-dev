@@ -252,20 +252,20 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(OpenInRightPane(fileName, switchTo)))
     }
     
-    fun openTopPanel(): CodeSampleWithIdeOps {
-        return CodeSampleWithIdeOps(this, mutableListOf(OpenTopPanel))
+    fun openTopPanel(name: String = "default"): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenTopPanel(name)))
     }
     
-    fun closeTopPanel(): CodeSampleWithIdeOps {
-        return CodeSampleWithIdeOps(this, mutableListOf(CloseTopPanel))
+    fun closeTopPanel(name: String = "default"): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseTopPanel(name)))
     }
     
-    fun openLeftPanel(): CodeSampleWithIdeOps {
-        return CodeSampleWithIdeOps(this, mutableListOf(OpenLeftPanel))
+    fun openLeftPanel(name: String = "default"): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(OpenLeftPanel(name)))
     }
     
-    fun closeLeftPanel(): CodeSampleWithIdeOps {
-        return CodeSampleWithIdeOps(this, mutableListOf(CloseLeftPanel))
+    fun closeLeftPanel(name: String = "default"): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(CloseLeftPanel(name)))
     }
 
     override fun equals(other: Any?): Boolean {
@@ -304,13 +304,13 @@ data class ShowEmoji(val emoji: String)
 
 object HideEmoji
 
-object OpenTopPanel
+data class OpenTopPanel(val name: String)
 
-object CloseTopPanel
+data class CloseTopPanel(val name: String)
 
-object OpenLeftPanel
+data class OpenLeftPanel(val name: String)
 
-object CloseLeftPanel
+data class CloseLeftPanel(val name: String)
 
 data class OpenInLeftPane(val fileName: String, val switchTo: Boolean)
 
@@ -386,23 +386,23 @@ class CodeSampleWithIdeOps(
         return this
     }
     
-    fun openTopPanel(): CodeSampleWithIdeOps {
-        ideOperations.add(OpenTopPanel)
+    fun openTopPanel(name: String = "default"): CodeSampleWithIdeOps {
+        ideOperations.add(OpenTopPanel(name))
         return this
     }
     
-    fun closeTopPanel(): CodeSampleWithIdeOps {
-        ideOperations.add(CloseTopPanel)
+    fun closeTopPanel(name: String = "default"): CodeSampleWithIdeOps {
+        ideOperations.add(CloseTopPanel(name))
         return this
     }
     
-    fun openLeftPanel(): CodeSampleWithIdeOps {
-        ideOperations.add(OpenLeftPanel)
+    fun openLeftPanel(name: String = "default"): CodeSampleWithIdeOps {
+        ideOperations.add(OpenLeftPanel(name))
         return this
     }
     
-    fun closeLeftPanel(): CodeSampleWithIdeOps {
-        ideOperations.add(CloseLeftPanel)
+    fun closeLeftPanel(name: String = "default"): CodeSampleWithIdeOps {
+        ideOperations.add(CloseLeftPanel(name))
         return this
     }
 }
@@ -503,20 +503,20 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(HideEmoji)
     }
 
-    fun List<CodeSample>.openTopPanel(): List<CodeSample> {
-        return this + last().attach(OpenTopPanel)
+    fun List<CodeSample>.openTopPanel(name: String = "default"): List<CodeSample> {
+        return this + last().attach(OpenTopPanel(name))
     }
 
-    fun List<CodeSample>.closeTopPanel(): List<CodeSample> {
-        return this + last().attach(CloseTopPanel)
+    fun List<CodeSample>.closeTopPanel(name: String = "default"): List<CodeSample> {
+        return this + last().attach(CloseTopPanel(name))
     }
 
-    fun List<CodeSample>.openLeftPanel(): List<CodeSample> {
-        return this + last().attach(OpenLeftPanel)
+    fun List<CodeSample>.openLeftPanel(name: String = "default"): List<CodeSample> {
+        return this + last().attach(OpenLeftPanel(name))
     }
 
-    fun List<CodeSample>.closeLeftPanel(): List<CodeSample> {
-        return this + last().attach(CloseLeftPanel)
+    fun List<CodeSample>.closeLeftPanel(name: String = "default"): List<CodeSample> {
+        return this + last().attach(CloseLeftPanel(name))
     }
 
     fun List<CodeSample>.openInLeftPane(fileName: String, switchTo: Boolean = false): List<CodeSample> {
@@ -607,23 +607,23 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
         return this
     }
     
-    fun openTopPanel(): ChainableOperations {
-        operations.add(OpenTopPanel)
+    fun openTopPanel(name: String = "default"): ChainableOperations {
+        operations.add(OpenTopPanel(name))
         return this
     }
     
-    fun closeTopPanel(): ChainableOperations {
-        operations.add(CloseTopPanel)
+    fun closeTopPanel(name: String = "default"): ChainableOperations {
+        operations.add(CloseTopPanel(name))
         return this
     }
     
-    fun openLeftPanel(): ChainableOperations {
-        operations.add(OpenLeftPanel)
+    fun openLeftPanel(name: String = "default"): ChainableOperations {
+        operations.add(OpenLeftPanel(name))
         return this
     }
     
-    fun closeLeftPanel(): ChainableOperations {
-        operations.add(CloseLeftPanel)
+    fun closeLeftPanel(name: String = "default"): ChainableOperations {
+        operations.add(CloseLeftPanel(name))
         return this
     }
     
