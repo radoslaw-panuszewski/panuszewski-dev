@@ -432,6 +432,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         }
     }
 
+    fun List<CodeSample>.pass(times: Int = 1): List<CodeSample> {
+        var result = this
+        repeat(times) {
+            result = result.then { this }
+        }
+        return result
+    }
+
     fun List<CodeSample>.then(transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()
         val cleanedSample = when (lastSample.data) {
