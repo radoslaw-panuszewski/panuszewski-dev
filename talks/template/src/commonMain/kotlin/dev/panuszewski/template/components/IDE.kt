@@ -74,6 +74,7 @@ data class IdeState(
     val emoji: String? = null,
     val errorText: String? = null,
     val openPanels: Set<String> = emptySet(),
+    val panelStates: Map<String, Int> = emptyMap(),
     val state: Int = 0
 )
 

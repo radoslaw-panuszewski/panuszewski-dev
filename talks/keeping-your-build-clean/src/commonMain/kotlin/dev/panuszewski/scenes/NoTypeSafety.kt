@@ -57,9 +57,9 @@ fun StoryboardBuilder.NoTypeSafety() {
                                     append(BULLET_1)
                                     withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
                                 }
-                                createChildTransition {
+                                panelState.createChildTransition {
                                     when {
-                                        panelState >= 1 -> buildAnnotatedString {
+                                        it >= 1 -> buildAnnotatedString {
                                             append(BULLET_1)
                                             withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("No type safety") }
                                         }
@@ -163,7 +163,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
         .then { hide(nonTypesafePlugin, nonTypesafeExternalDependency).reveal(typesafePlugin, typesafeExternalDependency).unfocus() }
-        .then { unfocus() }
         .openNamedPanel("agenda")
+        .then { this }
         .closeNamedPanel("agenda")
 }

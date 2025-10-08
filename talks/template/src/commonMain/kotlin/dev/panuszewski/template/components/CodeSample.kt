@@ -440,6 +440,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree,
             is OpenErrorWindow, is CloseErrorWindow,
+            is OpenNamedPanel, is CloseNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
@@ -462,6 +463,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree,
             is OpenErrorWindow, is CloseErrorWindow,
+            is OpenNamedPanel, is CloseNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
             else -> lastSample
         }
