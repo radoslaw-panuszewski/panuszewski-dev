@@ -41,7 +41,7 @@ fun StoryboardBuilder.ImperativeCode() {
                 val ideState = buildIdeState(files)
 
                 ideState.IdeLayout {
-                    topPanel(name = "typesafe-conventions") {
+                    adaptiveTopPanel(name = "typesafe-conventions") {
                         ResourceImage(
                             resource = Res.drawable.typesafe_conventions,
                             modifier = Modifier

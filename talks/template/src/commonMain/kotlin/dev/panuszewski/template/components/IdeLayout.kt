@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import dev.panuszewski.template.extensions.ComposableLambda
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
@@ -661,7 +662,15 @@ fun Transition<IdeState>.IdeLayout(
     val fileTreeWidth by animateDp { if (it.fileTreeHidden) 0.dp else 275.dp }
 
     Box(Modifier.fillMaxSize()) {
-        Box(Modifier.align(Alignment.TopCenter)) {
+        Box(
+            Modifier
+                .align(Alignment.TopCenter)
+                .onSizeChanged { size ->
+                    if (scope.topPanelAdaptive) {
+                        topPanelHeight = size.height
+                    }
+                }
+        ) {
             isTopPanelOpen.SlideFromBottomAnimatedVisibility {
                 scope.topPanelContent?.invoke()
             }
