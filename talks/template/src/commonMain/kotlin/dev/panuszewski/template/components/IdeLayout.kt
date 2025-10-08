@@ -2,6 +2,7 @@ package dev.panuszewski.template.components
 
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,18 +19,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.SceneScope
 import dev.panuszewski.template.extensions.ComposableLambda
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.safeGet
-import dev.panuszewski.template.extensions.withStateTransition
 import kotlinx.coroutines.delay
 
 class IdeLayoutScope internal constructor() {
-    var ideState: IdeState? = null
     var topPanelOpenAt: List<Int> = emptyList()
     var topPanelContent: ComposableLambda? = null
     var topPanelName: String? = null
@@ -428,7 +425,7 @@ fun Transition<Int>.buildIdeState(vararg files: Pair<String, Any>) =
 @Composable
 fun Transition<Int>.buildIdeState(
     files: List<Pair<String, Any>>
-): IdeState {
+): Transition<IdeState> {
     require(files.isNotEmpty()) { "files list must not be empty" }
 
     val primaryFilePath = files.first().first
@@ -448,11 +445,6 @@ fun Transition<Int>.buildIdeState(
             }
         }
         .toMap()
-
-    println("DEBUG buildIdeState: allCodeSamples keys = ${allCodeSamples.keys}")
-    allCodeSamples.forEach { (key, samples) ->
-        println("DEBUG buildIdeState: $key has ${samples.size} samples")
-    }
 
     val mapping = remember(allCodeSamples) {
         buildFileStateMapping(primaryFilePath, allCodeSamples)
@@ -624,122 +616,74 @@ fun Transition<Int>.buildIdeState(
         }
     }
 
-    val selectedFile = createChildTransition { globalState ->
+    return createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].selectedFile
-    }.targetState
-
-    val emoji = createChildTransition { globalState ->
-        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].emoji
-    }.targetState
-
-    val leftPaneFile = createChildTransition { globalState ->
-        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].leftPaneFile
-    }.targetState
-
-    val rightPaneFile = createChildTransition { globalState ->
-        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].rightPaneFile
-    }.targetState
-
-    val fileTreeHidden = createChildTransition { globalState ->
-        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].fileTreeHidden
-    }.targetState
-
-    val errorText = createChildTransition { globalState ->
-        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].errorText
-    }.targetState
-
-    val openPanels = createChildTransition { globalState ->
-        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
-        mapping[clampedState].openPanels
-    }.targetState
-
-    return IdeState(
-        files = allFiles,
-        selectedFile = selectedFile,
-        emoji = emoji,
-        leftPaneFile = leftPaneFile,
-        rightPaneFile = rightPaneFile,
-        fileTreeHidden = fileTreeHidden,
-        errorText = errorText,
-        openPanels = openPanels
-    )
+        IdeState(
+            files = allFiles,
+            selectedFile = mapping[clampedState].selectedFile,
+            emoji = mapping[clampedState].emoji,
+            leftPaneFile = mapping[clampedState].leftPaneFile,
+            rightPaneFile = mapping[clampedState].rightPaneFile,
+            fileTreeHidden = mapping[clampedState].fileTreeHidden,
+            errorText = mapping[clampedState].errorText,
+            openPanels = mapping[clampedState].openPanels,
+            state = clampedState
+        )
+    }
 }
 
 @Composable
-fun SceneScope<Int>.IdeLayout(
+fun Transition<IdeState>.IdeLayout(
     builder: IdeLayoutScope.() -> Unit
-) =
-    withStateTransition {
-        val scope = IdeLayoutScope().apply(builder)
+) {
+    val scope = IdeLayoutScope().apply(builder)
 
-        val ideStateHolder = remember { mutableStateOf(scope.ideState ?: IdeState(emptyList())) }
+    val isTopPanelOpen = createChildTransition { (it.state in scope.topPanelOpenAt) || (scope.topPanelName != null && scope.topPanelName in it.openPanels) }
+    val isLeftPanelOpen = createChildTransition { (it.state in scope.leftPanelOpenAt)  || (scope.leftPanelName != null && scope.leftPanelName in it.openPanels) }
+    val isEmojiVisible = createChildTransition { it.emoji != null }
 
-        if (scope.ideState != null) {
-            ideStateHolder.value = scope.ideState!!
-        }
+    var topPanelHeight by remember { mutableIntStateOf(0) }
 
-        val currentIdeState by ideStateHolder
-
-        val isTopPanelOpen = scope.topPanelName != null && scope.topPanelName in currentIdeState.openPanels
-        val isLeftPanelOpen = scope.leftPanelName != null && scope.leftPanelName in currentIdeState.openPanels
-
-        var topPanelHeight by remember { mutableIntStateOf(0) }
-
-        val ideTopPadding by animateDp {
-            if (it in scope.topPanelOpenAt || isTopPanelOpen) {
-                if (scope.topPanelAdaptive && topPanelHeight > 0) {
-                    (topPanelHeight / 2).dp + 32.dp
-                } else {
-                    260.dp
-                }
+    val ideTopPadding by isTopPanelOpen.animateDp {
+        if (it) {
+            if (scope.topPanelAdaptive && topPanelHeight > 0) {
+                (topPanelHeight / 2).dp + 32.dp
             } else {
-                0.dp
+                260.dp
+            }
+        } else {
+            0.dp
+        }
+    }
+
+    val ideStartPadding by isLeftPanelOpen.animateDp { if (it) 260.dp else 0.dp }
+
+    val fileTreeWidth by animateDp { if (it.fileTreeHidden) 0.dp else 275.dp }
+
+    Box(Modifier.fillMaxSize()) {
+        Box(Modifier.align(Alignment.TopCenter)) {
+            isTopPanelOpen.SlideFromBottomAnimatedVisibility {
+                scope.topPanelContent?.invoke()
             }
         }
-        val ideStartPadding by animateDp { if (it in scope.leftPanelOpenAt || isLeftPanelOpen) 260.dp else 0.dp }
 
-        val fileTreeWidth by androidx.compose.animation.core.animateDpAsState(
-            targetValue = if (currentIdeState.fileTreeHidden) 0.dp else 275.dp
+        Box(Modifier.align(Alignment.TopStart)) {
+            isLeftPanelOpen.FadeInOutAnimatedVisibility {
+                scope.leftPanelContent?.invoke()
+            }
+        }
+
+        IDE(
+            ideState = currentState.copy(fileTreeWidth = fileTreeWidth),
+            modifier = Modifier.padding(top = ideTopPadding, start = ideStartPadding),
         )
 
-        Box(Modifier.fillMaxSize()) {
-            Box(
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .onSizeChanged { size ->
-                        if (scope.topPanelAdaptive) {
-                            topPanelHeight = size.height
-                        }
-                    }
-            ) {
-                SlideFromBottomAnimatedVisibility({ it in scope.topPanelOpenAt || isTopPanelOpen }) {
-                    scope.topPanelContent?.invoke()
-                }
-            }
-
-            Box(Modifier.align(Alignment.TopStart)) {
-                FadeInOutAnimatedVisibility({ it in scope.leftPanelOpenAt || isLeftPanelOpen }) {
-                    scope.leftPanelContent?.invoke()
-                }
-            }
-
-            IDE(
-                ideState = currentIdeState.copy(fileTreeWidth = fileTreeWidth),
-                modifier = Modifier.padding(top = ideTopPadding, start = ideStartPadding),
-            )
-
-            Box(Modifier.align(Alignment.Center)) {
-                FadeInOutAnimatedVisibility({ currentIdeState.emoji != null }) {
-                    ProvideTextStyle(MaterialTheme.typography.h1) {
-                        Text(currentIdeState.emoji ?: "")
-                    }
+        Box(Modifier.align(Alignment.Center)) {
+            isEmojiVisible.FadeInOutAnimatedVisibility {
+                ProvideTextStyle(MaterialTheme.typography.h1) {
+                    Text(currentState.emoji ?: "")
                 }
             }
         }
     }
+}

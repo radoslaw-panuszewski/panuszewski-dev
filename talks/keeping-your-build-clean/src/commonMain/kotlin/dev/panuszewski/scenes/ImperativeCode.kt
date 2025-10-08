@@ -1,8 +1,6 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
@@ -11,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
-import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.ResourceImage
@@ -20,7 +17,6 @@ import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
-import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
@@ -43,20 +39,16 @@ fun StoryboardBuilder.ImperativeCode() {
         withStateTransition {
             TitleScaffold("Imperative code") {
                 val ideState = buildIdeState(files)
-                
-                IdeLayout {
-                    this.ideState = ideState
 
-                    adaptiveTopPanel("typesafe-conventions") {
-                        Box {
-                            ResourceImage(
-                                resource = Res.drawable.typesafe_conventions,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color.White)
-                                    .padding(8.dp)
-                            )
-                        }
+                ideState.IdeLayout {
+                    topPanel(name = "typesafe-conventions") {
+                        ResourceImage(
+                            resource = Res.drawable.typesafe_conventions,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White)
+                                .padding(8.dp)
+                        )
                     }
                 }
             }
@@ -118,6 +110,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
         .openNamedPanel("typesafe-conventions")
+        .closeNamedPanel("typesafe-conventions")
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
