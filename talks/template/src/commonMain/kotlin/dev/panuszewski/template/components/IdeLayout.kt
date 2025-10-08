@@ -27,124 +27,126 @@ import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.safeGet
 import kotlinx.coroutines.delay
 
+typealias PanelContent = @Composable (Int) -> Unit
+
 class IdeLayoutScope internal constructor() {
     var topPanelOpenAt: List<Int> = emptyList()
-    var topPanelContent: ComposableLambda? = null
+    var topPanelContent: PanelContent? = null
     var topPanelName: String? = null
     var topPanelAdaptive: Boolean = false
     var leftPanelOpenAt: List<Int> = emptyList()
-    var leftPanelContent: ComposableLambda? = null
+    var leftPanelContent: PanelContent? = null
     var leftPanelName: String? = null
     var centerEmojiVisibleAt: List<Int> = emptyList()
-    var centerEmojiContent: ComposableLambda? = null
+    var centerEmojiContent: PanelContent? = null
 
-    fun topPanel(name: String, content: ComposableLambda) {
+    fun topPanel(name: String, content: PanelContent) {
         topPanelContent = content
         topPanelName = name
         topPanelAdaptive = false
     }
 
-    fun topPanel(name: String, openAt: List<Int>, content: ComposableLambda) {
+    fun topPanel(name: String, openAt: List<Int>, content: PanelContent) {
         topPanelOpenAt = openAt
         topPanelContent = content
         topPanelName = name
         topPanelAdaptive = false
     }
 
-    fun topPanel(name: String, openAt: Int, content: ComposableLambda) {
+    fun topPanel(name: String, openAt: Int, content: PanelContent) {
         topPanel(name, listOf(openAt), content)
     }
 
-    fun topPanel(name: String, openAt: IntRange, content: ComposableLambda) {
+    fun topPanel(name: String, openAt: IntRange, content: PanelContent) {
         topPanel(name, openAt.toList(), content)
     }
 
-    fun topPanel(content: ComposableLambda) {
+    fun topPanel(content: PanelContent) {
         topPanelContent = content
         topPanelName = "default"
         topPanelAdaptive = false
     }
 
-    fun topPanel(openAt: List<Int>, content: ComposableLambda) {
+    fun topPanel(openAt: List<Int>, content: PanelContent) {
         topPanelOpenAt = openAt
         topPanelContent = content
         topPanelName = "default"
         topPanelAdaptive = false
     }
 
-    fun topPanel(openAt: Int, content: ComposableLambda) {
+    fun topPanel(openAt: Int, content: PanelContent) {
         topPanel(openAt = listOf(openAt), content)
     }
 
-    fun topPanel(openAt: IntRange, content: ComposableLambda) {
+    fun topPanel(openAt: IntRange, content: PanelContent) {
         topPanel(openAt = openAt.toList(), content)
     }
 
-    fun adaptiveTopPanel(name: String, content: ComposableLambda) {
+    fun adaptiveTopPanel(name: String, content: PanelContent) {
         topPanelContent = content
         topPanelName = name
         topPanelAdaptive = true
     }
 
-    fun adaptiveTopPanel(name: String, openAt: List<Int>, content: ComposableLambda) {
+    fun adaptiveTopPanel(name: String, openAt: List<Int>, content: PanelContent) {
         topPanelOpenAt = openAt
         topPanelContent = content
         topPanelName = name
         topPanelAdaptive = true
     }
 
-    fun adaptiveTopPanel(name: String, openAt: Int, content: ComposableLambda) {
+    fun adaptiveTopPanel(name: String, openAt: Int, content: PanelContent) {
         adaptiveTopPanel(name, listOf(openAt), content)
     }
 
-    fun adaptiveTopPanel(name: String, openAt: IntRange, content: ComposableLambda) {
+    fun adaptiveTopPanel(name: String, openAt: IntRange, content: PanelContent) {
         adaptiveTopPanel(name, openAt.toList(), content)
     }
 
-    fun leftPanel(name: String, content: ComposableLambda) {
+    fun leftPanel(name: String, content: PanelContent) {
         leftPanelContent = content
         leftPanelName = name
     }
 
-    fun leftPanel(name: String, openAt: List<Int>, content: ComposableLambda) {
+    fun leftPanel(name: String, openAt: List<Int>, content: PanelContent) {
         leftPanelOpenAt = openAt
         leftPanelContent = content
         leftPanelName = name
     }
 
-    fun leftPanel(name: String, openAt: Int, content: ComposableLambda) {
+    fun leftPanel(name: String, openAt: Int, content: PanelContent) {
         leftPanel(name, listOf(openAt), content)
     }
 
-    fun leftPanel(name: String, openAt: IntRange, content: ComposableLambda) {
+    fun leftPanel(name: String, openAt: IntRange, content: PanelContent) {
         leftPanel(name, openAt.toList(), content)
     }
 
-    fun leftPanel(content: ComposableLambda) {
+    fun leftPanel(content: PanelContent) {
         leftPanelContent = content
         leftPanelName = "default"
     }
 
-    fun leftPanel(openAt: List<Int>, content: ComposableLambda) {
+    fun leftPanel(openAt: List<Int>, content: PanelContent) {
         leftPanelOpenAt = openAt
         leftPanelContent = content
         leftPanelName = "default"
     }
 
-    fun leftPanel(openAt: Int, content: ComposableLambda) {
+    fun leftPanel(openAt: Int, content: PanelContent) {
         leftPanel(openAt = listOf(openAt), content)
     }
 
-    fun leftPanel(openAt: IntRange, content: ComposableLambda) {
+    fun leftPanel(openAt: IntRange, content: PanelContent) {
         leftPanel(openAt = openAt.toList(), content)
     }
 
-    fun centerEmoji(visibleAt: List<Int>, content: ComposableLambda) {
+    fun centerEmoji(visibleAt: List<Int>, content: PanelContent) {
         centerEmojiVisibleAt = visibleAt
         centerEmojiContent = content
     }
 
-    fun centerEmoji(visibleAt: Int, content: ComposableLambda) {
+    fun centerEmoji(visibleAt: Int, content: PanelContent) {
         centerEmoji(listOf(visibleAt), content)
     }
 }
