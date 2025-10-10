@@ -214,6 +214,7 @@ fun buildFileStateMapping(
 
         if (chainedOps != null) {
             globalState++
+            val panelsOpenedInThisFrame = mutableSetOf<String>()
             for (operation in chainedOps.operations) {
                 when (operation) {
                     CloseLeftPane -> {
@@ -267,9 +268,11 @@ fun buildFileStateMapping(
                         errorText = null
                     }
                     is OpenNamedPanel -> {
+                        val wasNewlyOpened = operation.name !in panelStates
                         openPanels.add(operation.name)
-                        if (operation.name !in panelStates) {
+                        if (wasNewlyOpened) {
                             panelStates[operation.name] = 0
+                            panelsOpenedInThisFrame.add(operation.name)
                         }
                     }
                     is CloseNamedPanel -> {
@@ -284,7 +287,9 @@ fun buildFileStateMapping(
                 }
             }
             for (panelName in openPanels) {
-                panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
+                if (panelName !in panelsOpenedInThisFrame) {
+                    panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
+                }
             }
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
