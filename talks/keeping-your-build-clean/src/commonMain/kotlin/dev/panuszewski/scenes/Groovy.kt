@@ -172,8 +172,16 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .pass(3)
         .closeNamedPanel("groovy")
         .then { underline(groovy).focus(nothing).showEmoji("🤢") }
-        // TODO .renameSelectedFile("build.gradle.kts")
-        .then { unfocus().hide(groovy).reveal(kotlin).changeLanguage(Language.KotlinDsl).hideEmoji().changeTitle("Kotlin DSL ❤️") }
+        .then {
+            this
+                .unfocus()
+                .hide(groovy)
+                .reveal(kotlin)
+                .changeLanguage(Language.KotlinDsl)
+                .hideEmoji()
+                .changeTitle("Kotlin DSL ❤️")
+                .renameSelectedFile("build.gradle.kts")
+        }
         .openNamedPanel("agenda")
         .pass()
         .closeNamedPanel("agenda")

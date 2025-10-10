@@ -76,7 +76,8 @@ data class IdeState(
     val openPanels: Set<String> = emptySet(),
     val panelStates: Map<String, Int> = emptyMap(),
     val state: Int = 0,
-    val title: String? = null
+    val title: String? = null,
+    val fileRenames: Map<String, String> = emptyMap()
 )
 
 @Composable
@@ -247,7 +248,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                                 enlargedFile = enlargedFile,
                                                 highlightedFile = highlightedFile,
                                                 ideColors = ideColors,
-                                                visiblePathsState = visiblePaths
+                                                visiblePathsState = visiblePaths,
+                                                fileRenames = fileRenames
                                             )
                                         }
                                     } else {
@@ -259,7 +261,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                                             enlargedFile = enlargedFile,
                                             highlightedFile = highlightedFile,
                                             ideColors = ideColors,
-                                            visiblePathsState = visiblePaths
+                                            visiblePathsState = visiblePaths,
+                                            fileRenames = fileRenames
                                         )
                                     }
                                 }
@@ -555,7 +558,8 @@ private fun FileTreeItem(
     highlightedFile: ProjectFile?,
     ideColors: IdeColorScheme,
     modifier: Modifier = Modifier,
-    visiblePathsState: State<Set<String>>
+    visiblePathsState: State<Set<String>>,
+    fileRenames: Map<String, String> = emptyMap()
 ) {
     val isExpanded = expandedFolders[node.path] ?: true
     val isSelected = node.file == currentOpenFile
@@ -564,6 +568,8 @@ private fun FileTreeItem(
 
     val iconSize by animateDpAsState(targetValue = if (isEnlarged) 20.dp else 16.dp)
     val spacerWidth by animateDpAsState(targetValue = if (isEnlarged) 12.dp else 8.dp)
+    
+    val displayName = fileRenames[node.path] ?: node.name
 
     val hasVisibilityTransition = node.file?.visibilityTransition != null && node.isFolder
     
@@ -585,14 +591,14 @@ private fun FileTreeItem(
             FileTreeItemContent(
                 node, depth, isExpanded, isSelected, isEnlarged, isHighlighted,
                 iconSize, spacerWidth, expandedFolders, currentOpenFile, enlargedFile,
-                highlightedFile, ideColors, modifier, visiblePathsState
+                highlightedFile, ideColors, modifier, visiblePathsState, displayName, fileRenames
             )
         }
     } else {
         FileTreeItemContent(
             node, depth, isExpanded, isSelected, isEnlarged, isHighlighted,
             iconSize, spacerWidth, expandedFolders, currentOpenFile, enlargedFile,
-            highlightedFile, ideColors, modifier, visiblePathsState
+            highlightedFile, ideColors, modifier, visiblePathsState, displayName, fileRenames
         )
     }
 }
@@ -613,7 +619,9 @@ private fun FileTreeItemContent(
     highlightedFile: ProjectFile?,
     ideColors: IdeColorScheme,
     modifier: Modifier = Modifier,
-    visiblePathsState: State<Set<String>>
+    visiblePathsState: State<Set<String>>,
+    displayName: String,
+    fileRenames: Map<String, String> = emptyMap()
 ) {
     Column {
         // Render this node
@@ -679,9 +687,9 @@ private fun FileTreeItemContent(
                 ProvideTextStyle(textStyle) {
                     androidx.compose.runtime.key(node.path) {
                         MagicText(text = buildAnnotatedString {
-                            if (node.name.contains(".")) {
-                                val beforeExtension = node.name.substringBeforeLast(".")
-                                val afterExtension = node.name.substringAfterLast(".")
+                            if (displayName.contains(".")) {
+                                val beforeExtension = displayName.substringBeforeLast(".")
+                                val afterExtension = displayName.substringAfterLast(".")
                                 append(beforeExtension)
                                 append(".")
                                 if (afterExtension == "dcl") {
@@ -690,7 +698,7 @@ private fun FileTreeItemContent(
                                     append(afterExtension)
                                 }
                             } else {
-                                append(node.name)
+                                append(displayName)
                             }
                         })
                     }
@@ -729,7 +737,8 @@ private fun FileTreeItemContent(
                         highlightedFile = highlightedFile,
                         ideColors = ideColors,
                         modifier = modifier,
-                        visiblePathsState = visiblePathsState
+                        visiblePathsState = visiblePathsState,
+                        fileRenames = fileRenames
                     )
                 }
             }

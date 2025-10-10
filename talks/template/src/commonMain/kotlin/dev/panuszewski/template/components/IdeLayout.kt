@@ -159,7 +159,8 @@ data class FileStateMapping(
     val errorText: String? = null,
     val openPanels: Set<String> = emptySet(),
     val panelStates: Map<String, Int> = emptyMap(),
-    val title: String? = null
+    val title: String? = null,
+    val fileRenames: Map<String, String> = emptyMap()
 )
 
 fun buildFileStateMapping(
@@ -181,8 +182,9 @@ fun buildFileStateMapping(
     val openPanels = mutableSetOf<String>()
     val panelStates = mutableMapOf<String, Int>()
     var currentTitle: String? = title
+    val fileRenames = mutableMapOf<String, String>()
 
-    mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+    mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
     fileStates[currentFile] = 1
 
     while (true) {
@@ -208,6 +210,7 @@ fun buildFileStateMapping(
         val openPanelMarker = sample?.data as? OpenNamedPanel
         val closePanelMarker = sample?.data as? CloseNamedPanel
         val changeTitleMarker = sample?.data as? ChangeTitle
+        val renameFileMarker = sample?.data as? RenameSelectedFile
 
         if (chainedOps != null) {
             globalState++
@@ -275,12 +278,15 @@ fun buildFileStateMapping(
                     is ChangeTitle -> {
                         currentTitle = operation.title
                     }
+                    is RenameSelectedFile -> {
+                        fileRenames[currentFile] = operation.newName
+                    }
                 }
             }
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (advanceTogetherMarker != null) {
             globalState++
@@ -291,7 +297,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (switchMarker != null) {
             globalState++
@@ -327,7 +333,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (openLeftMarker != null) {
             globalState++
@@ -342,7 +348,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (openRightMarker != null) {
             globalState++
@@ -357,7 +363,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeLeftMarker) {
             globalState++
@@ -368,7 +374,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (closeRightMarker) {
             globalState++
@@ -379,7 +385,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = (fileStates[currentFile] ?: 0) + 1
         } else if (hideFileTreeMarker) {
             globalState++
@@ -387,7 +393,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (showFileTreeMarker) {
             globalState++
@@ -395,7 +401,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (openErrorMarker != null) {
             globalState++
@@ -403,7 +409,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (closeErrorMarker) {
             globalState++
@@ -411,7 +417,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (showEmojiMarker != null) {
             globalState++
@@ -419,7 +425,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (hideEmojiMarker) {
             globalState++
@@ -427,7 +433,7 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (openPanelMarker != null) {
             globalState++
@@ -435,12 +441,12 @@ fun buildFileStateMapping(
             if (openPanelMarker.name !in panelStates) {
                 panelStates[openPanelMarker.name] = 0
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (closePanelMarker != null) {
             globalState++
             openPanels.remove(closePanelMarker.name)
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else if (changeTitleMarker != null) {
             globalState++
@@ -448,14 +454,22 @@ fun buildFileStateMapping(
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (renameFileMarker != null) {
+            globalState++
+            fileRenames[currentFile] = renameFileMarker.newName
+            for (panelName in openPanels) {
+                panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
+            }
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         } else {
             globalState++
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
-            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle))
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap()))
             fileStates[currentFile] = currentFileState + 1
         }
 
@@ -685,6 +699,7 @@ fun Transition<Int>.buildIdeState(
 
     return createChildTransition { globalState ->
         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+        val currentFileRenames = mapping[clampedState].fileRenames
         IdeState(
             files = allFiles,
             selectedFile = mapping[clampedState].selectedFile,
@@ -696,7 +711,8 @@ fun Transition<Int>.buildIdeState(
             openPanels = mapping[clampedState].openPanels,
             panelStates = mapping[clampedState].panelStates,
             state = clampedState,
-            title = mapping[clampedState].title
+            title = mapping[clampedState].title,
+            fileRenames = currentFileRenames
         )
     }
 }
