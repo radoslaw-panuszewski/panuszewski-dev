@@ -81,19 +81,21 @@ fun StoryboardBuilder.NoTypeSafety() {
 
 private val LIBS_VERSIONS_TOML = buildCodeSamples {
     val todo by tag()
-    val libraries by tag()
+    val catalog by tag()
 
-    // TODO also add [plugins] block here!!!
     """
-    ${libraries}[libraries]
-    mongodb-driver-sync = "org.springframework.boot:spring-boot-starter-web:3.5.6"
+    ${catalog}[plugins]
+    kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.20" }
+    
+    [libraries]
+    spring-boot = "org.springframework.boot:spring-boot-starter-web:3.5.6"
 
-    ${libraries}${todo}// TODO${todo}
+    ${catalog}${todo}// TODO${todo}
     """
         .trimIndent()
         .toCodeSample(language = Language.Toml)
-        .startWith { hide(libraries) }
-        .then { reveal(libraries) }
+        .startWith { hide(catalog) }
+        .then { reveal(catalog) }
         .then { hide(todo) }
         .switchTo("build.gradle.kts")
 }
