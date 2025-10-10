@@ -109,8 +109,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishImperative, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .openNamedPanel("typesafe-conventions")
-        .closeNamedPanel("typesafe-conventions")
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { reveal(topWhen, bottomWhen, monday) }
@@ -175,12 +173,13 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .switchTo("buildSrc/settings.gradle.kts")
         .then { this }
         .then { focus(libsPlugin) }
-        .then { hide(libsPlugin).reveal(nonTypesafePlugin).unfocus() }
-        .then { focusNoScroll(libsDep1, libsDep2, libsDep3, libsDep4) }
+        .then { hide(libsPlugin).reveal(nonTypesafePlugin).highlightAsError(libsDep1, libsDep2, libsDep3, libsDep4) }
+        .then { unfocus().focusNoScroll(libsDep1, libsDep2, libsDep3, libsDep4) }
         .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
         .showEmoji("😩")
         .hideEmoji()
         .openNamedPanel("typesafe-conventions")
+        .closeNamedPanel("typesafe-conventions")
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
