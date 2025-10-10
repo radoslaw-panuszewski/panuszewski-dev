@@ -16,6 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import dev.panuszewski.template.components.CodeSample
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.h6

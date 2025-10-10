@@ -85,7 +85,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     dependencies {
-        implementation project(':first-library')
+        implementation project(':sub-project')
         implementation 'org.springframework.boot:spring-boot-starter-web:3.5.6'
     }$${groovy}$${kotlin}buildscript {
         repositories {
@@ -99,7 +99,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
-        "implementation"(project(":first-library"))
+        "implementation"(project(":sub-project"))
         "implementation"("org.springframework.boot:spring-boot-starter-web:3.5.6")
     }$${kotlin}
     """
@@ -120,7 +120,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
                 .changeTitle("Kotlin DSL ❤️")
                 .renameSelectedFile("build.gradle.kts")
         }
-        .openNamedPanel("agenda")
+        .openAgenda()
         .pass()
-        .closeNamedPanel("agenda")
+        .closeAgenda()
 }

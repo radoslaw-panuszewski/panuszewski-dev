@@ -322,12 +322,6 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                         .fillMaxWidth()
                         .background(ideColors.codePanelBackground)
                 ) {
-//                    Divider(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        color = ideColors.paneSeparator,
-//                        thickness = 1.dp
-//                    )
-//
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -433,7 +427,7 @@ private fun CodeDisplayArea(
                                             transitionSpec = { fadeIn() togetherWith fadeOut() }
                                         ) { file ->
                                             if (file != null) {
-                                                CodePanel(file = file, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
+                                                CodePanel(file = file, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp))
                                             }
                                         }
                                     }

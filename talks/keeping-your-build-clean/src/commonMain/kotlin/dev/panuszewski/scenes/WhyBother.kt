@@ -79,9 +79,9 @@ fun StoryboardBuilder.WhyBother() {
 
                 val fileTreeWidth by animateDp {
                     when {
-                        it >= ideBackToNormal -> 275.dp
+                        it >= ideBackToNormal -> 225.dp
                         it >= ideShrinks -> 0.dp
-                        else -> 275.dp
+                        else -> 225.dp
                     }
                 }
 
@@ -140,7 +140,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .forEach { it.apply plugin: 'java-library' }$${imperative2}
 
     $${mixedConcerns}dependencies {
-        implementation $${noTypesafe2}project(':first-library')$${noTypesafe2}
+        implementation $${noTypesafe2}project(':sub-project')$${noTypesafe2}
     }
 
     tasks.register('sayHello') {

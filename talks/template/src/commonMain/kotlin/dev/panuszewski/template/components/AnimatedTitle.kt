@@ -23,11 +23,10 @@ fun SceneScope<*>.AnimatedTitle(title: String?, modifier: Modifier = Modifier) {
 @Composable
 fun SceneScope<*>.AnimatedTitle(title: AnnotatedString?, modifier: Modifier = Modifier) {
     val titleToDisplay = buildAnnotatedString {
+        // surrounded by invisible emojis to fix issue with hoping height when real emoji is added :)
+        withStyle(SpanStyle(color = Color.Transparent)) { append("🥞") }
         append(title)
-        withStyle(SpanStyle(color = Color.Transparent)) {
-            // invisible emoji at the end just to fix issue with hoping height when real emoji is added :)
-            append("🥞")
-        }
+        withStyle(SpanStyle(color = Color.Transparent)) { append("🥞") }
     }
 
     when (transition.currentState) {

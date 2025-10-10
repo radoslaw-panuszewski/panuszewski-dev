@@ -100,7 +100,7 @@ private val GRADLE_PLUGIN_BACKTICK_REGEX = """`([a-zA-Z][a-zA-Z0-9-]*)`""".toReg
 
 private val VERSION_CATALOG_ACCESSOR_REGEX = """\b(libs\.[a-zA-Z][a-zA-Z0-9]*(?:\.[a-zA-Z][a-zA-Z0-9]*)*)\b""".toRegex()
 
-private val DSL_KEYWORD_REGEX = """\b(versionCatalogs|MONDAY|TUESDAY|projects|firstLibrary|compileKotlin|explicitApiMode|Strict|buildscript|allprojects|subprojects|dependencies|tasks)\b""".toRegex()
+private val DSL_KEYWORD_REGEX = """\b(versionCatalogs|MONDAY|TUESDAY|projects|subProject|firstLibrary|secondLibrary|compileKotlin|explicitApiMode|Strict|buildscript|allprojects|subprojects|dependencies|tasks)\b""".toRegex()
 
 private val KOTLIN_KEYWORD_REGEX = """\b(package|import|class|interface|fun|object|val|var|typealias|constructor|by|companion|init|this|super|typeof|where|if|else|when|try|catch|finally|for|do|while|throw|return|continue|break|as|is|in|true|false|null|abstract|annotation|actual|const|crossinline|data|enum|expect|external|final|infix|inline|inner|internal|lateinit|noinline|open|operator|out|override|private|protected|public|reified|sealed|suspend|tailrec|vararg|dynamic)\b""".toRegex()
 

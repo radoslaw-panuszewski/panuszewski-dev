@@ -463,6 +463,12 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return result
     }
 
+    fun List<CodeSample>.openAgenda(): List<CodeSample> =
+        then { openNamedPanel("agenda").hideFileTree() }
+
+    fun List<CodeSample>.closeAgenda(): List<CodeSample> =
+        then { closeNamedPanel("agenda").showFileTree() }
+
     fun List<CodeSample>.then(transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()
         val cleanedSample = when (lastSample.data) {

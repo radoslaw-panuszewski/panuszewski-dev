@@ -15,6 +15,7 @@ import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.StoryboardBuilder
+import dev.panuszewski.scenes.CrossConfiguration
 import dev.panuszewski.scenes.Groovy
 import dev.panuszewski.scenes.ImperativeCode
 import dev.panuszewski.scenes.NoTypeSafety
@@ -41,10 +42,11 @@ val KeepingYourBuildClean = Storyboard.build(
 //        )
 //    )
 
-//    WhyBother()
-//    Groovy()
-//    NoTypeSafety()
+    WhyBother()
+    Groovy()
+    NoTypeSafety()
     ImperativeCode()
+    CrossConfiguration()
 }
 
 

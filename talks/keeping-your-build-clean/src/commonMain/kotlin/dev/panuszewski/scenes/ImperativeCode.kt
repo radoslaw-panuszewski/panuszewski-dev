@@ -103,7 +103,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
     
     ${someImperativeCode}dependencies {
-        implementation(projects.firstLibrary)
+        implementation(projects.subProject)
         implementation(libs.spring.boot.web)${randomDatabase}
         ${topWhen}
         when (today()) {
@@ -132,9 +132,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
         .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
         .then { unfocus() }
-        .then { openNamedPanel("agenda").hideFileTree() }
+        .openAgenda()
         .pass()
-        .then { closeNamedPanel("agenda").showFileTree() }
+        .closeAgenda()
 }
 
 val WTF_APP_GRADLE_KTS = buildCodeSamples {
