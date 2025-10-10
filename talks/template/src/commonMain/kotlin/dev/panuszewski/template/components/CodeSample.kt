@@ -245,6 +245,10 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(HideFileTree))
     }
     
+    fun revealFile(fileName: String): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(RevealFile(fileName)))
+    }
+    
     fun showEmoji(emoji: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(ShowEmoji(emoji)))
     }
@@ -321,6 +325,8 @@ object HideFileTree
 
 object ShowFileTree
 
+data class RevealFile(val fileName: String)
+
 data class OpenErrorWindow(val text: String)
 
 object CloseErrorWindow
@@ -374,6 +380,11 @@ class CodeSampleWithIdeOps(
     
     fun hideFileTree(): CodeSampleWithIdeOps {
         ideOperations.add(HideFileTree)
+        return this
+    }
+    
+    fun revealFile(fileName: String): CodeSampleWithIdeOps {
+        ideOperations.add(RevealFile(fileName))
         return this
     }
     
@@ -475,7 +486,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is SwitchToFile, is ShowEmoji, is HideEmoji,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
-            is HideFileTree, is ShowFileTree,
+            is HideFileTree, is ShowFileTree, is RevealFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
@@ -499,7 +510,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is SwitchToFile, is ShowEmoji, is HideEmoji,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
-            is HideFileTree, is ShowFileTree,
+            is HideFileTree, is ShowFileTree, is RevealFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
@@ -554,6 +565,10 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(ShowFileTree)
     }
 
+    fun List<CodeSample>.revealFile(fileName: String): List<CodeSample> {
+        return this + last().attach(RevealFile(fileName))
+    }
+
     fun List<CodeSample>.openErrorWindow(text: String): List<CodeSample> {
         return this + last().attach(OpenErrorWindow(text))
     }
@@ -603,6 +618,11 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
     
     fun hideFileTree(): ChainableOperations {
         operations.add(HideFileTree)
+        return this
+    }
+    
+    fun revealFile(fileName: String): ChainableOperations {
+        operations.add(RevealFile(fileName))
         return this
     }
     

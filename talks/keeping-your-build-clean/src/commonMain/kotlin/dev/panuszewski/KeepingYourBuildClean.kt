@@ -42,10 +42,10 @@ val KeepingYourBuildClean = Storyboard.build(
 //        )
 //    )
 
-    WhyBother()
-    Groovy()
-    NoTypeSafety()
-    ImperativeCode()
+//    WhyBother()
+//    Groovy()
+//    NoTypeSafety()
+//    ImperativeCode()
     CrossConfiguration()
 }
 
