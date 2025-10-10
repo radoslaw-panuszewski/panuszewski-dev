@@ -66,7 +66,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val topWhen by tag()
     val bottomWhen by tag()
     val monday by tag()
-    val mongo by tag()
     val postgres by tag()
     val cassandra by tag()
     val masochistIfTop by tag()
@@ -113,10 +112,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
-        .then { reveal(topWhen, bottomWhen, monday) }
-        .then { reveal(postgres, cassandra) }
-        .then { reveal(masochistIfTop, masochistIfBottom) }
-        .showEmoji("😬")
+        .then { revealAndFocusNoStyling(topWhen, bottomWhen, monday) }
+        .then { revealAndFocusNoStyling(postgres, cassandra) }
+        .then { revealAndFocusNoStyling(masochistIfTop, masochistIfBottom) }
+        .then { unfocus().showEmoji("😬") }
         .hideEmoji()
         .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = true)
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
@@ -170,7 +169,8 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
         .thenTogetherWith("build.gradle.kts") { hide(todo) }
         .then { closeLeftPane().showFileTree() }
-        .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'") }
+        .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
+        .openErrorWindow("e: Unresolved reference 'libs'\n\n\n")
         .closeErrorWindow()
         .switchTo("buildSrc/settings.gradle.kts")
         .then { this }

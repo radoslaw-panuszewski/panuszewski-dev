@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -101,14 +102,17 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
-    scrollTransitionSpec: @Composable Transition.Segment<CodeSample>.() -> FiniteAnimationSpec<Float> = { tween(0) },
     scrollMargin: Int = 0,
     showWarningUnderlines: Boolean = true,
     skipIndentationInWarnings: Boolean = true,
 ) {
     val state = rememberScrollState()
     val lineHeight = with(LocalDensity.current) { LocalTextStyle.current.lineHeight.toPx() }
-    val scrollPosition by animateFloat(scrollTransitionSpec, "ScrollAnimation") { (it.Scroll() - scrollMargin) * lineHeight }
+
+    val scrollPosition by animateFloat {
+        (it.Scroll() - scrollMargin) * lineHeight
+    }
+
     state.dispatchRawDelta(scrollPosition - state.value)
 
     Box(

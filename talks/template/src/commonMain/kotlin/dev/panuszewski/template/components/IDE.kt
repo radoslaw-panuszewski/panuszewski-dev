@@ -116,11 +116,11 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
         }
         
         val visiblePaths = remember { mutableStateOf(setOf<String>()) }
-        
+
         LaunchedEffect(allFilePaths) {
             if (newlyAddedPaths.isNotEmpty()) {
                 visiblePaths.value = allFilePaths - newlyAddedPaths
-                kotlinx.coroutines.delay(50)
+                delay(50)
                 visiblePaths.value = allFilePaths
             } else if (removedPaths.isNotEmpty()) {
                 visiblePaths.value = allFilePaths
@@ -203,7 +203,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                         .background(ideColors.background)
                 ) {
                 // File tree panel with scene-controlled animated width
-                val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 275.dp else 0.dp)
+                val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 200.dp else 0.dp)
 
                 Box(
                     modifier = Modifier

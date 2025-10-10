@@ -139,6 +139,9 @@ class CodeSample private constructor(
     fun revealAndFocus(vararg tags: TextTag) =
         reveal(*tags).focus(*tags)
 
+    fun revealAndFocusNoStyling(vararg tags: TextTag) =
+        reveal(*tags).focusNoStyling(*tags)
+
     fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag, focusedStyle = focusedStyle, unfocusedStyle = unfocusedStyle)
 

@@ -743,7 +743,7 @@ fun Transition<IdeState>.IdeLayout(
 
     val ideStartPadding by isLeftPanelOpen.animateDp { if (it) 260.dp else 0.dp }
 
-    val fileTreeWidth by animateDp { if (it.fileTreeHidden) 0.dp else 275.dp }
+    val fileTreeWidth by animateDp { if (it.fileTreeHidden) 0.dp else 225.dp }
 
     Box(Modifier.fillMaxSize()) {
         Box(
