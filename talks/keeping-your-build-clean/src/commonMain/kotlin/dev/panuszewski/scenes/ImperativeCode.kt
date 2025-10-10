@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.ResourceImage
@@ -49,6 +50,16 @@ fun StoryboardBuilder.ImperativeCode() {
                                 .background(Color.White)
                                 .padding(8.dp)
                         )
+                    }
+
+                    leftPanel("agenda") { panelState ->
+                        panelState.Agenda {
+                            item("Groovy", crossedOutSince = 0)
+                            item("No type safety", crossedOutSince = 0)
+                            item("Imperative code", crossedOutSince = 1)
+                            item("Cross configuration")
+                            item("Mixed concerns")
+                        }
                     }
                 }
             }
@@ -109,6 +120,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .then { openNamedPanel("agenda").hideFileTree() }
+        .pass()
+        .then { closeNamedPanel("agenda").showFileTree() }
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
@@ -121,8 +135,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
         .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
         .then { unfocus() }
-        .then { reveal(someImperativeCode).focus(someImperativeCode) }
-        .then { unfocus() }
+        .then { openNamedPanel("agenda").hideFileTree() }
+        .pass()
+        .then { closeNamedPanel("agenda").showFileTree() }
 }
 
 val WTF_APP_GRADLE_KTS = buildCodeSamples {

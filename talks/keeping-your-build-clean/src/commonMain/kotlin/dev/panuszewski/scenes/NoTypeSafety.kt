@@ -1,35 +1,18 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.animation.core.createChildTransition
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
-import androidx.compose.ui.Alignment.Companion.TopStart
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
-import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
-import dev.panuszewski.template.extensions.Text
-import dev.panuszewski.template.extensions.annotate
-import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
-import dev.panuszewski.template.theme.BULLET_1
 
 fun StoryboardBuilder.NoTypeSafety() {
 
@@ -48,29 +31,12 @@ fun StoryboardBuilder.NoTypeSafety() {
 
                 ideState.IdeLayout {
                     leftPanel("agenda") { panelState ->
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.padding(top = 32.dp).align(TopStart),
-                        ) {
-                            h6 {
-                                Text {
-                                    append(BULLET_1)
-                                    withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("Groovy") }
-                                }
-                                panelState.createChildTransition {
-                                    when {
-                                        it >= 1 -> buildAnnotatedString {
-                                            append(BULLET_1)
-                                            withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { append("No type safety") }
-                                        }
-                                        else -> "$BULLET_1 No type safety".annotate()
-                                    }
-                                }.MagicAnnotatedString()
-
-                                Text("$BULLET_1 Imperative code")
-                                Text("$BULLET_1 Cross configuration")
-                                Text("$BULLET_1 Mixed concerns")
-                            }
+                        panelState.Agenda {
+                            item("Groovy", crossedOutSince = 0)
+                            item("No type safety", crossedOutSince = 1)
+                            item("Imperative code")
+                            item("Cross configuration")
+                            item("Mixed concerns")
                         }
                     }
                 }
@@ -168,7 +134,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { this }
         .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }
         // agenda
-        .openNamedPanel("agenda")
-        .then { this }
-        .closeNamedPanel("agenda")
+        .then { openNamedPanel("agenda").hideFileTree() }
+        .pass()
+        .then { closeNamedPanel("agenda").showFileTree() }
 }
