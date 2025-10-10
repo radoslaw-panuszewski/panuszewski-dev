@@ -18,18 +18,15 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IdeLayout
-import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.TitleScaffold
-import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.precompose
-import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
@@ -47,9 +44,9 @@ fun StoryboardBuilder.Groovy() {
         withStateTransition {
             BUILD_GRADLE_KTS.precompose()
 
-            val ideState = buildIdeState(files)
+            val ideState = buildIdeState(initialTitle = "Groovy", files = files)
 
-            val title = "Groovy"
+            val title = ideState.currentState.title
 
             TitleScaffold(title) {
                 ideState.IdeLayout {
@@ -176,8 +173,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .closeNamedPanel("groovy")
         .then { underline(groovy).focus(nothing).showEmoji("🤢") }
         // TODO .renameSelectedFile("build.gradle.kts")
-        // TODO .changeTitle("Kotlin DSL ❤️")
-        .then { unfocus().hide(groovy).reveal(kotlin).changeLanguage(Language.KotlinDsl).hideEmoji() }
+        .then { unfocus().hide(groovy).reveal(kotlin).changeLanguage(Language.KotlinDsl).hideEmoji().changeTitle("Kotlin DSL ❤️") }
         .openNamedPanel("agenda")
         .pass()
         .closeNamedPanel("agenda")

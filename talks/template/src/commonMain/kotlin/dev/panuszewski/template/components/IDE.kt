@@ -75,7 +75,8 @@ data class IdeState(
     val errorText: String? = null,
     val openPanels: Set<String> = emptySet(),
     val panelStates: Map<String, Int> = emptyMap(),
-    val state: Int = 0
+    val state: Int = 0,
+    val title: String? = null
 )
 
 @Composable

@@ -209,8 +209,10 @@ class CodeSample private constructor(
     }
 
     fun changeLanguage(language: Language): CodeSample = copy(language = language)
-
-    fun changeTitle(title: String?): CodeSample = copy(title = title)
+    
+    fun changeTitle(title: String?): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ChangeTitle(title)))
+    }
     
     fun openErrorWindow(text: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(OpenErrorWindow(text)))
@@ -316,6 +318,8 @@ data class OpenErrorWindow(val text: String)
 
 object CloseErrorWindow
 
+data class ChangeTitle(val title: String?)
+
 data class AdvanceTogetherWith(val fileName: String)
 
 data class ChainedOperations(val operations: List<Any>)
@@ -324,6 +328,11 @@ class CodeSampleWithIdeOps(
     val codeSample: CodeSample,
     val ideOperations: MutableList<Any>
 ) {
+    fun changeTitle(title: String?): CodeSampleWithIdeOps {
+        ideOperations.add(ChangeTitle(title))
+        return this
+    }
+    
     fun openErrorWindow(text: String): CodeSampleWithIdeOps {
         ideOperations.add(OpenErrorWindow(text))
         return this
@@ -449,7 +458,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is HideFileTree, is ShowFileTree,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
-            is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
+            is AdvanceTogetherWith, is ChainedOperations,
+            is ChangeTitle -> lastSample.attach(null)
             else -> lastSample
         }
         val result = transformer(cleanedSample)
@@ -472,7 +482,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is HideFileTree, is ShowFileTree,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
-            is AdvanceTogetherWith, is ChainedOperations -> lastSample.attach(null)
+            is AdvanceTogetherWith, is ChainedOperations,
+            is ChangeTitle -> lastSample.attach(null)
             else -> lastSample
         }
         val markerSample = cleanedSample.attach(AdvanceTogetherWith(fileName))
@@ -530,6 +541,10 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun List<CodeSample>.closeErrorWindow(): List<CodeSample> {
         return this + last().attach(CloseErrorWindow)
     }
+    
+    fun List<CodeSample>.changeTitle(title: String?): List<CodeSample> {
+        return this + last().attach(ChangeTitle(title))
+    }
 
     fun List<CodeSample>.instead(transformer: CodeSample.() -> CodeSample): List<CodeSample> {
         return this.subList(fromIndex = 0, toIndex = lastIndex) + transformer(this.last())
@@ -537,6 +552,11 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 }
 
 class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
+    fun changeTitle(title: String?): ChainableOperations {
+        operations.add(ChangeTitle(title))
+        return this
+    }
+    
     fun closeRightPane(): ChainableOperations {
         operations.add(CloseRightPane)
         return this
