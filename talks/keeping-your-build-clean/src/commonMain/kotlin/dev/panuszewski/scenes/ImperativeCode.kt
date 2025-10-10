@@ -182,6 +182,12 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .hideEmoji()
         .openNamedPanel("typesafe-conventions")
         .closeNamedPanel("typesafe-conventions")
+        .showFileTree()
+        .switchTo("buildSrc/settings.gradle.kts")
+        .then { this }
+        .then { focus(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4) }
+        .then { hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).unfocus() }
+        .switchTo("build.gradle.kts")
 }
 
 private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
@@ -230,10 +236,15 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
 }
 
 private val BUILD_SRC_SETTINGS = buildCodeSamples {
+    val typesafeConventions by tag()
     val versionCatalogDeclaration by tag()
 
     """
-    dependencyResolutionManagement {
+    ${typesafeConventions}plugins {
+        id("dev.panuszewski.typesafe-conventions") version "0.9.0"
+    }
+    
+    ${typesafeConventions}dependencyResolutionManagement {
         repositories {
             mavenCentral()
         }${versionCatalogDeclaration}
@@ -247,7 +258,12 @@ private val BUILD_SRC_SETTINGS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(versionCatalogDeclaration) }
+        .startWith { hide(versionCatalogDeclaration, typesafeConventions) }
         .then { reveal(versionCatalogDeclaration) }
         .switchTo("buildSrc/build.gradle.kts")
+        .then { this }
+        .then { hide(versionCatalogDeclaration) }
+        .then { revealAndFocus(typesafeConventions) }
+        .then { unfocus() }
+        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 }
