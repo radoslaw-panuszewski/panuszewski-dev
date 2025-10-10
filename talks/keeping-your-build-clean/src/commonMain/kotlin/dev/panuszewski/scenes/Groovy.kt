@@ -107,30 +107,12 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
             classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
         }
     }
-
-    allprojects {
-        apply plugin: 'org.jetbrains.kotlin.jvm'
-
-        compileKotlin {
-            compilerOptions {
-                explicitApiMode = Strict
-            }
-        }
-    }
-
-    subprojects
-        .findAll { it.name.endsWith('-library') }
-        .forEach { it.apply plugin: 'java-library' }
+    
+    apply plugin: 'org.jetbrains.kotlin.jvm'
 
     dependencies {
         implementation project(':first-library')
         implementation 'org.springframework.boot:spring-boot-starter-web:3.5.6'
-    }
-
-    tasks.register('sayHello') {
-        doLast {
-            println 'lol'
-        }
     }$${groovy}$${kotlin}buildscript {
         repositories {
             gradlePluginPortal()
@@ -139,30 +121,12 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
             classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
         }
     }
-
-    allprojects {
-        apply(plugin = "org.jetbrains.kotlin.jvm")
-
-        tasks.named<KotlinCompile>("compileKotlin") {
-            compilerOptions {
-                explicitApiMode = Strict
-            }
-        }
-    }
-
-    subprojects
-        .filter { it.name.endsWith("-library") }
-        .forEach { it.apply(plugin = "java-library") }
+    
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
         "implementation"(project(":first-library"))
         "implementation"("org.springframework.boot:spring-boot-starter-web:3.5.6")
-    }
-
-    tasks.register("sayHello") {
-        doLast {
-            println("lol")
-        }
     }$${kotlin}
     """
         .trimIndent()

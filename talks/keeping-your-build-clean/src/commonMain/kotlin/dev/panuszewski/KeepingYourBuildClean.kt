@@ -43,8 +43,8 @@ val KeepingYourBuildClean = Storyboard.build(
 
 //    WhyBother()
     Groovy()
-//    NoTypeSafety()
-//    ImperativeCode()
+    NoTypeSafety()
+    ImperativeCode()
 }
 
 

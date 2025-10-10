@@ -149,20 +149,23 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(declarativePlugin, typesafePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
+        // plugins block
         .then { focusNoScroll(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
-        .then { unfocus() }
         .then { focus(imperativePlugin) }
         .then { unfocus().hide(imperativePlugin).reveal(declarativePlugin) }
         .then { focusNoScroll(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).unfocus() }
-        .then { focusNoScroll(nonTypesafeProjectDependency) }
-        .switchTo("settings.gradle.kts")
-        .then { this }
-        .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }
+        // version catalog
         .then { focusNoScroll(nonTypesafePlugin, nonTypesafeExternalDependency) }
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
         .then { hide(nonTypesafePlugin, nonTypesafeExternalDependency).reveal(typesafePlugin, typesafeExternalDependency).unfocus() }
+        // project accessors
+        .then { focusNoScroll(nonTypesafeProjectDependency) }
+        .switchTo("settings.gradle.kts")
+        .then { this }
+        .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }
+        // agenda
         .openNamedPanel("agenda")
         .then { this }
         .closeNamedPanel("agenda")
