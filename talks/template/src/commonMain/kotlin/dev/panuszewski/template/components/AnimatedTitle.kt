@@ -1,13 +1,14 @@
 package dev.panuszewski.template.components
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
 import dev.panuszewski.template.extensions.annotate
@@ -21,12 +22,20 @@ fun SceneScope<*>.AnimatedTitle(title: String?, modifier: Modifier = Modifier) {
 
 @Composable
 fun SceneScope<*>.AnimatedTitle(title: AnnotatedString?, modifier: Modifier = Modifier) {
+    val titleToDisplay = buildAnnotatedString {
+        append(title)
+        withStyle(SpanStyle(color = Color.Transparent)) {
+            // invisible emoji at the end just to fix issue with hoping height when real emoji is added :)
+            append("🥞")
+        }
+    }
+
     when (transition.currentState) {
-        is Frame.State<*> if title != null -> SHARED_TITLE = title
+        is Frame.State<*> if titleToDisplay != null -> SHARED_TITLE = titleToDisplay
         else -> {}
     }
     if (SHARED_TITLE == null) {
-        SHARED_TITLE = title
+        SHARED_TITLE = titleToDisplay
     }
     SHARED_TITLE?.let {
         AnimatedContent(targetState = it) { targetTitle ->

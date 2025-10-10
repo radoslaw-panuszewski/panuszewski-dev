@@ -281,7 +281,8 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                         rightPaneFile = rightPaneFile,
                         selectedFile = selectedFile,
                         codePanelOffset = codePanelOffset,
-                        ideColors = ideColors
+                        ideColors = ideColors,
+                        fileRenames = fileRenames
                     )
                 }
             }
@@ -354,7 +355,8 @@ private fun CodeDisplayArea(
     rightPaneFile: ProjectFile?,
     selectedFile: ProjectFile?,
     codePanelOffset: State<Float>,
-    ideColors: IdeColorScheme
+    ideColors: IdeColorScheme,
+    fileRenames: Map<String, String> = emptyMap()
 ) {
     val leftPaneWeight by animateFloatAsState(
         targetValue = if (leftPaneFile != null) 1f else 0f,
@@ -414,8 +416,9 @@ private fun CodeDisplayArea(
                                             contentAlignment = Alignment.Center
                                         ) {
                                             code3 {
+                                                val displayName = fileRenames[displayLeftPaneFile.value!!.path] ?: displayLeftPaneFile.value!!.name
                                                 Text(
-                                                    text = displayLeftPaneFile.value!!.name,
+                                                    text = displayName,
                                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
@@ -478,8 +481,9 @@ private fun CodeDisplayArea(
                                             contentAlignment = Alignment.Center
                                         ) {
                                             code3 {
+                                                val displayName = fileRenames[displayRightPaneFile.value!!.path] ?: displayRightPaneFile.value!!.name
                                                 Text(
-                                                    text = displayRightPaneFile.value!!.name,
+                                                    text = displayName,
                                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                                     color = ideColors.textPrimary
                                                 )
