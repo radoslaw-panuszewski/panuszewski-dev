@@ -533,11 +533,11 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(HideEmoji)
     }
 
-    fun List<CodeSample>.openNamedPanel(name: String): List<CodeSample> {
+    fun List<CodeSample>.openPanel(name: String): List<CodeSample> {
         return this + last().attach(OpenNamedPanel(name))
     }
 
-    fun List<CodeSample>.closeNamedPanel(name: String): List<CodeSample> {
+    fun List<CodeSample>.closePanel(name: String): List<CodeSample> {
         return this + last().attach(CloseNamedPanel(name))
     }
 
@@ -656,12 +656,12 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
         return this
     }
     
-    fun openNamedPanel(name: String): ChainableOperations {
+    fun openPanel(name: String): ChainableOperations {
         operations.add(OpenNamedPanel(name))
         return this
     }
     
-    fun closeNamedPanel(name: String): ChainableOperations {
+    fun closePanel(name: String): ChainableOperations {
         operations.add(CloseNamedPanel(name))
         return this
     }

@@ -192,8 +192,8 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
         .showEmoji("😩")
         .hideEmoji()
-        .openNamedPanel("typesafe-conventions")
-        .closeNamedPanel("typesafe-conventions")
+        .openPanel("typesafe-conventions")
+        .closePanel("typesafe-conventions")
         .showFileTree()
         .switchTo("buildSrc/settings.gradle.kts")
         .then { this }

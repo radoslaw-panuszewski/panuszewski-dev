@@ -1,12 +1,26 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
+import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
@@ -33,8 +47,48 @@ fun StoryboardBuilder.CrossConfiguration() {
             )
 
             TitleScaffold(ideState.currentState.title) {
-                ideState.IdeLayout {
 
+                ideState.IdeLayout {
+                    topPanel("tree") { panelState ->
+                        val primaryColor = MaterialTheme.colors.primary
+                        val secondaryColor = MaterialTheme.colors.secondary
+
+                        val tree = when {
+                            panelState.currentState >= 4 -> buildTree {
+                                node("root-project", primaryColor) {
+                                    node("library-1")
+                                    node("library-2")
+                                    node("app")
+                                }
+                            }
+                            panelState.currentState >= 3 -> buildTree {
+                                node("root-project", primaryColor) {
+                                    node("library-1")
+                                    node("library-2")
+                                }
+                            }
+                            panelState.currentState >= 2 -> buildTree {
+                                node("root-project", primaryColor) {
+                                    node("library-1")
+                                }
+                            }
+                            panelState.currentState >= 1 -> buildTree {
+                                node("root-project", primaryColor)
+                            }
+                            else -> buildTree {}
+                        }
+                        AnimatedHorizontalTree(tree) { node ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(node.color ?: MaterialTheme.colors.secondary)
+                            ) {
+                                ProvideTextStyle(TextStyle(color = Color.White)) {
+                                    Text(text = node.value, modifier = Modifier.padding(8.dp))
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -42,40 +96,42 @@ fun StoryboardBuilder.CrossConfiguration() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
-    val subproject by tag()
-    val springBoot by tag()
-    val library1 by tag()
-    val library2 by tag()
+    val pluginsBlock by tag()
+    val subprojectsBlock by tag()
+    val javaLibrary by tag()
+    val kotlinJvmBlock by tag()
 
     """
-    plugins {
-        `wtf-app`
+    ${pluginsBlock}plugins {
+        alias(libs.plugins.kotlin.jvm)
     }
-    
-    dependencies {${subproject}
-        implementation(projects.subProject)${subproject}${springBoot}
-        implementation(libs.spring.boot.web)${springBoot}${library1}
-        implementation(projects.firstLibrary)${library1}${library2}
-        implementation(projects.secondLibrary)${library2}
-    }
+        
+    ${pluginsBlock}${subprojectsBlock}subprojects { ${javaLibrary}
+        apply(plugin = "java-library")
+    ${javaLibrary}${kotlinJvmBlock}    apply(plugin = libs.plugins.kotlin.jvm.get().pluginId)
+    ${kotlinJvmBlock}}${subprojectsBlock}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(library1, library2) }
-        .then { hide(springBoot) }
-        .then { hide(subproject).reveal(library1).reveal(library1).revealFile("first-library/build.gradle.kts")}
-        .then { reveal(library2).revealFile("second-library/build.gradle.kts") }
-        .switchTo("first-library/build.gradle.kts")
+        .startWith { hide(pluginsBlock, subprojectsBlock, javaLibrary, kotlinJvmBlock) }
+        .openPanel("tree")
+        .pass(3)
+        .closePanel("tree")
+        .then { reveal(subprojectsBlock) }
+        .then { reveal(javaLibrary) }
+        .then { reveal(kotlinJvmBlock).reveal(pluginsBlock) }
+        .openPanel("tree")
+        .pass()
+        .closePanel("tree")
 }
 
 private val FIRST_LIBRARY_BUILD_GRADLE_KTS = buildCodeSamples {
     """
-        
+    
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { this }
-        .openInRightPane("second-library/build.gradle.kts")
 }
 
 private val SECOND_LIBRARY_BUILD_GRADLE_KTS = buildCodeSamples {

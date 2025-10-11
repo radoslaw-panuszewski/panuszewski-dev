@@ -106,9 +106,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.Groovy)
         .startWith { hide(kotlin) }
-        .openNamedPanel("groovy")
+        .openPanel("groovy")
         .pass(3)
-        .closeNamedPanel("groovy")
+        .closePanel("groovy")
         .then { underline(groovy).focus(nothing).showEmoji("🤢") }
         .then {
             this
