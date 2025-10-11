@@ -24,6 +24,7 @@ import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
@@ -41,16 +42,19 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
+        val buildSrcAppears = 4
+        val buildLogicAppears = 9
+
         withStateTransition {
             val title = when {
-                currentState >= 9 -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
-                currentState >= 4 -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
+                currentState >= buildLogicAppears -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
+                currentState >= buildSrcAppears -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
                 else -> "Making changes".annotate()
             }
 
             TitleScaffold(title) {
                 val tree = when {
-                    currentState >= 14 -> buildTree {
+                    currentState >= 15 -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
                             node("wtf-lib", buildLogicColor)
                         }
@@ -63,7 +67,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                             node("app1", appColor) { node(buildLogicApp) }
                         }
                     }
-                    currentState >= 13 -> buildTree {
+                    currentState >= 14 -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
                             node("wtf-lib", buildLogicColor)
                         }
@@ -76,7 +80,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                             node("app1", highlightColor) { node(buildLogicApp) }
                         }
                     }
-                    currentState >= 12 -> buildTree {
+                    currentState >= 13 -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
                             node("wtf-lib", buildLogicColor)
                         }
@@ -89,7 +93,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                             node("app1", appColor) { node(buildLogicApp) }
                         }
                     }
-                    currentState >= 11 -> buildTree {
+                    currentState >= 12 -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
                             node("wtf-lib", buildLogicColor)
                         }
@@ -102,7 +106,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                             node("app1", appColor) { node(buildLogicApp) }
                         }
                     }
-                    currentState >= 10 -> buildTree {
+                    currentState >= 11 -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
                             node("wtf-lib", buildLogicColor)
                         }
@@ -216,6 +220,20 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         ) {
                             createChildTransition {
                                 when {
+                                    it >= buildLogicAppears + 1 && node.value.startsWith("lib") -> buildAnnotatedString {
+                                        appendLine("plugins {")
+                                        append("    id(")
+                                        withColor(LocalCodeStyle.current.string.color) { append("\"wtf-lib\"") }
+                                        appendLine(")")
+                                        append("}")
+                                    }
+                                    it >= buildLogicAppears + 1 && node.value.startsWith("app") -> buildAnnotatedString {
+                                        appendLine("plugins {")
+                                        append("    id(")
+                                        withColor(LocalCodeStyle.current.string.color) { append("\"wtf-app\"") }
+                                        appendLine(")")
+                                        append("}")
+                                    }
                                     it >= 2 && node.value.startsWith("lib") -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         withColor(libColor) { appendLine("    `wtf-lib`") }
