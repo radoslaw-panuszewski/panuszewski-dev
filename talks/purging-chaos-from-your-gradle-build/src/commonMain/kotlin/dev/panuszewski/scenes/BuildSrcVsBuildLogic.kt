@@ -17,38 +17,164 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildTree
-import dev.panuszewski.template.extensions.toCode
+import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.withStateTransition
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
 import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.BuildSrcVsBuildLogic() {
     scene(100) {
+        val rootColor = MaterialTheme.colors.primary
+        val libColor = NICE_BLUE
+        val appColor = MaterialTheme.colors.secondary
+        val buildSrcColor = NICE_PINK
+        val buildLogicColor = NICE_GREEN
+        val highlightColor = NICE_ORANGE
+        val neutralColor = Color.Gray
+
         withStateTransition {
-            TitleScaffold("buildSrc vs build-logic") {
+            val title = when {
+                currentState >= 9 -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
+                currentState >= 4 -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
+                else -> "Making changes".annotate()
+            }
 
-                val rootColor = MaterialTheme.colors.primary
-                val libColor = NICE_BLUE
-                val appColor = MaterialTheme.colors.secondary
-                val buildSrcColor = NICE_GREEN
-                val highlightColor = NICE_ORANGE
-
+            TitleScaffold(title) {
                 val tree = when {
+                    currentState >= 14 -> buildTree {
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("wtf-lib", buildLogicColor)
+                        }
+                        val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                            node("wtf-app", buildLogicColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildLogicLib) }
+                            node("lib2", libColor) { node(buildLogicLib) }
+                            node("app1", appColor) { node(buildLogicApp) }
+                        }
+                    }
+                    currentState >= 13 -> buildTree {
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("wtf-lib", buildLogicColor)
+                        }
+                        val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
+                            node("wtf-app", highlightColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildLogicLib) }
+                            node("lib2", libColor) { node(buildLogicLib) }
+                            node("app1", highlightColor) { node(buildLogicApp) }
+                        }
+                    }
+                    currentState >= 12 -> buildTree {
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("wtf-lib", buildLogicColor)
+                        }
+                        val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
+                            node("wtf-app", highlightColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildLogicLib) }
+                            node("lib2", libColor) { node(buildLogicLib) }
+                            node("app1", appColor) { node(buildLogicApp) }
+                        }
+                    }
+                    currentState >= 11 -> buildTree {
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("wtf-lib", buildLogicColor)
+                        }
+                        val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                            node("wtf-app", highlightColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildLogicLib) }
+                            node("lib2", libColor) { node(buildLogicLib) }
+                            node("app1", appColor) { node(buildLogicApp) }
+                        }
+                    }
+                    currentState >= 10 -> buildTree {
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("wtf-lib", buildLogicColor)
+                        }
+                        val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                            node("wtf-app", buildLogicColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildLogicLib) }
+                            node("lib2", libColor) { node(buildLogicLib) }
+                            node("app1", appColor) { node(buildLogicApp) }
+                        }
+                    }
+                    currentState >= 9 -> buildTree {
+                        val buildLogic = reusableNode("build-logic", buildLogicColor) {
+                            node("wtf-lib", buildLogicColor)
+                            node("wtf-app", buildLogicColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildLogic) }
+                            node("lib2", libColor) { node(buildLogic) }
+                            node("app1", appColor) { node(buildLogic) }
+                        }
+                    }
+                    currentState >= 8 -> buildTree {
+                        val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                            node("wtf-lib", buildSrcColor)
+                            node("wtf-app", buildSrcColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildSrc) }
+                            node("lib2", libColor) { node(buildSrc) }
+                            node("app1", appColor) { node(buildSrc) }
+                        }
+                    }
+                    currentState >= 7 -> buildTree {
+                        val buildSrc = reusableNode("buildSrc", highlightColor) {
+                            node("wtf-lib", buildSrcColor)
+                            node("wtf-app", highlightColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", highlightColor) { node(buildSrc) }
+                            node("lib2", highlightColor) { node(buildSrc) }
+                            node("app1", highlightColor) { node(buildSrc) }
+                        }
+                    }
+                    currentState >= 6 -> buildTree {
+                        val buildSrc = reusableNode("buildSrc", highlightColor) {
+                            node("wtf-lib", buildSrcColor)
+                            node("wtf-app", highlightColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildSrc) }
+                            node("lib2", libColor) { node(buildSrc) }
+                            node("app1", appColor) { node(buildSrc) }
+                        }
+                    }
+                    currentState >= 5 -> buildTree {
+                        val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                            node("wtf-lib", buildSrcColor)
+                            node("wtf-app", highlightColor)
+                        }
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildSrc) }
+                            node("lib2", libColor) { node(buildSrc) }
+                            node("app1", appColor) { node(buildSrc) }
+                        }
+                    }
                     currentState >= 4 -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
                             node("wtf-lib", buildSrcColor)
                             node("wtf-app", buildSrcColor)
                         }
-
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
@@ -56,8 +182,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         }
                     }
                     currentState >= 3 -> buildTree {
-                        val wtfLib = reusableNode("wtf-lib", buildSrcColor)
-                        val wtfApp = reusableNode("wtf-app", buildSrcColor)
+                        val wtfLib = reusableNode("wtf-lib", neutralColor)
+                        val wtfApp = reusableNode("wtf-app", neutralColor)
 
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(wtfLib) }
