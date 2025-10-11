@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.EMPTY_SAMPLE
@@ -117,12 +118,8 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
                                         .background(LocalIdeColors.current.paneBackground)
                                 ) {
-                                    val text = panelState.createChildTransition {
+                                    panelState.createChildTransition {
                                         when {
-                                            it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
-                                                withColor(NICE_ORANGE) { append("lib") }
-                                                withColor(Color.White) { append(node.value.substringAfter("lib")) }
-                                            }
                                             it >= 7 && node.value.startsWith("lib") -> """
                                                 plugins {
                                                     `wtf-lib`
@@ -130,12 +127,15 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                 """
                                                 .trimIndent()
                                                 .toCode(language = Language.KotlinDsl)
+                                            it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
+                                                withColor(NICE_ORANGE) { append("lib") }
+                                                withColor(Color.White) { append(node.value.substringAfter("lib")) }
+                                            }
                                             else -> buildAnnotatedString {
                                                 withColor(Color.White) { append(node.value) }
                                             }
                                         }
-                                    } // .MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
-                                    Text(text = text.currentState, modifier = Modifier.padding(8.dp))
+                                    }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByWords() })
                                 }
                             }
                         }
