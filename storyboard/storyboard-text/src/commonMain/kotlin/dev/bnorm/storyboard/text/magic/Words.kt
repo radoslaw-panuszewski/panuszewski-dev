@@ -50,4 +50,4 @@ private fun AnnotatedString.split(): List<AnnotatedString> {
 }
 
 fun AnnotatedString.splitByChars(): List<AnnotatedString> =
-    text.toCharArray().map { AnnotatedString(it.toString()) }
+    indices.map { i -> subSequence(i, i + 1) }

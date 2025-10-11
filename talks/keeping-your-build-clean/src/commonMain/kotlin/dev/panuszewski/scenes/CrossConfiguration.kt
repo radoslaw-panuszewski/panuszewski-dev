@@ -135,7 +135,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                 withColor(Color.White) { append(node.value) }
                                             }
                                         }
-                                    }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByWords() })
+                                    }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
                                 }
                             }
                         }
