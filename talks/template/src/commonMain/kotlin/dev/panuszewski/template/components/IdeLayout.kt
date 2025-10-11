@@ -757,7 +757,7 @@ fun Transition<IdeState>.IdeLayout(
     val ideTopPadding by isTopPanelOpen.animateDp {
         if (it) {
             if (scope.topPanelAdaptive && topPanelHeight > 0) {
-                (topPanelHeight / 2).dp + 32.dp
+                (topPanelHeight / 2).dp
             } else {
                 260.dp
             }

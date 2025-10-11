@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.SceneScope
@@ -15,10 +16,10 @@ import dev.panuszewski.template.theme.code2
 import dev.panuszewski.template.theme.code3
 
 @Composable
-fun Text(content: @Composable AnnotatedString.Builder.() -> Unit) {
+fun Text(modifier: Modifier = Modifier, content: @Composable AnnotatedString.Builder.() -> Unit) {
     val builder = AnnotatedString.Builder()
     builder.content()
-    Text(builder.toAnnotatedString())
+    Text(text = builder.toAnnotatedString(), modifier = modifier)
 }
 
 @Composable

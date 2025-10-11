@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,18 +23,19 @@ import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
+import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
         "build.gradle.kts" to BUILD_GRADLE_KTS,
-        "first-library" to DIRECTORY.initiallyHidden(),
-        "first-library/build.gradle.kts" to FIRST_LIBRARY_BUILD_GRADLE_KTS.initiallyHidden(),
-        "second-library" to DIRECTORY.initiallyHidden(),
-        "second-library/build.gradle.kts" to SECOND_LIBRARY_BUILD_GRADLE_KTS.initiallyHidden(),
+        "lib1" to DIRECTORY.initiallyHidden(),
+        "lib2" to DIRECTORY.initiallyHidden(),
     )
 
     val totalStates = calculateTotalStates(files)
@@ -52,31 +52,40 @@ fun StoryboardBuilder.CrossConfiguration() {
 
                 ideState.IdeLayout {
                     adaptiveTopPanel("tree") { panelState ->
-                        Box(Modifier.height(150.dp)) {
-                            val primaryColor = MaterialTheme.colors.primary
-                            val secondaryColor = MaterialTheme.colors.secondary
+                        Box(Modifier.height(200.dp)) {
+                            val rootProjectColor = MaterialTheme.colors.primary
+                            val libraryColor = NICE_BLUE
+                            val appColor = MaterialTheme.colors.secondary
 
                             val tree = when {
+                                panelState.currentState >= 5 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("lib1", libraryColor)
+                                        node("lib2", libraryColor)
+                                        node("app1", appColor)
+                                        node("libre-office-installer", appColor)
+                                    }
+                                }
                                 panelState.currentState >= 4 -> buildTree {
-                                    node("root-project", primaryColor) {
-                                        node("first-library")
-                                        node("second-library")
-                                        node("app", NICE_ORANGE)
+                                    node("root-project", rootProjectColor) {
+                                        node("lib1", libraryColor)
+                                        node("lib2", libraryColor)
+                                        node("app1", appColor)
                                     }
                                 }
                                 panelState.currentState >= 3 -> buildTree {
-                                    node("root-project", primaryColor) {
-                                        node("first-library")
-                                        node("second-library")
+                                    node("root-project", rootProjectColor) {
+                                        node("lib1", libraryColor)
+                                        node("lib2", libraryColor)
                                     }
                                 }
                                 panelState.currentState >= 2 -> buildTree {
-                                    node("root-project", primaryColor) {
-                                        node("first-library")
+                                    node("root-project", rootProjectColor) {
+                                        node("lib1", libraryColor)
                                     }
                                 }
                                 panelState.currentState >= 1 -> buildTree {
-                                    node("root-project", primaryColor)
+                                    node("root-project", rootProjectColor)
                                 }
                                 else -> buildTree {}
                             }
@@ -84,10 +93,17 @@ fun StoryboardBuilder.CrossConfiguration() {
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(node.color ?: secondaryColor)
+                                        .background(node.color ?: Color.Unspecified)
                                 ) {
                                     ProvideTextStyle(TextStyle(color = Color.White)) {
-                                        Text(text = node.value, modifier = Modifier.padding(8.dp))
+                                        Text(Modifier.padding(8.dp)) {
+                                            if (panelState.currentState >= 5 && node.value.startsWith("lib")) {
+                                                withColor(NICE_ORANGE) { append("lib") }
+                                                append(node.value.substringAfter("lib"))
+                                            } else {
+                                                append(node.value)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -115,7 +131,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
 
     """
     ${subprojectsBlock}subprojects${subprojectsFilter}
-        .filter { it.name.endsWith("-library")${subprojectsFilter}${subprojectsForEach}
+        .filter { it.name.startsWith("lib")${subprojectsFilter}${subprojectsForEach}
         .forEach${subprojectsForEach} { ${javaLibrary}
         ${subprojectsIndent1}    it.${subprojectsIndent1}apply(plugin = "java-library")
     ${javaLibrary}${mavenPublish}    ${subprojectsIndent2}    it.${subprojectsIndent2}apply(plugin = "maven-publish")${publication}
@@ -141,22 +157,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .closePanel("tree")
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
         .then { unfocus() }
-}
-
-private val FIRST_LIBRARY_BUILD_GRADLE_KTS = buildCodeSamples {
-    """
-    
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.KotlinDsl)
-        .startWith { this }
-}
-
-private val SECOND_LIBRARY_BUILD_GRADLE_KTS = buildCodeSamples {
-    """
-        
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.KotlinDsl)
-        .startWith { this }
+        .openPanel("tree")
+        .pass()
+        .then { focus(subprojectsFilter) }
+        .then { unfocus().closePanel("tree") }
 }

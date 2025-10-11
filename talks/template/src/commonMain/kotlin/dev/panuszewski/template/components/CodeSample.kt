@@ -265,11 +265,11 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(OpenInRightPane(fileName, switchTo)))
     }
     
-    fun openNamedPanel(name: String): CodeSampleWithIdeOps {
+    fun openPanel(name: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(OpenNamedPanel(name)))
     }
     
-    fun closeNamedPanel(name: String): CodeSampleWithIdeOps {
+    fun closePanel(name: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(CloseNamedPanel(name)))
     }
 
@@ -475,10 +475,10 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     }
 
     fun List<CodeSample>.openAgenda(): List<CodeSample> =
-        then { openNamedPanel("agenda").hideFileTree() }
+        then { openPanel("agenda").hideFileTree() }
 
     fun List<CodeSample>.closeAgenda(): List<CodeSample> =
-        then { closeNamedPanel("agenda").showFileTree() }
+        then { closePanel("agenda").showFileTree() }
 
     fun List<CodeSample>.then(transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()

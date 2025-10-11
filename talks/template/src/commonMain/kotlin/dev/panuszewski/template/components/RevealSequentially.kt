@@ -63,7 +63,7 @@ class RevealSequentiallyScope(
     }
 
     fun annotatedStringItem(stateCount: Int = 1, content: @Composable AnnotatedString.Builder.() -> Unit) {
-        items.add(RevealedItem(stateCount) { Text(content) })
+        items.add(RevealedItem(stateCount) { Text(content = content) })
     }
 
     @Composable
