@@ -2,6 +2,7 @@ package dev.panuszewski
 
 import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
+import dev.panuszewski.scenes.BuildSrcVsBuildLogic
 import dev.panuszewski.scenes.CrossConfiguration
 import dev.panuszewski.scenes.Groovy
 import dev.panuszewski.scenes.ImperativeCode
@@ -30,7 +31,8 @@ val KeepingYourBuildClean = Storyboard.build(
 //    Groovy()
 //    NoTypeSafety()
 //    ImperativeCode()
-    CrossConfiguration()
+//    CrossConfiguration()
+    BuildSrcVsBuildLogic()
 }
 
 
