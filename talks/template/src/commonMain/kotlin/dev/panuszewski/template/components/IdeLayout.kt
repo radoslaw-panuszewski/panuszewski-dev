@@ -216,6 +216,7 @@ fun buildFileStateMapping(
         val changeTitleMarker = sample?.data as? ChangeTitle
         val renameFileMarker = sample?.data as? RenameSelectedFile
         val revealFileMarker = sample?.data as? RevealFile
+        val hideFileMarker = sample?.data as? HideFile
 
         if (chainedOps != null) {
             globalState++
@@ -291,6 +292,9 @@ fun buildFileStateMapping(
                     }
                     is RevealFile -> {
                         revealedFiles.add(operation.fileName)
+                    }
+                    is HideFile -> {
+                        revealedFiles.remove(operation.fileName)
                     }
                 }
             }
@@ -485,6 +489,14 @@ fun buildFileStateMapping(
             }
             mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap(), revealedFiles = revealedFiles.toSet()))
             fileStates[currentFile] = currentFileState + 1
+        } else if (hideFileMarker != null) {
+            globalState++
+            revealedFiles.remove(hideFileMarker.fileName)
+            for (panelName in openPanels) {
+                panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
+            }
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), title = currentTitle, fileRenames = fileRenames.toMap(), revealedFiles = revealedFiles.toSet()))
+            fileStates[currentFile] = currentFileState + 1
         } else {
             globalState++
             for (panelName in openPanels) {
@@ -617,7 +629,12 @@ fun Transition<Int>.buildIdeState(
             value is InitiallyHiddenFile -> {
                 val appearAtState = fileVisibilityMap[filePath] ?: return@mapNotNull null
                 val visibilityTransition = createChildTransition { globalState ->
-                    globalState >= appearAtState
+                    val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+                    val fileStateMap = mapping[clampedState]
+                    filePath in fileStateMap.revealedFiles ||
+                    fileStateMap.selectedFile == filePath ||
+                    fileStateMap.leftPaneFile == filePath ||
+                    fileStateMap.rightPaneFile == filePath
                 }
 
                 val keepVisible = remember { mutableStateOf(false) }
@@ -669,7 +686,9 @@ fun Transition<Int>.buildIdeState(
 
                 if (appearAtState != null) {
                     val visibilityTransition = createChildTransition { globalState ->
-                        globalState >= appearAtState
+                        val clampedState = globalState.coerceIn(0, mapping.lastIndex)
+                        val fileStateMap = mapping[clampedState]
+                        filePath in fileStateMap.revealedFiles
                     }
 
                     val keepVisible = remember { mutableStateOf(false) }

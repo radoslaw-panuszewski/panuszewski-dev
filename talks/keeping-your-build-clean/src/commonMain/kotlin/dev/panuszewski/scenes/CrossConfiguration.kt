@@ -53,7 +53,6 @@ fun StoryboardBuilder.CrossConfiguration() {
         "buildSrc" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin/wtf-lib.gradle.kts" to WTF_LIB_GRADLE_KTS.initiallyHidden(),
-        "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to EMPTY_SAMPLE.initiallyHidden(),
     )
 
     val totalStates = calculateTotalStates(files)
@@ -238,7 +237,7 @@ private val WTF_LIB_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(config) }
         .thenTogetherWith("build.gradle.kts") { hide(todo) }
-        .then { showFileTree().closeLeftPane() }
+        .then { showFileTree().closeLeftPane().hideFile("app1").hideFile("libre-office-installer") }
         .openPanel("tree")
         .pass(2)
         .closePanel("tree")

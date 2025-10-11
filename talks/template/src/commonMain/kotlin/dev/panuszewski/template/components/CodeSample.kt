@@ -248,6 +248,10 @@ class CodeSample private constructor(
     fun revealFile(fileName: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(RevealFile(fileName)))
     }
+
+    fun hideFile(fileName: String): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(HideFile(fileName)))
+    }
     
     fun showEmoji(emoji: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(ShowEmoji(emoji)))
@@ -327,6 +331,8 @@ object ShowFileTree
 
 data class RevealFile(val fileName: String)
 
+data class HideFile(val fileName: String)
+
 data class OpenErrorWindow(val text: String)
 
 object CloseErrorWindow
@@ -385,6 +391,11 @@ class CodeSampleWithIdeOps(
     
     fun revealFile(fileName: String): CodeSampleWithIdeOps {
         ideOperations.add(RevealFile(fileName))
+        return this
+    }
+
+    fun hideFile(fileName: String): CodeSampleWithIdeOps {
+        ideOperations.add(HideFile(fileName))
         return this
     }
     
@@ -486,7 +497,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is SwitchToFile, is ShowEmoji, is HideEmoji,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
-            is HideFileTree, is ShowFileTree, is RevealFile,
+            is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
@@ -510,7 +521,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is SwitchToFile, is ShowEmoji, is HideEmoji,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
-            is HideFileTree, is ShowFileTree, is RevealFile,
+            is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
@@ -569,6 +580,10 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(RevealFile(fileName))
     }
 
+    fun List<CodeSample>.hideFile(fileName: String): List<CodeSample> {
+        return this + last().attach(HideFile(fileName))
+    }
+
     fun List<CodeSample>.openErrorWindow(text: String): List<CodeSample> {
         return this + last().attach(OpenErrorWindow(text))
     }
@@ -623,6 +638,11 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
     
     fun revealFile(fileName: String): ChainableOperations {
         operations.add(RevealFile(fileName))
+        return this
+    }
+
+    fun hideFile(fileName: String): ChainableOperations {
+        operations.add(HideFile(fileName))
         return this
     }
     
