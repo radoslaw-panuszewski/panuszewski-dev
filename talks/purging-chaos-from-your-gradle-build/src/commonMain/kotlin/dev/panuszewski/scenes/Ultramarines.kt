@@ -10,10 +10,10 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
 import org.jetbrains.compose.resources.painterResource
-import talks.keeping_your_build_clean.generated.resources.Res
-import talks.keeping_your_build_clean.generated.resources.chaos
+import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
+import talks.purging_chaos_from_your_gradle_build.generated.resources.ultramarines
 
-fun StoryboardBuilder.Chaos() {
+fun StoryboardBuilder.Ultramarines() {
 
     scene(
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
@@ -23,7 +23,7 @@ fun StoryboardBuilder.Chaos() {
             Modifier
                 .fillMaxSize()
                 .paint(
-                    painter = painterResource(Res.drawable.chaos),
+                    painter = painterResource(Res.drawable.ultramarines),
                     contentScale = ContentScale.Crop
                 )
         )

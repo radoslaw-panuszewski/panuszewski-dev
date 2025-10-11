@@ -20,7 +20,7 @@ rootProject.name = "talks"
 include("kotlin-new-features")
 include("template")
 include("future-of-jvm-build-tools")
-include("keeping-your-build-clean")
+include("purging-chaos-from-your-gradle-build")
 includeBuild("../storyboard")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
