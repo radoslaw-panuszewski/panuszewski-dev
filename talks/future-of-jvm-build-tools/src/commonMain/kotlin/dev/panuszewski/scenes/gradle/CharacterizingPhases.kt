@@ -4,11 +4,11 @@ import androidx.compose.animation.core.createChildTransition
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.scenes.gradle.GradlePhase.*
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 
 fun StoryboardBuilder.CharacterizingPhases() {
     scene(6) {
-        withStateTransition {
+        withIntTransition {
             TitleScaffold("Gradle") {
                 PhasesBar(
                     phasesBarVisible = createChildTransition { it >= 1 },

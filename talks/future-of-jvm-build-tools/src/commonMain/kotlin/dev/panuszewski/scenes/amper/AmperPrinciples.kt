@@ -16,11 +16,11 @@ import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.theme.withPrimaryColor
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 
 fun StoryboardBuilder.AmperPrinciples() {
     scene(stateCount = 5) {
-        withStateTransition {
+        withIntTransition {
             TitleScaffold("Amper Principles") {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     Column(

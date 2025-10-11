@@ -24,7 +24,7 @@ import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.subsequentNumbers
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
@@ -64,7 +64,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withStateTransition {
+        withIntTransition {
             val title = when {
                 currentState >= buildLogicAppears -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildSrcAppears -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }

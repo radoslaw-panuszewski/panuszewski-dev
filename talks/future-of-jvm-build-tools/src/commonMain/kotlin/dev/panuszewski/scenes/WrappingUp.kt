@@ -13,14 +13,14 @@ import dev.panuszewski.template.theme.appendWithColor
 import dev.panuszewski.template.theme.appendWithPrimaryColor
 import dev.panuszewski.template.theme.appendWithSecondaryColor
 import dev.panuszewski.template.theme.appendWithSecondaryVariantColor
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 
 fun StoryboardBuilder.WrappingUp() {
     scene(
         stateCount = 7,
         exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
-        withStateTransition {
+        withIntTransition {
             TitleScaffold("Wrapping up!") {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(32.dp),

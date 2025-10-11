@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
-import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IDE
 import dev.panuszewski.template.components.IdeState
@@ -22,13 +21,12 @@ import dev.panuszewski.template.components.RevealedItem
 import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.extensions.ComposableLambda
 import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.sortedMapOf
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
 
 fun StoryboardBuilder.WhyBother() {
@@ -55,7 +53,7 @@ fun StoryboardBuilder.WhyBother() {
         stateCount = ideBackToNormal + 1,
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
     ) {
-        withStateTransition {
+        withIntTransition {
             BUILD_GRADLE_KTS.precompose()
 
             SlidingTitleScaffold("Why bother?") {

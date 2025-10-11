@@ -18,7 +18,7 @@ import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 
 fun StoryboardBuilder.Groovy() {
 
@@ -29,7 +29,7 @@ fun StoryboardBuilder.Groovy() {
     val totalStates = calculateTotalStates(files)
 
     scene(totalStates) {
-        withStateTransition {
+        withIntTransition {
             BUILD_GRADLE_KTS.precompose()
 
             val ideState = buildIdeState(initialTitle = "Groovy", files = files)

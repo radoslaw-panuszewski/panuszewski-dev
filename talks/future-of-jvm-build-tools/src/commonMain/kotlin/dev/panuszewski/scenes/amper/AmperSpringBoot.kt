@@ -25,7 +25,7 @@ import dev.panuszewski.template.extensions.precompose
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 import kotlin.math.max
 
 fun StoryboardBuilder.AmperSpringBoot() {
@@ -66,7 +66,7 @@ fun StoryboardBuilder.AmperSpringBoot() {
         MAIN_KT.precompose()
         EXAMPLE_TEST_KT.precompose()
 
-        withStateTransition {
+        withIntTransition {
             val ideTopPadding by animateDp { if (it >= ideShrinks) 281.dp else 0.dp }
 
             TitleScaffold("Amper + Spring Boot") {

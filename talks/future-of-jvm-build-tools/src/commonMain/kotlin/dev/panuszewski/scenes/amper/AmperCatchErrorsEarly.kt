@@ -36,7 +36,7 @@ import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 import talks.future_of_jvm_build_tools.generated.resources.Res
 import talks.future_of_jvm_build_tools.generated.resources.amper_catching_errors
 
@@ -49,7 +49,7 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
     val finalState = warningDisappears
 
     scene((initialState..finalState).toList()) {
-        withStateTransition {
+        withIntTransition {
             val ideTopPadding by animateDp { if (it >= ideExpands) 0.dp else 281.dp }
             val warningHeight by animateDp { if (it == warningEnlarged) 225.dp else 150.dp }
             val warningXOffset by animateDp { if (it == warningEnlarged) 0.dp else 165.dp }

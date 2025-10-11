@@ -20,7 +20,7 @@ import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.typesafe_conventions
 
@@ -37,7 +37,7 @@ fun StoryboardBuilder.ImperativeCode() {
     val totalStates = calculateTotalStates(files)
 
     scene(totalStates) {
-        withStateTransition {
+        withIntTransition {
             TitleScaffold("Imperative code") {
                 val ideState = buildIdeState(files)
 

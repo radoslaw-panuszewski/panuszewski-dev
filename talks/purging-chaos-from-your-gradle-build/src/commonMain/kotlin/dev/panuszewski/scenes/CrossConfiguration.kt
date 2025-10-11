@@ -17,9 +17,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
+import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.DIRECTORY
@@ -32,10 +34,10 @@ import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
-import dev.panuszewski.template.extensions.withStateTransition
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_ORANGE
@@ -58,15 +60,16 @@ fun StoryboardBuilder.CrossConfiguration() {
     val totalStates = calculateTotalStates(files)
 
     scene(totalStates) {
-        withStateTransition {
+        val intTransition = transition.createChildTransition { it.toState() }
 
-            val ideState = buildIdeState(
-                files = files,
-                initialTitle = "Cross configuration"
-            )
+        val ideState = intTransition.buildIdeState(
+            files = files,
+            initialTitle = "Cross configuration"
+        )
 
-            TitleScaffold(ideState.currentState.title) {
+        TitleScaffold(ideState.currentState.title) {
 
+            transition.SlideFromBottomAnimatedVisibility({ it is Frame.State<*> }) {
                 ideState.IdeLayout {
                     adaptiveTopPanel("tree") { panelState ->
                         Box(Modifier.height(200.dp)) {

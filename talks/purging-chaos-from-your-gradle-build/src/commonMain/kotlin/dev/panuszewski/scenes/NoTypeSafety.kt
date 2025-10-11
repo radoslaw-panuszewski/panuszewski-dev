@@ -12,7 +12,7 @@ import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.extensions.withIntTransition
 
 fun StoryboardBuilder.NoTypeSafety() {
 
@@ -25,7 +25,7 @@ fun StoryboardBuilder.NoTypeSafety() {
     val totalStates = calculateTotalStates(files)
 
     scene(totalStates) {
-        withStateTransition {
+        withIntTransition {
             TitleScaffold("No type safety") {
                 val ideState = buildIdeState(files)
 
