@@ -577,7 +577,7 @@ fun Transition<Int>.buildIdeState(
         visibilityMap
     }
 
-    val directoryVisibilityMap = remember(fileVisibilityMap, files) {
+    val directoryVisibilityMap = remember(fileVisibilityMap, files, mapping) {
         val dirMap = mutableMapOf<String, Int>()
         val hiddenDirectories = files
             .filter { (_, value) -> value is Directory && value.isInitiallyHidden }
@@ -596,6 +596,17 @@ fun Transition<Int>.buildIdeState(
                 currentPath = parentPath
             }
         }
+
+        for ((index, fileMapping) in mapping.withIndex()) {
+            for (revealedFile in fileMapping.revealedFiles) {
+                if (revealedFile in hiddenDirectories) {
+                    if (revealedFile !in dirMap || index < dirMap[revealedFile]!!) {
+                        dirMap[revealedFile] = index
+                    }
+                }
+            }
+        }
+
         dirMap
     }
 
@@ -693,6 +704,8 @@ fun Transition<Int>.buildIdeState(
                         isDirectory = true,
                         visibilityTransition = delayedVisibilityTransition
                     )
+                } else if (value.isInitiallyHidden) {
+                    return@mapNotNull null
                 } else {
                     ProjectFile(
                         name = filePath.substringAfterLast('/'),

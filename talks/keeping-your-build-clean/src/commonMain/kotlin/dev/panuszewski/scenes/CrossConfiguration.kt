@@ -36,6 +36,8 @@ fun StoryboardBuilder.CrossConfiguration() {
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "lib1" to DIRECTORY.initiallyHidden(),
         "lib2" to DIRECTORY.initiallyHidden(),
+        "app1" to DIRECTORY.initiallyHidden(),
+        "libre-office-installer" to DIRECTORY.initiallyHidden(),
     )
 
     val totalStates = calculateTotalStates(files)
@@ -146,19 +148,20 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(subprojectsBlock, javaLibrary, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
-        .pass(3)
+        .pass()
+        .revealFile("lib1")
+        .revealFile("lib2")
         .closePanel("tree")
         .then { reveal(subprojectsBlock) }
         .then { reveal(javaLibrary) }
         .then { reveal(mavenPublish) }
         .then { reveal(publication) }
         .openPanel("tree")
-        .pass()
+        .revealFile("app1")
         .closePanel("tree")
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
-        .then { unfocus() }
-        .openPanel("tree")
-        .pass()
+        .then { unfocus().openPanel("tree") }
+        .revealFile("libre-office-installer")
         .then { focus(subprojectsFilter) }
         .then { unfocus().closePanel("tree") }
 }
