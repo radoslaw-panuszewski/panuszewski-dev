@@ -166,10 +166,21 @@ data class FileStateMapping(
     val revealedFiles: Set<String> = emptySet()
 )
 
+private fun getAllParentPaths(path: String): List<String> {
+    val parents = mutableListOf<String>()
+    var currentPath = path
+    while (currentPath.contains('/')) {
+        currentPath = currentPath.substringBeforeLast('/')
+        parents.add(currentPath)
+    }
+    return parents
+}
+
 fun buildFileStateMapping(
     initialFile: String,
     allCodeSamples: Map<String, List<CodeSample>>,
     title: String?,
+    initiallyHiddenDirectories: Set<String> = emptySet()
 ): List<FileStateMapping> {
     val mappings = mutableListOf<FileStateMapping>()
     var currentFile = initialFile
@@ -253,6 +264,11 @@ fun buildFileStateMapping(
                         if (leftPaneFile !in fileStates) {
                             fileStates[leftPaneFile!!] = 0
                         }
+                        getAllParentPaths(operation.fileName).forEach { parentPath ->
+                            if (parentPath in initiallyHiddenDirectories) {
+                                revealedFiles.add(parentPath)
+                            }
+                        }
                         if (operation.switchTo) {
                             currentFile = operation.fileName
                         }
@@ -262,6 +278,11 @@ fun buildFileStateMapping(
                         rightPaneFile = operation.fileName
                         if (rightPaneFile !in fileStates) {
                             fileStates[rightPaneFile!!] = 0
+                        }
+                        getAllParentPaths(operation.fileName).forEach { parentPath ->
+                            if (parentPath in initiallyHiddenDirectories) {
+                                revealedFiles.add(parentPath)
+                            }
                         }
                         if (operation.switchTo) {
                             currentFile = operation.fileName
@@ -292,9 +313,22 @@ fun buildFileStateMapping(
                     }
                     is RevealFile -> {
                         revealedFiles.add(operation.fileName)
+                        getAllParentPaths(operation.fileName).forEach { parentPath ->
+                            if (parentPath in initiallyHiddenDirectories) {
+                                revealedFiles.add(parentPath)
+                            }
+                        }
                     }
                     is HideFile -> {
                         revealedFiles.remove(operation.fileName)
+                        getAllParentPaths(operation.fileName).forEach { parentPath ->
+                            if (parentPath in initiallyHiddenDirectories) {
+                                val hasOtherVisibleChildren = revealedFiles.any { it != operation.fileName && it.startsWith("$parentPath/") }
+                                if (!hasOtherVisibleChildren) {
+                                    revealedFiles.remove(parentPath)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -359,6 +393,11 @@ fun buildFileStateMapping(
             if (leftPaneFile !in fileStates) {
                 fileStates[leftPaneFile!!] = 0
             }
+            getAllParentPaths(openLeftMarker.fileName).forEach { parentPath ->
+                if (parentPath in initiallyHiddenDirectories) {
+                    revealedFiles.add(parentPath)
+                }
+            }
             if (openLeftMarker.switchTo) {
                 currentFile = openLeftMarker.fileName
             }
@@ -373,6 +412,11 @@ fun buildFileStateMapping(
             rightPaneFile = openRightMarker.fileName
             if (rightPaneFile !in fileStates) {
                 fileStates[rightPaneFile!!] = 0
+            }
+            getAllParentPaths(openRightMarker.fileName).forEach { parentPath ->
+                if (parentPath in initiallyHiddenDirectories) {
+                    revealedFiles.add(parentPath)
+                }
             }
             if (openRightMarker.switchTo) {
                 currentFile = openRightMarker.fileName
@@ -484,6 +528,11 @@ fun buildFileStateMapping(
         } else if (revealFileMarker != null) {
             globalState++
             revealedFiles.add(revealFileMarker.fileName)
+            getAllParentPaths(revealFileMarker.fileName).forEach { parentPath ->
+                if (parentPath in initiallyHiddenDirectories) {
+                    revealedFiles.add(parentPath)
+                }
+            }
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
@@ -492,6 +541,14 @@ fun buildFileStateMapping(
         } else if (hideFileMarker != null) {
             globalState++
             revealedFiles.remove(hideFileMarker.fileName)
+            getAllParentPaths(hideFileMarker.fileName).forEach { parentPath ->
+                if (parentPath in initiallyHiddenDirectories) {
+                    val hasOtherVisibleChildren = revealedFiles.any { it != hideFileMarker.fileName && it.startsWith("$parentPath/") }
+                    if (!hasOtherVisibleChildren) {
+                        revealedFiles.remove(parentPath)
+                    }
+                }
+            }
             for (panelName in openPanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }
@@ -548,6 +605,11 @@ fun Transition<Int>.buildIdeState(
             if (value is InitiallyHiddenFile) path to value.codeSamples else null
         }
         .toMap()
+    
+    val initiallyHiddenDirectories = files
+        .filter { (_, value) -> value is Directory && value.isInitiallyHidden }
+        .map { (path, _) -> path }
+        .toSet()
 
     val allCodeSamples = files
         .mapNotNull { (path, value) ->
@@ -560,8 +622,8 @@ fun Transition<Int>.buildIdeState(
         }
         .toMap()
 
-    val mapping = remember(allCodeSamples) {
-        buildFileStateMapping(primaryFilePath, allCodeSamples, initialTitle)
+    val mapping = remember(allCodeSamples, initiallyHiddenDirectories) {
+        buildFileStateMapping(primaryFilePath, allCodeSamples, initialTitle, initiallyHiddenDirectories)
     }
 
     val fileVisibilityMap = remember(initiallyHiddenFilesMap, mapping) {
@@ -617,6 +679,17 @@ fun Transition<Int>.buildIdeState(
                     if (revealedFile !in dirMap || index < dirMap[revealedFile]!!) {
                         dirMap[revealedFile] = index
                     }
+                }
+                
+                var currentPath = revealedFile
+                while (currentPath.contains('/')) {
+                    val parentPath = currentPath.substringBeforeLast('/')
+                    if (parentPath in hiddenDirectories) {
+                        if (parentPath !in dirMap || index < dirMap[parentPath]!!) {
+                            dirMap[parentPath] = index
+                        }
+                    }
+                    currentPath = parentPath
                 }
             }
         }
@@ -688,7 +761,18 @@ fun Transition<Int>.buildIdeState(
                     val visibilityTransition = createChildTransition { globalState ->
                         val clampedState = globalState.coerceIn(0, mapping.lastIndex)
                         val fileStateMap = mapping[clampedState]
-                        filePath in fileStateMap.revealedFiles
+                        
+                        val isExplicitlyRevealed = filePath in fileStateMap.revealedFiles
+                        
+                        val hasVisibleDescendant = listOfNotNull(
+                            fileStateMap.selectedFile,
+                            fileStateMap.leftPaneFile,
+                            fileStateMap.rightPaneFile
+                        ).plus(fileStateMap.revealedFiles).any { visiblePath ->
+                            visiblePath.startsWith("$filePath/")
+                        }
+                        
+                        isExplicitlyRevealed || hasVisibleDescendant
                     }
 
                     val keepVisible = remember { mutableStateOf(false) }
