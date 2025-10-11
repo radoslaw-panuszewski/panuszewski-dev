@@ -27,6 +27,7 @@ import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withStateTransition
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
+import dev.panuszewski.template.theme.NICE_GREEN
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.withColor
 
@@ -38,10 +39,11 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                 val rootColor = MaterialTheme.colors.primary
                 val libColor = NICE_BLUE
                 val appColor = MaterialTheme.colors.secondary
-                val buildSrcColor = NICE_ORANGE
+                val buildSrcColor = NICE_GREEN
+                val highlightColor = NICE_ORANGE
 
                 val tree = when {
-                    currentState >= 5 -> buildTree {
+                    currentState >= 4 -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
                             node("wtf-lib", buildSrcColor)
                             node("wtf-app", buildSrcColor)
@@ -53,7 +55,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                             node("app1", appColor) { node(buildSrc) }
                         }
                     }
-                    currentState >= 4 -> buildTree {
+                    currentState >= 3 -> buildTree {
                         val wtfLib = reusableNode("wtf-lib", buildSrcColor)
                         val wtfApp = reusableNode("wtf-app", buildSrcColor)
 
@@ -88,20 +90,16 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         ) {
                             createChildTransition {
                                 when {
-                                    it == 2 && node.value.startsWith("lib") -> """
-                                        plugins {
-                                            `wtf-lib`
-                                        }
-                                        """
-                                        .trimIndent()
-                                        .toCode(language = Language.KotlinDsl)
-                                    it == 2 && node.value.startsWith("app") -> """
-                                        plugins {
-                                            `wtf-app`
-                                        }
-                                        """
-                                        .trimIndent()
-                                        .toCode(language = Language.KotlinDsl)
+                                    it >= 2 && node.value.startsWith("lib") -> buildAnnotatedString {
+                                        appendLine("plugins {")
+                                        withColor(libColor) { appendLine("    `wtf-lib`") }
+                                        append("}")
+                                    }
+                                    it >= 2 && node.value.startsWith("app") -> buildAnnotatedString {
+                                        appendLine("plugins {")
+                                        withColor(appColor) { appendLine("    `wtf-app`") }
+                                        append("}")
+                                    }
                                     else -> buildAnnotatedString {
                                         withColor(Color.White) { append(node.value) }
                                     }
