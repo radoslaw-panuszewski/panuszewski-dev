@@ -67,6 +67,7 @@ fun <T : Any> AnimatedHorizontalTree(
                     Connection(
                         parentRect = parentRect.translate(offset),
                         childRect = childRect.translate(offset),
+                        color = Color.Gray,
                         modifier = Modifier.sharedElement(
                             rememberSharedContentState("$parent-$child"),
                             animatedVisibilityScope = this@AnimatedContent

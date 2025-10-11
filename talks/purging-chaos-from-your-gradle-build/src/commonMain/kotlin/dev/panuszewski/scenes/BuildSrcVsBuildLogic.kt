@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,30 +35,43 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
         withStateTransition {
             TitleScaffold("buildSrc vs build-logic") {
 
-                val buildSrcColor = MaterialTheme.colors.primary
+                val rootColor = MaterialTheme.colors.primary
                 val libColor = NICE_BLUE
                 val appColor = MaterialTheme.colors.secondary
+                val buildSrcColor = NICE_ORANGE
 
                 val tree = when {
-                    currentState >= 2 -> buildTree {
-                        node("buildSrc", buildSrcColor) {
-                            node("wtf-lib", libColor) {
-                                node("lib1", libColor)
-                                node("lib2", libColor)
-                            }
-                            node("wtf-app", appColor) {
-                                node("app1", appColor)
-                            }
+                    currentState >= 5 -> buildTree {
+                        val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                            node("wtf-lib", buildSrcColor)
+                            node("wtf-app", buildSrcColor)
+                        }
+
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(buildSrc) }
+                            node("lib2", libColor) { node(buildSrc) }
+                            node("app1", appColor) { node(buildSrc) }
+                        }
+                    }
+                    currentState >= 4 -> buildTree {
+                        val wtfLib = reusableNode("wtf-lib", buildSrcColor)
+                        val wtfApp = reusableNode("wtf-app", buildSrcColor)
+
+                        node("root-project", rootColor) {
+                            node("lib1", libColor) { node(wtfLib) }
+                            node("lib2", libColor) { node(wtfLib) }
+                            node("app1", appColor) { node(wtfApp) }
                         }
                     }
                     currentState >= 1 -> buildTree {
-                        node("buildSrc", buildSrcColor) {
-                            node("wtf-lib", libColor)
-                            node("wtf-app", appColor)
+                        node("root-project", rootColor) {
+                            node("lib1", libColor)
+                            node("lib2", libColor)
+                            node("app1", appColor)
                         }
                     }
                     else -> buildTree {
-                        node("buildSrc", buildSrcColor)
+                        node("root-project", rootColor)
                     }
                 }
 
@@ -76,14 +88,14 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         ) {
                             createChildTransition {
                                 when {
-                                    it == 3 && node.value.startsWith("lib") -> """
+                                    it == 2 && node.value.startsWith("lib") -> """
                                         plugins {
                                             `wtf-lib`
                                         }
                                         """
                                         .trimIndent()
                                         .toCode(language = Language.KotlinDsl)
-                                    it == 3 && node.value.startsWith("app") -> """
+                                    it == 2 && node.value.startsWith("app") -> """
                                         plugins {
                                             `wtf-app`
                                         }
