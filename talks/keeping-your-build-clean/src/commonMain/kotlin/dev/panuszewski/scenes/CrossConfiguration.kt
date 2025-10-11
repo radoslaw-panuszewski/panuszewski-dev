@@ -2,6 +2,7 @@ package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -26,6 +27,7 @@ import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.theme.NICE_ORANGE
 
 fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
@@ -49,42 +51,44 @@ fun StoryboardBuilder.CrossConfiguration() {
             TitleScaffold(ideState.currentState.title) {
 
                 ideState.IdeLayout {
-                    topPanel("tree") { panelState ->
-                        val primaryColor = MaterialTheme.colors.primary
-                        val secondaryColor = MaterialTheme.colors.secondary
+                    adaptiveTopPanel("tree") { panelState ->
+                        Box(Modifier.height(150.dp)) {
+                            val primaryColor = MaterialTheme.colors.primary
+                            val secondaryColor = MaterialTheme.colors.secondary
 
-                        val tree = when {
-                            panelState.currentState >= 4 -> buildTree {
-                                node("root-project", primaryColor) {
-                                    node("library-1")
-                                    node("library-2")
-                                    node("app")
+                            val tree = when {
+                                panelState.currentState >= 4 -> buildTree {
+                                    node("root-project", primaryColor) {
+                                        node("first-library")
+                                        node("second-library")
+                                        node("app", NICE_ORANGE)
+                                    }
                                 }
-                            }
-                            panelState.currentState >= 3 -> buildTree {
-                                node("root-project", primaryColor) {
-                                    node("library-1")
-                                    node("library-2")
+                                panelState.currentState >= 3 -> buildTree {
+                                    node("root-project", primaryColor) {
+                                        node("first-library")
+                                        node("second-library")
+                                    }
                                 }
-                            }
-                            panelState.currentState >= 2 -> buildTree {
-                                node("root-project", primaryColor) {
-                                    node("library-1")
+                                panelState.currentState >= 2 -> buildTree {
+                                    node("root-project", primaryColor) {
+                                        node("first-library")
+                                    }
                                 }
+                                panelState.currentState >= 1 -> buildTree {
+                                    node("root-project", primaryColor)
+                                }
+                                else -> buildTree {}
                             }
-                            panelState.currentState >= 1 -> buildTree {
-                                node("root-project", primaryColor)
-                            }
-                            else -> buildTree {}
-                        }
-                        AnimatedHorizontalTree(tree) { node ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(node.color ?: MaterialTheme.colors.secondary)
-                            ) {
-                                ProvideTextStyle(TextStyle(color = Color.White)) {
-                                    Text(text = node.value, modifier = Modifier.padding(8.dp))
+                            AnimatedHorizontalTree(tree) { node ->
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(node.color ?: secondaryColor)
+                                ) {
+                                    ProvideTextStyle(TextStyle(color = Color.White)) {
+                                        Text(text = node.value, modifier = Modifier.padding(8.dp))
+                                    }
                                 }
                             }
                         }
@@ -96,33 +100,47 @@ fun StoryboardBuilder.CrossConfiguration() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
-    val pluginsBlock by tag()
     val subprojectsBlock by tag()
     val javaLibrary by tag()
-    val kotlinJvmBlock by tag()
+    val mavenPublish by tag()
+    val publication by tag()
+    val subprojectsFilter by tag()
+    val subprojectsForEach by tag()
+    val subprojectsIndent1 by tag()
+    val subprojectsIndent2 by tag()
+    val subprojectsIndent3 by tag()
+    val subprojectsIndent4 by tag()
+    val subprojectsIndent5 by tag()
+    val subprojectsClosingBrace by tag()
 
     """
-    ${pluginsBlock}plugins {
-        alias(libs.plugins.kotlin.jvm)
-    }
-        
-    ${pluginsBlock}${subprojectsBlock}subprojects { ${javaLibrary}
-        apply(plugin = "java-library")
-    ${javaLibrary}${kotlinJvmBlock}    apply(plugin = libs.plugins.kotlin.jvm.get().pluginId)
-    ${kotlinJvmBlock}}${subprojectsBlock}
+    ${subprojectsBlock}subprojects${subprojectsFilter}
+        .filter { it.name.endsWith("-library")${subprojectsFilter}${subprojectsForEach}
+        .forEach${subprojectsForEach} { ${javaLibrary}
+        ${subprojectsIndent1}    it.${subprojectsIndent1}apply(plugin = "java-library")
+    ${javaLibrary}${mavenPublish}    ${subprojectsIndent2}    it.${subprojectsIndent2}apply(plugin = "maven-publish")${publication}
+    
+        ${subprojectsIndent3}    ${subprojectsIndent3}publishing.publications.create<MavenPublication>("library") {
+        ${subprojectsIndent4}    ${subprojectsIndent4}    from(components["java"])
+        ${subprojectsIndent5}    ${subprojectsIndent5}}${publication}${subprojectsClosingBrace}
+        }${subprojectsClosingBrace}
+    ${mavenPublish}}${subprojectsBlock}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(pluginsBlock, subprojectsBlock, javaLibrary, kotlinJvmBlock) }
+        .startWith { hide(subprojectsBlock, javaLibrary, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
         .pass(3)
         .closePanel("tree")
         .then { reveal(subprojectsBlock) }
         .then { reveal(javaLibrary) }
-        .then { reveal(kotlinJvmBlock).reveal(pluginsBlock) }
+        .then { reveal(mavenPublish) }
+        .then { reveal(publication) }
         .openPanel("tree")
         .pass()
         .closePanel("tree")
+        .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
+        .then { unfocus() }
 }
 
 private val FIRST_LIBRARY_BUILD_GRADLE_KTS = buildCodeSamples {
