@@ -1,5 +1,7 @@
 package dev.panuszewski.template.theme
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Typography
@@ -8,6 +10,8 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString.Builder
 import androidx.compose.ui.text.SpanStyle
@@ -17,6 +21,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.SceneDecorator
 import dev.panuszewski.template.extensions.JetBrainsMono
+import org.jetbrains.compose.resources.painterResource
 
 val NICE_ORANGE = Color(0xFFFF8A04)
 val NICE_BLUE = Color(0xFF0A7CFA)

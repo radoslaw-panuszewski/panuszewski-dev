@@ -109,7 +109,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openPanel("groovy")
         .pass(3)
         .closePanel("groovy")
-        .then { underline(groovy).focus(nothing).showEmoji("🤢") }
+        .then { underline(groovy).focus(nothing) }
+        .showEmoji("🤢")
         .then {
             this
                 .unfocus()

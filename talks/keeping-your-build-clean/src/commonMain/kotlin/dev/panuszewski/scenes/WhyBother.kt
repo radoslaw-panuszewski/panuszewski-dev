@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
+import dev.bnorm.storyboard.easel.template.SceneEnter
+import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IDE
 import dev.panuszewski.template.components.IdeState
@@ -48,7 +51,10 @@ fun StoryboardBuilder.WhyBother() {
     ) =
         subsequentNumbers(since = bulletpointsAppear)
 
-    scene(stateCount = ideBackToNormal + 1) {
+    scene(
+        stateCount = ideBackToNormal + 1,
+        enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
+    ) {
         withStateTransition {
             BUILD_GRADLE_KTS.precompose()
 
