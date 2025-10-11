@@ -1,14 +1,18 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -118,24 +122,29 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
                                         .background(LocalIdeColors.current.paneBackground)
                                 ) {
-                                    panelState.createChildTransition {
-                                        when {
-                                            it >= 7 && node.value.startsWith("lib") -> """
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                    ) {
+                                        panelState.createChildTransition {
+                                            when {
+                                                it >= 7 && node.value.startsWith("lib") -> """
                                                 plugins {
                                                     `wtf-lib`
                                                 }
                                                 """
-                                                .trimIndent()
-                                                .toCode(language = Language.KotlinDsl)
-                                            it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
-                                                withColor(NICE_ORANGE) { append("lib") }
-                                                withColor(Color.White) { append(node.value.substringAfter("lib")) }
+                                                    .trimIndent()
+                                                    .toCode(language = Language.KotlinDsl)
+                                                it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
+                                                    withColor(NICE_ORANGE) { append("lib") }
+                                                    withColor(Color.White) { append(node.value.substringAfter("lib")) }
+                                                }
+                                                else -> buildAnnotatedString {
+                                                    withColor(Color.White) { append(node.value) }
+                                                }
                                             }
-                                            else -> buildAnnotatedString {
-                                                withColor(Color.White) { append(node.value) }
-                                            }
-                                        }
-                                    }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                        }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                    }
                                 }
                             }
                         }
