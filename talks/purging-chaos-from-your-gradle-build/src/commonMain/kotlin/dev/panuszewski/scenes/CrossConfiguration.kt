@@ -237,9 +237,9 @@ private val WTF_LIB_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(config) }
         .thenTogetherWith("build.gradle.kts") { hide(todo) }
-        .then { showFileTree().closeLeftPane().hideFile("app1").hideFile("libre-office-installer") }
+        .then { showFileTree().closeLeftPane().hideFile("app1").hideFile("libre-office-installer").resumePanel("tree") }
         .openPanel("tree")
-        .pass(2)
+        .pass()
         .closePanel("tree")
         .openAgenda()
         .pass()

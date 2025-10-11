@@ -277,6 +277,14 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(CloseNamedPanel(name)))
     }
 
+    fun pausePanel(name: String): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(PauseNamedPanel(name)))
+    }
+
+    fun resumePanel(name: String): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ResumeNamedPanel(name)))
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -316,6 +324,10 @@ object HideEmoji
 data class OpenNamedPanel(val name: String)
 
 data class CloseNamedPanel(val name: String)
+
+data class PauseNamedPanel(val name: String)
+
+data class ResumeNamedPanel(val name: String)
 
 data class OpenInLeftPane(val fileName: String, val switchTo: Boolean)
 
@@ -428,6 +440,16 @@ class CodeSampleWithIdeOps(
         ideOperations.add(CloseNamedPanel(name))
         return this
     }
+
+    fun pausePanel(name: String): CodeSampleWithIdeOps {
+        ideOperations.add(PauseNamedPanel(name))
+        return this
+    }
+
+    fun resumePanel(name: String): CodeSampleWithIdeOps {
+        ideOperations.add(ResumeNamedPanel(name))
+        return this
+    }
 }
 
 data class InitiallyHiddenFile(val codeSamples: List<CodeSample>)
@@ -500,12 +522,13 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
+            is PauseNamedPanel, is ResumeNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
             is ChangeTitle, is RenameSelectedFile -> lastSample.attach(null)
             else -> lastSample
         }
-        val result = transformer(cleanedSample)
-        return when (result) {
+
+        return when (val result = transformer(cleanedSample)) {
             is CodeSampleWithIdeOps -> {
                 val sampleWithChainedOps = result.codeSample.attach(ChainedOperations(result.ideOperations))
                 this + sampleWithChainedOps
@@ -515,7 +538,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         }
     }
 
-    fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> CodeSample): List<CodeSample> {
+    fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()
         val cleanedSample = when (lastSample.data) {
             is SwitchToFile, is ShowEmoji, is HideEmoji,
@@ -524,12 +547,21 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
+            is PauseNamedPanel, is ResumeNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
             is ChangeTitle, is RenameSelectedFile -> lastSample.attach(null)
             else -> lastSample
         }
         val markerSample = cleanedSample.attach(AdvanceTogetherWith(fileName))
-        return this + transformer(markerSample)
+
+        return when (val result = transformer(markerSample)) {
+            is CodeSampleWithIdeOps -> {
+                val sampleWithChainedOps = result.codeSample.attach(ChainedOperations(result.ideOperations))
+                this + sampleWithChainedOps
+            }
+            is CodeSample -> this + result
+            else -> throw IllegalArgumentException("Transformer must return CodeSample or CodeSampleWithIdeOps")
+        }
     }
 
     fun List<CodeSample>.switchTo(fileName: String): List<CodeSample> {
@@ -550,6 +582,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.closePanel(name: String): List<CodeSample> {
         return this + last().attach(CloseNamedPanel(name))
+    }
+
+    fun List<CodeSample>.pausePanel(name: String): List<CodeSample> {
+        return this + last().attach(PauseNamedPanel(name))
+    }
+
+    fun List<CodeSample>.resumePanel(name: String): List<CodeSample> {
+        return this + last().attach(ResumeNamedPanel(name))
     }
 
     fun List<CodeSample>.openInLeftPane(fileName: String, switchTo: Boolean = false): List<CodeSample> {
@@ -683,6 +723,16 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
     
     fun closePanel(name: String): ChainableOperations {
         operations.add(CloseNamedPanel(name))
+        return this
+    }
+
+    fun pausePanel(name: String): ChainableOperations {
+        operations.add(PauseNamedPanel(name))
+        return this
+    }
+
+    fun resumePanel(name: String): ChainableOperations {
+        operations.add(ResumeNamedPanel(name))
         return this
     }
     

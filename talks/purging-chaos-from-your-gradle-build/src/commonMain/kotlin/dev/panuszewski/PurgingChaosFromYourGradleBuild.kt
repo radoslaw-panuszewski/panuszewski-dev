@@ -27,9 +27,9 @@ val KeepingYourBuildClean = Storyboard.build(
 //    Chaos()
 //    Ultramarines()
 //    WhyBother()
-    Groovy()
-    NoTypeSafety()
-    ImperativeCode()
+//    Groovy()
+//    NoTypeSafety()
+//    ImperativeCode()
     CrossConfiguration()
 }
 
