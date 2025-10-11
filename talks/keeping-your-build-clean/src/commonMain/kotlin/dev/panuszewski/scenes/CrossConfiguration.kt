@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
-import dev.bnorm.storyboard.text.magic.splitByWords
+import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.EMPTY_SAMPLE
@@ -33,7 +32,6 @@ import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
-import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
@@ -47,9 +45,9 @@ fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "lib1" to DIRECTORY.initiallyHidden(),
-        "lib1/build.gradle.kts" to LIB1_BUILD_GRADLE_KTS.initiallyHidden(),
+        "lib1/build.gradle.kts" to EMPTY_SAMPLE.initiallyHidden(),
         "lib2" to DIRECTORY.initiallyHidden(),
-        "lib2/build.gradle.kts" to LIB2_BUILD_GRADLE_KTS.initiallyHidden(),
+        "lib2/build.gradle.kts" to EMPTY_SAMPLE.initiallyHidden(),
         "app1" to DIRECTORY.initiallyHidden(),
         "libre-office-installer" to DIRECTORY.initiallyHidden(),
         "buildSrc" to DIRECTORY.initiallyHidden(),
@@ -149,6 +147,16 @@ fun StoryboardBuilder.CrossConfiguration() {
                             }
                         }
                     }
+
+                    leftPanel("agenda") { panelState ->
+                        panelState.Agenda {
+                            item("Groovy", crossedOutSince = 0)
+                            item("No type safety", crossedOutSince = 0)
+                            item("Imperative code", crossedOutSince = 0)
+                            item("Cross configuration", crossedOutSince = 1)
+                            item("Mixed concerns")
+                        }
+                    }
                 }
             }
         }
@@ -233,41 +241,5 @@ private val WTF_LIB_GRADLE_KTS = buildCodeSamples {
         .then { showFileTree().closeLeftPane() }
         .openPanel("tree")
         .pass(2)
-}
-
-private val LIB1_BUILD_GRADLE_KTS = buildCodeSamples {
-    val wtfLibUsage by tag()
-    val todo by tag()
-
-    """
-    ${wtfLibUsage}plugins {
-        `wtf-lib`
-    }
-    
-    ${wtfLibUsage}${todo}// TODO${todo}
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(wtfLibUsage) }
-        .then { reveal(wtfLibUsage) }
-        .then { hide(todo) }
-        .openInLeftPane("lib2/build.gradle.kts", switchTo = true)
-}
-
-private val LIB2_BUILD_GRADLE_KTS = buildCodeSamples {
-    val wtfLibUsage by tag()
-    val todo by tag()
-
-    """
-    ${wtfLibUsage}plugins {
-        `wtf-lib`
-    }
-    
-    ${wtfLibUsage}${todo}// TODO${todo}
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(wtfLibUsage) }
-        .then { reveal(wtfLibUsage) }
-        .then { hide(todo) }
+        .closePanel("tree")
 }
