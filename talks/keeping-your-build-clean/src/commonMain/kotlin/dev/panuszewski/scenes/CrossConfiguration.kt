@@ -241,4 +241,7 @@ private val WTF_LIB_GRADLE_KTS = buildCodeSamples {
         .openPanel("tree")
         .pass(2)
         .closePanel("tree")
+        .openAgenda()
+        .pass()
+        .closeAgenda()
 }
