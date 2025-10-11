@@ -1,22 +1,27 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.DIRECTORY
+import dev.panuszewski.template.components.EMPTY_SAMPLE
 import dev.panuszewski.template.components.IdeLayout
+import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
@@ -26,7 +31,9 @@ import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withStateTransition
+import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.withColor
@@ -35,9 +42,15 @@ fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "lib1" to DIRECTORY.initiallyHidden(),
+        "lib1/build.gradle.kts" to LIB1_BUILD_GRADLE_KTS.initiallyHidden(),
         "lib2" to DIRECTORY.initiallyHidden(),
+        "lib2/build.gradle.kts" to LIB2_BUILD_GRADLE_KTS.initiallyHidden(),
         "app1" to DIRECTORY.initiallyHidden(),
         "libre-office-installer" to DIRECTORY.initiallyHidden(),
+        "buildSrc" to DIRECTORY.initiallyHidden(),
+        "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
+        "buildSrc/src/main/kotlin/wtf-lib.gradle.kts" to WTF_LIB_GRADLE_KTS.initiallyHidden(),
+        "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to EMPTY_SAMPLE.initiallyHidden(),
     )
 
     val totalStates = calculateTotalStates(files)
@@ -60,6 +73,12 @@ fun StoryboardBuilder.CrossConfiguration() {
                             val appColor = MaterialTheme.colors.secondary
 
                             val tree = when {
+                                panelState.currentState >= 6 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("lib1", libraryColor)
+                                        node("lib2", libraryColor)
+                                    }
+                                }
                                 panelState.currentState >= 5 -> buildTree {
                                     node("root-project", rootProjectColor) {
                                         node("lib1", libraryColor)
@@ -95,18 +114,28 @@ fun StoryboardBuilder.CrossConfiguration() {
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(node.color ?: Color.Unspecified)
+                                        .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                                        .background(LocalIdeColors.current.paneBackground)
                                 ) {
-                                    ProvideTextStyle(TextStyle(color = Color.White)) {
-                                        Text(Modifier.padding(8.dp)) {
-                                            if (panelState.currentState >= 5 && node.value.startsWith("lib")) {
+                                    val text = panelState.createChildTransition {
+                                        when {
+                                            it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
                                                 withColor(NICE_ORANGE) { append("lib") }
-                                                append(node.value.substringAfter("lib"))
-                                            } else {
-                                                append(node.value)
+                                                withColor(Color.White) { append(node.value.substringAfter("lib")) }
+                                            }
+                                            it >= 7 && node.value.startsWith("lib") -> """
+                                                plugins {
+                                                    `wtf-lib`
+                                                }
+                                                """
+                                                .trimIndent()
+                                                .toCode(language = Language.KotlinDsl)
+                                            else -> buildAnnotatedString {
+                                                withColor(Color.White) { append(node.value) }
                                             }
                                         }
-                                    }
+                                    } // .MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                    Text(text = text.currentState, modifier = Modifier.padding(8.dp))
                                 }
                             }
                         }
@@ -130,29 +159,29 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val subprojectsIndent4 by tag()
     val subprojectsIndent5 by tag()
     val subprojectsClosingBrace by tag()
+    val commonConfig by tag()
 
     """
     ${subprojectsBlock}subprojects${subprojectsFilter}
         .filter { it.name.startsWith("lib")${subprojectsFilter}${subprojectsForEach}
-        .forEach${subprojectsForEach} { ${javaLibrary}
+        .forEach${subprojectsForEach} { ${javaLibrary}${commonConfig}
         ${subprojectsIndent1}    it.${subprojectsIndent1}apply(plugin = "java-library")
     ${javaLibrary}${mavenPublish}    ${subprojectsIndent2}    it.${subprojectsIndent2}apply(plugin = "maven-publish")${publication}
     
         ${subprojectsIndent3}    ${subprojectsIndent3}publishing.publications.create<MavenPublication>("library") {
         ${subprojectsIndent4}    ${subprojectsIndent4}    from(components["java"])
-        ${subprojectsIndent5}    ${subprojectsIndent5}}${publication}${subprojectsClosingBrace}
+        ${subprojectsIndent5}    ${subprojectsIndent5}}${publication}${commonConfig}${subprojectsClosingBrace}
         }${subprojectsClosingBrace}
     ${mavenPublish}}${subprojectsBlock}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(subprojectsBlock, javaLibrary, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
+        .startWith { hide(javaLibrary, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
         .pass()
         .revealFile("lib1")
         .revealFile("lib2")
         .closePanel("tree")
-        .then { reveal(subprojectsBlock) }
         .then { reveal(javaLibrary) }
         .then { reveal(mavenPublish) }
         .then { reveal(publication) }
@@ -160,8 +189,76 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .revealFile("app1")
         .closePanel("tree")
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
-        .then { unfocus().openPanel("tree") }
+        .openPanel("tree")
         .revealFile("libre-office-installer")
-        .then { focus(subprojectsFilter) }
         .then { unfocus().closePanel("tree") }
+        .openInRightPane("buildSrc/src/main/kotlin/wtf-lib.gradle.kts", switchTo = true)
+        .then { focus(commonConfig) }
+        .then { hide(commonConfig) }
+        .then { hide(subprojectsBlock) }
+}
+
+private val WTF_LIB_GRADLE_KTS = buildCodeSamples {
+    val config by tag()
+    val todo by tag()
+
+    """
+    ${config}plugins {
+        `java-library`    
+        `maven-publish`
+    }
+    
+    publishing.publications.create<MavenPublication>("library") {
+        from(components["java"])
+    }
+    
+    ${config}${todo}// TODO${todo}
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(config) }
+        .hideFileTree()
+        .thenTogetherWith("build.gradle.kts") { this }
+        .thenTogetherWith("build.gradle.kts") { reveal(config) }
+        .thenTogetherWith("build.gradle.kts") { hide(todo) }
+        .then { showFileTree().closeLeftPane() }
+        .openPanel("tree")
+        .pass(2)
+}
+
+private val LIB1_BUILD_GRADLE_KTS = buildCodeSamples {
+    val wtfLibUsage by tag()
+    val todo by tag()
+
+    """
+    ${wtfLibUsage}plugins {
+        `wtf-lib`
+    }
+    
+    ${wtfLibUsage}${todo}// TODO${todo}
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(wtfLibUsage) }
+        .then { reveal(wtfLibUsage) }
+        .then { hide(todo) }
+        .openInLeftPane("lib2/build.gradle.kts", switchTo = true)
+}
+
+private val LIB2_BUILD_GRADLE_KTS = buildCodeSamples {
+    val wtfLibUsage by tag()
+    val todo by tag()
+
+    """
+    ${wtfLibUsage}plugins {
+        `wtf-lib`
+    }
+    
+    ${wtfLibUsage}${todo}// TODO${todo}
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(wtfLibUsage) }
+        .then { reveal(wtfLibUsage) }
+        .then { hide(todo) }
 }

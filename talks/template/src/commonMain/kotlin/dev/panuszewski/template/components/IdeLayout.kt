@@ -20,9 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
+import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.safeGet
+import dev.panuszewski.template.extensions.startWith
 import kotlinx.coroutines.delay
 
 typealias PanelContent = @Composable (Transition<Int>) -> Unit
@@ -825,4 +827,11 @@ fun Transition<IdeState>.IdeLayout(
             }
         }
     }
+}
+
+val EMPTY_SAMPLE = buildCodeSamples {
+    ""
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { this }
 }
