@@ -264,6 +264,7 @@ fun buildFileStateMapping(
                         if (leftPaneFile !in fileStates) {
                             fileStates[leftPaneFile!!] = 0
                         }
+                        revealedFiles.add(operation.fileName)
                         getAllParentPaths(operation.fileName).forEach { parentPath ->
                             if (parentPath in initiallyHiddenDirectories) {
                                 revealedFiles.add(parentPath)
@@ -279,6 +280,7 @@ fun buildFileStateMapping(
                         if (rightPaneFile !in fileStates) {
                             fileStates[rightPaneFile!!] = 0
                         }
+                        revealedFiles.add(operation.fileName)
                         getAllParentPaths(operation.fileName).forEach { parentPath ->
                             if (parentPath in initiallyHiddenDirectories) {
                                 revealedFiles.add(parentPath)
@@ -357,6 +359,13 @@ fun buildFileStateMapping(
             if (currentFile !in fileStates) {
                 fileStates[currentFile] = 0
             }
+            
+            revealedFiles.add(currentFile)
+            getAllParentPaths(currentFile).forEach { parentPath ->
+                if (parentPath in initiallyHiddenDirectories) {
+                    revealedFiles.add(parentPath)
+                }
+            }
 
             if (previousFile == leftPaneFile) {
                 leftPaneFile = currentFile
@@ -393,6 +402,7 @@ fun buildFileStateMapping(
             if (leftPaneFile !in fileStates) {
                 fileStates[leftPaneFile!!] = 0
             }
+            revealedFiles.add(openLeftMarker.fileName)
             getAllParentPaths(openLeftMarker.fileName).forEach { parentPath ->
                 if (parentPath in initiallyHiddenDirectories) {
                     revealedFiles.add(parentPath)
@@ -413,6 +423,7 @@ fun buildFileStateMapping(
             if (rightPaneFile !in fileStates) {
                 fileStates[rightPaneFile!!] = 0
             }
+            revealedFiles.add(openRightMarker.fileName)
             getAllParentPaths(openRightMarker.fileName).forEach { parentPath ->
                 if (parentPath in initiallyHiddenDirectories) {
                     revealedFiles.add(parentPath)
@@ -705,9 +716,9 @@ fun Transition<Int>.buildIdeState(
                     val clampedState = globalState.coerceIn(0, mapping.lastIndex)
                     val fileStateMap = mapping[clampedState]
                     filePath in fileStateMap.revealedFiles ||
-                    fileStateMap.selectedFile == filePath ||
-                    fileStateMap.leftPaneFile == filePath ||
-                    fileStateMap.rightPaneFile == filePath
+                        fileStateMap.selectedFile == filePath ||
+                        fileStateMap.leftPaneFile == filePath ||
+                        fileStateMap.rightPaneFile == filePath
                 }
 
                 val keepVisible = remember { mutableStateOf(false) }
