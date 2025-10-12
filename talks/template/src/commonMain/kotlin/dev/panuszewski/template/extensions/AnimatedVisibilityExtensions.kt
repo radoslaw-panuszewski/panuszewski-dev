@@ -5,7 +5,10 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -142,13 +145,14 @@ fun Transition<Boolean>.SlideFromBottomAnimatedVisibility(
 @Composable
 fun <T> Transition<T>.FadeInOutAnimatedVisibility(
     visible: (T) -> Boolean,
+    animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
     modifier: Modifier = Modifier,
     content: @Composable() AnimatedVisibilityScope.() -> Unit
 ) = AnimatedVisibility(
     visible = visible,
     modifier = modifier,
-    enter = fadeIn(),
-    exit = fadeOut(),
+    enter = fadeIn(animationSpec),
+    exit = fadeOut(animationSpec),
     content = content
 )
 
@@ -166,13 +170,14 @@ fun Transition<Boolean>.FadeInOutAnimatedVisibility(
 @Composable
 fun <T> Transition<T>.FadeOutAnimatedVisibility(
     visible: (T) -> Boolean,
+    animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
     modifier: Modifier = Modifier,
     content: @Composable() AnimatedVisibilityScope.() -> Unit
 ) = AnimatedVisibility(
     visible = visible,
     modifier = modifier,
     enter = EnterTransition.None,
-    exit = fadeOut(),
+    exit = fadeOut(animationSpec),
     content = content
 )
 
