@@ -22,6 +22,7 @@ val NICE_ORANGE = Color(0xFFFF8A04)
 val NICE_BLUE = Color(0xFF0A7CFA)
 val NICE_GREEN = Color(0xFF389E2D)
 val NICE_PINK = Color(0xFFDB26E0)
+val NICE_LIGHT_TURQUOISE = Color(0xFF39CEC2)
 
 data class IdeColorScheme(
     val toolbar: Color,
