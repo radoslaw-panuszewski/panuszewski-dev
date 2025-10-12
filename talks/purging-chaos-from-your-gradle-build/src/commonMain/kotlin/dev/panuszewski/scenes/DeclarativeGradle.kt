@@ -199,6 +199,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .pass(6)
         .closePanel("tree")
         .then { reveal(declarative).hide(normal) }
+        .enlargeSelectedFile()
         .renameSelectedFile("build.gradle.dcl")
         .showImage(Res.drawable.sogood)
+        .hideImage()
 }
