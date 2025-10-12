@@ -205,7 +205,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                         .background(ideColors.background)
                 ) {
                 // File tree panel with scene-controlled animated width
-                val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 200.dp else 0.dp)
+                val actualFileTreeWidth = fileTreeWidth ?: (if (showFileTree) 225.dp else 0.dp)
 
                 Box(
                     modifier = Modifier
