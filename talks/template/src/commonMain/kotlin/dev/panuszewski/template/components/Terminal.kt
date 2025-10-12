@@ -38,12 +38,8 @@ import kotlin.math.max
 fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
     val ideColors = LocalIdeColors.current
     
-    // Track animated texts at the Terminal level to reset when list changes
-    val animationTrigger = remember(textsToDisplay.hashCode()) { mutableStateOf(0) }
-    
-    LaunchedEffect(textsToDisplay.hashCode()) {
-        animationTrigger.value++
-    }
+    // Track which texts have been seen/animated - only new texts should animate
+    val seenTexts = remember { mutableSetOf<String>() }
     
     Column(
         modifier = modifier
@@ -101,10 +97,14 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
 
             LazyColumn(state = columnState, modifier = Modifier.padding(bottom = 16.dp)) {
                 for ((index, text) in texts.withIndex()) {
+                    val shouldAnimate = text !in seenTexts
+                    if (shouldAnimate && text.startsWith("$")) {
+                        seenTexts.add(text)
+                    }
 
-                    item(key = "$text-$index-${animationTrigger.value}") {
+                    item(key = "$text-$index") {
                         if (text.startsWith("$")) {
-                            TerminalCommand(text = text, ideColors = ideColors, trigger = animationTrigger.value)
+                            TerminalCommand(text = text, ideColors = ideColors, shouldAnimate = shouldAnimate)
                         } else {
                             Spacer(Modifier.height(16.dp))
                             code3 { Text(text, color = ideColors.textSecondary) }
@@ -121,14 +121,16 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
 }
 
 @Composable
-private fun TerminalCommand(text: String, ideColors: dev.panuszewski.template.theme.IdeColorScheme, trigger: Int) {
-    var displayedText by remember(text, trigger) { mutableStateOf("") }
+private fun TerminalCommand(text: String, ideColors: dev.panuszewski.template.theme.IdeColorScheme, shouldAnimate: Boolean) {
+    var displayedText by remember(text) { mutableStateOf(if (shouldAnimate) "" else text) }
     
-    LaunchedEffect(text, trigger) {
-        displayedText = ""
-        for (i in 0..text.length) {
-            displayedText = text.take(i)
-            delay(10)
+    LaunchedEffect(text) {
+        if (shouldAnimate) {
+            displayedText = ""
+            for (i in 0..text.length) {
+                displayedText = text.take(i)
+                delay(10)
+            }
         }
     }
     

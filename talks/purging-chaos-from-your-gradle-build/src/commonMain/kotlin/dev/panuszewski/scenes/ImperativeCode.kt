@@ -39,7 +39,11 @@ fun StoryboardBuilder.ImperativeCode() {
 
                 ideState.IdeLayout {
                     adaptiveTopPanel("terminal") { panelState ->
-                        val allTexts = listOf("$ git reset --hard")
+                        val allTexts = listOf(
+                            "$ git reset --hard",
+                            "HEAD is now at 2c720ee Extracted convention plugin as-is"
+                        )
+
                         val texts = allTexts.take(max(0, panelState.currentState))
                         Terminal(
                             textsToDisplay = texts,
@@ -128,7 +132,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
         .openPanel("terminal")
-        .pass()
+        .pass(2)
         .closePanel("terminal")
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
