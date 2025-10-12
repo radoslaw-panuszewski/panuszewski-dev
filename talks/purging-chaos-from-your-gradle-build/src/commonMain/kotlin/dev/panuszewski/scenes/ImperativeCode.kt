@@ -1,19 +1,15 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
-import dev.panuszewski.template.components.ResourceImage
+import dev.panuszewski.template.components.Terminal
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
@@ -22,8 +18,6 @@ import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
-import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
-import talks.purging_chaos_from_your_gradle_build.generated.resources.typesafe_conventions
 
 fun StoryboardBuilder.ImperativeCode() {
 
@@ -43,17 +37,28 @@ fun StoryboardBuilder.ImperativeCode() {
                 val ideState = buildIdeState(files)
 
                 ideState.IdeLayout {
-                    adaptiveTopPanel(name = "typesafe-conventions") {
-                        Box(Modifier.padding(bottom = 32.dp)) {
-                        ResourceImage(
-                            resource = Res.drawable.typesafe_conventions,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White)
-                                .padding(8.dp)
+                    adaptiveTopPanel("terminal") { panelState ->
+                        val texts = when {
+                            panelState.currentState >= 1 -> listOf("git reset --hard")
+                            else -> emptyList()
+                        }
+                        Terminal(
+                            textsToDisplay = texts,
+                            modifier = Modifier.padding(bottom = 32.dp).height(200.dp)
                         )
-                            }
                     }
+
+//                    adaptiveTopPanel("typesafe-conventions") {
+//                        Box(Modifier.padding(bottom = 32.dp)) {
+//                            ResourceImage(
+//                                resource = Res.drawable.typesafe_conventions,
+//                                modifier = Modifier
+//                                    .clip(RoundedCornerShape(8.dp))
+//                                    .background(Color.White)
+//                                    .padding(8.dp)
+//                            )
+//                        }
+//                    }
 
                     leftPanel("agenda") { panelState ->
                         panelState.Agenda {
@@ -123,6 +128,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .openPanel("terminal")
+        .pass()
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
@@ -203,6 +210,10 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .hideFileTree()
         .showEmoji("😩")
         .hideEmoji()
+        // git reset
+        .openPanel("terminal")
+        .then { reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
+        .closePanel("terminal")
         // showing typesafe-conventions
         .openPanel("typesafe-conventions")
         .closePanel("typesafe-conventions")

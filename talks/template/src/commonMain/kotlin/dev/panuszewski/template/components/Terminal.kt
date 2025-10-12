@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ import kotlin.math.max
 fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
             .border(
                 color = Color.Black,
                 width = 1.dp,
@@ -73,7 +76,7 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .background(Color(0xFFFEFFFE))
                 .padding(horizontal = 16.dp)
         ) {
