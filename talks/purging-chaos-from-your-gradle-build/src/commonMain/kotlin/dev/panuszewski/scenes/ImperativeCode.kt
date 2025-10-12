@@ -1,6 +1,7 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
@@ -43,6 +44,7 @@ fun StoryboardBuilder.ImperativeCode() {
 
                 ideState.IdeLayout {
                     adaptiveTopPanel(name = "typesafe-conventions") {
+                        Box(Modifier.padding(bottom = 32.dp)) {
                         ResourceImage(
                             resource = Res.drawable.typesafe_conventions,
                             modifier = Modifier
@@ -50,6 +52,7 @@ fun StoryboardBuilder.ImperativeCode() {
                                 .background(Color.White)
                                 .padding(8.dp)
                         )
+                            }
                     }
 
                     leftPanel("agenda") { panelState ->
@@ -124,8 +127,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
         .then { revealAndFocusNoStyling(topWhen, bottomWhen, monday) }
-        .then { revealAndFocusNoStyling(postgres, cassandra) }
-        .then { revealAndFocusNoStyling(masochistIfTop, masochistIfBottom) }
+        .then { reveal(postgres, cassandra) }
+        .then { reveal(masochistIfTop, masochistIfBottom) }
         .then { unfocus().showEmoji("😬") }
         .hideEmoji()
         .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = true)
@@ -227,7 +230,7 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(pluginDependency, pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerFunction) }
-        .then { reveal(pluginDependency) }
+        .then { revealAndFocus(pluginDependency) }
         .openErrorWindow(
             """
             > Could not resolve all dependencies for configuration ':buildSrc:buildScriptClasspath'.
@@ -241,7 +244,7 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
         """.trimIndent()
         )
         .closeErrorWindow()
-        .then { reveal(pluginMarkerUsage1, pluginMarkerUsage2).focus(pluginMarkerUsage1, pluginMarkerUsage2) }
+        .then { revealAndFocus(pluginMarkerUsage1, pluginMarkerUsage2) }
         .then { revealAndFocus(pluginMarkerFunction) }
         .then { unfocus() }
         .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
@@ -271,7 +274,7 @@ private val BUILD_SRC_SETTINGS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(versionCatalogDeclaration, typesafeConventions) }
-        .then { reveal(versionCatalogDeclaration) }
+        .then { revealAndFocus(versionCatalogDeclaration) }
         .switchTo("buildSrc/build.gradle.kts")
         .then { this }
         .then { hide(versionCatalogDeclaration) }

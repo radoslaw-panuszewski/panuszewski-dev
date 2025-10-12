@@ -21,12 +21,12 @@ val KeepingYourBuildClean = Storyboard.build(
     format = Default,
     decorator = DARK_THEME,
 ) {
-    TitleScene()
-    Chaos()
-    Ultramarines()
-    WhyBother()
-    Groovy()
-    NoTypeSafety()
+//    TitleScene()
+//    Chaos()
+//    Ultramarines()
+//    WhyBother()
+//    Groovy()
+//    NoTypeSafety()
     ImperativeCode()
     CrossConfiguration()
     BuildSrcVsBuildLogic()
