@@ -1,4 +1,4 @@
-package dev.panuszewski.components
+package dev.panuszewski.template.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.panuszewski.components.Hat.BASEBALL_CAP
-import dev.panuszewski.components.Hat.TOP_HAT
+import dev.panuszewski.template.components.Hat.BASEBALL_CAP
+import dev.panuszewski.template.components.Hat.TOP_HAT
 import dev.panuszewski.template.extensions.h1
 import dev.panuszewski.template.extensions.h6
 

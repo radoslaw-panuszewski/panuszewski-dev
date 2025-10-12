@@ -5,5 +5,5 @@ import dev.panuszewski.template.showStoryboardInDesktop
 
 @OptIn(ExperimentalStoryStateApi::class)
 fun main() {
-    showStoryboardInDesktop(KeepingYourBuildClean)
+    showStoryboardInDesktop(PurgingChaosFromYourGradleBuild)
 }

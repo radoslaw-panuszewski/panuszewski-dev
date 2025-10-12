@@ -1,4 +1,4 @@
-package dev.panuszewski.scenes.gradle
+package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement

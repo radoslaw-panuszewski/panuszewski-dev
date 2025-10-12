@@ -24,7 +24,6 @@ import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IDE
-import dev.panuszewski.template.components.IDE_STATE
 import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.addDirectory
@@ -57,7 +56,7 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
             val ideAlpha by animateFloat { if (it == warningEnlarged) 0.1f else 1f }
 
             TitleScaffold("Catching errors early") {
-                IDE_STATE = IdeState(
+                val ideState = IdeState(
                     files = buildList {
                         addFile(
                             name = "module.yaml",
@@ -84,7 +83,7 @@ fun StoryboardBuilder.AmperCatchErrorsEarly() {
                 transition.FadeOutAnimatedVisibility({ it is Frame.State<*> }) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
                         IDE(
-                            ideState = IDE_STATE,
+                            ideState = ideState,
                             modifier = Modifier
                                 .alpha(ideAlpha)
                                 .fillMaxWidth()

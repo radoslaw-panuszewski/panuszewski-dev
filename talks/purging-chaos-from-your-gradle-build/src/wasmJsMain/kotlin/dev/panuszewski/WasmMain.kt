@@ -3,5 +3,5 @@ package dev.panuszewski
 import dev.panuszewski.template.showStoryboardInBrowser
 
 fun main() {
-    showStoryboardInBrowser(KeepingYourBuildClean)
+    showStoryboardInBrowser(PurgingChaosFromYourGradleBuild)
 }
