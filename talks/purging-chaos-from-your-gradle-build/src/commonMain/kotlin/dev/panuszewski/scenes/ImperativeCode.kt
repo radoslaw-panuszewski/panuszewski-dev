@@ -2,9 +2,12 @@ package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,17 +50,22 @@ fun StoryboardBuilder.ImperativeCode() {
 
                 ideState.IdeLayout {
                     adaptiveLeftPanel("terminal") { panelState ->
-                        val allTexts = listOf(
-                            "$ git reset --hard",
-                            "HEAD is now at 2c720ee Extracted convention plugin as-is"
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxHeight().padding(end = 32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val allTexts = listOf(
+                                "$ git reset --hard",
+                                "HEAD is now at Extracted convention plugin as-is"
+                            )
 
-                        val texts = allTexts.take(max(0, panelState.currentState))
-                        Terminal(
-                            textsToDisplay = texts,
-                            bottomSpacerHeight = 0.dp,
-                            modifier = Modifier.padding(bottom = 32.dp).height(125.dp)
-                        )
+                            val texts = allTexts.take(max(0, panelState.currentState))
+                            Terminal(
+                                textsToDisplay = texts,
+                                bottomSpacerHeight = 0.dp,
+                                modifier = Modifier.padding(bottom = 32.dp).width(300.dp).height(200.dp)
+                            )
+                        }
                     }
 
                     adaptiveTopPanel("typesafe-conventions") {
@@ -141,7 +149,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .openPanel("terminal")
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
@@ -221,22 +228,26 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         // showing that it sucks
         .hideFileTree()
         .showEmoji("😩")
-        .hideEmoji()
+        .then { hideEmoji().showFileTree() }
         // git reset
         .openPanel("terminal")
-        .pass()
-        .then { reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
+        .thenTogetherWith("buildSrc/settings.gradle.kts") { this }
+        .then {
+            reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4)
+                .hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4)
+                .highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4)
+                .hideFile("buildSrc/build.gradle.kts")
+                .hideFile("buildSrc/settings.gradle.kts")
+        }
         .closePanel("terminal")
         // showing typesafe-conventions
         .openPanel("typesafe-conventions")
         .closePanel("typesafe-conventions")
-        .showFileTree()
         // switching to settings to apply typesafe-conventions
         .switchTo("buildSrc/settings.gradle.kts")
         .pass()
         // restoring typesafe accessors
-        .then { focus(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4) }
-        .then { hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).unfocus() }
+        .then { unfocus() }
         // going back to original file
         .switchTo("build.gradle.kts")
 }
@@ -271,13 +282,12 @@ private val SETTINGS_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
         // going back to convention plugin
         .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
         .pass()
-        // applying typesafe-conventions
-        .then { focus(versionCatalogDeclaration) }
         .then { hide(versionCatalogDeclaration).unfocus() }
+        // applying typesafe-conventions
         .then { revealAndFocus(typesafeConventions) }
         .then { unfocus() }
         // go to build.gradle.kts to remove plugin dependency
-        .switchTo("buildSrc/build.gradle.kts")
+        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 }
 
 private val BUILD_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
