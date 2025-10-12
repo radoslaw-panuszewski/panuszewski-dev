@@ -46,7 +46,7 @@ fun StoryboardBuilder.ImperativeCode() {
                 val ideState = buildIdeState(files)
 
                 ideState.IdeLayout {
-                    leftPanel("terminal") { panelState ->
+                    adaptiveLeftPanel("terminal") { panelState ->
                         val allTexts = listOf(
                             "$ git reset --hard",
                             "HEAD is now at 2c720ee Extracted convention plugin as-is"

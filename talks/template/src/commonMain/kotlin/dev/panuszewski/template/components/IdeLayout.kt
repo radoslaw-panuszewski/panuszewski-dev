@@ -121,6 +121,22 @@ class IdeLayoutScope internal constructor() {
         leftPanel(openAt = openAt.toList(), content)
     }
 
+    fun adaptiveLeftPanel(name: String, content: PanelContent) {
+        leftPanels[name] = PanelDefinition(content = content, adaptive = true)
+    }
+
+    fun adaptiveLeftPanel(name: String, openAt: List<Int>, content: PanelContent) {
+        leftPanels[name] = PanelDefinition(content = content, adaptive = true, openAt = openAt)
+    }
+
+    fun adaptiveLeftPanel(name: String, openAt: Int, content: PanelContent) {
+        adaptiveLeftPanel(name, listOf(openAt), content)
+    }
+
+    fun adaptiveLeftPanel(name: String, openAt: IntRange, content: PanelContent) {
+        adaptiveLeftPanel(name, openAt.toList(), content)
+    }
+
     fun centerEmoji(visibleAt: List<Int>, content: PanelContent) {
         centerEmojiVisibleAt = visibleAt
         centerEmojiContent = content
@@ -907,13 +923,13 @@ fun Transition<IdeState>.IdeLayout(
     val isEmojiVisible = createChildTransition { it.emoji != null }
 
     var topPanelHeight by remember { mutableIntStateOf(0) }
+    var leftPanelWidth by remember { mutableIntStateOf(0) }
 
     val ideTopPadding by animateDp { ideState ->
         val anyPanelOpen = scope.topPanels.any { (name, panel) ->
             (ideState.state in panel.openAt) || (name in ideState.openPanels)
         }
         if (anyPanelOpen) {
-            // Find which panel is currently open
             val currentOpenPanel = scope.topPanels.entries.lastOrNull { (name, panel) ->
                 (ideState.state in panel.openAt) || (name in ideState.openPanels)
             }
@@ -928,7 +944,24 @@ fun Transition<IdeState>.IdeLayout(
         }
     }
 
-    val ideStartPadding by isLeftPanelOpen.animateDp { if (it) 260.dp else 0.dp }
+    val ideStartPadding by animateDp { ideState ->
+        val anyPanelOpen = scope.leftPanels.any { (name, panel) ->
+            (ideState.state in panel.openAt) || (name in ideState.openPanels)
+        }
+        if (anyPanelOpen) {
+            val currentOpenPanel = scope.leftPanels.entries.lastOrNull { (name, panel) ->
+                (ideState.state in panel.openAt) || (name in ideState.openPanels)
+            }
+            val isAdaptive = currentOpenPanel?.value?.adaptive ?: false
+            if (isAdaptive && leftPanelWidth > 0) {
+                (leftPanelWidth / 2).dp
+            } else {
+                260.dp
+            }
+        } else {
+            0.dp
+        }
+    }
 
     val fileTreeWidth by animateDp { if (it.fileTreeHidden) 0.dp else 225.dp }
 
@@ -959,7 +992,16 @@ fun Transition<IdeState>.IdeLayout(
             }
         }
 
-        Box(Modifier.align(Alignment.TopStart)) {
+        Box(
+            Modifier
+                .align(Alignment.TopStart)
+                .onSizeChanged { size ->
+                    val hasAdaptivePanel = scope.leftPanels.values.any { it.adaptive }
+                    if (hasAdaptivePanel && size.width > 0) {
+                        leftPanelWidth = size.width
+                    }
+                }
+        ) {
             scope.leftPanels.forEach { (name, panel) ->
                 val isPanelOpen = createChildTransition { state ->
                     (state.state in panel.openAt) || (name in state.openPanels)
