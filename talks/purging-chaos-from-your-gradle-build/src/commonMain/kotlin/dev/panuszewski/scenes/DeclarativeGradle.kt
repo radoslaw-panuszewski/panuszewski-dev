@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
@@ -37,6 +38,7 @@ import dev.panuszewski.template.components.IdeState
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.addFile
 import dev.panuszewski.template.components.AnimatedHorizontalTree
+import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
 import dev.panuszewski.template.components.ResourceImage
@@ -44,16 +46,23 @@ import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.body2
 import dev.panuszewski.template.components.buildCodeSamples
+import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.code2
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.extensions.withIntTransition
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.sogood
 
 fun StoryboardBuilder.DeclarativeGradle() {
+
+    val files = listOf(
+        "build.gradle.kts" to BUILD_GRADLE_KTS
+    )
+
     val ideShrinkedSince = 0
     val titleChanges = ideShrinkedSince + 1
     val graphAppears = titleChanges + 1
@@ -63,84 +72,75 @@ fun StoryboardBuilder.DeclarativeGradle() {
     val stateCount = soGoodVisible + 1
 
     scene(stateCount) {
-        with(transition) {
+        withIntTransition {
+
+            val ideState = buildIdeState(files)
+
             val title = when {
-                currentState.toState() >= titleChanges -> "Declarative Gradle"
+                currentState >= titleChanges -> "Declarative Gradle"
                 else -> null
             }
 
             TitleScaffold(title) {
 
-                val ideTopPadding by animateDp {
-                    when {
-                        it.toState(start = -1) >= ideBackToNormalSince -> 0.dp
-                        it.toState(start = -1) >= ideShrinkedSince -> 300.dp
-                        else -> 0.dp
-                    }
-                }
+                ideState.IdeLayout {
 
-                FadeOutAnimatedVisibility({ it is Frame.State<*> }) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-
-                        val textStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
-
+                    topPanel("tree") { panelState ->
                         Column(
                             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            FadeInOutAnimatedVisibility({ it.toState() in graphAppears until ideBackToNormalSince }) {
 
-                                val tree = when {
-                                    currentState.toState() >= graphAppears + 6 -> buildTree {
-                                        node("Software Definition") {
-                                            node("javaLibrary { ... }")
-                                            node("kotlinJvmApplication { ... }")
-                                            node("...")
-                                        }
-                                    }
-                                    currentState.toState() >= graphAppears + 5 -> buildTree {
-                                        node("Software Definition") {
-                                            node("javaLibrary { ... }")
-                                            node("kotlinJvmApplication { ... }")
-                                        }
-                                    }
-                                    currentState.toState() >= graphAppears + 4 -> buildTree {
-                                        node("Software Definition") {
-                                            node("javaLibrary { ... }")
-                                        }
-                                    }
-                                    else -> buildTree {
-                                        node("Software Definition")
+                            val tree = when {
+                                panelState.currentState >= 6 -> buildTree {
+                                    node("Software Definition") {
+                                        node("javaLibrary { ... }")
+                                        node("kotlinJvmApplication { ... }")
+                                        node("...")
                                     }
                                 }
+                                panelState.currentState >= 5 -> buildTree {
+                                    node("Software Definition") {
+                                        node("javaLibrary { ... }")
+                                        node("kotlinJvmApplication { ... }")
+                                    }
+                                }
+                                panelState.currentState >= 4 -> buildTree {
+                                    node("Software Definition") {
+                                        node("javaLibrary { ... }")
+                                    }
+                                }
+                                else -> buildTree {
+                                    node("Software Definition")
+                                }
+                            }
 
-                                Box(
-                                    contentAlignment = Alignment.TopCenter,
-                                    modifier = Modifier.fillMaxWidth().height(120.dp)
-                                ) {
-                                    AnimatedHorizontalTree(tree) { node ->
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .background(if (node.isRoot) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant)
-                                                .animateContentSize()
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxWidth().height(120.dp)
+                            ) {
+                                AnimatedHorizontalTree(tree) { node ->
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (node.isRoot) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant)
+                                            .animateContentSize()
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(8.dp),
+                                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
-                                            Column(
-                                                modifier = Modifier.padding(8.dp),
-                                                verticalArrangement = Arrangement.spacedBy(16.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                ProvideTextStyle(textStyle) {
-                                                    if (node.isRoot) {
-                                                        h6 { Text(node.value) }
+                                            ProvideTextStyle(TextStyle(color = Color.White)) {
+                                                if (node.isRoot) {
+                                                    h6 { Text(node.value) }
 
-                                                        SlideFromTopAnimatedVisibility({ it.toState() >= graphAppears + 1 }) {
-                                                            body2 { Text { append("What needs to be built?") } }
-                                                        }
-                                                    } else {
-                                                        code2 { Text(node.value) }
+                                                    panelState.SlideFromTopAnimatedVisibility({ it >= 1 }) {
+                                                        body2 { Text { append("What needs to be built?") } }
                                                     }
+                                                } else {
+                                                    code2 { Text(node.value) }
                                                 }
                                             }
                                         }
@@ -148,7 +148,7 @@ fun StoryboardBuilder.DeclarativeGradle() {
                                 }
                             }
 
-                            FadeInOutAnimatedVisibility({ it.toState() in graphAppears + 2 until ideBackToNormalSince }) {
+                            panelState.FadeInOutAnimatedVisibility({ it >= 2 }) {
                                 Column(
                                     modifier = Modifier
                                         .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
@@ -158,11 +158,11 @@ fun StoryboardBuilder.DeclarativeGradle() {
                                     verticalArrangement = Arrangement.spacedBy(16.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    ProvideTextStyle(textStyle) {
+                                    ProvideTextStyle(TextStyle(color = Color.White)) {
                                         h6 {
                                             Text { append("Build Logic") }
 
-                                            SlideFromTopAnimatedVisibility({ it.toState() >= graphAppears + 3 }) {
+                                            panelState.SlideFromTopAnimatedVisibility({ it >= 3 }) {
                                                 body2 { Text { append("How to build it?") } }
                                             }
                                         }
@@ -170,57 +170,52 @@ fun StoryboardBuilder.DeclarativeGradle() {
                                 }
                             }
                         }
-
-                        Box(contentAlignment = Alignment.Center) {
-                            val files = buildList {
-                                addFile(
-                                    name = if (currentState.toState() >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
-                                    path = if (currentState.toState() >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
-                                    content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it.toState() - ideBackToNormalSince) })
-                            }
-                            IDE(
-                                IdeState(
-                                    files = files,
-                                    selectedFile = if (currentState.toState() >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
-                                    enlargedFile = when {
-                                        currentState.toState() >= migratedToDeclarative + 1 -> "build.gradle.dcl"
-                                        currentState.toState() >= migratedToDeclarative -> "build.gradle.kts"
-                                        else -> null
-                                    },
-                                ),
-                                modifier = Modifier
-                                    .padding(
-                                        start = 32.dp,
-                                        end = 32.dp,
-                                        top = ideTopPadding,
-                                        bottom = 32.dp
-                                    )
-                                    .sharedElement(
-                                        sharedContentState = rememberSharedContentState("IDE"),
-                                        animatedVisibilityScope = contextOf<AnimatedVisibilityScope>()
-                                    ),
-                            )
-
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .offset(x = 120.dp, y = -90.dp)
-                                ) {
-                                    FadeInOutAnimatedVisibility({ it.toState() == soGoodVisible }) {
-                                        ResourceImage(
-                                            remember { Res.drawable.sogood },
-                                            modifier = Modifier.border(1.dp, Color(0xFFFF8A04))
-                                        )
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
+//
+//                Box(contentAlignment = Alignment.Center) {
+//                    val files = buildList {
+//                        addFile(
+//                            name = if (currentState.toState() >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+//                            path = if (currentState.toState() >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+//                            content = createChildTransition { BUILD_GRADLE_KTS.safeGet(it.toState() - ideBackToNormalSince) })
+//                    }
+//                    IDE(
+//                        IdeState(
+//                            files = files,
+//                            selectedFile = if (currentState.toState() >= migratedToDeclarative + 1) "build.gradle.dcl" else "build.gradle.kts",
+//                            enlargedFile = when {
+//                                currentState.toState() >= migratedToDeclarative + 1 -> "build.gradle.dcl"
+//                                currentState.toState() >= migratedToDeclarative -> "build.gradle.kts"
+//                                else -> null
+//                            },
+//                        ),
+//                        modifier = Modifier
+//                            .padding(top = ideTopPadding)
+//                            .sharedElement(
+//                                sharedContentState = rememberSharedContentState("IDE"),
+//                                animatedVisibilityScope = contextOf<AnimatedVisibilityScope>()
+//                            ),
+//                    )
+//
+//                    Box(
+//                        modifier = Modifier.fillMaxSize(),
+//                        contentAlignment = Alignment.CenterStart
+//                    ) {
+//                        Box(
+//                            modifier = Modifier
+//                                .size(100.dp)
+//                                .offset(x = 120.dp, y = -90.dp)
+//                        ) {
+//                            FadeInOutAnimatedVisibility({ it.toState() == soGoodVisible }) {
+//                                ResourceImage(
+//                                    remember { Res.drawable.sogood },
+//                                    modifier = Modifier.border(1.dp, Color(0xFFFF8A04))
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -263,5 +258,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.Kotlin)
         .startWith { hide(declarative) }
+        .openPanel("tree")
+        .pass(6)
+        .closePanel("tree")
         .then { reveal(declarative).hide(normal) }
+        .renameSelectedFile("build.gradle.dcl")
 }

@@ -134,8 +134,6 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
                                 files = files,
                                 selectedFile = "build.gradle.kts",
                             ),
-                            modifier = Modifier
-                                .padding(start = 32.dp, end = 32.dp, top = 0.dp, bottom = 32.dp)
                         )
 
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {

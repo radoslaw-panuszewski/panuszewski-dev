@@ -22,12 +22,14 @@ fun SceneScope<*>.AnimatedTitle(title: String?, modifier: Modifier = Modifier) {
 
 @Composable
 fun SceneScope<*>.AnimatedTitle(title: AnnotatedString?, modifier: Modifier = Modifier) {
-    val titleToDisplay = buildAnnotatedString {
-        // surrounded by invisible emojis to fix issue with hoping height when real emoji is added :)
-        withStyle(SpanStyle(color = Color.Transparent)) { append("🥞") }
-        append(title)
-        withStyle(SpanStyle(color = Color.Transparent)) { append("🥞") }
-    }
+    val titleToDisplay = if (title != null) {
+        buildAnnotatedString {
+            // surrounded by invisible emojis to fix issue with hoping height when real emoji is added :)
+            withStyle(SpanStyle(color = Color.Transparent)) { append("🥞") }
+            append(title)
+            withStyle(SpanStyle(color = Color.Transparent)) { append("🥞") }
+        }
+    } else null
 
     when (transition.currentState) {
         is Frame.State<*> if titleToDisplay != null -> SHARED_TITLE = titleToDisplay
