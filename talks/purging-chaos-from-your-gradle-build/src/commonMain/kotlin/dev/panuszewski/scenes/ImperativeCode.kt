@@ -46,7 +46,7 @@ fun StoryboardBuilder.ImperativeCode() {
                 val ideState = buildIdeState(files)
 
                 ideState.IdeLayout {
-                    adaptiveTopPanel("terminal") { panelState ->
+                    leftPanel("terminal") { panelState ->
                         val allTexts = listOf(
                             "$ git reset --hard",
                             "HEAD is now at 2c720ee Extracted convention plugin as-is"
@@ -55,7 +55,8 @@ fun StoryboardBuilder.ImperativeCode() {
                         val texts = allTexts.take(max(0, panelState.currentState))
                         Terminal(
                             textsToDisplay = texts,
-                            modifier = Modifier.padding(bottom = 32.dp).height(200.dp)
+                            bottomSpacerHeight = 0.dp,
+                            modifier = Modifier.padding(bottom = 32.dp).height(125.dp)
                         )
                     }
 
@@ -140,8 +141,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .openPanel("typesafe-conventions")
-        .closePanel("typesafe-conventions")
+        .openPanel("terminal")
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
@@ -224,6 +224,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .hideEmoji()
         // git reset
         .openPanel("terminal")
+        .pass()
         .then { reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
         .closePanel("terminal")
         // showing typesafe-conventions
