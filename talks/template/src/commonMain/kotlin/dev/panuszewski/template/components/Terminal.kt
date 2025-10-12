@@ -38,6 +38,13 @@ import kotlin.math.max
 fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
     val ideColors = LocalIdeColors.current
     
+    // Track animated texts at the Terminal level to reset when list changes
+    val animationTrigger = remember(textsToDisplay.hashCode()) { mutableStateOf(0) }
+    
+    LaunchedEffect(textsToDisplay.hashCode()) {
+        animationTrigger.value++
+    }
+    
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -95,17 +102,9 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
             LazyColumn(state = columnState, modifier = Modifier.padding(bottom = 16.dp)) {
                 for ((index, text) in texts.withIndex()) {
 
-                    item {
+                    item(key = "$text-$index-${animationTrigger.value}") {
                         if (text.startsWith("$")) {
-                            var displayedText by remember { mutableStateOf("") }
-                            LaunchedEffect(Unit) {
-                                for (i in 0..text.length) {
-                                    displayedText = text.take(i)
-                                    delay(10)
-                                }
-                            }
-                            Spacer(Modifier.height(16.dp))
-                            code3 { Text(displayedText, color = ideColors.textPrimary) }
+                            TerminalCommand(text = text, ideColors = ideColors, trigger = animationTrigger.value)
                         } else {
                             Spacer(Modifier.height(16.dp))
                             code3 { Text(text, color = ideColors.textSecondary) }
@@ -119,4 +118,20 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
             }
         }
     }
+}
+
+@Composable
+private fun TerminalCommand(text: String, ideColors: dev.panuszewski.template.theme.IdeColorScheme, trigger: Int) {
+    var displayedText by remember(text, trigger) { mutableStateOf("") }
+    
+    LaunchedEffect(text, trigger) {
+        displayedText = ""
+        for (i in 0..text.length) {
+            displayedText = text.take(i)
+            delay(10)
+        }
+    }
+    
+    Spacer(Modifier.height(16.dp))
+    code3 { Text(displayedText, color = ideColors.textPrimary) }
 }

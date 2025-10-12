@@ -18,6 +18,7 @@ import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
+import kotlin.math.max
 
 fun StoryboardBuilder.ImperativeCode() {
 
@@ -38,10 +39,8 @@ fun StoryboardBuilder.ImperativeCode() {
 
                 ideState.IdeLayout {
                     adaptiveTopPanel("terminal") { panelState ->
-                        val texts = when {
-                            panelState.currentState >= 1 -> listOf("git reset --hard")
-                            else -> emptyList()
-                        }
+                        val allTexts = listOf("$ git reset --hard")
+                        val texts = allTexts.take(max(0, panelState.currentState))
                         Terminal(
                             textsToDisplay = texts,
                             modifier = Modifier.padding(bottom = 32.dp).height(200.dp)
@@ -130,6 +129,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
         .openPanel("terminal")
         .pass()
+        .closePanel("terminal")
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
