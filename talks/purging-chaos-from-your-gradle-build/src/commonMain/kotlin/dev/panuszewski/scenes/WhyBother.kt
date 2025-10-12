@@ -67,7 +67,7 @@ fun StoryboardBuilder.WhyBother() {
                             imperativeCodeBulletpoint to RevealedItem { Text("$BULLET_1 Imperative code") },
                             crossConfigurationBulletpoint to RevealedItem { Text("$BULLET_1 Cross configuration") },
                             mixedConcernsBulletpoint to RevealedItem { Text("$BULLET_1 Mixed concerns") },
-                            groovyBulletpoint to RevealedItem { Text("$BULLET_1 Groovy") },
+                            groovyBulletpoint to RevealedItem { Text("$BULLET_1 Groovy 🤢") },
                         )
                         bulletpoints.forEach { item(it.value) }
                     }

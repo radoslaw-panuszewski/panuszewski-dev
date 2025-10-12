@@ -45,42 +45,6 @@ fun StoryboardBuilder.NoTypeSafety() {
     }
 }
 
-private val LIBS_VERSIONS_TOML = buildCodeSamples {
-    val todo by tag()
-    val catalog by tag()
-
-    """
-    ${catalog}[plugins]
-    kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.20" }
-    
-    [libraries]
-    spring-boot = "org.springframework.boot:spring-boot-starter-web:3.5.6"
-
-    ${catalog}${todo}// TODO${todo}
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.Toml)
-        .startWith { hide(catalog) }
-        .then { reveal(catalog) }
-        .then { hide(todo) }
-        .switchTo("build.gradle.kts")
-}
-
-private val SETTINGS_GRADLE_KTS = buildCodeSamples {
-    val typesafeProjectAccessors by tag()
-
-    """
-    ${typesafeProjectAccessors}enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
-    ${typesafeProjectAccessors}rootProject.name = "example-project"
-    """
-        .trimIndent()
-        .toCodeSample()
-        .startWith { hide(typesafeProjectAccessors) }
-        .then { reveal(typesafeProjectAccessors) }
-        .switchTo("build.gradle.kts")
-}
-
 private val BUILD_GRADLE_KTS = buildCodeSamples {
     val imperativePlugin by tag()
     val declarativePlugin by tag()
@@ -137,4 +101,40 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openAgenda()
         .pass()
         .closeAgenda()
+}
+
+private val LIBS_VERSIONS_TOML = buildCodeSamples {
+    val todo by tag()
+    val catalog by tag()
+
+    """
+    ${catalog}[plugins]
+    kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.20" }
+    
+    [libraries]
+    spring-boot = "org.springframework.boot:spring-boot-starter-web:3.5.6"
+
+    ${catalog}${todo}// TODO${todo}
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.Toml)
+        .startWith { hide(catalog) }
+        .then { reveal(catalog) }
+        .then { hide(todo) }
+        .switchTo("build.gradle.kts")
+}
+
+private val SETTINGS_GRADLE_KTS = buildCodeSamples {
+    val typesafeProjectAccessors by tag()
+
+    """
+    ${typesafeProjectAccessors}enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+    ${typesafeProjectAccessors}rootProject.name = "example-project"
+    """
+        .trimIndent()
+        .toCodeSample()
+        .startWith { hide(typesafeProjectAccessors) }
+        .then { reveal(typesafeProjectAccessors) }
+        .switchTo("build.gradle.kts")
 }
