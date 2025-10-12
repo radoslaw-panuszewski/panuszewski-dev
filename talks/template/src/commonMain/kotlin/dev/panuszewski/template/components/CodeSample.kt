@@ -280,6 +280,10 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(EnlargeSelectedFile))
     }
     
+    fun shrinkSelectedFile(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ShrinkSelectedFile))
+    }
+    
     fun showEmoji(emoji: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(ShowEmoji(emoji)))
     }
@@ -396,6 +400,8 @@ data class RenameSelectedFile(val newName: String)
 
 object EnlargeSelectedFile
 
+object ShrinkSelectedFile
+
 data class AdvanceTogetherWith(val fileName: String)
 
 data class ChainedOperations(val operations: List<Any>)
@@ -456,6 +462,11 @@ class CodeSampleWithIdeOps(
     
     fun enlargeSelectedFile(): CodeSampleWithIdeOps {
         ideOperations.add(EnlargeSelectedFile)
+        return this
+    }
+    
+    fun shrinkSelectedFile(): CodeSampleWithIdeOps {
+        ideOperations.add(ShrinkSelectedFile)
         return this
     }
     
@@ -590,7 +601,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is OpenNamedPanel, is CloseNamedPanel,
             is PauseNamedPanel, is ResumeNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
-            is ChangeTitle, is RenameSelectedFile, EnlargeSelectedFile -> lastSample.attach(null)
+            is ChangeTitle, is RenameSelectedFile, EnlargeSelectedFile, ShrinkSelectedFile -> lastSample.attach(null)
             else -> lastSample
         }
 
@@ -615,7 +626,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is OpenNamedPanel, is CloseNamedPanel,
             is PauseNamedPanel, is ResumeNamedPanel,
             is AdvanceTogetherWith, is ChainedOperations,
-            is ChangeTitle, is RenameSelectedFile, EnlargeSelectedFile -> lastSample.attach(null)
+            is ChangeTitle, is RenameSelectedFile, EnlargeSelectedFile, ShrinkSelectedFile -> lastSample.attach(null)
             else -> lastSample
         }
         val markerSample = cleanedSample.attach(AdvanceTogetherWith(fileName))
@@ -702,6 +713,10 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(EnlargeSelectedFile)
     }
 
+    fun List<CodeSample>.shrinkSelectedFile(): List<CodeSample> {
+        return this + last().attach(ShrinkSelectedFile)
+    }
+
     fun List<CodeSample>.openErrorWindow(text: String): List<CodeSample> {
         return this + last().attach(OpenErrorWindow(text))
     }
@@ -766,6 +781,11 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
     
     fun enlargeSelectedFile(): ChainableOperations {
         operations.add(EnlargeSelectedFile)
+        return this
+    }
+    
+    fun shrinkSelectedFile(): ChainableOperations {
+        operations.add(ShrinkSelectedFile)
         return this
     }
     

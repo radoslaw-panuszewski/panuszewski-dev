@@ -243,6 +243,7 @@ fun buildFileStateMapping(
         val revealFileMarker = sample?.data as? RevealFile
         val hideFileMarker = sample?.data as? HideFile
         val enlargeSelectedFileMarker = sample?.data === EnlargeSelectedFile
+        val shrinkSelectedFileMarker = sample?.data === ShrinkSelectedFile
 
         if (chainedOps != null) {
             globalState++
@@ -368,6 +369,9 @@ fun buildFileStateMapping(
                     }
                     EnlargeSelectedFile -> {
                         enlargedFile = currentFile
+                    }
+                    ShrinkSelectedFile -> {
+                        enlargedFile = null
                     }
                 }
             }
@@ -638,6 +642,14 @@ fun buildFileStateMapping(
         } else if (enlargeSelectedFileMarker) {
             globalState++
             enlargedFile = currentFile
+            for (panelName in activePanels) {
+                panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
+            }
+            mappings.add(FileStateMapping(currentFile, fileStates.toMap(), emoji = currentEmoji, image = currentImage, leftPaneFile = leftPaneFile, rightPaneFile = rightPaneFile, fileTreeHidden = fileTreeHidden, errorText = errorText, openPanels = openPanels.toSet(), panelStates = panelStates.toMap(), pausedPanels = pausedPanels.toSet(), activePanels = activePanels.toSet(), title = currentTitle, fileRenames = fileRenames.toMap(), revealedFiles = revealedFiles.toSet(), enlargedFile = enlargedFile))
+            fileStates[currentFile] = currentFileState + 1
+        } else if (shrinkSelectedFileMarker) {
+            globalState++
+            enlargedFile = null
             for (panelName in activePanels) {
                 panelStates[panelName] = (panelStates[panelName] ?: 0) + 1
             }

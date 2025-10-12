@@ -202,5 +202,5 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .enlargeSelectedFile()
         .renameSelectedFile("build.gradle.dcl")
         .showImage(Res.drawable.sogood)
-        .hideImage()
+        .then { hideImage().shrinkSelectedFile() }
 }
