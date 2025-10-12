@@ -1,7 +1,7 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -42,15 +46,15 @@ fun StoryboardBuilder.TitleScene() {
 
     val titleDisappears = 1
     val chaoticConfigAppears = titleDisappears
-    val chaoticConfigScrollsToBottom = chaoticConfigAppears + 1
+    val waitBeforeScroll = chaoticConfigAppears + 1
 
     scene(
-        stateCount = chaoticConfigScrollsToBottom,
+        stateCount = waitBeforeScroll,
         enterTransition = { fadeIn(tween(3000)) },
-        exitTransition = { fadeOut(tween(3000)) },
+        exitTransition = { fadeOut(tween(durationMillis = 10000, delayMillis = 3000)) },
     ) {
 
-        transition.FadeOutAnimatedVisibility({ it.toState() < titleDisappears }, tween(2000)) {
+        transition.SlideFromBottomAnimatedVisibility({ it.toState() < titleDisappears }) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -66,12 +70,20 @@ fun StoryboardBuilder.TitleScene() {
             }
         }
 
-        val scrollPosition by transition.animateInt({ tween(durationMillis = 2000, easing = LinearEasing) }) {
-            when {
-                it == Frame.End -> 10886
-                else -> 0
+        var shouldScroll by remember { mutableStateOf(false) }
+        
+        LaunchedEffect(transition.currentState) {
+            if (transition.currentState == Frame.End) {
+                shouldScroll = true
             }
         }
+
+        val scrollProgress by animateFloatAsState(
+            targetValue = if (shouldScroll) 1f else 0f,
+            animationSpec = tween(durationMillis = 10000, easing = LinearEasing)
+        )
+        
+        val scrollPosition = (scrollProgress * 10886).toInt()
 
         transition.FadeInOutAnimatedVisibility({ it.toState() >= chaoticConfigAppears }, tween(2000)) {
             Box(

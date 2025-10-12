@@ -527,3 +527,49 @@ value === DIRECTORY -> {
   - Check if frames execute in unexpected states (e.g., two frames executing when only one state advance occurred)
   - Verify that marker frames are properly removed from frame lists after being processed
 - **BEST PRACTICE**: When implementing new marker-based operations (emoji display, pane operations, etc.), always ensure they are added to the marker detection logic in `buildIdeStateWithMapping()` so they get properly cleared after execution
+
+### Simultaneous Animations During Scene Transitions: Non-Blocking vs Blocking Animations
+- **PROBLEM**: When implementing animations that should continue during scene transitions (e.g., scrolling an image while cross-fading to the next scene), using `transition.animateInt()` causes the scene to wait for the animation to complete before starting the exit transition. The scrolling and cross-fade happen sequentially instead of simultaneously.
+- **ROOT CAUSE**: `transition.animateInt()` and similar transition-based animations are **blocking** - the storyboard framework waits for them to complete before moving to the next scene. This is by design, as the framework ensures all state animations finish before transitioning.
+- **SYMPTOMS**:
+  - Animation completes fully, then the scene transition (fade out) begins
+  - Both animations have the same duration but happen one after another
+  - Total time is sum of both durations instead of the maximum of the two
+- **THE SOLUTION**: Use Compose's `animateFloatAsState` or `animateIntAsState` instead of `transition.animateInt()`. These are **non-blocking** animations that run independently of the scene transition lifecycle:
+  ```kotlin
+  // ❌ WRONG: Blocking animation
+  val scrollPosition by transition.animateInt(
+      transitionSpec = { tween(durationMillis = 3000, easing = LinearEasing) },
+      targetValueByState = { if (it == Frame.End) 10886 else 0 }
+  )
+  
+  // ✅ CORRECT: Non-blocking animation
+  var shouldScroll by remember { mutableStateOf(false) }
+  
+  LaunchedEffect(transition.currentState) {
+      if (transition.currentState == Frame.End) {
+          shouldScroll = true
+      }
+  }
+  
+  val scrollProgress by animateFloatAsState(
+      targetValue = if (shouldScroll) 1f else 0f,
+      animationSpec = tween(durationMillis = 3000, easing = LinearEasing)
+  )
+  
+  val scrollPosition = (scrollProgress * 10886).toInt()
+  ```
+- **HOW IT WORKS**:
+  1. `LaunchedEffect` detects when `transition.currentState` becomes `Frame.End`
+  2. Sets `shouldScroll = true`, triggering the animation
+  3. `animateFloatAsState` runs independently - doesn't block the scene transition
+  4. Scene's exit transition (fadeOut) starts immediately
+  5. Both animations run simultaneously for their respective durations
+- **KEY INSIGHT**: Compose state animations (`animateFloatAsState`, `animateIntAsState`) are independent of the storyboard transition system. Use them when you need animations to overlap with scene transitions.
+- **WHEN TO USE**:
+  - ✅ Use `animateFloatAsState`/`animateIntAsState` when animations should continue during scene transitions
+  - ✅ Use `transition.animateInt()`/`transition.animateFloat()` when animations should complete before transitioning
+- **DEBUGGING TECHNIQUE**:
+  - If animations wait to complete before transitioning, check if you're using `transition.animate*()` methods
+  - Replace with Compose's `animate*AsState()` and trigger via state changes detected by `LaunchedEffect`
+- **BEST PRACTICE**: For visual effects that enhance transitions (scrolling, rotating, zooming), use non-blocking Compose animations. For content changes that must complete before transitioning (showing/hiding critical elements), use blocking transition animations.

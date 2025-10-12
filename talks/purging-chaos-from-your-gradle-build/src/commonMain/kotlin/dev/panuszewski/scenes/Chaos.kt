@@ -14,6 +14,7 @@ import dev.bnorm.storyboard.AdvanceDirection.Forward
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.chaos
@@ -21,7 +22,7 @@ import talks.purging_chaos_from_your_gradle_build.generated.resources.chaos
 fun StoryboardBuilder.Chaos() {
 
     scene(
-        enterTransition = { direction -> if (direction == Forward) fadeIn(tween(3000)) else SceneEnter(CenterEnd).invoke(direction) },
+        enterTransition = { direction -> if (direction == Forward) fadeIn(tween(durationMillis = 10000, delayMillis = 3000)) else SceneEnter(CenterEnd).invoke(direction) },
         exitTransition = { direction -> if (direction == Forward) SceneExit(CenterEnd).invoke(direction) else fadeOut(tween(3000)) },
     ) {
         Box(
