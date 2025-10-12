@@ -54,7 +54,7 @@ fun SceneScope<Int>.SlidingTitleScaffold(
 
     val titleTextStyle by isLargeTitle.animateTextStyle(
         targetValueByState = { isLarge ->
-            if (isLarge) MaterialTheme.typography.h2 else MaterialTheme.typography.h4
+            if (isLarge) MaterialTheme.typography.h3 else MaterialTheme.typography.h4
         },
         transitionSpec = { tween(durationMillis) }
     )
