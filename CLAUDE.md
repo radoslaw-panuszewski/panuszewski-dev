@@ -527,3 +527,98 @@ value === DIRECTORY -> {
   - Check if frames execute in unexpected states (e.g., two frames executing when only one state advance occurred)
   - Verify that marker frames are properly removed from frame lists after being processed
 - **BEST PRACTICE**: When implementing new marker-based operations (emoji display, pane operations, etc.), always ensure they are added to the marker detection logic in `buildIdeStateWithMapping()` so they get properly cleared after execution
+
+### Multiple Top Panels Support: Transition State Access
+- **PROBLEM**: When implementing support for multiple top panels in IdeLayout, both panels (terminal and typesafe-conventions) could be defined but only the last one in the code would open. After fixing that, the adaptive panel height was always wrong - the IDE was pushed too far down.
+- **ROOT CAUSE #1 - Single Panel Variables**: The `IdeLayoutScope` stored panel data in single variables (`topPanelName`, `topPanelContent`, `topPanelAdaptive`) that got overwritten when multiple panels were defined. Only the last panel's data was retained.
+- **ROOT CAUSE #2 - Wrong State Access**: When calculating padding with `isTopPanelOpen.animateDp { it ->`, the `it` parameter was a Boolean (whether any panel is open), not the IdeState. Using `currentState` in the lambda gave stale state from the parent transition, not the actual target state.
+- **ROOT CAUSE #3 - Measuring Container Not Content**: The outer Box wrapping AnimatedVisibility was being measured (266px), but when checking which panel was open using `currentState`, the `openPanels` set was empty because the state hadn't propagated yet from the transition.
+
+#### The Complete Solution
+
+**Part 1: Store Panels in Map** (IdeLayout.kt)
+```kotlin
+data class PanelDefinition(
+    val content: PanelContent,
+    val adaptive: Boolean = false,
+    val openAt: List<Int> = emptyList()
+)
+
+class IdeLayoutScope internal constructor() {
+    internal val topPanels = mutableMapOf<String, PanelDefinition>()
+    // ... other properties ...
+    
+    fun adaptiveTopPanel(name: String, content: PanelContent) {
+        topPanels[name] = PanelDefinition(content = content, adaptive = true)
+    }
+}
+```
+
+**Part 2: Animate on Parent Transition** (IdeLayout.kt)
+```kotlin
+// ❌ WRONG: Animating on child boolean transition
+val ideTopPadding by isTopPanelOpen.animateDp { it ->
+    // 'it' is Boolean, no access to IdeState
+    // 'currentState' is stale from parent transition
+}
+
+// ✅ CORRECT: Animate directly on parent IdeState transition  
+val ideTopPadding by animateDp { ideState ->
+    // 'ideState' is the transition's target state
+    val anyPanelOpen = scope.topPanels.any { (name, panel) ->
+        (ideState.state in panel.openAt) || (name in ideState.openPanels)
+    }
+    if (anyPanelOpen) {
+        val currentOpenPanel = scope.topPanels.entries.lastOrNull { (name, panel) ->
+            (ideState.state in panel.openAt) || (name in ideState.openPanels)
+        }
+        // Use panel's adaptive property and measured height
+    }
+}
+```
+
+**Part 3: Measure Container, Check Any Adaptive** (IdeLayout.kt)
+```kotlin
+Box(Modifier.align(Alignment.TopCenter)
+    .onSizeChanged { size ->
+        // Don't check which panel is open during measurement
+        // Just check if ANY panel is adaptive
+        val hasAdaptivePanel = scope.topPanels.values.any { it.adaptive }
+        if (hasAdaptivePanel && size.height > 0) {
+            topPanelHeight = size.height
+        }
+    }
+) {
+    // Render all panels, each with own AnimatedVisibility
+    scope.topPanels.forEach { (name, panel) ->
+        val isPanelOpen = createChildTransition { state ->
+            (state.state in panel.openAt) || (name in state.openPanels)
+        }
+        isPanelOpen.SlideFromBottomAnimatedVisibility {
+            // Panel content
+        }
+    }
+}
+```
+
+#### Key Insights
+- **Map vs Single Variables**: Use a map to store multiple panels instead of overwriting single variables
+- **Transition State Access**: `animateDp { ideState ->` on parent transition gives access to full IdeState with `openPanels` set
+- **Measurement Timing**: `onSizeChanged` fires during layout before state propagates; check for any adaptive panel, not specific one
+- **Independent Animations**: Each panel needs its own `AnimatedVisibility` for proper slide animations
+- **State Propagation**: During `onSizeChanged`, `currentState.openPanels` may be empty; during `animateDp`, `ideState.openPanels` has current values
+
+#### Testing and Verification
+- **CRITICAL**: After making code changes, ALWAYS run the app and verify debug output matches expectations
+- **User May Interrupt**: If user says they tested it while you're running the app, that's OK - they saw the visual result. Don't interpret interruption as your mistake; the user sees the app as soon as you run it
+- **Don't Break Commands**: Run complete commands like `/path/to/executable | grep "pattern"` in one go, don't split into separate steps
+- **Add Debug Logging**: Use `println()` to track state values, which panel is detected as open, and what padding is calculated
+- **Compare Working vs Broken**: Run both versions with debug logging to see what differs (e.g., `openPanels` set, adaptive detection)
+
+#### Common Mistakes
+- ❌ Using `isTopPanelOpen.animateDp` when you need access to IdeState properties
+- ❌ Using `currentState` inside transition lambdas (it's from parent, may be stale)
+- ❌ Checking which specific panel is open during `onSizeChanged` (state hasn't propagated)
+- ❌ Storing panels in single variables that get overwritten
+- ❌ Not running the app after fixes to verify the behavior
+- ❌ Breaking run commands into multiple steps (cd && run → separate commands)
