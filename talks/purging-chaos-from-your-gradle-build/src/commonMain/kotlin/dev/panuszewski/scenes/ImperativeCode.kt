@@ -32,8 +32,8 @@ fun StoryboardBuilder.ImperativeCode() {
         "buildSrc" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
-        "buildSrc/settings.gradle.kts" to BUILD_SRC_SETTINGS.initiallyHidden(),
-        "buildSrc/build.gradle.kts" to BUILD_SRC_BUILDSCRIPT.initiallyHidden(),
+        "buildSrc/settings.gradle.kts" to SETTINGS_GRADLE_KTS_IN_BUILD_SRC.initiallyHidden(),
+        "buildSrc/build.gradle.kts" to BUILD_GRADLE_KTS_IN_BUILD_SRC.initiallyHidden(),
     )
     val totalStates = calculateTotalStates(files)
 
@@ -180,32 +180,83 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(extractedCode, nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4) }
         .hideFileTree()
+        // extracting the plugin
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
         .thenTogetherWith("build.gradle.kts") { hide(todo) }
         .then { closeLeftPane().showFileTree() }
+        // showing errors
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
         .openErrorWindow("e: Unresolved reference 'libs'\n\n\n")
         .closeErrorWindow()
+        // switching to settings to import version catalog from parent build
         .switchTo("buildSrc/settings.gradle.kts")
-        .then { this }
-        .then { focus(libsPlugin) }
-        .then { hide(libsPlugin).reveal(nonTypesafePlugin).highlightAsError(libsDep1, libsDep2, libsDep3, libsDep4) }
+        .pass()
+        // replacing dependency accessors with non-typesafe API
         .then { unfocus().focusNoScroll(libsDep1, libsDep2, libsDep3, libsDep4) }
-        .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).unfocus().hideFileTree() }
+        .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin) }
+        .switchTo("buildSrc/build.gradle.kts")
+        // replacing plugin accessors with non-typesafe API
+        .then { focus(libsPlugin) }
+        .then { hide(libsPlugin).reveal(nonTypesafePlugin).unfocus() }
+        // showing that it sucks
+        .hideFileTree()
         .showEmoji("😩")
         .hideEmoji()
+        // showing typesafe-conventions
         .openPanel("typesafe-conventions")
         .closePanel("typesafe-conventions")
         .showFileTree()
+        // switching to settings to apply typesafe-conventions
         .switchTo("buildSrc/settings.gradle.kts")
-        .then { this }
+        .pass()
+        // restoring typesafe accessors
         .then { focus(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4) }
         .then { hide(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).reveal(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).unfocus() }
+        // going back to original file
         .switchTo("build.gradle.kts")
 }
 
-private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
+private val SETTINGS_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
+    val typesafeConventions by tag()
+    val versionCatalogDeclaration by tag()
+
+    """
+    ${typesafeConventions}plugins {
+        id("dev.panuszewski.typesafe-conventions") version "0.9.0"
+    }
+    
+    ${typesafeConventions}dependencyResolutionManagement {
+        repositories {
+            mavenCentral()
+        }${versionCatalogDeclaration}
+        
+        versionCatalogs {
+            create("libs") {
+                from(files("../gradle/libs.versions.toml"))
+            }
+        }${versionCatalogDeclaration}
+    } 
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(versionCatalogDeclaration, typesafeConventions) }
+        // importing version catalog from parent build
+        .then { revealAndFocus(versionCatalogDeclaration) }
+        .then { unfocus() }
+        // going back to convention plugin
+        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .pass()
+        // applying typesafe-conventions
+        .then { focus(versionCatalogDeclaration) }
+        .then { hide(versionCatalogDeclaration).unfocus() }
+        .then { revealAndFocus(typesafeConventions) }
+        .then { unfocus() }
+        // go to build.gradle.kts to remove plugin dependency
+        .switchTo("buildSrc/build.gradle.kts")
+}
+
+private val BUILD_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
     val pluginDependency by tag()
     val pluginMarkerUsage1 by tag()
     val pluginMarkerUsage2 by tag()
@@ -230,6 +281,8 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(pluginDependency, pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerFunction) }
+        .pass()
+        // adding plugin dependency
         .then { revealAndFocus(pluginDependency) }
         .openErrorWindow(
             """
@@ -241,44 +294,18 @@ private val BUILD_SRC_BUILDSCRIPT = buildCodeSamples {
                     - FileCollections, for example files('some.jar', 'someOther.jar').
                     - Projects, for example project(':some:project:path').
                     - ClassPathNotation, for example gradleApi().
-        """.trimIndent()
+            """.trimIndent()
         )
         .closeErrorWindow()
+        // introducing pluginMarker
         .then { revealAndFocus(pluginMarkerUsage1, pluginMarkerUsage2) }
         .then { revealAndFocus(pluginMarkerFunction) }
         .then { unfocus() }
+        // going back to convention plugin
         .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
-}
-
-private val BUILD_SRC_SETTINGS = buildCodeSamples {
-    val typesafeConventions by tag()
-    val versionCatalogDeclaration by tag()
-
-    """
-    ${typesafeConventions}plugins {
-        id("dev.panuszewski.typesafe-conventions") version "0.9.0"
-    }
-    
-    ${typesafeConventions}dependencyResolutionManagement {
-        repositories {
-            mavenCentral()
-        }${versionCatalogDeclaration}
-        
-        versionCatalogs {
-            create("libs") {
-                from(files("../gradle/libs.versions.toml"))
-            }
-        }${versionCatalogDeclaration}
-    } 
-    """
-        .trimIndent()
-        .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(versionCatalogDeclaration, typesafeConventions) }
-        .then { revealAndFocus(versionCatalogDeclaration) }
-        .switchTo("buildSrc/build.gradle.kts")
-        .then { this }
-        .then { hide(versionCatalogDeclaration) }
-        .then { revealAndFocus(typesafeConventions) }
-        .then { unfocus() }
+        .pass()
+        // removing plugin dependency
+        .then { focus(pluginMarkerFunction, pluginDependency) }
+        .then { hide(pluginMarkerFunction, pluginDependency).unfocus() }
         .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
 }
