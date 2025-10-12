@@ -29,11 +29,14 @@ import kotlinx.coroutines.delay
 
 typealias PanelContent = @Composable (Transition<Int>) -> Unit
 
+data class PanelDefinition(
+    val content: PanelContent,
+    val adaptive: Boolean = false,
+    val openAt: List<Int> = emptyList()
+)
+
 class IdeLayoutScope internal constructor() {
-    var topPanelOpenAt: List<Int> = emptyList()
-    var topPanelContent: PanelContent? = null
-    var topPanelName: String? = null
-    var topPanelAdaptive: Boolean = false
+    internal val topPanels = mutableMapOf<String, PanelDefinition>()
     var leftPanelOpenAt: List<Int> = emptyList()
     var leftPanelContent: PanelContent? = null
     var leftPanelName: String? = null
@@ -41,16 +44,11 @@ class IdeLayoutScope internal constructor() {
     var centerEmojiContent: PanelContent? = null
 
     fun topPanel(name: String, content: PanelContent) {
-        topPanelContent = content
-        topPanelName = name
-        topPanelAdaptive = false
+        topPanels[name] = PanelDefinition(content = content, adaptive = false)
     }
 
     fun topPanel(name: String, openAt: List<Int>, content: PanelContent) {
-        topPanelOpenAt = openAt
-        topPanelContent = content
-        topPanelName = name
-        topPanelAdaptive = false
+        topPanels[name] = PanelDefinition(content = content, adaptive = false, openAt = openAt)
     }
 
     fun topPanel(name: String, openAt: Int, content: PanelContent) {
@@ -62,16 +60,11 @@ class IdeLayoutScope internal constructor() {
     }
 
     fun topPanel(content: PanelContent) {
-        topPanelContent = content
-        topPanelName = "default"
-        topPanelAdaptive = false
+        topPanels["default"] = PanelDefinition(content = content, adaptive = false)
     }
 
     fun topPanel(openAt: List<Int>, content: PanelContent) {
-        topPanelOpenAt = openAt
-        topPanelContent = content
-        topPanelName = "default"
-        topPanelAdaptive = false
+        topPanels["default"] = PanelDefinition(content = content, adaptive = false, openAt = openAt)
     }
 
     fun topPanel(openAt: Int, content: PanelContent) {
@@ -83,16 +76,11 @@ class IdeLayoutScope internal constructor() {
     }
 
     fun adaptiveTopPanel(name: String, content: PanelContent) {
-        topPanelContent = content
-        topPanelName = name
-        topPanelAdaptive = true
+        topPanels[name] = PanelDefinition(content = content, adaptive = true)
     }
 
     fun adaptiveTopPanel(name: String, openAt: List<Int>, content: PanelContent) {
-        topPanelOpenAt = openAt
-        topPanelContent = content
-        topPanelName = name
-        topPanelAdaptive = true
+        topPanels[name] = PanelDefinition(content = content, adaptive = true, openAt = openAt)
     }
 
     fun adaptiveTopPanel(name: String, openAt: Int, content: PanelContent) {
@@ -913,15 +901,28 @@ fun Transition<IdeState>.IdeLayout(
 ) {
     val scope = IdeLayoutScope().apply(builder)
 
-    val isTopPanelOpen = createChildTransition { (it.state in scope.topPanelOpenAt) || (scope.topPanelName != null && scope.topPanelName in it.openPanels) }
+    // Check if any panel should be open
+    val isTopPanelOpen = createChildTransition { state ->
+        scope.topPanels.any { (name, panel) ->
+            (state.state in panel.openAt) || (name in state.openPanels)
+        }
+    }
     val isLeftPanelOpen = createChildTransition { (it.state in scope.leftPanelOpenAt)  || (scope.leftPanelName != null && scope.leftPanelName in it.openPanels) }
     val isEmojiVisible = createChildTransition { it.emoji != null }
 
     var topPanelHeight by remember { mutableIntStateOf(0) }
 
-    val ideTopPadding by isTopPanelOpen.animateDp {
-        if (it) {
-            if (scope.topPanelAdaptive && topPanelHeight > 0) {
+    val ideTopPadding by animateDp { ideState ->
+        val anyPanelOpen = scope.topPanels.any { (name, panel) ->
+            (ideState.state in panel.openAt) || (name in ideState.openPanels)
+        }
+        if (anyPanelOpen) {
+            // Find which panel is currently open
+            val currentOpenPanel = scope.topPanels.entries.lastOrNull { (name, panel) ->
+                (ideState.state in panel.openAt) || (name in ideState.openPanels)
+            }
+            val isAdaptive = currentOpenPanel?.value?.adaptive ?: false
+            if (isAdaptive && topPanelHeight > 0) {
                 (topPanelHeight / 2).dp
             } else {
                 260.dp
@@ -940,17 +941,25 @@ fun Transition<IdeState>.IdeLayout(
             Modifier
                 .align(Alignment.TopCenter)
                 .onSizeChanged { size ->
-                    if (scope.topPanelAdaptive) {
+                    // If any panel is adaptive, update the height when Box has content
+                    val hasAdaptivePanel = scope.topPanels.values.any { it.adaptive }
+                    if (hasAdaptivePanel && size.height > 0) {
                         topPanelHeight = size.height
                     }
                 }
         ) {
-            isTopPanelOpen.SlideFromBottomAnimatedVisibility {
-                val panelState = createChildTransition {
-                    val panelName = scope.topPanelName
-                    if (panelName != null) it.panelStates[panelName] ?: 0 else 0
+            // Render all panels - only one will be visible at a time
+            scope.topPanels.forEach { (name, panel) ->
+                val isPanelOpen = createChildTransition { state ->
+                    (state.state in panel.openAt) || (name in state.openPanels)
                 }
-                scope.topPanelContent?.invoke(panelState)
+                
+                isPanelOpen.SlideFromBottomAnimatedVisibility {
+                    val panelState = createChildTransition {
+                        it.panelStates[name] ?: 0
+                    }
+                    panel.content.invoke(panelState)
+                }
             }
         }
 
