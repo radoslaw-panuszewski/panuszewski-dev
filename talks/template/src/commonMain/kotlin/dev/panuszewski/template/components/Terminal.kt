@@ -30,16 +30,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.panuszewski.template.extensions.code3
+import dev.panuszewski.template.theme.LocalIdeColors
 import kotlinx.coroutines.delay
 import kotlin.math.max
 
 @Composable
 fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
+    val ideColors = LocalIdeColors.current
+    
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .border(
-                color = Color.Black,
+                color = ideColors.border,
                 width = 1.dp,
                 shape = RoundedCornerShape(8.dp)
             )
@@ -49,13 +52,13 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF1F0EE))
+                .background(ideColors.toolbar)
                 .padding(vertical = 6.dp, horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .padding(end = 6.dp)
+                    .padding(start = 10.dp, end = 6.dp)
                     .size(10.dp)
                     .background(Color(0xFFFF605C), shape = RoundedCornerShape(50))
             )
@@ -72,12 +75,12 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
             )
         }
 
-        Divider(Modifier.background(Color(0xFFA6A7A6)))
+        Divider(Modifier.background(ideColors.toolbarBorder))
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFFEFFFE))
+                .background(ideColors.codePanelBackground)
                 .padding(horizontal = 16.dp)
         ) {
 
@@ -102,10 +105,10 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
                                 }
                             }
                             Spacer(Modifier.height(16.dp))
-                            code3 { Text(displayedText) }
+                            code3 { Text(displayedText, color = ideColors.textPrimary) }
                         } else {
                             Spacer(Modifier.height(16.dp))
-                            code3 { Text(text, color = Color(53, 140, 142)) }
+                            code3 { Text(text, color = ideColors.textSecondary) }
                         }
 
                         if (index == texts.lastIndex) {
