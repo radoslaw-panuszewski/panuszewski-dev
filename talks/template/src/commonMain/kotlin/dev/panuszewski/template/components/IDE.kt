@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -72,6 +73,7 @@ data class IdeState(
     val highlightedFile: String? = null,
     val fileTreeWidth: Dp? = null,
     val emoji: String? = null,
+    val image: DrawableResource? = null,
     val errorText: String? = null,
     val openPanels: Set<String> = emptySet(),
     val panelStates: Map<String, Int> = emptyMap(),

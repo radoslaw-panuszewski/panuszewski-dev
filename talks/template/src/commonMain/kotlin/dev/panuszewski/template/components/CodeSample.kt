@@ -13,8 +13,9 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByWords
 import dev.bnorm.storyboard.text.replaceAllByTag
 import dev.panuszewski.template.extensions.TagType
-import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.extensions.toCode
+import dev.panuszewski.template.theme.LocalCodeStyle
+import org.jetbrains.compose.resources.DrawableResource
 import kotlin.collections.iterator
 
 @Immutable
@@ -261,6 +262,14 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(HideEmoji))
     }
     
+    fun showImage(imageResource: DrawableResource): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ShowImage(imageResource)))
+    }
+    
+    fun hideImage(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(HideImage))
+    }
+    
     fun openInLeftPane(fileName: String, switchTo: Boolean = false): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(OpenInLeftPane(fileName, switchTo)))
     }
@@ -320,6 +329,10 @@ data class SwitchToFile(val fileName: String)
 data class ShowEmoji(val emoji: String)
 
 object HideEmoji
+
+data class ShowImage(val imageResource: DrawableResource)
+
+object HideImage
 
 data class OpenNamedPanel(val name: String)
 
@@ -418,6 +431,16 @@ class CodeSampleWithIdeOps(
     
     fun hideEmoji(): CodeSampleWithIdeOps {
         ideOperations.add(HideEmoji)
+        return this
+    }
+    
+    fun showImage(imageResource: DrawableResource): CodeSampleWithIdeOps {
+        ideOperations.add(ShowImage(imageResource))
+        return this
+    }
+    
+    fun hideImage(): CodeSampleWithIdeOps {
+        ideOperations.add(HideImage)
         return this
     }
     
@@ -522,7 +545,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun List<CodeSample>.then(transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()
         val cleanedSample = when (lastSample.data) {
-            is SwitchToFile, is ShowEmoji, is HideEmoji,
+            is SwitchToFile, is ShowEmoji, is HideEmoji, is ShowImage, is HideImage,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
@@ -547,7 +570,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
     fun List<CodeSample>.thenTogetherWith(fileName: String, transformer: CodeSample.() -> Any): List<CodeSample> {
         val lastSample = this.last()
         val cleanedSample = when (lastSample.data) {
-            is SwitchToFile, is ShowEmoji, is HideEmoji,
+            is SwitchToFile, is ShowEmoji, is HideEmoji, is ShowImage, is HideImage,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
             is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
@@ -580,6 +603,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
 
     fun List<CodeSample>.hideEmoji(): List<CodeSample> {
         return this + last().attach(HideEmoji)
+    }
+
+    fun List<CodeSample>.showImage(imageResource: DrawableResource): List<CodeSample> {
+        return this + last().attach(ShowImage(imageResource))
+    }
+
+    fun List<CodeSample>.hideImage(): List<CodeSample> {
+        return this + last().attach(HideImage)
     }
 
     fun List<CodeSample>.openPanel(name: String): List<CodeSample> {

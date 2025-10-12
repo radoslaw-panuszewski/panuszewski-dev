@@ -28,6 +28,7 @@ import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
+import talks.purging_chaos_from_your_gradle_build.generated.resources.placzka
 import talks.purging_chaos_from_your_gradle_build.generated.resources.typesafe_conventions
 import kotlin.math.max
 
@@ -149,6 +150,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .showImage(Res.drawable.placzka)
+        .hideImage()
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
