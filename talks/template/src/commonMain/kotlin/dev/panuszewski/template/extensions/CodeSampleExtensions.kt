@@ -18,7 +18,7 @@ import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.extensions.TagType.NORMAL
 
-enum class TagType { NORMAL, WARNING }
+enum class TagType { NORMAL, WARNING, ERROR }
 
 fun TextTagScope.tag(tagType: TagType? = NORMAL) = tag("", tagType)
 

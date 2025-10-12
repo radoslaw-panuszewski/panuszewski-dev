@@ -31,10 +31,11 @@ class CodeSample private constructor(
     val language: Language,
     val title: String?,
     val splitMethod: (AnnotatedString) -> List<AnnotatedString>,
-    val warningTags: List<TextTag> = emptyList()
+    val warningTags: List<TextTag> = emptyList(),
+    val errorTags: List<TextTag> = emptyList()
 ) {
     constructor(text: AnnotatedString, language: Language, title: String? = null, splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() })
-            : this(emptyList(), FOCUSED_STYLE, UNFOCUSED_STYLE, emptyMap(), emptyMap(), null, null, text, language, title, splitMethod)
+            : this(emptyList(), FOCUSED_STYLE, UNFOCUSED_STYLE, emptyMap(), emptyMap(), null, null, text, language, title, splitMethod, emptyList())
 
     @Composable
     fun Split() = splitMethod(String())
@@ -84,7 +85,8 @@ class CodeSample private constructor(
             language: Language,
             title: String? = null,
             splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
-            warningTags: List<TextTag> = emptyList()
+            warningTags: List<TextTag> = emptyList(),
+            errorTags: List<TextTag> = emptyList()
         ): CodeSample = CodeSample(
             focus = emptyList(),
             focusedStyle = FOCUSED_STYLE,
@@ -97,7 +99,8 @@ class CodeSample private constructor(
             language = language,
             title = title,
             splitMethod = splitMethod,
-            warningTags = warningTags
+            warningTags = warningTags,
+            errorTags = errorTags
         )
     }
 
@@ -114,7 +117,8 @@ class CodeSample private constructor(
         title: String? = this.title,
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = this.splitMethod,
         warningTags: List<TextTag> = this.warningTags,
-    ): CodeSample = CodeSample(focus, focusedStyle, unfocusedStyle, replaced, styled, scrollTag, data, text, language, title, splitMethod, warningTags)
+        errorTags: List<TextTag> = this.errorTags,
+    ): CodeSample = CodeSample(focus, focusedStyle, unfocusedStyle, replaced, styled, scrollTag, data, text, language, title, splitMethod, warningTags, errorTags)
 
     fun collapse(tag: TextTag): CodeSample = copy(replaced = replaced + (tag to ELLIPSIS))
     fun collapse(vararg tags: TextTag): CodeSample = collapse(tags.asList())
@@ -146,8 +150,11 @@ class CodeSample private constructor(
     fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
         copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag, focusedStyle = focusedStyle, unfocusedStyle = unfocusedStyle)
 
-    fun underline(tag: TextTag): CodeSample =
+    fun underlineWarning(tag: TextTag): CodeSample =
         changeTagType(tag, TagType.WARNING)
+
+    fun underlineError(tag: TextTag): CodeSample =
+        changeTagType(tag, TagType.ERROR)
 
     fun resetUnderline(tag: TextTag): CodeSample =
         changeTagType(tag, TagType.NORMAL)
@@ -168,7 +175,22 @@ class CodeSample private constructor(
             }
         }
 
-        return copy(warningTags = updatedWarningTags)
+        val updatedErrorTags = when (newType) {
+            TagType.ERROR -> {
+                // Add tag to error tags if not already present
+                if (tag in errorTags) {
+                    errorTags
+                } else {
+                    errorTags + tag
+                }
+            }
+            else -> {
+                // Remove tag from error tags if present
+                errorTags - tag
+            }
+        }
+
+        return copy(warningTags = updatedWarningTags, errorTags = updatedErrorTags)
     }
 
     fun changeTagType(tags: List<TextTag>, newType: TagType): CodeSample {
@@ -306,6 +328,7 @@ class CodeSample private constructor(
         if (scrollTag != other.scrollTag) return false
         if (data != other.data) return false
         if (warningTags != other.warningTags) return false
+        if (errorTags != other.errorTags) return false
         return true
     }
 
@@ -317,6 +340,7 @@ class CodeSample private constructor(
         result = 31 * result + (scrollTag?.hashCode() ?: 0)
         result = 31 * result + (data?.hashCode() ?: 0)
         result = 31 * result + warningTags.hashCode()
+        result = 31 * result + errorTags.hashCode()
         return result
     }
 }
@@ -491,7 +515,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
         val warningTags = tags.filter { it.data == TagType.WARNING }
-        return CodeSample.create(extractTags(this), language, title, splitMethod, warningTags)
+        val errorTags = tags.filter { it.data == TagType.ERROR }
+        return CodeSample.create(extractTags(this), language, title, splitMethod, warningTags, errorTags)
     }
 
     fun AnnotatedString.toCodeSample(
@@ -500,7 +525,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         splitMethod: (AnnotatedString) -> List<AnnotatedString> = { it.splitByWords() },
     ): CodeSample {
         val warningTags = tags.filter { it.data == TagType.WARNING }
-        return CodeSample.create(this, language, title, splitMethod, warningTags)
+        val errorTags = tags.filter { it.data == TagType.ERROR }
+        return CodeSample.create(this, language, title, splitMethod, warningTags, errorTags)
     }
 
     fun CodeSample.collapse(data: Any?): CodeSample = collapse(tags.filter { data == it.data })

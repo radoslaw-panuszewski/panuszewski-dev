@@ -65,12 +65,14 @@ fun Transition<CodeSample>.EnhancedMagicCodeSample(
     if (showWarningUnderlines) {
         val sample = currentState.String()
         val warningRanges = extractWarningRanges(sample, currentState.warningTags, skipIndentationInWarnings)
+        val errorRanges = extractErrorRanges(sample, currentState.errorTags, skipIndentationInWarnings)
+        val allRanges = warningRanges + errorRanges
 
-        val cacheKey = UnderlineDrawKey(sample.hashCode(), warningRanges.hashCode())
-        val drawInstructions = if (warningRanges.isNotEmpty()) {
+        val cacheKey = UnderlineDrawKey(sample.hashCode(), allRanges.hashCode())
+        val drawInstructions = if (allRanges.isNotEmpty()) {
             drawInstructionsCache.getOrPut(cacheKey) {
                 val textLayoutResult = measurer.measure(sample, style = style)
-                painter.drawInstructionsFor(textLayoutResult, warningRanges)
+                painter.drawInstructionsFor(textLayoutResult, allRanges)
             }
         } else {
             null
@@ -140,6 +142,13 @@ private fun extractWarningRanges(processedString: AnnotatedString, warningTags: 
     }
 }
 
+@Composable
+private fun extractErrorRanges(processedString: AnnotatedString, errorTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
+    return remember(processedString.hashCode(), errorTags.hashCode(), skipIndentation) {
+        extractErrorRangesImpl(processedString, errorTags, skipIndentation)
+    }
+}
+
 private fun extractWarningRangesImpl(processedString: AnnotatedString, warningTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
     val ranges = mutableMapOf<IntRange, Color>()
 
@@ -159,6 +168,33 @@ private fun extractWarningRangesImpl(processedString: AnnotatedString, warningTa
                     }
                 } else {
                     ranges[range] = Color.Yellow
+                }
+            }
+        }
+    }
+
+    return ranges
+}
+
+private fun extractErrorRangesImpl(processedString: AnnotatedString, errorTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
+    val ranges = mutableMapOf<IntRange, Color>()
+
+    // Use the error tags that were stored during CodeSample creation
+    for (errorTag in errorTags) {
+        // Find annotations for this specific error tag
+        val annotations = processedString.getStringAnnotations(errorTag.annotationStringTag, 0, processedString.length)
+
+        for (annotation in annotations) {
+            if (annotation.item == errorTag.id) {
+                val range = annotation.start..<annotation.end
+
+                if (skipIndentation) {
+                    val adjustedRanges = createRangesSkippingIndentation(processedString.text, range)
+                    for (adjustedRange in adjustedRanges) {
+                        ranges[adjustedRange] = Color.Red
+                    }
+                } else {
+                    ranges[range] = Color.Red
                 }
             }
         }
