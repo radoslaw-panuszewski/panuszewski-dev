@@ -37,9 +37,7 @@ data class PanelDefinition(
 
 class IdeLayoutScope internal constructor() {
     internal val topPanels = mutableMapOf<String, PanelDefinition>()
-    var leftPanelOpenAt: List<Int> = emptyList()
-    var leftPanelContent: PanelContent? = null
-    var leftPanelName: String? = null
+    internal val leftPanels = mutableMapOf<String, PanelDefinition>()
     var centerEmojiVisibleAt: List<Int> = emptyList()
     var centerEmojiContent: PanelContent? = null
 
@@ -92,14 +90,11 @@ class IdeLayoutScope internal constructor() {
     }
 
     fun leftPanel(name: String, content: PanelContent) {
-        leftPanelContent = content
-        leftPanelName = name
+        leftPanels[name] = PanelDefinition(content = content, adaptive = false)
     }
 
     fun leftPanel(name: String, openAt: List<Int>, content: PanelContent) {
-        leftPanelOpenAt = openAt
-        leftPanelContent = content
-        leftPanelName = name
+        leftPanels[name] = PanelDefinition(content = content, adaptive = false, openAt = openAt)
     }
 
     fun leftPanel(name: String, openAt: Int, content: PanelContent) {
@@ -111,14 +106,11 @@ class IdeLayoutScope internal constructor() {
     }
 
     fun leftPanel(content: PanelContent) {
-        leftPanelContent = content
-        leftPanelName = "default"
+        leftPanels["default"] = PanelDefinition(content = content, adaptive = false)
     }
 
     fun leftPanel(openAt: List<Int>, content: PanelContent) {
-        leftPanelOpenAt = openAt
-        leftPanelContent = content
-        leftPanelName = "default"
+        leftPanels["default"] = PanelDefinition(content = content, adaptive = false, openAt = openAt)
     }
 
     fun leftPanel(openAt: Int, content: PanelContent) {
@@ -907,7 +899,11 @@ fun Transition<IdeState>.IdeLayout(
             (state.state in panel.openAt) || (name in state.openPanels)
         }
     }
-    val isLeftPanelOpen = createChildTransition { (it.state in scope.leftPanelOpenAt)  || (scope.leftPanelName != null && scope.leftPanelName in it.openPanels) }
+    val isLeftPanelOpen = createChildTransition { state ->
+        scope.leftPanels.any { (name, panel) ->
+            (state.state in panel.openAt) || (name in state.openPanels)
+        }
+    }
     val isEmojiVisible = createChildTransition { it.emoji != null }
 
     var topPanelHeight by remember { mutableIntStateOf(0) }
@@ -964,12 +960,17 @@ fun Transition<IdeState>.IdeLayout(
         }
 
         Box(Modifier.align(Alignment.TopStart)) {
-            isLeftPanelOpen.FadeInOutAnimatedVisibility {
-                val panelState = createChildTransition {
-                    val panelName = scope.leftPanelName
-                    if (panelName != null) it.panelStates[panelName] ?: 0 else 0
+            scope.leftPanels.forEach { (name, panel) ->
+                val isPanelOpen = createChildTransition { state ->
+                    (state.state in panel.openAt) || (name in state.openPanels)
                 }
-                scope.leftPanelContent?.invoke(panelState)
+                
+                isPanelOpen.FadeInOutAnimatedVisibility {
+                    val panelState = createChildTransition {
+                        it.panelStates[name] ?: 0
+                    }
+                    panel.content.invoke(panelState)
+                }
             }
         }
 
