@@ -35,6 +35,7 @@ import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideOutToBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
@@ -69,7 +70,7 @@ fun StoryboardBuilder.CrossConfiguration() {
 
         TitleScaffold(ideState.currentState.title) {
 
-            transition.SlideFromBottomAnimatedVisibility({ it is Frame.State<*> }) {
+            transition.SlideOutToBottomAnimatedVisibility({ it != Frame.End }) {
                 ideState.IdeLayout {
                     adaptiveTopPanel("tree") { panelState ->
                         Box(Modifier.height(200.dp)) {

@@ -143,6 +143,20 @@ fun Transition<Boolean>.SlideFromBottomAnimatedVisibility(
 )
 
 @Composable
+fun <T> Transition<T>.SlideOutToBottomAnimatedVisibility(
+    visible: (T) -> Boolean,
+    modifier: Modifier = Modifier,
+    fraction: Float = 0.5f,
+    content: @Composable() AnimatedVisibilityScope.() -> Unit
+) = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = EnterTransition.None,
+    exit = SlideDirection.FROM_BOTTOM.exit(fraction),
+    content = content
+)
+
+@Composable
 fun <T> Transition<T>.FadeInOutAnimatedVisibility(
     visible: (T) -> Boolean,
     animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
