@@ -57,7 +57,7 @@ fun StoryboardBuilder.ImperativeCode() {
                         ) {
                             val allTexts = listOf(
                                 "$ git reset --hard",
-                                "HEAD is now at Extracted convention plugin as-is"
+                                "HEAD is now at 'Extracted convention plugin as-is'"
                             )
 
                             val texts = allTexts.take(max(0, panelState.currentState))
@@ -150,8 +150,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
-        .showImage(Res.drawable.placzka)
-        .hideImage()
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
@@ -230,8 +228,8 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         .then { hide(libsPlugin).reveal(nonTypesafePlugin).unfocus() }
         // showing that it sucks
         .hideFileTree()
-        .showEmoji("😩")
-        .then { hideEmoji().showFileTree() }
+        .showImage(Res.drawable.placzka)
+        .then { hideImage().showFileTree() }
         // git reset
         .openPanel("terminal")
         .thenTogetherWith("buildSrc/settings.gradle.kts") { this }

@@ -3,9 +3,13 @@ package dev.panuszewski.template.components
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -18,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.highlight.Language
@@ -1060,7 +1065,9 @@ fun Transition<IdeState>.IdeLayout(
             isImageVisible.FadeInOutAnimatedVisibility {
                 val imageRes = currentState.image
                 if (imageRes != null) {
-                    ResourceImage(imageRes, Modifier.fillMaxSize(0.6f))
+                    Box(Modifier.clip(CircleShape).border(2.dp, MaterialTheme.colors.primary, CircleShape)) {
+                        ResourceImage(imageRes, modifier = Modifier.width(300.dp))
+                    }
                 }
             }
         }
