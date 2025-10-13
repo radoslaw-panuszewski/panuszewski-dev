@@ -167,6 +167,7 @@ fun StoryboardBuilder.CrossConfiguration() {
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
+    val appConfig by tag()
     val subprojectsBlock by tag()
     val javaLibrary by tag()
     val mavenPublish by tag()
@@ -182,7 +183,16 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val commonConfig by tag()
 
     """
-    ${subprojectsBlock}subprojects${subprojectsFilter}
+    ${appConfig}plugins {
+        `wtf-app`
+    }
+    
+    dependencies {
+        implementation(projects.subProject)
+        implementation(libs.spring.boot.web)
+    }
+        
+    ${appConfig}${subprojectsBlock}subprojects${subprojectsFilter}
         .filter { it.name.startsWith("lib")${subprojectsFilter}${subprojectsForEach}
         .forEach${subprojectsForEach} { ${javaLibrary}${commonConfig}
         ${subprojectsIndent1}    it.${subprojectsIndent1}apply(plugin = "java-library")
@@ -196,7 +206,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
+        .startWith { hide(subprojectsBlock, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
         .pass()
         .revealFile("lib1")
