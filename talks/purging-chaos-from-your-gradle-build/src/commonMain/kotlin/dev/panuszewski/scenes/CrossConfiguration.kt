@@ -196,13 +196,12 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(javaLibrary, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
+        .startWith { hide(mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
         .pass()
         .revealFile("lib1")
         .revealFile("lib2")
         .closePanel("tree")
-        .then { reveal(javaLibrary) }
         .then { reveal(mavenPublish) }
         .then { reveal(publication) }
         .openPanel("tree")

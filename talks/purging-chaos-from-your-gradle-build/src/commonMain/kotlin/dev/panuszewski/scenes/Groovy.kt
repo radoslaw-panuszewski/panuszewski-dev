@@ -3,6 +3,7 @@ package dev.panuszewski.scenes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,16 +37,16 @@ fun StoryboardBuilder.Groovy() {
 
             TitleScaffold(title) {
                 ideState.IdeLayout {
-                    topPanel("groovy") { panelState ->
+                    adaptiveTopPanel("groovy") { panelState ->
                         Column(
                             verticalArrangement = Arrangement.spacedBy(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().height(200.dp),
                         ) {
                             panelState.RevealSequentially {
-                                stringItem("Dynamic typing")
-                                stringItem("Poor IDE support")
-                                stringItem("Hard to debug")
+                                stringItem("Dynamic typing ❌")
+                                stringItem("Poor IDE support ❌")
+                                stringItem("Hard to debug ❌")
                             }
                         }
                     }

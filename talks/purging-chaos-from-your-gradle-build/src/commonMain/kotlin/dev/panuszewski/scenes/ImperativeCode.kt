@@ -132,7 +132,11 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         apply(plugin = "kotlin")
     }
     
-    ${someImperativeCode}dependencies {
+    ${someImperativeCode}subprojects {
+        apply(plugin = "java-library")
+    }
+    
+    dependencies {
         implementation(projects.subProject)
         implementation(libs.spring.boot.web)${randomDatabase}
         ${topWhen}
@@ -219,18 +223,12 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         // switching to settings to import version catalog from parent build
         .switchTo("buildSrc/settings.gradle.kts")
         .pass()
-        // replacing dependency accessors with non-typesafe API
-        .then { unfocus().focusNoScroll(libsDep1, libsDep2, libsDep3, libsDep4) }
-        .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin) }
-        // TODO to od razu z poprzednim sie dzieje
-        .switchTo("buildSrc/build.gradle.kts")
-        // replacing plugin accessors with non-typesafe API
-        .then { focus(libsPlugin) }
-        .then { hide(libsPlugin).reveal(nonTypesafePlugin).unfocus() }
+        // replacing typesafe accessors with non-typesafe API
+        .then { focus(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
+        .then { hide(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin).hideFileTree() }
         // showing that it sucks
-        .hideFileTree()
         .showImage(Res.drawable.placzka)
-        .then { hideImage().showFileTree() }
+        .then { hideImage() }
         // git reset
         .openPanel("terminal")
         .thenTogetherWith("buildSrc/settings.gradle.kts") { this }
@@ -241,7 +239,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
                 .hideFile("buildSrc/build.gradle.kts")
                 .hideFile("buildSrc/settings.gradle.kts")
         }
-        .closePanel("terminal")
+        .closePanelAndShowFileTree("terminal")
         // showing typesafe-conventions
         .openPanel("typesafe-conventions")
         .closePanel("typesafe-conventions")
@@ -282,7 +280,7 @@ private val SETTINGS_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
         .then { revealAndFocus(versionCatalogDeclaration) }
         .then { unfocus() }
         // going back to convention plugin
-        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .switchTo("buildSrc/build.gradle.kts")
         .pass()
         .then { hide(versionCatalogDeclaration).unfocus() }
         // applying typesafe-conventions
@@ -317,7 +315,6 @@ private val BUILD_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(pluginDependency, pluginMarkerUsage1, pluginMarkerUsage2, pluginMarkerFunction) }
-        .pass()
         // adding plugin dependency
         .then { revealAndFocus(pluginDependency) }
         .openErrorWindow(
