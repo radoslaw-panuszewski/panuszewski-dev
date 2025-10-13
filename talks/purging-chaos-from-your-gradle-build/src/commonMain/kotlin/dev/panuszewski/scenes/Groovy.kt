@@ -81,6 +81,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
     
     apply plugin: 'org.jetbrains.kotlin.jvm'
+    
+    subprojects {
+        apply plugin: 'java-library'
+    }
 
     dependencies {
         implementation project(':sub-project')
@@ -95,6 +99,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
     
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    
+    subprojects {
+        apply(plugin = "java-library")
+    }
 
     dependencies {
         "implementation"(project(":sub-project"))
