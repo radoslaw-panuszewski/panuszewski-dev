@@ -87,7 +87,7 @@ private val BUILD_GRADLE = buildCodeSamples {
             gradlePluginPortal()
         }
         dependencies {
-            classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20')
+            classpath('$${noTypesafe1}org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
         }
     }
 
@@ -118,10 +118,10 @@ private val BUILD_GRADLE = buildCodeSamples {
         .pass()
         .openAgenda()
         .then { focus(allCode) }
-        .then { focus(noTypesafe2, noTypesafe3) }
+        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3) }
         .then { focus(imperative1, imperative2, imperative3) }
         .then { focus(crossConfig2) }
         .then { focus(mixedConcerns) }
-        .then { unfocus().closeAgenda() }
-
+        .then { unfocus() }
+        .closeAgenda()
 }
