@@ -1,5 +1,6 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +20,11 @@ import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.RevealedItem
 import dev.panuszewski.template.components.SlidingTitleScaffold
+import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.sortedMapOf
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.subsequentNumbers
@@ -45,31 +48,33 @@ fun StoryboardBuilder.KnowYourEnemy() {
         withIntTransition {
             val ideState = buildIdeState(files)
 
-            SlidingTitleScaffold("Know your enemy") {
-                ideState.IdeLayout {
-                    leftPanel("agenda") { panelState ->
-                        val (
-                            groovyBulletpoint,
-                            noTypeSafetyBulletpoint,
-                            imperativeCodeBulletpoint,
-                            crossConfigurationBulletpoint,
-                            mixedConcernsBulletpoint,
-                        ) =
-                            subsequentNumbers()
+            TitleScaffold("Know your enemy") {
+                SlideFromBottomAnimatedVisibility({ it >= 1 }) {
+                    ideState.IdeLayout {
+                        leftPanel("agenda") { panelState ->
+                            val (
+                                groovyBulletpoint,
+                                noTypeSafetyBulletpoint,
+                                imperativeCodeBulletpoint,
+                                crossConfigurationBulletpoint,
+                                mixedConcernsBulletpoint,
+                            ) =
+                                subsequentNumbers()
 
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.padding(top = 32.dp).align(TopStart),
-                        ) {
-                            panelState.RevealSequentially {
-                                val bulletpoints = sortedMapOf(
-                                    noTypeSafetyBulletpoint to RevealedItem { Text("$BULLET_1 No type safety") },
-                                    imperativeCodeBulletpoint to RevealedItem { Text("$BULLET_1 Imperative code") },
-                                    crossConfigurationBulletpoint to RevealedItem { Text("$BULLET_1 Cross configuration") },
-                                    mixedConcernsBulletpoint to RevealedItem { Text("$BULLET_1 Mixed concerns") },
-                                    groovyBulletpoint to RevealedItem { Text("$BULLET_1 Groovy 🤢") },
-                                )
-                                bulletpoints.forEach { item(it.value) }
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.padding(top = 32.dp).align(TopStart),
+                            ) {
+                                panelState.RevealSequentially {
+                                    val bulletpoints = sortedMapOf(
+                                        noTypeSafetyBulletpoint to RevealedItem { Text("$BULLET_1 No type safety") },
+                                        imperativeCodeBulletpoint to RevealedItem { Text("$BULLET_1 Imperative code") },
+                                        crossConfigurationBulletpoint to RevealedItem { Text("$BULLET_1 Cross configuration") },
+                                        mixedConcernsBulletpoint to RevealedItem { Text("$BULLET_1 Mixed concerns") },
+                                        groovyBulletpoint to RevealedItem { Text("$BULLET_1 Groovy 🤢") },
+                                    )
+                                    bulletpoints.forEach { item(it.value) }
+                                }
                             }
                         }
                     }
@@ -91,14 +96,17 @@ private val BUILD_GRADLE = buildCodeSamples {
     val crossConfig2 by tag()
     val mixedConcerns by tag()
 
-    $$"""
+    $$"""    
     $${allCode}buildscript {
-        classpath($${noTypesafe1}'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
+        repositories {
+            gradlePluginPortal()
+        }
+        dependencies {
+            classpath($${noTypesafe1}'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
+        }
     }
 
-    $${crossConfig1}allprojects$${crossConfig1} {
-        $${imperative1}apply plugin: 'kotlin'$${imperative1}
-    }
+    $${imperative1}apply plugin: 'org.jetbrains.kotlin.jvm'$${imperative1}
 
     $${crossConfig2}subprojects$${crossConfig2}
         $${imperative2}.findAll { it.name.endsWith('-library') }
@@ -106,6 +114,7 @@ private val BUILD_GRADLE = buildCodeSamples {
 
     $${mixedConcerns}dependencies {
         implementation $${noTypesafe2}project(':sub-project')$${noTypesafe2}
+        implementation 'org.springframework.boot:spring-boot-starter-web:3.5.6'    
     }
 
     tasks.register('sayHello') {
@@ -115,15 +124,15 @@ private val BUILD_GRADLE = buildCodeSamples {
     }$${mixedConcerns}$${allCode}
     """
         .trimIndent()
-        .toCodeSample(language = Language.Groovy, splitMethod = { listOf(it) })
+        .toCodeSample(language = Language.Groovy)
         .startWith { this }
-        .pass(2)
+        .pass()
         .openAgenda()
         .then { focus(allCode) }
         .then { focus(noTypesafe1, noTypesafe2, noTypesafe3) }
         .then { focus(imperative1, imperative2, imperative3) }
         .then { focus(crossConfig1, crossConfig2) }
-        .then { focus(mixedConcerns, scroll = false) }
+        .then { focus(mixedConcerns) }
         .then { unfocus().closeAgenda() }
 
 }

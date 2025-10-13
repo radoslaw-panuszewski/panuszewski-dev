@@ -30,8 +30,6 @@ fun StoryboardBuilder.Groovy() {
 
     scene(totalStates) {
         withIntTransition {
-            BUILD_GRADLE_KTS.precompose()
-
             val ideState = buildIdeState(initialTitle = "Groovy", files = files)
 
             val title = ideState.currentState.title
