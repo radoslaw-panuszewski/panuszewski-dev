@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.AdvanceDirection.Forward
 import dev.bnorm.storyboard.StoryboardBuilder
@@ -31,6 +32,7 @@ import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
+import dev.panuszewski.template.theme.NICE_ORANGE
 
 fun StoryboardBuilder.KnowYourEnemy() {
 
@@ -65,7 +67,7 @@ fun StoryboardBuilder.KnowYourEnemy() {
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
                                 modifier = Modifier.padding(top = 32.dp).align(TopStart),
                             ) {
-                                panelState.RevealSequentially {
+                                panelState.RevealSequentially(highlightedTextStyle = TextStyle(color = NICE_ORANGE)) {
                                     val bulletpoints = sortedMapOf(
                                         noTypeSafetyBulletpoint to RevealedItem { Text("$BULLET_1 No type safety") },
                                         imperativeCodeBulletpoint to RevealedItem { Text("$BULLET_1 Imperative code") },

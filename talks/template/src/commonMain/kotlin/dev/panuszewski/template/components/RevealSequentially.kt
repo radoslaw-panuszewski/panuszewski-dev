@@ -20,33 +20,34 @@ fun Transition<out Frame<Int>>.RevealSequentially(
     since: Int = 1,
     until: Int = Int.MAX_VALUE,
     textStyle: TextStyle? = MaterialTheme.typography.h6,
+    highlightedTextStyle: TextStyle? = textStyle,
     configure: RevealSequentiallyScope.() -> Unit
 ): Int =
     createChildTransition { it.toState() }
-        .RevealSequentially(since, until, textStyle, configure)
+        .RevealSequentially(since, until, textStyle, highlightedTextStyle, configure)
 
 @Composable
 fun Transition<Int>.RevealSequentially(
     since: Int = 1,
     until: Int = Int.MAX_VALUE,
     textStyle: TextStyle? = MaterialTheme.typography.h6,
+    highlightedTextStyle: TextStyle? = null,
     configure: RevealSequentiallyScope.() -> Unit
 ): Int {
-    val scope = RevealSequentiallyScope(since, until)
+    val scope = RevealSequentiallyScope(since, until, textStyle, highlightedTextStyle, this)
     scope.configure()
     with(scope) {
-        if (textStyle != null) {
-            ProvideTextStyle(textStyle) { Content() }
-        } else {
-            Content()
-        }
+        Content()
     }
     return since + scope.items.size
 }
 
 class RevealSequentiallyScope(
     private val since: Int,
-    private val until: Int
+    private val until: Int,
+    private val textStyle: TextStyle?,
+    private val highlightedTextStyle: TextStyle?,
+    private val transition: Transition<Int>
 ) {
     val items = mutableListOf<RevealedItem>()
 
@@ -67,16 +68,43 @@ class RevealSequentiallyScope(
     }
 
     @Composable
-    fun Transition<Int>.Content() {
+    fun Content() {
         // Calculate cumulative state positions for each item
         var cumulativeState = since
+        
+        // Calculate the state when the last item appears and when highlighting should be removed
+        val lastItemStartState = since + items.sumOf { it.stateCount } - (items.lastOrNull()?.stateCount ?: 0)
+        val highlightRemovalState = lastItemStartState + (items.lastOrNull()?.stateCount ?: 0)
+        
+        // Get current target state once at the beginning
+        val currentTargetState = transition.targetState
 
-        for (revealedItem in items) {
+        for ((index, revealedItem) in items.withIndex()) {
             val itemStartState = cumulativeState
             val nextItemStartState = cumulativeState + revealedItem.stateCount
+            
+            // Determine if this item should be highlighted
+            // An item is highlighted if:
+            // 1. It's the most recently appeared item (target state is within its reveal range)
+            // 2. We haven't reached the highlight removal state yet
+            val shouldHighlight = currentTargetState >= itemStartState && 
+                                 currentTargetState < nextItemStartState &&
+                                 currentTargetState < highlightRemovalState
 
-            SlideFromTopAnimatedVisibility({ it in itemStartState..< until }) {
-                revealedItem.composable()
+            val styleToUse = if (shouldHighlight && highlightedTextStyle != null) {
+                textStyle?.merge(highlightedTextStyle)
+            } else {
+                textStyle
+            }
+
+            transition.SlideFromTopAnimatedVisibility({ it in itemStartState..< until }) {
+                if (styleToUse != null) {
+                    ProvideTextStyle(styleToUse) {
+                        revealedItem.composable()
+                    }
+                } else {
+                    revealedItem.composable()
+                }
             }
 
             cumulativeState = nextItemStartState
