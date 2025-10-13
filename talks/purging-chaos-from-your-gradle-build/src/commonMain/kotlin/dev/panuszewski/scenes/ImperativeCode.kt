@@ -222,6 +222,7 @@ val WTF_APP_GRADLE_KTS = buildCodeSamples {
         // replacing dependency accessors with non-typesafe API
         .then { unfocus().focusNoScroll(libsDep1, libsDep2, libsDep3, libsDep4) }
         .then { hide(libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin) }
+        // TODO to od razu z poprzednim sie dzieje
         .switchTo("buildSrc/build.gradle.kts")
         // replacing plugin accessors with non-typesafe API
         .then { focus(libsPlugin) }

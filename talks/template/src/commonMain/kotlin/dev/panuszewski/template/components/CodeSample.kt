@@ -316,6 +316,22 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(CloseNamedPanel(name)))
     }
 
+    fun openPanelAndHideFileTree(name: String): CodeSampleWithIdeOps {
+        return closePanel(name).hideFileTree()
+    }
+
+    fun closePanelAndShowFileTree(name: String): CodeSampleWithIdeOps {
+        return closePanel(name).showFileTree()
+    }
+
+    fun openAgenda(): CodeSampleWithIdeOps {
+        return openPanelAndHideFileTree("agenda")
+    }
+
+    fun closeAgenda(): CodeSampleWithIdeOps {
+        return closePanelAndShowFileTree("agenda")
+    }
+
     fun pausePanel(name: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(PauseNamedPanel(name)))
     }

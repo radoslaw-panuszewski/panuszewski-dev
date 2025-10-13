@@ -34,6 +34,7 @@ import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.h3
 import dev.panuszewski.template.extensions.subsequentNumbers
@@ -54,7 +55,7 @@ fun StoryboardBuilder.TitleScene() {
         exitTransition = { fadeOut(tween(durationMillis = 10000, delayMillis = 3000)) },
     ) {
 
-        transition.SlideFromBottomAnimatedVisibility({ it.toState() < titleDisappears }) {
+        transition.SlideFromTopAnimatedVisibility({ it.toState() < titleDisappears }) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
