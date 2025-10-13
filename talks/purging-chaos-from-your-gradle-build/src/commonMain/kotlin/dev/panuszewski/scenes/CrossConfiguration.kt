@@ -51,7 +51,7 @@ fun StoryboardBuilder.CrossConfiguration() {
         "lib1/build.gradle.kts" to EMPTY_SAMPLE.initiallyHidden(),
         "lib2" to DIRECTORY.initiallyHidden(),
         "lib2/build.gradle.kts" to EMPTY_SAMPLE.initiallyHidden(),
-        "app1" to DIRECTORY.initiallyHidden(),
+        "app" to DIRECTORY.initiallyHidden(),
         "libre-office-installer" to DIRECTORY.initiallyHidden(),
         "buildSrc" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
@@ -79,40 +79,45 @@ fun StoryboardBuilder.CrossConfiguration() {
                             val appColor = MaterialTheme.colors.secondary
 
                             val tree = when {
-                                panelState.currentState >= 6 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("lib1", libraryColor)
-                                        node("lib2", libraryColor)
-                                    }
-                                }
-                                panelState.currentState >= 5 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("lib1", libraryColor)
-                                        node("lib2", libraryColor)
-                                        node("app1", appColor)
-                                        node("libre-office-installer", appColor)
-                                    }
-                                }
-                                panelState.currentState >= 4 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("lib1", libraryColor)
-                                        node("lib2", libraryColor)
-                                        node("app1", appColor)
-                                    }
-                                }
+//                                panelState.currentState >= 7 -> buildTree {
+//                                    node("root-project", rootProjectColor) {
+//                                        node("lib1", libraryColor)
+//                                        node("lib2", libraryColor)
+//                                    }
+//                                }
+//                                panelState.currentState >= 6 -> buildTree {
+//                                    node("root-project", rootProjectColor) {
+//                                        node("lib1", libraryColor)
+//                                        node("lib2", libraryColor)
+//                                        node("app", appColor)
+//                                        node("libre-office-installer", appColor)
+//                                    }
+//                                }
+//                                panelState.currentState >= 5 -> buildTree {
+//                                    node("root-project", rootProjectColor) {
+//                                        node("lib1", libraryColor)
+//                                        node("lib2", libraryColor)
+//                                        node("app", appColor)
+//                                    }
+//                                }
+//                                panelState.currentState >= 4 -> buildTree {
+//                                    node("root-project", rootProjectColor) {
+//                                        node("lib1", libraryColor)
+//                                        node("lib2", libraryColor)
+//                                    }
+//                                }
+//                                panelState.currentState >= 3 -> buildTree {
+//                                    node("root-project", rootProjectColor) {
+//                                        node("lib1", libraryColor)
+//                                    }
+//                                }
                                 panelState.currentState >= 3 -> buildTree {
                                     node("root-project", rootProjectColor) {
-                                        node("lib1", libraryColor)
-                                        node("lib2", libraryColor)
-                                    }
-                                }
-                                panelState.currentState >= 2 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("lib1", libraryColor)
+                                        node("app", appColor)
                                     }
                                 }
                                 panelState.currentState >= 1 -> buildTree {
-                                    node("root-project", rootProjectColor)
+                                    node("app", rootProjectColor)
                                 }
                                 else -> buildTree {}
                             }
@@ -130,16 +135,27 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         panelState.createChildTransition {
                                             when {
                                                 it >= 7 && node.value.startsWith("lib") -> """
-                                                plugins {
-                                                    `wtf-lib`
-                                                }
-                                                """
+                                                    plugins {
+                                                        `wtf-lib`
+                                                    }
+                                                    """
                                                     .trimIndent()
                                                     .toCode(language = Language.KotlinDsl)
                                                 it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
                                                     withColor(NICE_ORANGE) { append("lib") }
                                                     withColor(Color.White) { append(node.value.substringAfter("lib")) }
                                                 }
+                                                it >= 2 && node.value == "app" -> """
+                                                    plugins {
+                                                        `wtf-app`
+                                                    }
+                                                    
+                                                        implementation(projects.subProject)
+                                                        implementation(libs.spring.boot.web)
+                                                    }    
+                                                    """
+                                                    .trimIndent()
+                                                    .toCode(language = Language.KotlinDsl)
                                                 else -> buildAnnotatedString {
                                                     withColor(Color.White) { append(node.value) }
                                                 }
@@ -209,13 +225,16 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .startWith { hide(subprojectsBlock, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
         .pass()
+        .revealFile("app")
+        // ---
+        .pass()
         .revealFile("lib1")
         .revealFile("lib2")
         .closePanel("tree")
         .then { reveal(mavenPublish) }
         .then { reveal(publication) }
         .openPanel("tree")
-        .revealFile("app1")
+        .revealFile("app")
         .closePanel("tree")
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
         .openPanel("tree")
@@ -250,7 +269,7 @@ private val WTF_LIB_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(config) }
         .thenTogetherWith("build.gradle.kts") { hide(todo) }
-        .then { showFileTree().closeLeftPane().hideFile("app1").hideFile("libre-office-installer").resumePanel("tree") }
+        .then { showFileTree().closeLeftPane().hideFile("app").hideFile("libre-office-installer").resumePanel("tree") }
         .openPanel("tree")
         .pass()
         .closePanel("tree")
