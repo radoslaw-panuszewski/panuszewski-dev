@@ -73,10 +73,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         ${nonTypesafePlugin}id("org.jetbrains.kotlin.jvm")${nonTypesafePlugin}${typesafePlugin}alias(libs.plugins.kotlin.jvm)${typesafePlugin}
     }${declarativePlugin}
 
-    subprojects {
-        apply(plugin = "java-library")
-    }
-
     dependencies {
         ${nonTypesafeConfiguration1}"implementation"${nonTypesafeConfiguration1}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeProjectDependency}project(":sub-project")${nonTypesafeProjectDependency}${typesafeProjectDependency}projects.subProject${typesafeProjectDependency})
         ${nonTypesafeConfiguration2}"implementation"${nonTypesafeConfiguration2}${typesafeConfiguration2}implementation${typesafeConfiguration2}(${nonTypesafeExternalDependency}"org.springframework.boot:spring-boot-starter-web:3.5.6"${nonTypesafeExternalDependency}${typesafeExternalDependency}libs.spring.boot.web${typesafeExternalDependency})

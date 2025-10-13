@@ -70,6 +70,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val nothing by tag()
     val groovy by tag()
     val kotlin by tag()
+    val subprojects by tag()
 
     $$"""
     $${nothing}$${nothing}$${groovy}buildscript {
@@ -101,11 +102,11 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     
     apply(plugin = "org.jetbrains.kotlin.jvm")
     
-    subprojects {
+    $${subprojects}subprojects {
         apply(plugin = "java-library")
     }
 
-    dependencies {
+    $${subprojects}dependencies {
         "implementation"(project(":sub-project"))
         "implementation"("org.springframework.boot:spring-boot-starter-web:3.5.6")
     }$${kotlin}
@@ -131,4 +132,5 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openAgenda()
         .pass()
         .closeAgenda()
+        .then { hide(subprojects) }
 }

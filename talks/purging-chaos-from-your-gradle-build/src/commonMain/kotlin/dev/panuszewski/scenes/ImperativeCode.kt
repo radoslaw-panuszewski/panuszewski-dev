@@ -132,11 +132,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         apply(plugin = "kotlin")
     }
     
-    ${someImperativeCode}subprojects {
-        apply(plugin = "java-library")
-    }
-    
-    dependencies {
+    ${someImperativeCode}dependencies {
         implementation(projects.subProject)
         implementation(libs.spring.boot.web)${randomDatabase}
         ${topWhen}
