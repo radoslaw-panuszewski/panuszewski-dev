@@ -36,7 +36,6 @@ import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
-import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideOutToBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
@@ -153,41 +152,11 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                it == 10 && node.value == "root-project" -> buildCodeSamples {
-                                                    val subprojectsBlock by tag()
-                                                    """
-                                                    ${subprojectsBlock}subprojects${subprojectsBlock} {
-                                                        apply(plugin = "java-library")
-                                                        apply(plugin = "maven-publish")
-                                                        
-                                                        publishing.publications.create("lib") {
-                                                            from(components["java"])
-                                                        }
-                                                    }
-                                                    """
-                                                        .trimIndent()
-                                                        .toCodeSample(language = Language.KotlinDsl)
-                                                        .focus(subprojectsBlock)
-                                                }.String()
-                                                it >= 8 && node.value == "root-project" -> """
-                                                    subprojects {
-                                                        apply(plugin = "java-library")
-                                                        apply(plugin = "maven-publish")
-                                                        
-                                                        publishing.publications.create("lib") {
-                                                            from(components["java"])
-                                                        }
-                                                    }
-                                                    """
-                                                    .trimIndent()
-                                                    .toCode(language = Language.KotlinDsl)
-                                                it >= 7 && node.value == "root-project" -> """
-                                                    |subprojects {        
-                                                    |    // TODO
-                                                    |}
-                                                    """
-                                                    .trimMargin()
-                                                    .toCode(language = Language.KotlinDsl)
+                                                it == 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
+                                                it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
+                                                it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
+                                                it in 8 until 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
+                                                it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
                                                 it == 8 && node.value.contains("lib") -> """
                                                     // rest of the config...
                                                     """
@@ -240,6 +209,31 @@ fun StoryboardBuilder.CrossConfiguration() {
             }
         }
     }
+}
+
+private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
+    val subprojectsKeyword by tag()
+    val subprojectsConfig by tag()
+    val todo by tag()
+
+    """
+    ${subprojectsKeyword}subprojects${subprojectsKeyword} {${subprojectsConfig}
+        apply(plugin = "java-library")
+        apply(plugin = "maven-publish")
+        
+        publishing.publications.create("lib") {
+            from(components["java"])
+        }${subprojectsConfig}${todo}
+        // TODO${todo}
+    }    
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(subprojectsConfig) }
+        .then { hide(todo).reveal(subprojectsConfig) }
+        .then { focus(subprojectsKeyword) }
+        .then { unfocus() }
+        .pass()
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
