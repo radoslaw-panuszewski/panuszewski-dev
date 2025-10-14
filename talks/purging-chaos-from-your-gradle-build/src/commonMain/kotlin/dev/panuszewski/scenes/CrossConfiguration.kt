@@ -153,9 +153,10 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                // TODO highlight 'subprojects' word
-                                                it == 10 && node.value == "root-project" -> """
-                                                    subprojects {
+                                                it == 10 && node.value == "root-project" -> buildCodeSamples {
+                                                    val subprojectsBlock by tag()
+                                                    """
+                                                    ${subprojectsBlock}subprojects${subprojectsBlock} {
                                                         apply(plugin = "java-library")
                                                         apply(plugin = "maven-publish")
                                                         
@@ -164,8 +165,10 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                         }
                                                     }
                                                     """
-                                                    .trimIndent()
-                                                    .toCode(language = Language.KotlinDsl)
+                                                        .trimIndent()
+                                                        .toCodeSample(language = Language.KotlinDsl)
+                                                        .focus(subprojectsBlock)
+                                                }.String()
                                                 it >= 8 && node.value == "root-project" -> """
                                                     subprojects {
                                                         apply(plugin = "java-library")
