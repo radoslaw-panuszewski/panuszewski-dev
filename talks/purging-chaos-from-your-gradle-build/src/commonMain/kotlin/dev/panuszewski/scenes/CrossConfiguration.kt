@@ -45,7 +45,7 @@ import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
-        "build.gradle.kts" to BUILD_GRADLE_KTS
+        "build.gradle.kts" to APP_BUILD_GRADLE_KTS
     )
 
     val totalStates = calculateTotalStates(files)
@@ -123,34 +123,9 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                 it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
                                                 it == 10 && node.value == "app" -> "app ❌".annotate()
                                                 it in listOf(10, 12) && node.value.contains("lib") -> "${node.value} ✅".annotate()
-                                                it == 8 && node.value.contains("lib") -> """
-                                                    // rest of the config...
-                                                    """
-                                                    .trimIndent()
-                                                    .toCode(language = Language.KotlinDsl)
-                                                it in 6 until 8 && node.value.contains("lib") -> """
-                                                    plugins {
-                                                        `java-library`
-                                                        `maven-publish`
-                                                    }
-                                                    publishing.publications.create("lib") {
-                                                        from(components["java"])
-                                                    }
-                                                    // rest of the config...
-                                                    """
-                                                    .trimIndent()
-                                                    .toCode(language = Language.KotlinDsl)
-                                                it in 2 until 4 && node.value == "app" -> """
-                                                    plugins {
-                                                        `wtf-app`
-                                                    }
-                                                    dependencies {
-                                                        implementation(projects.subProject)
-                                                        implementation(libs.spring.boot.web)
-                                                    }    
-                                                    """
-                                                    .trimIndent()
-                                                    .toCode(language = Language.KotlinDsl)
+                                                it == 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
+                                                it in 6 until 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[0].String()
+                                                it in 2 until 4 && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
                                                 else -> buildAnnotatedString {
                                                     withColor(Color.White) { append(node.value) }
                                                 }
@@ -214,12 +189,14 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
 }
 
-private val BUILD_GRADLE_KTS = buildCodeSamples {
+private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
+    val emptyLine by tag()
+
     """
     plugins {
         `wtf-app`
-    }
-    
+    }${emptyLine}
+    ${emptyLine}
     dependencies {
         implementation(projects.subProject)
         implementation(libs.spring.boot.web)
@@ -231,5 +208,25 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openPanel("tree")
         .pass()
         .hideIde()
+        .then { hide(emptyLine) }
         .pass(100)
+}
+
+private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
+    val libConfig by tag()
+
+    """
+    ${libConfig}plugins {
+        `java-library`
+        `maven-publish`
+    }
+    publishing.publications.create("lib") {
+        from(components["java"])
+    }
+    ${libConfig}// rest of the config...
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { this }
+        .then { hide(libConfig) }
 }
