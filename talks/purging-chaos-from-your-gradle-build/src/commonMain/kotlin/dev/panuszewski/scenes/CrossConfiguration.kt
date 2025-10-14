@@ -145,7 +145,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                it >= 7 && node.value == "root-project" -> """
+                                                it >= 8 && node.value == "root-project" -> """
                                                     subprojects {
                                                         apply(plugin = "java-library")
                                                         apply(plugin = "maven-publish")
@@ -153,19 +153,36 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                         publishing.publications.create("lib") {
                                                             from(components["java"])
                                                         }
-                                                    }
+                                                    } // TODO
                                                     """
                                                     .trimIndent()
+                                                    .toCode(language = Language.KotlinDsl)
+                                                it >= 7 && node.value == "root-project" -> """
+                                                    | // TODO                                                  
+                                                    |                                         
+                                                    |                                         
+                                                    |                                         
+                                                    |                                         
+                                                    |                                         
+                                                    |                                         
+                                                    |                                         
+                                                    """
+                                                    .trimMargin()
+                                                    .toCode(language = Language.KotlinDsl)
+                                                it == 8 && node.value.contains("lib") -> """
+                                                    | // rest of the config...                                                          
+                                                    """
+                                                    .trimMargin()
                                                     .toCode(language = Language.KotlinDsl)
                                                 it in 6 until 8 && node.value.contains("lib") -> """
                                                     plugins {
                                                         `java-library`
                                                         `maven-publish`
                                                     }
-                                                    
                                                     publishing.publications.create("lib") {
                                                         from(components["java"])
                                                     }
+                                                    // rest of the config...
                                                     """
                                                     .trimIndent()
                                                     .toCode(language = Language.KotlinDsl)
