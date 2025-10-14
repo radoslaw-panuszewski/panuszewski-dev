@@ -81,6 +81,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                             val rootProjectColor = MaterialTheme.colors.primary
                             val libraryColor = NICE_BLUE
                             val appColor = MaterialTheme.colors.secondary
+                            val highlightColor = NICE_ORANGE
 
                             val tree = when {
 //                                panelState.currentState >= 7 -> buildTree {
@@ -115,6 +116,13 @@ fun StoryboardBuilder.CrossConfiguration() {
 //                                        node("lib1", libraryColor)
 //                                    }
 //                                }
+                                panelState.currentState == 10 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("app", highlightColor)
+                                        node("lib1", highlightColor)
+                                        node("lib2", highlightColor)
+                                    }
+                                }
                                 panelState.currentState >= 5 -> buildTree {
                                     node("root-project", rootProjectColor) {
                                         node("app", appColor)
@@ -145,6 +153,19 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
+                                                // TODO highlight 'subprojects' word
+                                                it == 10 && node.value == "root-project" -> """
+                                                    subprojects {
+                                                        apply(plugin = "java-library")
+                                                        apply(plugin = "maven-publish")
+                                                        
+                                                        publishing.publications.create("lib") {
+                                                            from(components["java"])
+                                                        }
+                                                    }
+                                                    """
+                                                    .trimIndent()
+                                                    .toCode(language = Language.KotlinDsl)
                                                 it >= 8 && node.value == "root-project" -> """
                                                     subprojects {
                                                         apply(plugin = "java-library")
@@ -158,14 +179,9 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                     .trimIndent()
                                                     .toCode(language = Language.KotlinDsl)
                                                 it >= 7 && node.value == "root-project" -> """
-                                                    | // TODO                                                  
-                                                    |                                         
-                                                    |                                         
-                                                    |                                         
-                                                    |                                         
-                                                    |                                         
-                                                    |                                         
-                                                    |                                         
+                                                    |subprojects {        
+                                                    |    // TODO
+                                                    |}
                                                     """
                                                     .trimMargin()
                                                     .toCode(language = Language.KotlinDsl)
