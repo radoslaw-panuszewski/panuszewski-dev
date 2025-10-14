@@ -117,6 +117,20 @@ fun Transition<Boolean>.SlideFromTopAnimatedVisibility(
 )
 
 @Composable
+fun SlideFromBottomAnimatedVisibility(
+    visible: Boolean,
+    modifier: Modifier = Modifier,
+    fraction: Float = 0.5f,
+    content: @Composable() AnimatedVisibilityScope.() -> Unit
+) = AnimatedVisibility(
+    visible = visible,
+    modifier = modifier,
+    enter = SlideDirection.FROM_BOTTOM.enter(fraction),
+    exit = SlideDirection.FROM_BOTTOM.exit(fraction),
+    content = content
+)
+
+@Composable
 fun <T> Transition<T>.SlideFromBottomAnimatedVisibility(
     visible: (T) -> Boolean,
     modifier: Modifier = Modifier,

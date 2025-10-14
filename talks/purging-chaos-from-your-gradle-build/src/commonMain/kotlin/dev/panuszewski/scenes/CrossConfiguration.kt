@@ -224,7 +224,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(subprojectsBlock, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
-        .pass()
+        .pass(2)
+        .hideIde()
         .revealFile("app")
         // ---
         .pass()

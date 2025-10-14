@@ -268,6 +268,14 @@ class CodeSample private constructor(
         return CodeSampleWithIdeOps(this, mutableListOf(HideFileTree))
     }
     
+    fun showIde(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ShowIde))
+    }
+    
+    fun hideIde(): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(HideIde))
+    }
+    
     fun revealFile(fileName: String): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(RevealFile(fileName)))
     }
@@ -402,6 +410,10 @@ object HideFileTree
 
 object ShowFileTree
 
+object HideIde
+
+object ShowIde
+
 data class RevealFile(val fileName: String)
 
 data class HideFile(val fileName: String)
@@ -463,6 +475,16 @@ class CodeSampleWithIdeOps(
     
     fun hideFileTree(): CodeSampleWithIdeOps {
         ideOperations.add(HideFileTree)
+        return this
+    }
+    
+    fun showIde(): CodeSampleWithIdeOps {
+        ideOperations.add(ShowIde)
+        return this
+    }
+    
+    fun hideIde(): CodeSampleWithIdeOps {
+        ideOperations.add(HideIde)
         return this
     }
     
@@ -612,7 +634,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is SwitchToFile, is ShowEmoji, is HideEmoji, is ShowImage, is HideImage,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
-            is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
+            is HideFileTree, is ShowFileTree, is HideIde, is ShowIde, is RevealFile, is HideFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
             is PauseNamedPanel, is ResumeNamedPanel,
@@ -637,7 +659,7 @@ class CodeSamplesBuilder : TextTagScope.Default() {
             is SwitchToFile, is ShowEmoji, is HideEmoji, is ShowImage, is HideImage,
             is OpenInLeftPane, is OpenInRightPane,
             is CloseLeftPane, is CloseRightPane,
-            is HideFileTree, is ShowFileTree, is RevealFile, is HideFile,
+            is HideFileTree, is ShowFileTree, is HideIde, is ShowIde, is RevealFile, is HideFile,
             is OpenErrorWindow, is CloseErrorWindow,
             is OpenNamedPanel, is CloseNamedPanel,
             is PauseNamedPanel, is ResumeNamedPanel,
@@ -717,6 +739,14 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(ShowFileTree)
     }
 
+    fun List<CodeSample>.hideIde(): List<CodeSample> {
+        return this + last().attach(HideIde)
+    }
+
+    fun List<CodeSample>.showIde(): List<CodeSample> {
+        return this + last().attach(ShowIde)
+    }
+
     fun List<CodeSample>.revealFile(fileName: String): List<CodeSample> {
         return this + last().attach(RevealFile(fileName))
     }
@@ -782,6 +812,16 @@ class ChainableOperations(val operations: MutableList<Any> = mutableListOf()) {
     
     fun hideFileTree(): ChainableOperations {
         operations.add(HideFileTree)
+        return this
+    }
+    
+    fun showIde(): ChainableOperations {
+        operations.add(ShowIde)
+        return this
+    }
+    
+    fun hideIde(): ChainableOperations {
+        operations.add(HideIde)
         return this
     }
     

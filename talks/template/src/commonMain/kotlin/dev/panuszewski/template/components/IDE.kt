@@ -62,6 +62,7 @@ import dev.panuszewski.template.theme.IdeColorScheme
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.withColor
 import kotlinx.coroutines.delay
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 
 data class IdeState(
     val files: List<ProjectFile>,
@@ -69,6 +70,7 @@ data class IdeState(
     val leftPaneFile: String? = null,
     val rightPaneFile: String? = null,
     val fileTreeHidden: Boolean = false,
+    val ideHidden: Boolean = false,
     val enlargedFile: String? = null,
     val highlightedFile: String? = null,
     val fileTreeWidth: Dp? = null,
@@ -151,8 +153,9 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
             label = "codePanelOffset"
         )
 
-        Column(
-            modifier = modifier
+        SlideFromBottomAnimatedVisibility(visible = !ideHidden) {
+            Column(
+                modifier = modifier
                 .border(
                     color = ideColors.border,
                     width = 1.dp,
@@ -339,6 +342,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                     }
                 }
             }
+        }
         }
         }
     }
