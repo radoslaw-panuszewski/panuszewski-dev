@@ -72,6 +72,14 @@ fun StoryboardBuilder.CrossConfiguration() {
                             val highlightColor = NICE_ORANGE
 
                             val tree = when {
+                                panelState.currentState == 13 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("app", appColor)
+                                        node("lib1", highlightColor)
+                                        node("lib2", highlightColor)
+                                        node("librus", highlightColor)
+                                    }
+                                }
                                 panelState.currentState == 12 -> buildTree {
                                     node("root-project", rootProjectColor) {
                                         node("app", appColor)
@@ -116,15 +124,16 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                it == 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
+                                                it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
                                                 it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
                                                 it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
                                                 it in 8 until 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
                                                 it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
                                                 it == 10 && node.value == "app" -> "app ❌".annotate()
-                                                it in listOf(10, 12) && node.value.contains("lib") -> "${node.value} ✅".annotate()
+                                                it == 13 && node.value == "librus" -> "librus ❌".annotate()
+                                                it in listOf(10, 12, 13) && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
                                                 it == 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
-                                                it in 6 until 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[0].String()
+                                                it in 6 until 8 && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
                                                 it in 2 until 4 && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
                                                 else -> buildAnnotatedString {
                                                     withColor(Color.White) { append(node.value) }
