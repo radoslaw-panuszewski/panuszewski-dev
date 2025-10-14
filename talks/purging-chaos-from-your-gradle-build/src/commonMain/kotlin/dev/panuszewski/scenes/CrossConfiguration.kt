@@ -37,10 +37,11 @@ import dev.panuszewski.template.extensions.SlideOutToBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
-import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
+import dev.panuszewski.template.theme.NICE_GREEN
 import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.CrossConfiguration() {
@@ -69,9 +70,34 @@ fun StoryboardBuilder.CrossConfiguration() {
                             val rootProjectColor = MaterialTheme.colors.primary
                             val libraryColor = NICE_BLUE
                             val appColor = MaterialTheme.colors.secondary
+                            val buildSrcColor = NICE_PINK
+                            val buildLogicColor = NICE_GREEN
                             val highlightColor = NICE_ORANGE
+                            val neutralColor = Color.Gray
 
-                            val tree = when {
+                            val mainBuildTree = when {
+                                panelState.currentState >= 15 -> buildTree {
+                                    val wtfLib = reusableNode("wtf-lib", libraryColor)
+
+                                    node("root-project", rootProjectColor) {
+                                        node("app", appColor)
+                                        node("lib1", libraryColor) {
+                                            node(wtfLib)
+                                        }
+                                        node("lib2", libraryColor) {
+                                            node(wtfLib)
+                                        }
+                                        node("librus")
+                                    }
+                                }
+                                panelState.currentState == 14 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("app", appColor)
+                                        node("lib1", libraryColor)
+                                        node("lib2", libraryColor)
+                                        node("librus")
+                                    }
+                                }
                                 panelState.currentState == 13 -> buildTree {
                                     node("root-project", rootProjectColor) {
                                         node("app", appColor)
@@ -111,7 +137,8 @@ fun StoryboardBuilder.CrossConfiguration() {
                                 }
                                 else -> buildTree {}
                             }
-                            AnimatedHorizontalTree(tree) { node ->
+
+                            AnimatedHorizontalTree(mainBuildTree) { node ->
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
@@ -124,6 +151,12 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
+                                                // TODO fix tree items positioning
+                                                it >= 17 && node.value == "wtf-lib" -> WTF_LIB[1].String()
+                                                it >= 17 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it == 16 && node.value == "wtf-lib" -> WTF_LIB[0].String()
+                                                it >= 16 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
+                                                it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
                                                 it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
                                                 it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
                                                 it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
@@ -135,9 +168,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                 it == 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
                                                 it in 6 until 8 && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
                                                 it in 2 until 4 && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
-                                                else -> buildAnnotatedString {
-                                                    withColor(Color.White) { append(node.value) }
-                                                }
+                                                else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                             }
                                         }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
                                     }
@@ -196,6 +227,9 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
         .then { focus(subprojectsKeyword) }
         .then { unfocus() }
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
+        .then { unfocus() }
+        .then { focus(subprojectsConfig) }
+        .then { unfocus().hide(subprojectsConfig) }
 }
 
 private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
@@ -238,4 +272,23 @@ private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { this }
         .then { hide(libConfig) }
+}
+
+private val WTF_LIB = buildCodeSamples {
+    val libConfig by tag()
+    val todo by tag()
+
+    """
+    ${libConfig}plugins {
+        `java-library`
+        `maven-publish`
+    }
+    publishing.publications.create("lib") {
+        from(components["java"])
+    }${libConfig}${todo}// TODO ${todo}
+    """
+        .trimIndent()
+        .toCodeSample(language = Language.KotlinDsl)
+        .startWith { hide(libConfig) }
+        .then { hide(todo).reveal(libConfig) }
 }

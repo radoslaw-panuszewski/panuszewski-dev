@@ -167,7 +167,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .closeAgenda()
 }
 
-val WTF_APP_GRADLE_KTS = buildCodeSamples {
+private val WTF_APP_GRADLE_KTS = buildCodeSamples {
     val todo by tag()
     val extractedCode by tag()
     val libsPlugin by tag()
