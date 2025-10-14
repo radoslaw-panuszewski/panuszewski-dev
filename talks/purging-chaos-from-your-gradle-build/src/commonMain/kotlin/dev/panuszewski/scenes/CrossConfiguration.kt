@@ -1,6 +1,7 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,7 +75,9 @@ fun StoryboardBuilder.CrossConfiguration() {
             transition.SlideOutToBottomAnimatedVisibility({ it != Frame.End }) {
                 ideState.IdeLayout {
                     adaptiveTopPanel("tree") { panelState ->
-                        Box(Modifier.height(200.dp)) {
+                        val panelHeight by panelState.animateDp { if (it < 3) 200.dp else 400.dp }
+
+                        Box(Modifier.height(panelHeight)) {
                             val rootProjectColor = MaterialTheme.colors.primary
                             val libraryColor = NICE_BLUE
                             val appColor = MaterialTheme.colors.secondary
@@ -111,6 +115,13 @@ fun StoryboardBuilder.CrossConfiguration() {
 //                                        node("lib1", libraryColor)
 //                                    }
 //                                }
+                                panelState.currentState >= 5 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("app", appColor)
+                                        node("lib1", libraryColor)
+                                        node("lib2", libraryColor)
+                                    }
+                                }
                                 panelState.currentState >= 3 -> buildTree {
                                     node("root-project", rootProjectColor) {
                                         node("app", appColor)
@@ -134,22 +145,35 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                it >= 7 && node.value.startsWith("lib") -> """
-                                                    plugins {
-                                                        `wtf-lib`
+                                                it >= 7 && node.value == "root-project" -> """
+                                                    subprojects {
+                                                        apply(plugin = "java-library")
+                                                        apply(plugin = "maven-publish")
+                                                        
+                                                        publishing.publications.create("lib") {
+                                                            from(components["java"])
+                                                        }
                                                     }
                                                     """
                                                     .trimIndent()
                                                     .toCode(language = Language.KotlinDsl)
-                                                it == 5 && node.value.startsWith("lib") -> buildAnnotatedString {
-                                                    withColor(NICE_ORANGE) { append("lib") }
-                                                    withColor(Color.White) { append(node.value.substringAfter("lib")) }
-                                                }
-                                                it >= 2 && node.value == "app" -> """
+                                                it in 6 until 8 && node.value.contains("lib") -> """
+                                                    plugins {
+                                                        `java-library`
+                                                        `maven-publish`
+                                                    }
+                                                    
+                                                    publishing.publications.create("lib") {
+                                                        from(components["java"])
+                                                    }
+                                                    """
+                                                    .trimIndent()
+                                                    .toCode(language = Language.KotlinDsl)
+                                                it in 2 until 4 && node.value == "app" -> """
                                                     plugins {
                                                         `wtf-app`
                                                     }
-                                                    
+                                                    dependencies {
                                                         implementation(projects.subProject)
                                                         implementation(libs.spring.boot.web)
                                                     }    
@@ -224,8 +248,9 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(subprojectsBlock, mavenPublish, publication, subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace) }
         .openPanel("tree")
-        .pass(2)
+        .pass()
         .hideIde()
+        .pass(100)
         .revealFile("app")
         // ---
         .pass()
