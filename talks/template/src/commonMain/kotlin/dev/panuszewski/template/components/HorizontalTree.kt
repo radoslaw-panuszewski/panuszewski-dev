@@ -308,40 +308,28 @@ fun <T> HorizontalTree(
         // Align all root nodes and their children
         alignChildren(rootNodes, 0, totalHeight)
 
-        // Post-processing step to center nodes with multiple parents vertically
+        // Post-processing step to adjust positioning for nodes with multiple parents
         for (node in nodes) {
             val allParents = node.getAllParents()
             if (allParents.size > 1) {
                 // Sort parents by their y position
                 val sortedParents = allParents.sortedBy { it.y }
-
-                // Find the middle parent (or the average of the two middle parents if even number)
-                val middleParentY = if (sortedParents.size % 2 == 1) {
-                    // Odd number of parents - use the middle one
-                    sortedParents[sortedParents.size / 2].y
-                } else {
-                    // Even number of parents - use the average of the two middle ones
-                    val middle1 = sortedParents[sortedParents.size / 2 - 1].y
-                    val middle2 = sortedParents[sortedParents.size / 2].y
-                    (middle1 + middle2) / 2
-                }
-
-                // Center the node vertically with the middle parent
-                node.y = middleParentY
                 
-                // After repositioning the node, we need to reposition its children to be centered around the new position
+                // Calculate the center position between first and last parent centers
+                val firstParentCenterY = sortedParents.first().y + sortedParents.first().placeable.height / 2
+                val lastParentCenterY = sortedParents.last().y + sortedParents.last().placeable.height / 2
+                val parentsCenterY = (firstParentCenterY + lastParentCenterY) / 2
+                
+                // Position the child node centered with respect to the parent group
+                node.y = parentsCenterY - node.placeable.height / 2
+                
+                // After repositioning the node, reposition its children to be centered around the new position
                 if (node.children.isNotEmpty()) {
-                    // Calculate total height of children
                     val childrenTotalHeight = node.children.sumOf { it.minHeight } + 
                                              ySpacing * (node.children.size - 1)
-                    
-                    // Calculate new center for this node
                     val newCenterY = node.y + node.placeable.height / 2
-                    
-                    // Position children centered around the new center
                     val childrenStartY = newCenterY - childrenTotalHeight / 2
                     
-                    // Recalculate children positions
                     val ySizes = IntArray(node.children.size) { node.children[it].minHeight }
                     val yPositions = IntArray(node.children.size)
                     with(verticalArrangement) { arrange(childrenTotalHeight, ySizes, yPositions) }

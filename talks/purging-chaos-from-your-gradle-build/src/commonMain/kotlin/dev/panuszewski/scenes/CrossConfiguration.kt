@@ -25,13 +25,13 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.Agenda
-import dev.panuszewski.template.components.AnimatedHorizontalTree
+import dev.panuszewski.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
-import dev.panuszewski.template.components.buildTree
+import dev.panuszewski.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.extensions.SlideOutToBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
@@ -63,7 +63,9 @@ fun StoryboardBuilder.CrossConfiguration() {
 
             transition.SlideOutToBottomAnimatedVisibility({ it != Frame.End }) {
                 ideState.IdeLayout {
-                    adaptiveTopPanel("tree") { panelState ->
+                    adaptiveTopPanel("tree") { ps ->
+                        val panelState = ps.createChildTransition { 17 }
+
                         val panelHeight by panelState.animateDp { if (it < 3) 200.dp else 400.dp }
 
                         Box(Modifier.height(panelHeight)) {

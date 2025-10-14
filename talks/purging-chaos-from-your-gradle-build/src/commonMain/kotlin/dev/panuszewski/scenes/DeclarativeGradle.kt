@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.TitleScaffold
-import dev.panuszewski.template.components.AnimatedHorizontalTree
+import dev.panuszewski.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
@@ -29,7 +29,7 @@ import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.body2
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
-import dev.panuszewski.template.components.buildTree
+import dev.panuszewski.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.extensions.code2
 import dev.panuszewski.template.extensions.h6

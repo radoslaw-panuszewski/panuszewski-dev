@@ -18,10 +18,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.magic.splitByChars
-import dev.panuszewski.template.components.AnimatedHorizontalTree
+import dev.panuszewski.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.TitleScaffold
-import dev.panuszewski.template.components.buildTree
+import dev.panuszewski.components.buildTree
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.withIntTransition
