@@ -37,6 +37,7 @@ import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.SlideOutToBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
@@ -115,6 +116,13 @@ fun StoryboardBuilder.CrossConfiguration() {
 //                                        node("lib1", libraryColor)
 //                                    }
 //                                }
+                                panelState.currentState == 12 -> buildTree {
+                                    node("root-project", rootProjectColor) {
+                                        node("app", appColor)
+                                        node("lib1", highlightColor)
+                                        node("lib2", highlightColor)
+                                    }
+                                }
                                 panelState.currentState == 10 -> buildTree {
                                     node("root-project", rootProjectColor) {
                                         node("app", highlightColor)
@@ -157,6 +165,8 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                 it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
                                                 it in 8 until 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
                                                 it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
+                                                it == 10 && node.value == "app" -> "app ❌".annotate()
+                                                it in listOf(10, 12) && node.value.contains("lib") -> "${node.value} ✅".annotate()
                                                 it == 8 && node.value.contains("lib") -> """
                                                     // rest of the config...
                                                     """
@@ -212,28 +222,40 @@ fun StoryboardBuilder.CrossConfiguration() {
 }
 
 private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
+    val subprojectsBlock by tag()
+    val subprojectsFilter by tag()
+    val subprojectsForEach by tag()
+    val subprojectsIndent1 by tag()
+    val subprojectsIndent2 by tag()
+    val subprojectsIndent3 by tag()
+    val subprojectsIndent4 by tag()
+    val subprojectsIndent5 by tag()
+    val subprojectsClosingBrace by tag()
     val subprojectsKeyword by tag()
     val subprojectsConfig by tag()
     val todo by tag()
 
     """
-    ${subprojectsKeyword}subprojects${subprojectsKeyword} {${subprojectsConfig}
-        apply(plugin = "java-library")
-        apply(plugin = "maven-publish")
-        
-        publishing.publications.create("lib") {
-            from(components["java"])
-        }${subprojectsConfig}${todo}
-        // TODO${todo}
-    }    
+    ${subprojectsBlock}${subprojectsKeyword}subprojects${subprojectsKeyword}${subprojectsFilter}
+        .filter { it.name.startsWith("lib")${subprojectsFilter}${subprojectsForEach}
+        .forEach${subprojectsForEach} { ${subprojectsConfig}
+        ${subprojectsIndent1}    it.${subprojectsIndent1}apply(plugin = "java-library")
+        ${subprojectsIndent2}    it.${subprojectsIndent2}apply(plugin = "maven-publish")
+    
+        ${subprojectsIndent3}    ${subprojectsIndent3}publishing.publications.create("lib") {
+        ${subprojectsIndent4}    ${subprojectsIndent4}    from(components["java"])
+        ${subprojectsIndent5}    ${subprojectsIndent5}}${subprojectsConfig}${todo}
+        // TODO          ${todo}${subprojectsClosingBrace}
+        }${subprojectsClosingBrace}
+    }${subprojectsBlock}    
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(subprojectsConfig) }
+        .startWith { hide(subprojectsConfig, subprojectsFilter, subprojectsForEach, subprojectsClosingBrace, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5) }
         .then { hide(todo).reveal(subprojectsConfig) }
         .then { focus(subprojectsKeyword) }
         .then { unfocus() }
-        .pass()
+        .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
 }
 
 private val BUILD_GRADLE_KTS = buildCodeSamples {
