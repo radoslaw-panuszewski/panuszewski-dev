@@ -63,9 +63,7 @@ fun StoryboardBuilder.CrossConfiguration() {
 
             transition.SlideOutToBottomAnimatedVisibility({ it != Frame.End }) {
                 ideState.IdeLayout {
-                    adaptiveTopPanel("tree") { ps ->
-                        val panelState = ps.createChildTransition { 17 }
-
+                    adaptiveTopPanel("tree") { panelState ->
                         val panelHeight by panelState.animateDp { if (it < 3) 200.dp else 400.dp }
 
                         Box(Modifier.height(panelHeight)) {

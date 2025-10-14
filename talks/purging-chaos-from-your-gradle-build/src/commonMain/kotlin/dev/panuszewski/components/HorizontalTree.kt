@@ -1,4 +1,4 @@
-package dev.panuszewski.template.components
+package dev.panuszewski.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
