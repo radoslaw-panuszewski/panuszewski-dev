@@ -34,6 +34,13 @@ fun highlightKotlinDsl(text: String, codeStyle: CodeStyle) = buildAnnotatedStrin
         }
     }
 
+    COMMENT_REGEX.forEachOccurrence(text) { range ->
+        if (!isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
+            addStyle(codeStyle.comment, range)
+            highlightedRanges.add(range)
+        }
+    }
+
     GRADLE_PLUGIN_BACKTICK_REGEX.findAll(text).forEach { match ->
         val range = match.groups[1]?.rangeCompat
         if (range != null && !isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
@@ -109,3 +116,5 @@ private val DSL_FUNCTION_REGEX = """\b(plugins|alias|explicitApi)(?=\s*(?:<[^>]+
 private val FUNCTION_CALL_REGEX = """\b(named|repositories|configure|classpath|apply|filter|forEach|endsWith|implementation|project|register)(?=\s*(?:<[^>]+>)?\s*[(\{])""".toRegex()
 
 private val STRING_INTERPOLATION_REGEX = """(\$)([a-zA-Z_][a-zA-Z0-9_]*)""".toRegex()
+
+private val COMMENT_REGEX = """(//.*?)$""".toRegex(RegexOption.MULTILINE)

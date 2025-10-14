@@ -153,7 +153,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                         publishing.publications.create("lib") {
                                                             from(components["java"])
                                                         }
-                                                    } // TODO
+                                                    }
                                                     """
                                                     .trimIndent()
                                                     .toCode(language = Language.KotlinDsl)
@@ -170,9 +170,9 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                     .trimMargin()
                                                     .toCode(language = Language.KotlinDsl)
                                                 it == 8 && node.value.contains("lib") -> """
-                                                    | // rest of the config...                                                          
+                                                    // rest of the config...
                                                     """
-                                                    .trimMargin()
+                                                    .trimIndent()
                                                     .toCode(language = Language.KotlinDsl)
                                                 it in 6 until 8 && node.value.contains("lib") -> """
                                                     plugins {
