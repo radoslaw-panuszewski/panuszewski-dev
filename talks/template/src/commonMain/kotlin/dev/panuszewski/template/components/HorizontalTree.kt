@@ -272,10 +272,10 @@ fun <T> HorizontalTree(
                 }
 
                 child.y = yPosition + childrenOffset + childOffset
-                
+
                 // Calculate the vertical center of the child node
                 val childCenterY = child.y + child.placeable.height / 2
-                
+
                 // If the child has children, center them around the child's center
                 if (child.children.isNotEmpty()) {
                     val childrenHeight = ySizes[i]
@@ -322,26 +322,26 @@ fun <T> HorizontalTree(
             if (allParents.size > 1) {
                 // Sort parents by their y position
                 val sortedParents = allParents.sortedBy { it.y }
-                
+
                 // Calculate the center position between first and last parent centers
                 val firstParentCenterY = sortedParents.first().y + sortedParents.first().placeable.height / 2
                 val lastParentCenterY = sortedParents.last().y + sortedParents.last().placeable.height / 2
                 val parentsCenterY = (firstParentCenterY + lastParentCenterY) / 2
-                
+
                 // Position the child node centered with respect to the parent group
                 node.y = parentsCenterY - node.placeable.height / 2
-                
+
                 // After repositioning the node, reposition its children to be centered around the new position
                 if (node.children.isNotEmpty()) {
-                    val childrenTotalHeight = node.children.sumOf { it.minHeight } + 
-                                             ySpacing * (node.children.size - 1)
+                    val childrenTotalHeight = node.children.sumOf { it.minHeight } +
+                            ySpacing * (node.children.size - 1)
                     val newCenterY = node.y + node.placeable.height / 2
                     val childrenStartY = newCenterY - childrenTotalHeight / 2
-                    
+
                     val ySizes = IntArray(node.children.size) { node.children[it].minHeight }
                     val yPositions = IntArray(node.children.size)
                     with(verticalArrangement) { arrange(childrenTotalHeight, ySizes, yPositions) }
-                    
+
                     for (i in node.children.indices) {
                         val child = node.children[i]
                         val childOffset = if (child.placeable.height < child.minHeight) {
