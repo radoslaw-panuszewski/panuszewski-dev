@@ -138,7 +138,10 @@ fun StoryboardBuilder.CrossConfiguration() {
                                 else -> buildTree {}
                             }
 
-                            AnimatedHorizontalTree(mainBuildTree) { node ->
+                            AnimatedHorizontalTree(
+                                tree = mainBuildTree,
+                                excludeSharedChildrenFromLayout = true,
+                            ) { node ->
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))

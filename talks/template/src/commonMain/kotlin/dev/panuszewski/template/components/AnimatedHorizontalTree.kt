@@ -28,6 +28,7 @@ import kotlin.collections.set
 fun <T : Any> AnimatedHorizontalTree(
     tree: List<TreeElement<T>>,
     modifier: Modifier = Modifier,
+    excludeSharedChildrenFromLayout: Boolean = false,
     content: @Composable (node: TreeElement<T>) -> Unit,
 ) {
     SharedTransitionLayout {
@@ -63,6 +64,7 @@ fun <T : Any> AnimatedHorizontalTree(
                     roots = roots,
                     getChildren = { it.children },
                     modifier = Modifier.onPlaced { offset = it.positionInParent() },
+                    excludeSharedChildrenFromLayout = excludeSharedChildrenFromLayout,
                 ) { item ->
                     Box(
                         Modifier

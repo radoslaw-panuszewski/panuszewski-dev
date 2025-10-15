@@ -57,6 +57,7 @@ fun <T> HorizontalTree(
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     verticalMinimumSpacing: Dp = 0.dp,
+    excludeSharedChildrenFromLayout: Boolean = false,
     connection: @Composable (parent: T, parentRect: Rect, child: T, childRect: Rect) -> Unit = { _, _, _, _ -> },
     content: @Composable (node: T) -> Unit,
 ) {
@@ -70,6 +71,7 @@ fun <T> HorizontalTree(
         verticalArrangement = verticalArrangement,
         verticalAlignment = verticalAlignment,
         verticalMinimumSpacing = verticalMinimumSpacing,
+        excludeSharedChildrenFromLayout = excludeSharedChildrenFromLayout,
         connection = connection,
         content = content
     )
@@ -103,6 +105,11 @@ fun <T> HorizontalTree(
     // Useful when combined with non-SpacedBy arrangements.
     // TODO is this actually useful?
     verticalMinimumSpacing: Dp = 0.dp,
+
+    // When true, shared children (nodes with multiple parents) are excluded from height calculations
+    // and only positioned once during the initial layout pass. They are then repositioned in post-processing.
+    // When false, shared children are included in all calculations and may be positioned multiple times.
+    excludeSharedChildrenFromLayout: Boolean = false,
 
     // TODO support packing?
     //  - support top/bottom packing nodes at the same depth?
@@ -216,6 +223,10 @@ fun <T> HorizontalTree(
         fun heightUp(node: TreeNode<T>): Int {
             var childHeight = -ySpacing
             for (child in node.children) {
+                // When excludeSharedChildrenFromLayout is true, skip shared children in height calculation
+                if (excludeSharedChildrenFromLayout && child.getAllParents().size > 1) {
+                    continue
+                }
                 childHeight += heightUp(child) + ySpacing
             }
             node.minHeight = maxOf(node.placeable.height, childHeight)
@@ -234,17 +245,31 @@ fun <T> HorizontalTree(
             }
         }
 
+        // Track which shared nodes have been positioned during initial pass
+        val positionedSharedNodes = mutableSetOf<TreeNode<T>>()
+        
         fun alignChildren(children: List<TreeNode<T>>, yOffset: Int, height: Int) {
             if (children.isEmpty()) return
 
-            val ySizes = IntArray(children.size) { children[it].minHeight }
-            val yPositions = IntArray(children.size)
+            // When excludeSharedChildrenFromLayout is true, filter out shared nodes that have already been positioned
+            val childrenToPosition = if (excludeSharedChildrenFromLayout) {
+                children.filter { child ->
+                    child.getAllParents().size <= 1 || child !in positionedSharedNodes
+                }
+            } else {
+                children
+            }
+            
+            if (childrenToPosition.isEmpty()) return
+
+            val ySizes = IntArray(childrenToPosition.size) { childrenToPosition[it].minHeight }
+            val yPositions = IntArray(childrenToPosition.size)
             with(verticalArrangement) { arrange(height, ySizes, yPositions) }
 
             val childrenOffset = if (verticalArrangement.spacing.value > 0f) {
                 var min = height
                 var max = 0
-                for (i in children.indices) {
+                for (i in childrenToPosition.indices) {
                     min = minOf(min, yPositions[i])
                     max = maxOf(max, yPositions[i] + ySizes[i])
                 }
@@ -254,7 +279,7 @@ fun <T> HorizontalTree(
             }
 
             for (i in yPositions.indices) {
-                val child = children[i]
+                val child = childrenToPosition[i]
                 val yPosition = yOffset + yPositions[i]
 
                 val childOffset = if (child.placeable.height < child.minHeight) {
@@ -264,6 +289,11 @@ fun <T> HorizontalTree(
                 }
 
                 child.y = yPosition + childrenOffset + childOffset
+                
+                // Mark shared nodes as positioned when excludeSharedChildrenFromLayout is true
+                if (excludeSharedChildrenFromLayout && child.getAllParents().size > 1) {
+                    positionedSharedNodes.add(child)
+                }
 
                 // Calculate the vertical center of the child node
                 val childCenterY = child.y + child.placeable.height / 2
