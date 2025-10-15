@@ -216,11 +216,7 @@ fun <T> HorizontalTree(
         fun heightUp(node: TreeNode<T>): Int {
             var childHeight = -ySpacing
             for (child in node.children) {
-                // Only include children that don't have multiple parents
-                // Shared children will be positioned independently
-                if (child.getAllParents().size <= 1) {
-                    childHeight += heightUp(child) + ySpacing
-                }
+                childHeight += heightUp(child) + ySpacing
             }
             node.minHeight = maxOf(node.placeable.height, childHeight)
             return node.minHeight
@@ -241,18 +237,14 @@ fun <T> HorizontalTree(
         fun alignChildren(children: List<TreeNode<T>>, yOffset: Int, height: Int) {
             if (children.isEmpty()) return
 
-            // Filter out children with multiple parents - they'll be positioned in post-processing
-            val nonSharedChildren = children.filter { it.getAllParents().size <= 1 }
-            if (nonSharedChildren.isEmpty()) return
-
-            val ySizes = IntArray(nonSharedChildren.size) { nonSharedChildren[it].minHeight }
-            val yPositions = IntArray(nonSharedChildren.size)
+            val ySizes = IntArray(children.size) { children[it].minHeight }
+            val yPositions = IntArray(children.size)
             with(verticalArrangement) { arrange(height, ySizes, yPositions) }
 
             val childrenOffset = if (verticalArrangement.spacing.value > 0f) {
                 var min = height
                 var max = 0
-                for (i in nonSharedChildren.indices) {
+                for (i in children.indices) {
                     min = minOf(min, yPositions[i])
                     max = maxOf(max, yPositions[i] + ySizes[i])
                 }
@@ -262,7 +254,7 @@ fun <T> HorizontalTree(
             }
 
             for (i in yPositions.indices) {
-                val child = nonSharedChildren[i]
+                val child = children[i]
                 val yPosition = yOffset + yPositions[i]
 
                 val childOffset = if (child.placeable.height < child.minHeight) {
@@ -317,6 +309,19 @@ fun <T> HorizontalTree(
         alignChildren(rootNodes, 0, totalHeight)
 
         // Post-processing step to adjust positioning for nodes with multiple parents
+        fun repositionSharedNodeAndDescendants(node: TreeNode<T>, deltaY: Int) {
+            // Adjust this node's position
+            node.y += deltaY
+            
+            // Recursively adjust all children (both shared and non-shared)
+            for (child in node.children) {
+                if (child.getAllParents().size <= 1) {
+                    // Child has only one parent (this node), so adjust it
+                    repositionSharedNodeAndDescendants(child, deltaY)
+                }
+            }
+        }
+
         for (node in nodes) {
             val allParents = node.getAllParents()
             if (allParents.size > 1) {
@@ -328,30 +333,12 @@ fun <T> HorizontalTree(
                 val lastParentCenterY = sortedParents.last().y + sortedParents.last().placeable.height / 2
                 val parentsCenterY = (firstParentCenterY + lastParentCenterY) / 2
 
-                // Position the child node centered with respect to the parent group
-                node.y = parentsCenterY - node.placeable.height / 2
+                // Calculate how much we need to move this node
+                val targetY = parentsCenterY - node.placeable.height / 2
+                val deltaY = targetY - node.y
 
-                // After repositioning the node, reposition its children to be centered around the new position
-                if (node.children.isNotEmpty()) {
-                    val childrenTotalHeight = node.children.sumOf { it.minHeight } +
-                            ySpacing * (node.children.size - 1)
-                    val newCenterY = node.y + node.placeable.height / 2
-                    val childrenStartY = newCenterY - childrenTotalHeight / 2
-
-                    val ySizes = IntArray(node.children.size) { node.children[it].minHeight }
-                    val yPositions = IntArray(node.children.size)
-                    with(verticalArrangement) { arrange(childrenTotalHeight, ySizes, yPositions) }
-
-                    for (i in node.children.indices) {
-                        val child = node.children[i]
-                        val childOffset = if (child.placeable.height < child.minHeight) {
-                            verticalAlignment.align(child.placeable.height, child.minHeight)
-                        } else {
-                            0
-                        }
-                        child.y = childrenStartY + yPositions[i] + childOffset
-                    }
-                }
+                // Reposition the node and all its descendants by the same delta
+                repositionSharedNodeAndDescendants(node, deltaY)
             }
         }
 

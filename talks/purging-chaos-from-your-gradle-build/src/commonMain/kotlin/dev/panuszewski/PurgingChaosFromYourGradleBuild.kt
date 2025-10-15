@@ -29,7 +29,7 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
 //    Groovy()
 //    NoTypeSafety()
 //    ImperativeCode()
-//    CrossConfiguration()
+    CrossConfiguration()
     BuildSrcVsBuildLogic()
     TwoTypesOfGradleUsers()
     DeclarativeGradle()
