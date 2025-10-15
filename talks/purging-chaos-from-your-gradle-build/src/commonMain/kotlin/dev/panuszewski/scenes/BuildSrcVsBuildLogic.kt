@@ -35,9 +35,9 @@ import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.BuildSrcVsBuildLogic() {
     val (
-        subprojectsAppear,
+        initialState,
+        appConventionAppears,
         subprojectsExpand,
-        conventionsAppear,
         buildSrcAppears,
         wtfAppModifiedInBuildSrc,
         buildSrcModified,
@@ -201,28 +201,25 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                             node("app", appColor) { node(buildSrc) }
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("librus")
                         }
                     }
-                    currentState >= conventionsAppear -> buildTree {
-                        val appConvention = reusableNode("app-convention", neutralColor)
-                        val libConvention = reusableNode("lib-convention", neutralColor)
+                    currentState >= appConventionAppears -> buildTree {
+                        val appConvention = reusableNode("app-convention", appColor)
+                        val libConvention = reusableNode("lib-convention", libColor)
 
                         node("root-project", rootColor) {
                             node("app", appColor) { node(appConvention) }
                             node("lib1", libColor) { node(libConvention) }
                             node("lib2", libColor) { node(libConvention) }
-                            node("librus")
                         }
                     }
-                    currentState >= subprojectsAppear -> buildTree {
+                    currentState >= initialState -> buildTree {
                         val libConvention = reusableNode("lib-convention", libColor)
 
                         node("root-project", rootColor) {
                             node("app", appColor)
                             node("lib1", libColor) { node(libConvention) }
                             node("lib2", libColor) { node(libConvention) }
-                            node("librus")
                         }
                     }
                     else -> emptyList()

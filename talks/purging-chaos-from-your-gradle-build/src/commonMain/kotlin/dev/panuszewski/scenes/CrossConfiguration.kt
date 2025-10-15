@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,9 +64,9 @@ fun StoryboardBuilder.CrossConfiguration() {
 
             ideState.IdeLayout {
                 adaptiveTopPanel("tree") { panelState ->
-                    val panelHeight by panelState.animateDp { if (it < 3) 200.dp else 400.dp }
+                    val modifier = if (panelState.currentState < 3) Modifier.height(200.dp) else Modifier.fillMaxHeight()
 
-                    Box(Modifier.height(panelHeight)) {
+                    Box(modifier.animateContentSize()) {
                         val rootProjectColor = MaterialTheme.colors.primary
                         val libraryColor = NICE_BLUE
                         val appColor = MaterialTheme.colors.secondary
@@ -75,6 +76,19 @@ fun StoryboardBuilder.CrossConfiguration() {
                         val neutralColor = Color.Gray
 
                         val mainBuildTree = when {
+                            panelState.currentState >= 23 -> buildTree {
+                                val wtfLib = reusableNode("lib-convention", libraryColor)
+
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                    node("lib1", libraryColor) {
+                                        node(wtfLib)
+                                    }
+                                    node("lib2", libraryColor) {
+                                        node(wtfLib)
+                                    }
+                                }
+                            }
                             panelState.currentState >= 15 -> buildTree {
                                 val wtfLib = reusableNode("lib-convention", libraryColor)
 
@@ -259,7 +273,7 @@ private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
         .pass()
         .hideIde()
         .then { hide(emptyLine) }
-        .pass(19)
+        .pass(20)
 }
 
 private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
