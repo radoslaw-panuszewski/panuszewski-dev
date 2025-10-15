@@ -151,9 +151,11 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                // TODO fix tree items positioning
+                                                it >= 19 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
+                                                it >= 18 && node.value == "wtf-lib" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it >= 18 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                                 it >= 17 && node.value == "wtf-lib" -> WTF_LIB[1].String()
-                                                it >= 17 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
                                                 it == 16 && node.value == "wtf-lib" -> WTF_LIB[0].String()
                                                 it >= 16 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
                                                 it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
@@ -257,6 +259,8 @@ private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
 
 private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
     val libConfig by tag()
+    val restOfTheConfig by tag()
+    val conventionPluginUsage by tag()
 
     """
     ${libConfig}plugins {
@@ -266,12 +270,15 @@ private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
     publishing.publications.create("lib") {
         from(components["java"])
     }
-    ${libConfig}// rest of the config...
+    ${libConfig}${conventionPluginUsage}plugins {
+        `wtf-lib`
+    }${conventionPluginUsage}${restOfTheConfig}// rest of the config...${restOfTheConfig}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { this }
+        .startWith { hide(conventionPluginUsage) }
         .then { hide(libConfig) }
+        .then { hide(restOfTheConfig).reveal(conventionPluginUsage) }
 }
 
 private val WTF_LIB = buildCodeSamples {
