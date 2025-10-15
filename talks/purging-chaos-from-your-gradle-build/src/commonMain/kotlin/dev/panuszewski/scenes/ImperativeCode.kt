@@ -1,13 +1,16 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -18,6 +21,7 @@ import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.ResourceImage
+import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.Terminal
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
@@ -27,6 +31,8 @@ import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
+import dev.panuszewski.template.theme.withColor
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.placzka
 import talks.purging_chaos_from_your_gradle_build.generated.resources.typesafe_conventions
@@ -46,10 +52,35 @@ fun StoryboardBuilder.ImperativeCode() {
 
     scene(totalStates) {
         withIntTransition {
-            TitleScaffold("Imperative code") {
-                val ideState = buildIdeState(files)
+            val ideState = buildIdeState(files, initialTitle = "Imperative code")
+
+            TitleScaffold(ideState.currentState.title) {
 
                 ideState.IdeLayout {
+                    topPanel("bulletpoints") { panelState ->
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            panelState.RevealSequentially(since = 2) {
+                                annotatedStringItem {
+                                    append("A ")
+                                    withColor(NICE_LIGHT_TURQUOISE) { append("convention plugin") }
+                                    append(" is just a Gradle plugin local to your project")
+                                }
+                                annotatedStringItem {
+                                    append("It can be used to encapsulate an ")
+                                    withColor(NICE_LIGHT_TURQUOISE) { append("imperative build logic") }
+                                }
+                                annotatedStringItem {
+                                    append("Or share some ")
+                                    withColor(NICE_LIGHT_TURQUOISE) { append("common defaults") }
+                                    append(" (like the JVM version)")
+                                }
+                            }
+                        }
+                    }
+
                     adaptiveLeftPanel("terminal") { panelState ->
                         Box(
                             modifier = Modifier.fillMaxHeight().padding(end = 32.dp),
@@ -158,6 +189,12 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(masochistIfTop, masochistIfBottom) }
         .then { unfocus().showEmoji("😬") }
         .hideEmoji()
+        // explain convention plugins
+        .openPanel("bulletpoints")
+        .changeTitle("Convention plugins")
+        .pass(3)
+        .closePanel("bulletpoints")
+        // start extracting convention plugin
         .openInRightPane("buildSrc/src/main/kotlin/app-convention.gradle.kts", switchTo = true)
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
         .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
@@ -211,6 +248,7 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         .thenTogetherWith("build.gradle.kts") { this }
         .thenTogetherWith("build.gradle.kts") { reveal(extractedCode) }
         .thenTogetherWith("build.gradle.kts") { hide(todo) }
+        // closing build.gradle.kts
         .then { closeLeftPane().showFileTree() }
         // showing errors
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
