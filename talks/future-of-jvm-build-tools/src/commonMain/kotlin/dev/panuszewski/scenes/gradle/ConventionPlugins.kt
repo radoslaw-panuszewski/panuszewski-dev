@@ -203,16 +203,16 @@ fun StoryboardBuilder.ConventionPlugins() {
                                     }
                                     if (currentState.toState() >= conventionFileAdded) {
                                         addFile(
-                                            name = "wtf-app.gradle.kts",
-                                            path = "buildSrc/src/main/kotlin/wtf-app.gradle.kts",
-                                            content = createChildTransition { WTF_APP_GRADLE_KTS.safeGet(it.toState() - fileTreeHiddenSince) }
+                                            name = "app-convention.gradle.kts",
+                                            path = "buildSrc/src/main/kotlin/app-convention.gradle.kts",
+                                            content = createChildTransition { APP_CONVENTION_GRADLE_KTS.safeGet(it.toState() - fileTreeHiddenSince) }
                                         )
                                     }
                                 }
 
                                 val selectedFile = when {
                                     currentState.toState() < splitPaneEnabledSince -> "build.gradle.kts"
-                                    currentState.toState() == splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                                    currentState.toState() == splitPaneEnabledSince -> "buildSrc/src/main/kotlin/app-convention.gradle.kts"
                                     currentState.toState() >= splitPaneClosedSince -> "build.gradle.kts"
                                     else -> null
                                 }
@@ -225,7 +225,7 @@ fun StoryboardBuilder.ConventionPlugins() {
 
                                 val rightPaneFile = when {
                                     currentState.toState() >= splitPaneClosedSince -> null
-                                    currentState.toState() >= splitPaneEnabledSince -> "buildSrc/src/main/kotlin/wtf-app.gradle.kts"
+                                    currentState.toState() >= splitPaneEnabledSince -> "buildSrc/src/main/kotlin/app-convention.gradle.kts"
                                     else -> null
                                 }
 
@@ -294,7 +294,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         ${pluginsBlock}plugins {${javaPlugin}
             `java`${javaPlugin}${mavenPublishDeclarative}
             `maven-publish`${mavenPublishDeclarative}${wtfAppPlugin}
-            `wtf-app`${wtfAppPlugin}${pluginsBlockNewline}
+            `app-convention`${wtfAppPlugin}${pluginsBlockNewline}
         ${pluginsBlockNewline}}
         
         ${pluginsBlock}${mavenPublishImperative}${topIfCi}if (System.getenv("CI") == "true") {
@@ -353,7 +353,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { unfocus() }
 }
 
-val WTF_APP_GRADLE_KTS = buildCodeSamples {
+val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
     val todo by tag()
     val imperativeCode by tag()
     val javaPlugin by tag()

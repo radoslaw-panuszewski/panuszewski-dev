@@ -494,7 +494,7 @@ value === DIRECTORY -> {
 - Any hierarchical UI where parent and children should animate as a unit while maintaining their spatial relationship
 
 ### Multi-File State Synchronization: Clearing Markers on File Switch
-- **PROBLEM**: When switching from one file back to another (e.g., from `wtf-app.gradle.kts` back to `build.gradle.kts`), the target file would immediately execute its next frame instead of waiting for the next state advance. This happened because marker frames (like `SWITCH_TO`, `EMOJI_SHOW`, etc.) accumulated and weren't being cleared properly.
+- **PROBLEM**: When switching from one file back to another (e.g., from `app-convention.gradle.kts` back to `build.gradle.kts`), the target file would immediately execute its next frame instead of waiting for the next state advance. This happened because marker frames (like `SWITCH_TO`, `EMOJI_SHOW`, etc.) accumulated and weren't being cleared properly.
 - **ROOT CAUSE**: The `IdeLayout` composable tracks multiple types of marker frames (file switches, emoji display, pane operations) by scanning through all files' frames. When switching back to a file, these markers from previous states remained in the frame lists, causing the system to think it was still in a "marker frame state" and skip to the next regular frame.
 - **SYMPTOMS**: 
   - After `.switchTo("build.gradle.kts")` from another file, the `build.gradle.kts` would immediately execute its next `.then { ... }` frame

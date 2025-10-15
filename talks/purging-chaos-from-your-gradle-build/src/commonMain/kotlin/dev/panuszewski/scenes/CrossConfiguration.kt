@@ -77,7 +77,7 @@ fun StoryboardBuilder.CrossConfiguration() {
 
                             val mainBuildTree = when {
                                 panelState.currentState >= 15 -> buildTree {
-                                    val wtfLib = reusableNode("wtf-lib", libraryColor)
+                                    val wtfLib = reusableNode("lib-convention", libraryColor)
 
                                     node("root-project", rootProjectColor) {
                                         node("app", appColor)
@@ -152,11 +152,11 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         panelState.createChildTransition {
                                             when {
                                                 it >= 19 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
-                                                it >= 18 && node.value == "wtf-lib" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it >= 18 && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                                 it >= 18 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                it >= 17 && node.value == "wtf-lib" -> WTF_LIB[1].String()
+                                                it >= 17 && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
                                                 it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
-                                                it == 16 && node.value == "wtf-lib" -> WTF_LIB[0].String()
+                                                it == 16 && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
                                                 it >= 16 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
                                                 it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
                                                 it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
@@ -239,7 +239,7 @@ private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
 
     """
     plugins {
-        `wtf-app`
+        `app-convention`
     }${emptyLine}
     ${emptyLine}
     dependencies {
@@ -271,7 +271,7 @@ private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
         from(components["java"])
     }
     ${libConfig}${conventionPluginUsage}plugins {
-        `wtf-lib`
+        `lib-convention`
     }${conventionPluginUsage}${restOfTheConfig}// rest of the config...${restOfTheConfig}
     """
         .trimIndent()
@@ -281,7 +281,7 @@ private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
         .then { hide(restOfTheConfig).reveal(conventionPluginUsage) }
 }
 
-private val WTF_LIB = buildCodeSamples {
+private val LIB_CONVENTION = buildCodeSamples {
     val libConfig by tag()
     val todo by tag()
 

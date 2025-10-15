@@ -75,10 +75,10 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                 val tree = when {
                     currentState >= resetAfterBuildLogicChange -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("wtf-lib", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
                         }
                         val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                            node("wtf-app", buildLogicColor)
+                            node("app-convention", buildLogicColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
@@ -88,10 +88,10 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= onlyAppReconfigured -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("wtf-lib", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
                         }
                         val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
-                            node("wtf-app", highlightColor)
+                            node("app-convention", highlightColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
@@ -101,10 +101,10 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= buildLogicAppModified -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("wtf-lib", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
                         }
                         val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
-                            node("wtf-app", highlightColor)
+                            node("app-convention", highlightColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
@@ -114,10 +114,10 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= wtfAppModifiedInBuildLogic -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("wtf-lib", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
                         }
                         val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                            node("wtf-app", highlightColor)
+                            node("app-convention", highlightColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
@@ -127,10 +127,10 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("wtf-lib", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
                         }
                         val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                            node("wtf-app", buildLogicColor)
+                            node("app-convention", buildLogicColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
@@ -140,8 +140,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= buildLogicAppears -> buildTree {
                         val buildLogic = reusableNode("build-logic", buildLogicColor) {
-                            node("wtf-lib", buildLogicColor)
-                            node("wtf-app", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
+                            node("app-convention", buildLogicColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogic) }
@@ -151,8 +151,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= resetAfterBuildSrcChange -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                            node("wtf-lib", buildSrcColor)
-                            node("wtf-app", buildSrcColor)
+                            node("lib-convention", buildSrcColor)
+                            node("app-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
@@ -162,8 +162,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= allSubprojectsReconfigured -> buildTree {
                         val buildSrc = reusableNode("buildSrc", highlightColor) {
-                            node("wtf-lib", buildSrcColor)
-                            node("wtf-app", highlightColor)
+                            node("lib-convention", buildSrcColor)
+                            node("app-convention", highlightColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", highlightColor) { node(buildSrc) }
@@ -173,8 +173,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= buildSrcModified -> buildTree {
                         val buildSrc = reusableNode("buildSrc", highlightColor) {
-                            node("wtf-lib", buildSrcColor)
-                            node("wtf-app", highlightColor)
+                            node("lib-convention", buildSrcColor)
+                            node("app-convention", highlightColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
@@ -184,8 +184,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= wtfAppModifiedInBuildSrc -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                            node("wtf-lib", buildSrcColor)
-                            node("wtf-app", highlightColor)
+                            node("lib-convention", buildSrcColor)
+                            node("app-convention", highlightColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
@@ -195,8 +195,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                     }
                     currentState >= buildSrcAppears -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                            node("wtf-lib", buildSrcColor)
-                            node("wtf-app", buildSrcColor)
+                            node("lib-convention", buildSrcColor)
+                            node("app-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
@@ -205,8 +205,8 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         }
                     }
                     currentState >= conventionsAppear -> buildTree {
-                        val wtfLib = reusableNode("wtf-lib", neutralColor)
-                        val wtfApp = reusableNode("wtf-app", neutralColor)
+                        val wtfLib = reusableNode("lib-convention", neutralColor)
+                        val wtfApp = reusableNode("app-convention", neutralColor)
 
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(wtfLib) }
@@ -243,25 +243,25 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                                     it >= conventionsChangeToNonTypesafe && node.value.startsWith("lib") -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         append("    id(")
-                                        withColor(LocalCodeStyle.current.string.color) { append("\"wtf-lib\"") }
+                                        withColor(LocalCodeStyle.current.string.color) { append("\"lib-convention\"") }
                                         appendLine(")")
                                         append("}")
                                     }
                                     it >= conventionsChangeToNonTypesafe && node.value.startsWith("app") -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         append("    id(")
-                                        withColor(LocalCodeStyle.current.string.color) { append("\"wtf-app\"") }
+                                        withColor(LocalCodeStyle.current.string.color) { append("\"app-convention\"") }
                                         appendLine(")")
                                         append("}")
                                     }
                                     it >= subprojectsExpand && node.value.startsWith("lib") -> buildAnnotatedString {
                                         appendLine("plugins {")
-                                        withColor(libColor) { appendLine("    `wtf-lib`") }
+                                        withColor(libColor) { appendLine("    `lib-convention`") }
                                         append("}")
                                     }
                                     it >= subprojectsExpand && node.value.startsWith("app") -> buildAnnotatedString {
                                         appendLine("plugins {")
-                                        withColor(appColor) { appendLine("    `wtf-app`") }
+                                        withColor(appColor) { appendLine("    `app-convention`") }
                                         append("}")
                                     }
                                     else -> buildAnnotatedString {

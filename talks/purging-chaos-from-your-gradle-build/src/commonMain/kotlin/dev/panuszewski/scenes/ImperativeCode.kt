@@ -38,7 +38,7 @@ fun StoryboardBuilder.ImperativeCode() {
         "build.gradle.kts" to BUILD_GRADLE_KTS,
         "buildSrc" to DIRECTORY.initiallyHidden(),
         "buildSrc/src/main/kotlin" to DIRECTORY.initiallyHidden(),
-        "buildSrc/src/main/kotlin/wtf-app.gradle.kts" to WTF_APP_GRADLE_KTS.initiallyHidden(),
+        "buildSrc/src/main/kotlin/app-convention.gradle.kts" to APP_CONVENTION_GRADLE_KTS.initiallyHidden(),
         "buildSrc/settings.gradle.kts" to SETTINGS_GRADLE_KTS_IN_BUILD_SRC.initiallyHidden(),
         "buildSrc/build.gradle.kts" to BUILD_GRADLE_KTS_IN_BUILD_SRC.initiallyHidden(),
     )
@@ -121,7 +121,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     ${pluginsBlock}plugins {${javaPlugin}
         alias(libs.plugins.kotlin.jvm)${javaPlugin}${mavenPublishDeclarative}
         `maven-publish`${mavenPublishDeclarative}${wtfAppPlugin}
-        `wtf-app`${wtfAppPlugin}${pluginsBlockNewline}
+        `app-convention`${wtfAppPlugin}${pluginsBlockNewline}
     ${pluginsBlockNewline}}
     
     ${pluginsBlock}${mavenPublishImperative}${topIfCi}if (System.getenv("CI") == "true") {
@@ -158,7 +158,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(masochistIfTop, masochistIfBottom) }
         .then { unfocus().showEmoji("😬") }
         .hideEmoji()
-        .openInRightPane("buildSrc/src/main/kotlin/wtf-app.gradle.kts", switchTo = true)
+        .openInRightPane("buildSrc/src/main/kotlin/app-convention.gradle.kts", switchTo = true)
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
         .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }
         .then { unfocus() }
@@ -167,7 +167,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .closeAgenda()
 }
 
-private val WTF_APP_GRADLE_KTS = buildCodeSamples {
+private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
     val todo by tag()
     val extractedCode by tag()
     val libsPlugin by tag()
@@ -283,7 +283,7 @@ private val SETTINGS_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
         .then { revealAndFocus(typesafeConventions) }
         .then { unfocus() }
         // go to build.gradle.kts to remove plugin dependency
-        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .switchTo("buildSrc/src/main/kotlin/app-convention.gradle.kts")
 }
 
 private val BUILD_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
@@ -331,10 +331,10 @@ private val BUILD_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
         .then { revealAndFocus(pluginMarkerFunction) }
         .then { unfocus() }
         // going back to convention plugin
-        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .switchTo("buildSrc/src/main/kotlin/app-convention.gradle.kts")
         .pass()
         // removing plugin dependency
         .then { focus(pluginMarkerFunction, pluginDependency) }
         .then { hide(pluginMarkerFunction, pluginDependency).unfocus() }
-        .switchTo("buildSrc/src/main/kotlin/wtf-app.gradle.kts")
+        .switchTo("buildSrc/src/main/kotlin/app-convention.gradle.kts")
 }
