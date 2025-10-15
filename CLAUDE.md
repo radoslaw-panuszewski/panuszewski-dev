@@ -42,6 +42,12 @@ DO NOT UNCOMMENT THAT FILE! It is commented out because compiling it takes too l
 
 The compiled version of this file is published to Maven Local repository. DO NOT REMOVE OR OVERWRITE `dev.panuszewski:template-jvm:local` dependency! It is located in `/Users/radoslaw.panuszewski/.m2/repository/dev/panuszewski/template-jvm/local`.
 
+If you REALLY NEED to modify `IdeLayout.kt`:
+* uncomment the file
+* make the changes
+* execute `./gradlew :template:publishKotlinMultiplatformPublicationToMavenLocal`
+* comment out the file
+
 ## Build Commands
 
 ### Storyboard Library
