@@ -83,7 +83,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app1", appColor) { node(buildLogicApp) }
+                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= onlyAppReconfigured -> buildTree {
@@ -96,7 +96,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app1", highlightColor) { node(buildLogicApp) }
+                            node("app", highlightColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= buildLogicAppModified -> buildTree {
@@ -109,7 +109,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app1", appColor) { node(buildLogicApp) }
+                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= wtfAppModifiedInBuildLogic -> buildTree {
@@ -122,7 +122,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app1", appColor) { node(buildLogicApp) }
+                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
@@ -135,7 +135,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app1", appColor) { node(buildLogicApp) }
+                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= buildLogicAppears -> buildTree {
@@ -146,7 +146,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildLogic) }
                             node("lib2", libColor) { node(buildLogic) }
-                            node("app1", appColor) { node(buildLogic) }
+                            node("app", appColor) { node(buildLogic) }
                         }
                     }
                     currentState >= resetAfterBuildSrcChange -> buildTree {
@@ -157,7 +157,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app1", appColor) { node(buildSrc) }
+                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= allSubprojectsReconfigured -> buildTree {
@@ -168,7 +168,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", highlightColor) { node(buildSrc) }
                             node("lib2", highlightColor) { node(buildSrc) }
-                            node("app1", highlightColor) { node(buildSrc) }
+                            node("app", highlightColor) { node(buildSrc) }
                         }
                     }
                     currentState >= buildSrcModified -> buildTree {
@@ -179,7 +179,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app1", appColor) { node(buildSrc) }
+                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= wtfAppModifiedInBuildSrc -> buildTree {
@@ -190,7 +190,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app1", appColor) { node(buildSrc) }
+                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= buildSrcAppears -> buildTree {
@@ -201,7 +201,7 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app1", appColor) { node(buildSrc) }
+                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= conventionsAppear -> buildTree {
@@ -211,14 +211,14 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         node("root-project", rootColor) {
                             node("lib1", libColor) { node(wtfLib) }
                             node("lib2", libColor) { node(wtfLib) }
-                            node("app1", appColor) { node(wtfApp) }
+                            node("app", appColor) { node(wtfApp) }
                         }
                     }
                     currentState >= subprojectsAppear -> buildTree {
                         node("root-project", rootColor) {
                             node("lib1", libColor)
                             node("lib2", libColor)
-                            node("app1", appColor)
+                            node("app", appColor)
                         }
                     }
                     currentState >= rootProjectAppears -> buildTree {
@@ -240,26 +240,26 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
                         ) {
                             createChildTransition {
                                 when {
-                                    it >= conventionsChangeToNonTypesafe && node.value.startsWith("lib") -> buildAnnotatedString {
+                                    it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         append("    id(")
                                         withColor(LocalCodeStyle.current.string.color) { append("\"lib-convention\"") }
                                         appendLine(")")
                                         append("}")
                                     }
-                                    it >= conventionsChangeToNonTypesafe && node.value.startsWith("app") -> buildAnnotatedString {
+                                    it >= conventionsChangeToNonTypesafe && node.value =="app" -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         append("    id(")
                                         withColor(LocalCodeStyle.current.string.color) { append("\"app-convention\"") }
                                         appendLine(")")
                                         append("}")
                                     }
-                                    it >= subprojectsExpand && node.value.startsWith("lib") -> buildAnnotatedString {
+                                    it >= subprojectsExpand && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         withColor(libColor) { appendLine("    `lib-convention`") }
                                         append("}")
                                     }
-                                    it >= subprojectsExpand && node.value.startsWith("app") -> buildAnnotatedString {
+                                    it >= subprojectsExpand && node.value =="app" -> buildAnnotatedString {
                                         appendLine("plugins {")
                                         withColor(appColor) { appendLine("    `app-convention`") }
                                         append("}")
