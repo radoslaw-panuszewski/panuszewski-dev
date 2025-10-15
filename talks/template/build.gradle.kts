@@ -1,5 +1,6 @@
 plugins {
     `compose-convention`
+    `maven-publish`
 }
 
 kotlin {
@@ -12,5 +13,12 @@ kotlin {
                 api(libs.haze)
             }
         }
+    }
+}
+
+publishing {
+    publications.withType<MavenPublication> {
+        groupId = "dev.panuszewski"
+        version = "local"
     }
 }

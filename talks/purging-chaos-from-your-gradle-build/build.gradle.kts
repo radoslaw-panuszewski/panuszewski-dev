@@ -7,6 +7,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.template)
+                implementation("dev.panuszewski:template-jvm:local")
             }
         }
     }

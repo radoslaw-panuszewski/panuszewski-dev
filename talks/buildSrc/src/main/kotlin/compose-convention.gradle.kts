@@ -11,9 +11,9 @@ kotlin {
     jvmToolchain(24)
 
     jvm()
-    wasmJs {
-        browser()
-    }
+//    wasmJs {
+//        browser()
+//    }
 
     sourceSets {
         commonMain {

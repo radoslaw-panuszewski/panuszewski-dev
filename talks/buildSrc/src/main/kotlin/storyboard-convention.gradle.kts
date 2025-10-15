@@ -16,14 +16,14 @@ kotlin {
         }
     }
 
-    wasmJs {
-        binaries.executable()
-        browser {
-            commonWebpackConfig {
-                outputFileName = "storyboard.js"
-            }
-        }
-    }
+//    wasmJs {
+//        binaries.executable()
+//        browser {
+//            commonWebpackConfig {
+//                outputFileName = "storyboard.js"
+//            }
+//        }
+//    }
 }
 
 tasks {

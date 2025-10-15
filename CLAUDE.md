@@ -34,6 +34,14 @@ Presentation projects built using the Storyboard library. Each talk is a separat
 - `kotlin-new-features/`
 - `template/` - Base template for new talks
 
+#### Template
+
+Within the `template` project, one file is commented out: `talks/template/src/commonMain/kotlin/dev/panuszewski/template/components/IdeLayout.kt`.
+
+DO NOT UNCOMMENT THAT FILE! It is commented out because compiling it takes too long.
+
+The compiled version of this file is published to Maven Local repository. DO NOT REMOVE OR OVERWRITE `dev.panuszewski:template-jvm:local` dependency! It is located in `/Users/radoslaw.panuszewski/.m2/repository/dev/panuszewski/template-jvm/local`.
+
 ## Build Commands
 
 ### Storyboard Library
