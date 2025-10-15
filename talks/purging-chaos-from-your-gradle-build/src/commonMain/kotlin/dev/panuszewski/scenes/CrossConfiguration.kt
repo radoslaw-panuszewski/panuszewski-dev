@@ -151,13 +151,15 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     ) {
                                         panelState.createChildTransition {
                                             when {
-                                                it >= 19 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
-                                                it >= 18 && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                it >= 18 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it >= 22 && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it == 21 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
+                                                it >= 20 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                it >= 19 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
+                                                it >= 18 && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
+                                                it >= 18 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
                                                 it >= 17 && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
-                                                it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
+                                                it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
                                                 it == 16 && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
-                                                it >= 16 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
                                                 it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
                                                 it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
                                                 it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
@@ -207,6 +209,7 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
     val subprojectsKeyword by tag()
     val subprojectsConfig by tag()
     val todo by tag()
+    val nothingLeft by tag()
 
     """
     ${subprojectsBlock}${subprojectsKeyword}subprojects${subprojectsKeyword}${subprojectsFilter}
@@ -220,11 +223,11 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
         ${subprojectsIndent5}    ${subprojectsIndent5}}${subprojectsConfig}${todo}
         // TODO          ${todo}${subprojectsClosingBrace}
         }${subprojectsClosingBrace}
-    }${subprojectsBlock}    
+    }${subprojectsBlock}${nothingLeft}// nothing left to configure here :)${nothingLeft}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(subprojectsConfig, subprojectsFilter, subprojectsForEach, subprojectsClosingBrace, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5) }
+        .startWith { hide(nothingLeft, subprojectsConfig, subprojectsFilter, subprojectsForEach, subprojectsClosingBrace, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5) }
         .then { hide(todo).reveal(subprojectsConfig) }
         .then { focus(subprojectsKeyword) }
         .then { unfocus() }
@@ -232,6 +235,7 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
         .then { unfocus() }
         .then { focus(subprojectsConfig) }
         .then { unfocus().hide(subprojectsConfig) }
+        .then { hide(subprojectsBlock).reveal(nothingLeft) }
 }
 
 private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
@@ -297,5 +301,6 @@ private val LIB_CONVENTION = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
         .startWith { hide(libConfig) }
-        .then { hide(todo).reveal(libConfig) }
+        .then { hide(todo).reveal(libConfig).focus(libConfig) }
+        .then { unfocus() }
 }
