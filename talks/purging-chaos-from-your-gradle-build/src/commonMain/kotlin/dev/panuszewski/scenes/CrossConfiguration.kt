@@ -61,137 +61,135 @@ fun StoryboardBuilder.CrossConfiguration() {
 
         TitleScaffold(ideState.currentState.title) {
 
-            transition.SlideOutToBottomAnimatedVisibility({ it != Frame.End }) {
-                ideState.IdeLayout {
-                    adaptiveTopPanel("tree") { panelState ->
-                        val panelHeight by panelState.animateDp { if (it < 3) 200.dp else 400.dp }
+            ideState.IdeLayout {
+                adaptiveTopPanel("tree") { panelState ->
+                    val panelHeight by panelState.animateDp { if (it < 3) 200.dp else 400.dp }
 
-                        Box(Modifier.height(panelHeight)) {
-                            val rootProjectColor = MaterialTheme.colors.primary
-                            val libraryColor = NICE_BLUE
-                            val appColor = MaterialTheme.colors.secondary
-                            val buildSrcColor = NICE_PINK
-                            val buildLogicColor = NICE_GREEN
-                            val highlightColor = NICE_ORANGE
-                            val neutralColor = Color.Gray
+                    Box(Modifier.height(panelHeight)) {
+                        val rootProjectColor = MaterialTheme.colors.primary
+                        val libraryColor = NICE_BLUE
+                        val appColor = MaterialTheme.colors.secondary
+                        val buildSrcColor = NICE_PINK
+                        val buildLogicColor = NICE_GREEN
+                        val highlightColor = NICE_ORANGE
+                        val neutralColor = Color.Gray
 
-                            val mainBuildTree = when {
-                                panelState.currentState >= 15 -> buildTree {
-                                    val wtfLib = reusableNode("lib-convention", libraryColor)
+                        val mainBuildTree = when {
+                            panelState.currentState >= 15 -> buildTree {
+                                val wtfLib = reusableNode("lib-convention", libraryColor)
 
-                                    node("root-project", rootProjectColor) {
-                                        node("app", appColor)
-                                        node("lib1", libraryColor) {
-                                            node(wtfLib)
-                                        }
-                                        node("lib2", libraryColor) {
-                                            node(wtfLib)
-                                        }
-                                        node("librus")
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                    node("lib1", libraryColor) {
+                                        node(wtfLib)
                                     }
-                                }
-                                panelState.currentState == 14 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("app", appColor)
-                                        node("lib1", libraryColor)
-                                        node("lib2", libraryColor)
-                                        node("librus")
+                                    node("lib2", libraryColor) {
+                                        node(wtfLib)
                                     }
+                                    node("librus")
                                 }
-                                panelState.currentState == 13 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("app", appColor)
-                                        node("lib1", highlightColor)
-                                        node("lib2", highlightColor)
-                                        node("librus", highlightColor)
-                                    }
-                                }
-                                panelState.currentState == 12 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("app", appColor)
-                                        node("lib1", highlightColor)
-                                        node("lib2", highlightColor)
-                                    }
-                                }
-                                panelState.currentState == 10 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("app", highlightColor)
-                                        node("lib1", highlightColor)
-                                        node("lib2", highlightColor)
-                                    }
-                                }
-                                panelState.currentState >= 5 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("app", appColor)
-                                        node("lib1", libraryColor)
-                                        node("lib2", libraryColor)
-                                    }
-                                }
-                                panelState.currentState >= 3 -> buildTree {
-                                    node("root-project", rootProjectColor) {
-                                        node("app", appColor)
-                                    }
-                                }
-                                panelState.currentState >= 1 -> buildTree {
-                                    node("app", rootProjectColor)
-                                }
-                                else -> buildTree {}
                             }
+                            panelState.currentState == 14 -> buildTree {
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                    node("lib1", libraryColor)
+                                    node("lib2", libraryColor)
+                                    node("librus")
+                                }
+                            }
+                            panelState.currentState == 13 -> buildTree {
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                    node("lib1", highlightColor)
+                                    node("lib2", highlightColor)
+                                    node("librus", highlightColor)
+                                }
+                            }
+                            panelState.currentState == 12 -> buildTree {
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                    node("lib1", highlightColor)
+                                    node("lib2", highlightColor)
+                                }
+                            }
+                            panelState.currentState == 10 -> buildTree {
+                                node("root-project", rootProjectColor) {
+                                    node("app", highlightColor)
+                                    node("lib1", highlightColor)
+                                    node("lib2", highlightColor)
+                                }
+                            }
+                            panelState.currentState >= 5 -> buildTree {
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                    node("lib1", libraryColor)
+                                    node("lib2", libraryColor)
+                                }
+                            }
+                            panelState.currentState >= 3 -> buildTree {
+                                node("root-project", rootProjectColor) {
+                                    node("app", appColor)
+                                }
+                            }
+                            panelState.currentState >= 1 -> buildTree {
+                                node("app", rootProjectColor)
+                            }
+                            else -> buildTree {}
+                        }
 
-                            AnimatedHorizontalTree(
-                                tree = mainBuildTree,
-                                excludeSharedChildrenFromLayout = true,
-                            ) { node ->
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                        .background(LocalIdeColors.current.paneBackground)
+                        AnimatedHorizontalTree(
+                            tree = mainBuildTree,
+                            excludeSharedChildrenFromLayout = true,
+                        ) { node ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                                    .background(LocalIdeColors.current.paneBackground)
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
                                 ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
-                                    ) {
-                                        panelState.createChildTransition {
-                                            when {
-                                                it >= 22 && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                it == 21 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
-                                                it >= 20 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                it >= 19 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
-                                                it >= 18 && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
-                                                it >= 18 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
-                                                it >= 17 && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
-                                                it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
-                                                it == 16 && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
-                                                it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
-                                                it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
-                                                it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
-                                                it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
-                                                it in 8 until 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
-                                                it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
-                                                it == 10 && node.value == "app" -> "app ❌".annotate()
-                                                it == 13 && node.value == "librus" -> "librus ❌".annotate()
-                                                it in listOf(10, 12, 13) && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
-                                                it == 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
-                                                it in 6 until 8 && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
-                                                it in 2 until 4 && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
-                                                else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                            }
-                                        }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
-                                    }
+                                    panelState.createChildTransition {
+                                        when {
+                                            it >= 22 && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                            it == 21 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
+                                            it >= 20 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                            it >= 19 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
+                                            it >= 18 && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
+                                            it >= 18 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
+                                            it >= 17 && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
+                                            it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
+                                            it == 16 && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
+                                            it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
+                                            it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
+                                            it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
+                                            it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
+                                            it in 8 until 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
+                                            it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
+                                            it == 10 && node.value == "app" -> "app ❌".annotate()
+                                            it == 13 && node.value == "librus" -> "librus ❌".annotate()
+                                            it in listOf(10, 12, 13) && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
+                                            it == 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
+                                            it in 6 until 8 && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
+                                            it in 2 until 4 && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
+                                            else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                        }
+                                    }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
                                 }
                             }
                         }
                     }
+                }
 
-                    leftPanel("agenda") { panelState ->
-                        panelState.Agenda {
-                            item("Groovy", crossedOutSince = 0)
-                            item("No type safety", crossedOutSince = 0)
-                            item("Imperative code", crossedOutSince = 0)
-                            item("Cross configuration", crossedOutSince = 1)
-                            item("Mixed concerns")
-                        }
+                leftPanel("agenda") { panelState ->
+                    panelState.Agenda {
+                        item("Groovy", crossedOutSince = 0)
+                        item("No type safety", crossedOutSince = 0)
+                        item("Imperative code", crossedOutSince = 0)
+                        item("Cross configuration", crossedOutSince = 1)
+                        item("Mixed concerns")
                     }
                 }
             }

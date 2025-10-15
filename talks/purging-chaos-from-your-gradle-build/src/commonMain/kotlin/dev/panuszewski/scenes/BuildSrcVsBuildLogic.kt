@@ -35,7 +35,6 @@ import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.BuildSrcVsBuildLogic() {
     val (
-        rootProjectAppears,
         subprojectsAppear,
         subprojectsExpand,
         conventionsAppear,
@@ -74,155 +73,157 @@ fun StoryboardBuilder.BuildSrcVsBuildLogic() {
             TitleScaffold(title) {
                 val tree = when {
                     currentState >= resetAfterBuildLogicChange -> buildTree {
-                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("lib-convention", buildLogicColor)
-                        }
                         val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
                             node("app-convention", buildLogicColor)
                         }
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("lib-convention", buildLogicColor)
+                        }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildLogicApp) }
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= onlyAppReconfigured -> buildTree {
-                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("lib-convention", buildLogicColor)
-                        }
                         val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
                             node("app-convention", highlightColor)
                         }
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("lib-convention", buildLogicColor)
+                        }
                         node("root-project", rootColor) {
+                            node("app", highlightColor) { node(buildLogicApp) }
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app", highlightColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= buildLogicAppModified -> buildTree {
-                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("lib-convention", buildLogicColor)
-                        }
                         val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
                             node("app-convention", highlightColor)
                         }
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("lib-convention", buildLogicColor)
+                        }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildLogicApp) }
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= wtfAppModifiedInBuildLogic -> buildTree {
-                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                            node("lib-convention", buildLogicColor)
-                        }
                         val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
                             node("app-convention", highlightColor)
                         }
-                        node("root-project", rootColor) {
-                            node("lib1", libColor) { node(buildLogicLib) }
-                            node("lib2", libColor) { node(buildLogicLib) }
-                            node("app", appColor) { node(buildLogicApp) }
-                        }
-                    }
-                    currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
                         val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
                             node("lib-convention", buildLogicColor)
                         }
+                        node("root-project", rootColor) {
+                            node("app", appColor) { node(buildLogicApp) }
+                            node("lib1", libColor) { node(buildLogicLib) }
+                            node("lib2", libColor) { node(buildLogicLib) }
+                        }
+                    }
+                    currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
                         val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
                             node("app-convention", buildLogicColor)
                         }
+                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                            node("lib-convention", buildLogicColor)
+                        }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildLogicApp) }
                             node("lib1", libColor) { node(buildLogicLib) }
                             node("lib2", libColor) { node(buildLogicLib) }
-                            node("app", appColor) { node(buildLogicApp) }
                         }
                     }
                     currentState >= buildLogicAppears -> buildTree {
                         val buildLogic = reusableNode("build-logic", buildLogicColor) {
-                            node("lib-convention", buildLogicColor)
                             node("app-convention", buildLogicColor)
+                            node("lib-convention", buildLogicColor)
                         }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildLogic) }
                             node("lib1", libColor) { node(buildLogic) }
                             node("lib2", libColor) { node(buildLogic) }
-                            node("app", appColor) { node(buildLogic) }
                         }
                     }
                     currentState >= resetAfterBuildSrcChange -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                            node("lib-convention", buildSrcColor)
                             node("app-convention", buildSrcColor)
+                            node("lib-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildSrc) }
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= allSubprojectsReconfigured -> buildTree {
                         val buildSrc = reusableNode("buildSrc", highlightColor) {
-                            node("lib-convention", buildSrcColor)
                             node("app-convention", highlightColor)
+                            node("lib-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
+                            node("app", highlightColor) { node(buildSrc) }
                             node("lib1", highlightColor) { node(buildSrc) }
                             node("lib2", highlightColor) { node(buildSrc) }
-                            node("app", highlightColor) { node(buildSrc) }
                         }
                     }
                     currentState >= buildSrcModified -> buildTree {
                         val buildSrc = reusableNode("buildSrc", highlightColor) {
-                            node("lib-convention", buildSrcColor)
                             node("app-convention", highlightColor)
+                            node("lib-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildSrc) }
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= wtfAppModifiedInBuildSrc -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                            node("lib-convention", buildSrcColor)
                             node("app-convention", highlightColor)
+                            node("lib-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildSrc) }
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app", appColor) { node(buildSrc) }
                         }
                     }
                     currentState >= buildSrcAppears -> buildTree {
                         val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                            node("lib-convention", buildSrcColor)
                             node("app-convention", buildSrcColor)
+                            node("lib-convention", buildSrcColor)
                         }
                         node("root-project", rootColor) {
+                            node("app", appColor) { node(buildSrc) }
                             node("lib1", libColor) { node(buildSrc) }
                             node("lib2", libColor) { node(buildSrc) }
-                            node("app", appColor) { node(buildSrc) }
+                            node("librus")
                         }
                     }
                     currentState >= conventionsAppear -> buildTree {
-                        val wtfLib = reusableNode("lib-convention", neutralColor)
-                        val wtfApp = reusableNode("app-convention", neutralColor)
+                        val appConvention = reusableNode("app-convention", neutralColor)
+                        val libConvention = reusableNode("lib-convention", neutralColor)
 
                         node("root-project", rootColor) {
-                            node("lib1", libColor) { node(wtfLib) }
-                            node("lib2", libColor) { node(wtfLib) }
-                            node("app", appColor) { node(wtfApp) }
+                            node("app", appColor) { node(appConvention) }
+                            node("lib1", libColor) { node(libConvention) }
+                            node("lib2", libColor) { node(libConvention) }
+                            node("librus")
                         }
                     }
                     currentState >= subprojectsAppear -> buildTree {
+                        val libConvention = reusableNode("lib-convention", libColor)
+
                         node("root-project", rootColor) {
-                            node("lib1", libColor)
-                            node("lib2", libColor)
                             node("app", appColor)
+                            node("lib1", libColor) { node(libConvention) }
+                            node("lib2", libColor) { node(libConvention) }
+                            node("librus")
                         }
-                    }
-                    currentState >= rootProjectAppears -> buildTree {
-                        node("root-project", rootColor)
                     }
                     else -> emptyList()
                 }
