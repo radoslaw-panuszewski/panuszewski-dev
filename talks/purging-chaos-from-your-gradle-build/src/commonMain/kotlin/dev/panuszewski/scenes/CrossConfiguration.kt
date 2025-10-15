@@ -258,7 +258,7 @@ private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
         .pass()
         .hideIde()
         .then { hide(emptyLine) }
-        .pass(100)
+        .pass(19)
 }
 
 private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
