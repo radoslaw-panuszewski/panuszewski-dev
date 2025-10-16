@@ -1,4 +1,3 @@
-
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateBounds
@@ -23,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -45,6 +45,7 @@ import dev.panuszewski.template.extensions.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
+import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.LocalCodeStyle
@@ -70,19 +71,26 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         appConventionAppears,
         subprojectsExpand,
         buildSrcAppears,
-        bulletpointsAppear,
-        bulletpoint0,
-        bulletpoint1,
-        bulletpoint2,
-        bulletpoint3,
-        bulletpoint4,
-        bulletpointsDisappear,
+        badReputationAppears,
+        badReputationBullet1,
+        badReputationBullet2,
+        image1,
+        image2,
+        image3,
+        badReputationDisappears,
         terminalAppears,
         t1,
         t2,
         t3,
         t4,
         terminalDisappears,
+        bulletpoint1,
+        bulletpoint2,
+        bulletpoint3,
+        bulletpoint4,
+        bulletpoint5,
+        bulletpointsDisappear,
+        treeAppearsAgain,
         appConventionModifiedInBuildSrc,
         buildSrcModified,
         allSubprojectsReconfigured,
@@ -117,64 +125,94 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
             TitleScaffold(title) {
 
-                SlideFromTopAnimatedVisibility({ it in bulletpointsAppear until bulletpointsDisappear }) {
+                SlideFromTopAnimatedVisibility({ it in badReputationAppears until badReputationDisappears }) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        SlideFromTopAnimatedVisibility({ it >= bulletpoint0 }) {
-                            Text {
-                                append("A special directory recognized by Gradle...")
+                        SlideFromTopAnimatedVisibility({ it >= badReputationBullet1 }) {
+                            h6 {
+                                Text {
+                                    append("A special directory recognized by Gradle...")
+                                }
                             }
                         }
-                        SlideFromTopAnimatedVisibility({ it >= bulletpoint1 }) {
-                            Text {
-                                append("...with a ")
-                                withColor(textAccentColor) { append("very bad reputation") }
+
+                        SlideFromTopAnimatedVisibility({ it >= badReputationBullet2 }) {
+                            h6 {
+                                Text {
+                                    append("...with a ")
+                                    withColor(textAccentColor) { append("very bad reputation") }
+                                }
                             }
                         }
-                        Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            SlideFromBottomAnimatedVisibility({ it >= bulletpoint2 }) {
-                                val shift by animateDp({ tween(300) }) { if (it >= bulletpoint4) 64.dp else if (it >= bulletpoint3) 32.dp else 0.dp }
-                                val tint by animateFloat({ tween(300) }) { if (it >= bulletpoint4) 0.66f else if (it >= bulletpoint3) 0.33f else 0.01f }
-                                ResourceImage(
-                                    Res.drawable.buildsrc_article_1_light,
-                                    modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift),
-                                    contentScale = ContentScale.FillWidth,
-                                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                )
-                            }
-                            SlideFromBottomAnimatedVisibility({ it >= bulletpoint3 }) {
-                                val shift by animateDp({ tween(300) }) { if (it >= bulletpoint4) 32.dp else 0.dp }
-                                val tint by animateFloat({ tween(300) }) { if (it >= bulletpoint4) 0.33f else 0.01f }
-                                ResourceImage(
-                                    Res.drawable.buildsrc_article_2_light,
-                                    modifier = Modifier.padding(top = 32.dp, end = shift).width(500.dp).padding(end = shift),
-                                    contentScale = ContentScale.FillWidth,
-                                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                )
-                            }
-                            SlideFromBottomAnimatedVisibility({ it >= bulletpoint4 }) {
-                                ResourceImage(
-                                    Res.drawable.buildsrc_github_issue_light,
-                                    modifier = Modifier.padding(top = 64.dp, end = 0.dp).width(500.dp),
-                                    contentScale = ContentScale.FillWidth,
-                                )
+
+                        SlideFromBottomAnimatedVisibility({ it in image1..(image2 + 1) }) {
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                SlideFromBottomAnimatedVisibility({ it >= image1 }) {
+                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
+                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
+                                    ResourceImage(
+                                        Res.drawable.buildsrc_article_1_light,
+                                        modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+                                        contentScale = ContentScale.FillWidth,
+                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+                                    )
+                                }
+                                SlideFromBottomAnimatedVisibility({ it >= image2 }) {
+                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
+                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
+                                    ResourceImage(
+                                        Res.drawable.buildsrc_article_2_light,
+                                        modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+                                        contentScale = ContentScale.FillWidth,
+                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+                                    )
+                                }
+                                SlideFromBottomAnimatedVisibility({ it >= image3 }) {
+                                    ResourceImage(
+                                        Res.drawable.buildsrc_github_issue_light,
+                                        modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
+                                        contentScale = ContentScale.FillWidth,
+                                    )
+                                }
                             }
                         }
-//                            annotatedStringItem {
-//                                append("In many cases treated as an ")
-//                                withColor(textAccentColor) { append("included build") }
-//                            }
-//                            annotatedStringItem {
-//                                append("Always ")
-//                                withColor(textAccentColor) { append("compiled first") }
-//                                append(" and loaded via parent class loader")
-//                            }
+                    }
+                }
+
+                SlideFromTopAnimatedVisibility({ it in bulletpoint1 - 1 until bulletpointsDisappear }) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        RevealSequentially(since = bulletpoint1) {
+                            annotatedStringItem {
+                                append("Since newer Gradle versions, it's ")
+                                withColor(textAccentColor) { append("not that bad") }
+                            }
+                            annotatedStringItem {
+                                append("Now it behaves like an ")
+                                withColor(textAccentColor) { append("included build") }
+                                append(" (most of the time)")
+                            }
+                            annotatedStringItem {
+                                append("Modifying code in buildSrc no longer invalidates everything")
+                            }
+                            annotatedStringItem {
+                                append("However...")
+                            }
+                            annotatedStringItem {
+                                append("It's still ")
+                                withColor(textAccentColor) { append("always on classpath") }
+                                append(" of every buildscript in the parent build")
+                            }
+                        }
                     }
                 }
 
@@ -198,11 +236,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     )
                     Terminal(
                         textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 128.dp, vertical = 32.dp)
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 180.dp, vertical = 32.dp)
                     )
                 }
 
-                SlideFromBottomAnimatedVisibility({ it < bulletpointsAppear }) {
+                SlideFromBottomAnimatedVisibility({ it !in badReputationAppears..bulletpointsDisappear }) {
                     val tree = when {
                         currentState >= resetAfterBuildLogicChange -> buildTree {
                             val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
