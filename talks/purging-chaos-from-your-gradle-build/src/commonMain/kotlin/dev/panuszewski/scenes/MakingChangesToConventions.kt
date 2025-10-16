@@ -87,6 +87,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         resetAfterBuildSrcChange,
         buildLogicAppears,
         conventionsChangeToNonTypesafe,
+        buildLogicBulletpointsAppear,
+        blBulletpoint1,
+        blBulletpoint2,
+        blBulletpoint3,
+        blBulletpoint4,
+        buildLogicBulletpointsDisappear,
+        treeWithBuildLogicAppearsAgain,
         buildLogicSplitsIntoSubprojects,
         appConventionModifiedInBuildLogic,
         buildLogicAppModified,
@@ -104,10 +111,10 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val buildLogicColor = NICE_GREEN
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
-        val textAccentColor = NICE_PINK
 
         withIntTransition {
             val title = when {
+                currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
                 currentState >= buildSrcAppears -> buildAnnotatedString { withColor(buildSrcColor) { append("buildSrc") } }
@@ -134,7 +141,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             h6 {
                                 Text {
                                     append("...with a ")
-                                    withColor(textAccentColor) { append("very bad reputation") }
+                                    withColor(buildSrcColor) { append("very bad reputation") }
                                 }
                             }
                         }
@@ -182,12 +189,12 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     ) {
                         RevealSequentially(since = bulletpoint1) {
                             annotatedStringItem {
-                                append("Since newer Gradle versions, it's ")
-                                withColor(textAccentColor) { append("not that bad") }
+                                append("In recent Gradle versions, it's ")
+                                withColor(buildSrcColor) { append("not that bad") }
                             }
                             annotatedStringItem {
                                 append("Now it behaves like an ")
-                                withColor(textAccentColor) { append("included build") }
+                                withColor(buildSrcColor) { append("included build") }
                                 append(" (most of the time)")
                             }
                             annotatedStringItem {
@@ -197,9 +204,38 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 append("However...")
                             }
                             annotatedStringItem {
-                                append("It's still ")
-                                withColor(textAccentColor) { append("always on classpath") }
-                                append(" of every buildscript in the parent build")
+                                append("It's ")
+                                withColor(buildSrcColor) { append("on classpath") }
+                                append(" of every buildscript (regardless it's used or not)")
+                            }
+                        }
+                    }
+                }
+
+                FadeOutAnimatedVisibility({ it in buildLogicBulletpointsAppear until buildLogicBulletpointsDisappear }) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        RevealSequentially(since = blBulletpoint1) {
+                            annotatedStringItem {
+                                append("A regular Gradle ")
+                                withColor(buildLogicColor) { append("included build") }
+                                append(", can be of any name")
+                            }
+                            annotatedStringItem {
+                                append("Requires manual registration via ")
+                                withColor(buildLogicColor) { append("includeBuild(...)") }
+                            }
+                            annotatedStringItem {
+                                withColor(buildLogicColor) { append("Doesn't provide ") }
+                                append("typesafe accessors")
+                                append(" for convention plugins")
+                            }
+                            annotatedStringItem {
+                                append("Only on buildscript's classpath if it's ")
+                                withColor(buildLogicColor) { append("actually used") }
                             }
                         }
                     }
@@ -229,7 +265,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     )
                 }
 
-                SlideFromBottomAnimatedVisibility({ it !in badReputationAppears..bulletpointsDisappear }) {
+                SlideFromBottomAnimatedVisibility({ it !in badReputationAppears..bulletpointsDisappear && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear }) {
                     val tree = when {
                         currentState >= resetAfterBuildLogicChange -> buildTree {
                             val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
