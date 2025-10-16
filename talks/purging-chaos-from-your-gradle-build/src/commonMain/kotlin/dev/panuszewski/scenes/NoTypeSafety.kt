@@ -135,6 +135,7 @@ private val SETTINGS_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample()
         .startWith { hide(typesafeProjectAccessors) }
-        .then { reveal(typesafeProjectAccessors) }
+        .then { revealAndFocus(typesafeProjectAccessors) }
+        .then { unfocus() }
         .switchTo("build.gradle.kts")
 }

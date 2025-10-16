@@ -18,6 +18,7 @@ import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
@@ -45,7 +46,7 @@ fun StoryboardBuilder.KnowYourEnemy() {
         withIntTransition {
             val ideState = buildIdeState(files)
 
-            TitleScaffold("Know your enemy") {
+            SlidingTitleScaffold("Know your enemy") {
                 SlideFromBottomAnimatedVisibility({ it >= 1 }) {
                     ideState.IdeLayout {
                         leftPanel("agenda") { panelState ->
@@ -115,13 +116,13 @@ private val BUILD_GRADLE = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = Language.Groovy)
         .startWith { this }
-        .pass()
+        .pass(2)
         .openAgenda()
         .then { focus(allCode) }
-        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3) }
-        .then { focus(imperative1, imperative2, imperative3) }
-        .then { focus(crossConfig2) }
-        .then { focus(mixedConcerns) }
+        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3, unfocusedStyle = null) }
+        .then { focus(imperative1, imperative2, imperative3, unfocusedStyle = null) }
+        .then { focus(crossConfig2, unfocusedStyle = null) }
+        .then { focus(mixedConcerns, unfocusedStyle = null) }
         .then { unfocus() }
         .closeAgenda()
 }
