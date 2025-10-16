@@ -1,6 +1,5 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,12 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
@@ -39,9 +34,8 @@ import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.Terminal
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildTree
+import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
-import dev.panuszewski.template.extensions.SlideFromLeftAnimatedVisibility
-import dev.panuszewski.template.extensions.SlideFromRightAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
@@ -52,16 +46,12 @@ import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
-import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.withColor
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
-import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_1
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_1_light
-import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_2
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_2_light
-import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_github_issue
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_github_issue_light
 import kotlin.math.max
 
@@ -125,7 +115,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
             TitleScaffold(title) {
 
-                SlideFromTopAnimatedVisibility({ it in badReputationAppears until badReputationDisappears }) {
+                FadeOutAnimatedVisibility({ it in badReputationAppears until badReputationDisappears }) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -148,44 +138,42 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             }
                         }
 
-                        SlideFromBottomAnimatedVisibility({ it in image1..(image2 + 1) }) {
-                            Box(
-                                contentAlignment = Alignment.TopCenter,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                SlideFromBottomAnimatedVisibility({ it >= image1 }) {
-                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
-                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_article_1_light,
-                                        modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                    )
-                                }
-                                SlideFromBottomAnimatedVisibility({ it >= image2 }) {
-                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
-                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_article_2_light,
-                                        modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                    )
-                                }
-                                SlideFromBottomAnimatedVisibility({ it >= image3 }) {
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_github_issue_light,
-                                        modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                    )
-                                }
+                        Box(
+                            contentAlignment = Alignment.TopCenter,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            SlideFromBottomAnimatedVisibility({ it >= image1 }) {
+                                val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
+                                val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
+                                ResourceImage(
+                                    Res.drawable.buildsrc_article_1_light,
+                                    modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+                                    contentScale = ContentScale.FillWidth,
+                                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+                                )
+                            }
+                            SlideFromBottomAnimatedVisibility({ it >= image2 }) {
+                                val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
+                                val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
+                                ResourceImage(
+                                    Res.drawable.buildsrc_article_2_light,
+                                    modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+                                    contentScale = ContentScale.FillWidth,
+                                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+                                )
+                            }
+                            SlideFromBottomAnimatedVisibility({ it >= image3 }) {
+                                ResourceImage(
+                                    Res.drawable.buildsrc_github_issue_light,
+                                    modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
+                                    contentScale = ContentScale.FillWidth,
+                                )
                             }
                         }
                     }
                 }
 
-                SlideFromTopAnimatedVisibility({ it in bulletpoint1 - 1 until bulletpointsDisappear }) {
+                FadeOutAnimatedVisibility({ it in bulletpoint1 - 1 until bulletpointsDisappear }) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(32.dp),
