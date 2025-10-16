@@ -78,6 +78,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         bulletpoint4,
         bulletpointsDisappear,
         terminalAppears,
+        t1,
+        t2,
+        t3,
+        t4,
+        terminalDisappears,
         appConventionModifiedInBuildSrc,
         buildSrcModified,
         allSubprojectsReconfigured,
@@ -173,7 +178,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     }
                 }
 
-                SlideFromBottomAnimatedVisibility({ it >= terminalAppears }) {
+                SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
                     val terminalTexts = listOf(
                         "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project",
                         "> Task :init\nBUILD SUCCESSFUL",
@@ -193,7 +198,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     )
                     Terminal(
                         textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
-                        modifier = Modifier.fillMaxSize().padding(64.dp)
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 128.dp, vertical = 32.dp)
                     )
                 }
 
