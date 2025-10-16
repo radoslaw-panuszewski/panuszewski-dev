@@ -1,3 +1,4 @@
+
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateBounds
@@ -35,6 +36,7 @@ import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.components.Terminal
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
@@ -60,6 +62,7 @@ import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_a
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_2_light
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_github_issue
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_github_issue_light
+import kotlin.math.max
 
 fun StoryboardBuilder.MakingChangesToConventions() {
     val (
@@ -73,8 +76,8 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         bulletpoint2,
         bulletpoint3,
         bulletpoint4,
-        bulletpoint5,
         bulletpointsDisappear,
+        terminalAppears,
         appConventionModifiedInBuildSrc,
         buildSrcModified,
         allSubprojectsReconfigured,
@@ -170,7 +173,31 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     }
                 }
 
-                SlideFromBottomAnimatedVisibility({ it !in bulletpointsAppear until bulletpointsDisappear }) {
+                SlideFromBottomAnimatedVisibility({ it >= terminalAppears }) {
+                    val terminalTexts = listOf(
+                        "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project",
+                        "> Task :init\nBUILD SUCCESSFUL",
+                        "$ tree .",
+                        """
+                        .
+                        ├── build.gradle.kts
+                        ├── settings.gradle.kts
+                        ├── app
+                        │   ├── build.gradle.kts
+                        │   └── src
+                        └── build-logic
+                            ├── build.gradle.kts
+                            ├── settings.gradle.kts
+                            └── src
+                        """.trimIndent()
+                    )
+                    Terminal(
+                        textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
+                        modifier = Modifier.fillMaxSize().padding(64.dp)
+                    )
+                }
+
+                SlideFromBottomAnimatedVisibility({ it < bulletpointsAppear }) {
                     val tree = when {
                         currentState >= resetAfterBuildLogicChange -> buildTree {
                             val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
