@@ -1,26 +1,22 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import dev.bnorm.storyboard.Frame
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
@@ -34,7 +30,6 @@ import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
-import dev.panuszewski.template.extensions.SlideOutToBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
@@ -64,9 +59,8 @@ fun StoryboardBuilder.CrossConfiguration() {
 
             ideState.IdeLayout {
                 adaptiveTopPanel("tree") { panelState ->
-                    val modifier = if (panelState.currentState < 3) Modifier.height(200.dp) else Modifier.fillMaxHeight()
 
-                    Box(modifier.animateContentSize()) {
+                    Box(Modifier.height(if (panelState.currentState < 3) 200.dp else 800.dp)) {
                         val rootProjectColor = MaterialTheme.colors.primary
                         val libraryColor = NICE_BLUE
                         val appColor = MaterialTheme.colors.secondary

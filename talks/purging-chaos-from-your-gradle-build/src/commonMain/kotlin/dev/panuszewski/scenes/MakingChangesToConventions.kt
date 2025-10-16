@@ -109,6 +109,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         withIntTransition {
             val title = when {
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
+                currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
                 currentState >= buildSrcAppears -> buildAnnotatedString { withColor(buildSrcColor) { append("buildSrc") } }
                 else -> "Making changes to convention plugins".annotate()
             }
