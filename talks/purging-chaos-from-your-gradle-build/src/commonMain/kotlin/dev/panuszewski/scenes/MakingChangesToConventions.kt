@@ -10,7 +10,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,9 +43,13 @@ import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
+import dev.panuszewski.template.extensions.h2
+import dev.panuszewski.template.extensions.h3
+import dev.panuszewski.template.extensions.h5
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.BULLET_1
 import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
@@ -92,6 +100,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         blBulletpoint2,
         blBulletpoint3,
         blBulletpoint4,
+        blBulletpoint5,
         buildLogicBulletpointsDisappear,
         treeWithBuildLogicAppearsAgain,
         buildLogicSplitsIntoSubprojects,
@@ -99,9 +108,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         buildLogicAppModified,
         onlyAppReconfigured,
         resetAfterBuildLogicChange,
+        comparisonAppears,
+        comparisonBullet1,
+        comparisonBullet2,
+        comparisonBullet3,
+        comparisonDisappears,
+        totalStates,
     ) = subsequentNumbers()
-
-    val totalStates = resetAfterBuildLogicChange + 1
 
     scene(totalStates) {
         val rootColor = MaterialTheme.colors.primary
@@ -114,6 +127,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
         withIntTransition {
             val title = when {
+                currentState >= comparisonAppears -> "When to use which?".annotate()
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
@@ -206,7 +220,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             annotatedStringItem {
                                 append("It's ")
                                 withColor(buildSrcColor) { append("on classpath") }
-                                append(" of every buildscript (regardless it's used or not)")
+                                append(" of every buildscript (regardless if it's used or not)")
                             }
                         }
                     }
@@ -237,6 +251,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 append("Only on buildscript's classpath if it's ")
                                 withColor(buildLogicColor) { append("actually used") }
                             }
+                            annotatedStringItem {
+                                append("Allows to ")
+                                withColor(buildLogicColor) { append("isolate") }
+                                append(" your conventions in subprojects")
+                            }
                         }
                     }
                 }
@@ -265,7 +284,59 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     )
                 }
 
-                SlideFromBottomAnimatedVisibility({ it !in badReputationAppears..bulletpointsDisappear && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear }) {
+                SlideFromBottomAnimatedVisibility({ it in comparisonAppears until comparisonDisappears }) {
+
+                    Row(
+                        modifier = Modifier.fillMaxSize().padding(top = 32.dp),
+                        horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .border(1.dp, buildSrcColor)
+                                .background(color = buildSrcColor.copy(alpha = 0.03f))
+                                .fillMaxWidth()
+                                .weight(0.5f)
+                                .padding(16.dp)
+                                .animateContentSize(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
+
+                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body2) {
+                                stringItem("$BULLET_1 For simple builds")
+                                stringItem("$BULLET_1 If your conventions are tightly coupled")
+                                stringItem("$BULLET_1 (every project applies similar set of conventions)")
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .border(1.dp, buildLogicColor)
+                                .background(color = buildLogicColor.copy(alpha = 0.03f))
+                                .fillMaxWidth()
+                                .weight(0.5f)
+                                .padding(16.dp)
+                                .animateContentSize(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
+
+                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body2) {
+                                stringItem("$BULLET_1 For complex builds")
+                                stringItem("$BULLET_1 If a convention can be isolated")
+                                stringItem("$BULLET_1 (like it's applied to 1 or 2 subprojects out of 10)")
+                            }
+                        }
+                    }
+                }
+
+                SlideFromBottomAnimatedVisibility({
+                    it !in badReputationAppears..bulletpointsDisappear
+                            && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear
+                            && it !in comparisonAppears..comparisonDisappears
+                }) {
                     val tree = when {
                         currentState >= resetAfterBuildLogicChange -> buildTree {
                             val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {

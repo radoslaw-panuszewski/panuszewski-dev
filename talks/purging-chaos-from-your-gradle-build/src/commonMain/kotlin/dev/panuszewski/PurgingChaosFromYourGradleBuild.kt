@@ -17,7 +17,6 @@ import dev.panuszewski.template.theme.DARK_THEME
 
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
 
-// TODO buildSrc vs build-logic - when to use which
 // TODO convention plugins are not enough (before TwoTypesOfGradleUsers)
 // TODO wykreślanie agendy
 // TODO terminal po github issuesem
