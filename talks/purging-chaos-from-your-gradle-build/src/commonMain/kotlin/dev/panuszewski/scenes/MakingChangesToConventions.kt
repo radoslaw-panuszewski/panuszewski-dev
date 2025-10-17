@@ -12,15 +12,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,19 +30,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
-import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
-import dev.panuszewski.template.components.Terminal
 import dev.panuszewski.template.components.TerminalWithAnnotations
 import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.components.TreeElement
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
@@ -51,8 +52,6 @@ import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
-import dev.panuszewski.template.extensions.h2
-import dev.panuszewski.template.extensions.h3
 import dev.panuszewski.template.extensions.h5
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.subsequentNumbers
@@ -128,10 +127,16 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         titleChangesForFinalRecap,
         finalRecapBullet1,
         finalRecapBullet2,
-        finalRecapBullet3,
         libProjectsFolded,
         randomCodeAddedToAppProject,
         shrugEmoji,
+        resetAfterRandomCode,
+        finalRecapBullet3,
+        showAppConvention,
+        appConventionExpanded,
+        sharedDefaultsAdded,
+        customBuildLogicAdded,
+        resetAfterMixedConcerns,
         hideEverything,
         totalStates,
     ) = subsequentNumbers()
@@ -374,26 +379,40 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             LookaheadScope {
                                 FadeOutAnimatedVisibility({ it >= titleChangesForFinalRecap }) {
                                     Column(
-                                        modifier = Modifier.height(200.dp).fillMaxWidth(),
+                                        modifier = Modifier.wrapContentHeight().fillMaxWidth().padding(bottom = 16.dp),
                                         verticalArrangement = Arrangement.spacedBy(32.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         RevealSequentially(since = finalRecapBullet1) {
                                             annotatedStringItem {
-                                                append("Conventions are ")
-                                                withColor(NICE_LIGHT_TURQUOISE) { append("cool") }
-                                                append(", however...")
+                                                append("Conventions are cool, however...")
                                             }
-
+                                        }
+                                        RevealSequentially(since = finalRecapBullet2) {
                                             annotatedStringItem {
                                                 append("They encourages declarativity, but ")
-                                                withColor(NICE_LIGHT_TURQUOISE) { append("do not enforce it") }
+                                                withColor(NICE_ORANGE) { append("do not enforce it") }
+                                            }
+                                        }
+                                        RevealSequentially(since = finalRecapBullet3) {
+                                            annotatedStringItem {
+                                                append("Also, they often mix ")
+                                                withColor(NICE_BLUE) { append("shared defaults") }
+                                                append(" with ")
+                                                withColor(NICE_PINK) { append("custom build logic") }
                                             }
                                         }
                                     }
                                 }
 
                                 val tree = when {
+                                    currentState >= showAppConvention -> buildTree {
+                                        node("root-project", rootColor) {
+                                            node("app", appColor) {
+                                                node("app-convention", appColor)
+                                            }
+                                        }
+                                    }
                                     currentState >= libProjectsFolded -> buildTree {
                                         node("root-project", rootColor) {
                                             node("app", appColor)
@@ -571,34 +590,91 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                         ) {
                                             createChildTransition {
                                                 when {
+                                                    it >= resetAfterMixedConcerns && node.value == "app-convention" -> buildCodeSamples {
+                                                        """
+                                                        plugins {
+                                                            alias(libs.plugins.kotlin.jvm)
+                                                        }
+                                                        kotlin {
+                                                            jvmToolchain(25)
+                                                        }
+                                                        tasks.register("customTask") {
+                                                            doLast { println("lol") }
+                                                        }
+                                                        """
+                                                            .trimIndent()
+                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                    }.String()
+                                                    it >= customBuildLogicAdded && node.value == "app-convention" -> buildCodeSamples {
+                                                        val sharedDefaults by tag()
+                                                        val customBuildLogic by tag()
+                                                        """
+                                                        plugins {
+                                                            alias(libs.plugins.kotlin.jvm)
+                                                        }
+                                                        ${sharedDefaults}kotlin {
+                                                            jvmToolchain(25)
+                                                        }${sharedDefaults}
+                                                        ${customBuildLogic}tasks.register("customTask") {
+                                                            doLast { println("lol") }
+                                                        }${customBuildLogic}
+                                                        """
+                                                            .trimIndent()
+                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .focus(customBuildLogic, focusedStyle = SpanStyle(color = NICE_PINK))
+                                                    }.String()
+                                                    it >= sharedDefaultsAdded && node.value == "app-convention" -> buildCodeSamples {
+                                                        val sharedDefaults by tag()
+                                                        """
+                                                        plugins {
+                                                            alias(libs.plugins.kotlin.jvm)
+                                                        }
+                                                        ${sharedDefaults}kotlin {
+                                                            jvmToolchain(25)
+                                                        }${sharedDefaults}
+                                                        """
+                                                            .trimIndent()
+                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .focus(sharedDefaults, focusedStyle = SpanStyle(color = NICE_BLUE))
+                                                    }.String()
+                                                    it >= appConventionExpanded && node.value == "app-convention" -> buildCodeSamples {
+                                                        """
+                                                        plugins {
+                                                            alias(libs.plugins.kotlin.jvm)
+                                                        }
+                                                        """
+                                                            .trimIndent()
+                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                    }.String()
+                                                    it >= resetAfterRandomCode && node.value == "app" -> JustName(node)
                                                     it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
                                                         val randomCode by tag()
                                                         """
-                                            plugins {
-                                                id("app-convention")
-                                            }
-                                            dependencies {
-                                                implementation(libs.spring.boot.web)
-                                            }${randomCode}
-                                            for (project in subprojects) {
-                                                project.apply(plugin = "kotlin")
-                                            }${randomCode}
-                                            """
+                                                        plugins {
+                                                            id("app-convention")
+                                                        }
+                                                        dependencies {
+                                                            implementation(libs.spring.boot.web)
+                                                        }${randomCode}
+                                                        for (project in subprojects) {
+                                                            project.apply(plugin = "kotlin")
+                                                        }${randomCode}
+                                                        """
                                                             .trimIndent()
                                                             .toCodeSample(language = Language.KotlinDsl)
                                                             .focus(randomCode)
                                                     }.String()
                                                     it >= libProjectsFolded && node.value == "app" -> """
-                                            plugins {
-                                                id("app-convention")
-                                            }
-                                            dependencies {
-                                                implementation(libs.spring.boot.web)
-                                            }
-                                            """
+                                                        plugins {
+                                                            id("app-convention")
+                                                        }
+                                                        dependencies {
+                                                            implementation(libs.spring.boot.web)
+                                                        }
+                                                        """
                                                         .trimIndent()
                                                         .toCode(language = Language.KotlinDsl)
-                                                    it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                    it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
                                                     it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
                                                         appendLine("plugins {")
                                                         append("    id(")
@@ -623,7 +699,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         withColor(appColor) { appendLine("    `app-convention`") }
                                                         append("}")
                                                     }
-                                                    else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                    else -> JustName(node)
                                                 }
                                             }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
                                         }
@@ -635,7 +711,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
                         FadeInOutAnimatedVisibility({ it == shrugEmoji }) {
-                            ProvideTextStyle(MaterialTheme.typography.h5) {
+                            ProvideTextStyle(MaterialTheme.typography.h5.copy(color = NICE_ORANGE)) {
                                 androidx.compose.material.Text(
                                     text = """¯\_(ツ)_/¯""",
                                     modifier = Modifier.padding(top = 35.dp, end = 50.dp)
@@ -648,3 +724,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         }
     }
 }
+
+@Composable
+private fun JustName(node: TreeElement<String>): AnnotatedString =
+    buildAnnotatedString { withColor(Color.White) { append(node.value) } }
