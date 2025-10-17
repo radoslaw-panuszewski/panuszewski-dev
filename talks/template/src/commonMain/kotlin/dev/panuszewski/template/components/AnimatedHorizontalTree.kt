@@ -40,26 +40,26 @@ fun <T : Any> AnimatedHorizontalTree(
             var offset by remember { mutableStateOf(Offset.Zero) }
             val placements = remember { mutableStateMapOf<TreeElement<T>, Rect>() }
 
-            for ((parent, parentRect) in placements) {
-                for (child in parent.children) {
-                    val childRect = placements[child] ?: continue
-
-                    Connection(
-                        parentRect = parentRect.translate(offset),
-                        childRect = childRect.translate(offset),
-                        color = Color.Gray,
-                        modifier = Modifier.sharedElement(
-                            rememberSharedContentState("$parent-$child"),
-                            animatedVisibilityScope = this@AnimatedContent
-                        )
-                    )
-                }
-            }
-
             Box(
                 contentAlignment = BiasAlignment(0f, -0.5f),
                 modifier = modifier.fillMaxSize()
             ) {
+                for ((parent, parentRect) in placements) {
+                    for (child in parent.children) {
+                        val childRect = placements[child] ?: continue
+
+                        Connection(
+                            parentRect = parentRect.translate(offset),
+                            childRect = childRect.translate(offset),
+                            color = Color.Gray,
+                            modifier = Modifier.sharedElement(
+                                rememberSharedContentState("$parent-$child"),
+                                animatedVisibilityScope = this@AnimatedContent
+                            )
+                        )
+                    }
+                }
+
                 HorizontalTree(
                     roots = roots,
                     getChildren = { it.children },
