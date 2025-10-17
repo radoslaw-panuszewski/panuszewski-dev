@@ -3,7 +3,6 @@ package dev.panuszewski
 import dev.bnorm.storyboard.SceneFormat.Companion.Default
 import dev.bnorm.storyboard.Storyboard
 import dev.panuszewski.scenes.DeclarativeGradle
-import dev.panuszewski.scenes.IsItEnough
 import dev.panuszewski.scenes.MakingChangesToConventions
 import dev.panuszewski.scenes.TwoTypesOfGradleUsers
 import dev.panuszewski.template.theme.DARK_THEME
@@ -11,7 +10,7 @@ import dev.panuszewski.template.theme.DARK_THEME
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
 
 // TODO wykreślanie agendy
-// TODO terminal po github issuesem
+// TODO terminal pod github issuesem
 // TODO tytułowy slajd, pożegnalny slajd
 // TODO podsumowanie?
 // TODO light theme?
@@ -28,8 +27,7 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
 //    NoTypeSafety()
 //    ImperativeCode()
 //    CrossConfiguration()
-//    MakingChangesToConventions()
-    IsItEnough()
+    MakingChangesToConventions()
     TwoTypesOfGradleUsers()
     DeclarativeGradle()
 }

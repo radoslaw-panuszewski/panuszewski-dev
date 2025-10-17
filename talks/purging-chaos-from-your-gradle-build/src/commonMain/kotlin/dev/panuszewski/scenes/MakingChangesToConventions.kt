@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
+import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
@@ -37,7 +39,9 @@ import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.Terminal
 import dev.panuszewski.template.components.TitleScaffold
+import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildTree
+import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
@@ -48,6 +52,8 @@ import dev.panuszewski.template.extensions.h3
 import dev.panuszewski.template.extensions.h5
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.subsequentNumbers
+import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
 import dev.panuszewski.template.theme.LocalCodeStyle
@@ -113,6 +119,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         comparisonBullet2,
         comparisonBullet3,
         comparisonDisappears,
+        treeIsBackForFinalRecap,
+        titleChangesForFinalRecap,
+        libProjectsFolded,
+        randomCodeAddedToAppProject,
+        shrugEmoji,
         totalStates,
     ) = subsequentNumbers()
 
@@ -127,6 +138,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
         withIntTransition {
             val title = when {
+                currentState >= titleChangesForFinalRecap -> "Is it the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
@@ -303,10 +315,10 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                         ) {
                             h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
 
-                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body2) {
+                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
                                 stringItem("$BULLET_1 For simple builds")
                                 stringItem("$BULLET_1 If your conventions are tightly coupled")
-                                stringItem("$BULLET_1 (every project applies similar set of conventions)")
+                                stringItem("$BULLET_1 If projects apply similar sets of conventions")
                             }
                         }
 
@@ -323,10 +335,10 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                         ) {
                             h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
 
-                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body2) {
+                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
                                 stringItem("$BULLET_1 For complex builds")
-                                stringItem("$BULLET_1 If a convention can be isolated")
-                                stringItem("$BULLET_1 (like it's applied to 1 or 2 subprojects out of 10)")
+                                stringItem("$BULLET_1 If your conventions can work in isolation")
+                                stringItem("$BULLET_1 If projects apply disjoint sets of conventions")
                             }
                         }
                     }
@@ -338,6 +350,18 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             && it !in comparisonAppears..comparisonDisappears
                 }) {
                     val tree = when {
+                        currentState >= libProjectsFolded -> buildTree {
+                            node("root-project", rootColor) {
+                                node("app", appColor)
+                            }
+                        }
+                        currentState >= treeIsBackForFinalRecap -> buildTree {
+                            node("root-project", rootColor) {
+                                node("app", appColor)
+                                node("lib1", libColor)
+                                node("lib2", libColor)
+                            }
+                        }
                         currentState >= resetAfterBuildLogicChange -> buildTree {
                             val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
                                 node("app-convention", buildLogicColor)
@@ -504,6 +528,34 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             ) {
                                 createChildTransition {
                                     when {
+                                        it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
+                                            val randomCode by tag()
+                                            """
+                                            plugins {
+                                                id("app-convention")
+                                            }
+                                            dependencies {
+                                                implementation(libs.spring.boot.web)
+                                            }${randomCode}
+                                            for (project in subprojects) {
+                                                project.apply(plugin = "kotlin")
+                                            }${randomCode}
+                                            """
+                                                .trimIndent()
+                                                .toCodeSample(language = Language.KotlinDsl)
+                                                .focus(randomCode)
+                                        }.String()
+                                        it >= libProjectsFolded && node.value == "app" -> """
+                                            plugins {
+                                                id("app-convention")
+                                            }
+                                            dependencies {
+                                                implementation(libs.spring.boot.web)
+                                            }
+                                            """
+                                                .trimIndent()
+                                                .toCode(language = Language.KotlinDsl)
+                                        it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                         it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
                                             appendLine("plugins {")
                                             append("    id(")
@@ -528,12 +580,21 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                             withColor(appColor) { appendLine("    `app-convention`") }
                                             append("}")
                                         }
-                                        else -> buildAnnotatedString {
-                                            withColor(Color.White) { append(node.value) }
-                                        }
+                                        else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                     }
                                 }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
                             }
+                        }
+                    }
+                }
+
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                    FadeInOutAnimatedVisibility({ it == shrugEmoji }) {
+                        ProvideTextStyle(MaterialTheme.typography.h5) {
+                            androidx.compose.material.Text(
+                                text = """¯\_(ツ)_/¯""",
+                                modifier = Modifier.padding(top = 35.dp, end = 50.dp)
+                            )
                         }
                     }
                 }
