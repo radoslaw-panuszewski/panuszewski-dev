@@ -124,6 +124,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         libProjectsFolded,
         randomCodeAddedToAppProject,
         shrugEmoji,
+        hideEverything,
         totalStates,
     ) = subsequentNumbers()
 
@@ -149,135 +150,136 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
             TitleScaffold(title) {
 
-                FadeOutAnimatedVisibility({ it in badReputationAppears until badReputationDisappears }) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        SlideFromTopAnimatedVisibility({ it >= badReputationBullet1 }) {
-                            h6 {
-                                Text {
-                                    append("A special directory recognized by Gradle...")
-                                }
-                            }
-                        }
-
-                        SlideFromTopAnimatedVisibility({ it >= badReputationBullet2 }) {
-                            h6 {
-                                Text {
-                                    append("...with a ")
-                                    withColor(buildSrcColor) { append("very bad reputation") }
-                                }
-                            }
-                        }
-
-                        Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier.fillMaxSize()
+                FadeOutAnimatedVisibility({ it < hideEverything }) {
+                    FadeOutAnimatedVisibility({ it in badReputationAppears until badReputationDisappears }) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            SlideFromBottomAnimatedVisibility({ it >= image1 }) {
-                                val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
-                                val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
-                                ResourceImage(
-                                    Res.drawable.buildsrc_article_1_light,
-                                    modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                    contentScale = ContentScale.FillWidth,
-                                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                )
+                            SlideFromTopAnimatedVisibility({ it >= badReputationBullet1 }) {
+                                h6 {
+                                    Text {
+                                        append("A special directory recognized by Gradle...")
+                                    }
+                                }
                             }
-                            SlideFromBottomAnimatedVisibility({ it >= image2 }) {
-                                val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
-                                val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
-                                ResourceImage(
-                                    Res.drawable.buildsrc_article_2_light,
-                                    modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                    contentScale = ContentScale.FillWidth,
-                                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                )
+
+                            SlideFromTopAnimatedVisibility({ it >= badReputationBullet2 }) {
+                                h6 {
+                                    Text {
+                                        append("...with a ")
+                                        withColor(buildSrcColor) { append("very bad reputation") }
+                                    }
+                                }
                             }
-                            SlideFromBottomAnimatedVisibility({ it >= image3 }) {
-                                ResourceImage(
-                                    Res.drawable.buildsrc_github_issue_light,
-                                    modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
-                                    contentScale = ContentScale.FillWidth,
-                                )
+
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                SlideFromBottomAnimatedVisibility({ it >= image1 }) {
+                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
+                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
+                                    ResourceImage(
+                                        Res.drawable.buildsrc_article_1_light,
+                                        modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+                                        contentScale = ContentScale.FillWidth,
+                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+                                    )
+                                }
+                                SlideFromBottomAnimatedVisibility({ it >= image2 }) {
+                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
+                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
+                                    ResourceImage(
+                                        Res.drawable.buildsrc_article_2_light,
+                                        modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+                                        contentScale = ContentScale.FillWidth,
+                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+                                    )
+                                }
+                                SlideFromBottomAnimatedVisibility({ it >= image3 }) {
+                                    ResourceImage(
+                                        Res.drawable.buildsrc_github_issue_light,
+                                        modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
+                                        contentScale = ContentScale.FillWidth,
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                FadeOutAnimatedVisibility({ it in bulletpoint1 - 1 until bulletpointsDisappear }) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        RevealSequentially(since = bulletpoint1) {
-                            annotatedStringItem {
-                                append("In recent Gradle versions, it's ")
-                                withColor(buildSrcColor) { append("not that bad") }
-                            }
-                            annotatedStringItem {
-                                append("Now it behaves like an ")
-                                withColor(buildSrcColor) { append("included build") }
-                                append(" (most of the time)")
-                            }
-                            annotatedStringItem {
-                                append("Modifying code in buildSrc no longer invalidates everything")
-                            }
-                            annotatedStringItem {
-                                append("However...")
-                            }
-                            annotatedStringItem {
-                                append("It's ")
-                                withColor(buildSrcColor) { append("on classpath") }
-                                append(" of every buildscript (regardless if it's used or not)")
+                    FadeOutAnimatedVisibility({ it in bulletpoint1 - 1 until bulletpointsDisappear }) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            RevealSequentially(since = bulletpoint1) {
+                                annotatedStringItem {
+                                    append("In recent Gradle versions, it's ")
+                                    withColor(buildSrcColor) { append("not that bad") }
+                                }
+                                annotatedStringItem {
+                                    append("Now it behaves like an ")
+                                    withColor(buildSrcColor) { append("included build") }
+                                    append(" (most of the time)")
+                                }
+                                annotatedStringItem {
+                                    append("Modifying code in buildSrc will no longer invalidate everything")
+                                }
+                                annotatedStringItem {
+                                    append("However...")
+                                }
+                                annotatedStringItem {
+                                    append("It's ")
+                                    withColor(buildSrcColor) { append("on classpath") }
+                                    append(" of every buildscript (regardless if it's used or not)")
+                                }
                             }
                         }
                     }
-                }
 
-                FadeOutAnimatedVisibility({ it in buildLogicBulletpointsAppear until buildLogicBulletpointsDisappear }) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        RevealSequentially(since = blBulletpoint1) {
-                            annotatedStringItem {
-                                append("A regular Gradle ")
-                                withColor(buildLogicColor) { append("included build") }
-                                append(", can be of any name")
-                            }
-                            annotatedStringItem {
-                                append("Requires manual registration via ")
-                                withColor(buildLogicColor) { append("includeBuild(...)") }
-                            }
-                            annotatedStringItem {
-                                withColor(buildLogicColor) { append("Doesn't provide ") }
-                                append("typesafe accessors")
-                                append(" for convention plugins")
-                            }
-                            annotatedStringItem {
-                                append("Only on buildscript's classpath if it's ")
-                                withColor(buildLogicColor) { append("actually used") }
-                            }
-                            annotatedStringItem {
-                                append("Allows to ")
-                                withColor(buildLogicColor) { append("isolate") }
-                                append(" your conventions in subprojects")
+                    FadeOutAnimatedVisibility({ it in buildLogicBulletpointsAppear until buildLogicBulletpointsDisappear }) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            RevealSequentially(since = blBulletpoint1) {
+                                annotatedStringItem {
+                                    append("A regular Gradle ")
+                                    withColor(buildLogicColor) { append("included build") }
+                                    append(", can be of any name")
+                                }
+                                annotatedStringItem {
+                                    append("Requires manual registration via ")
+                                    withColor(buildLogicColor) { append("includeBuild(...)") }
+                                }
+                                annotatedStringItem {
+                                    withColor(buildLogicColor) { append("Doesn't provide ") }
+                                    append("typesafe accessors")
+                                    append(" for convention plugins")
+                                }
+                                annotatedStringItem {
+                                    append("Only on buildscript's classpath if it's ")
+                                    withColor(buildLogicColor) { append("actually used") }
+                                }
+                                annotatedStringItem {
+                                    append("Allows to ")
+                                    withColor(buildLogicColor) { append("isolate") }
+                                    append(" your conventions in subprojects")
+                                }
                             }
                         }
                     }
-                }
 
-                SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
-                    val terminalTexts = listOf(
-                        "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project",
-                        "> Task :init\nBUILD SUCCESSFUL",
-                        "$ tree .",
-                        """
+                    SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
+                        val terminalTexts = listOf(
+                            "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project",
+                            "> Task :init\nBUILD SUCCESSFUL",
+                            "$ tree .",
+                            """
                         .
                         ├── build.gradle.kts
                         ├── settings.gradle.kts
@@ -289,248 +291,248 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             ├── settings.gradle.kts
                             └── src
                         """.trimIndent()
-                    )
-                    Terminal(
-                        textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 180.dp, vertical = 32.dp)
-                    )
-                }
-
-                SlideFromBottomAnimatedVisibility({ it in comparisonAppears until comparisonDisappears }) {
-
-                    Row(
-                        modifier = Modifier.fillMaxSize().padding(top = 32.dp),
-                        horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .border(1.dp, buildSrcColor)
-                                .background(color = buildSrcColor.copy(alpha = 0.03f))
-                                .fillMaxWidth()
-                                .weight(0.5f)
-                                .padding(16.dp)
-                                .animateContentSize(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
-
-                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
-                                stringItem("$BULLET_1 For simple builds")
-                                stringItem("$BULLET_1 If your conventions are tightly coupled")
-                                stringItem("$BULLET_1 If projects apply similar sets of conventions")
-                            }
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .border(1.dp, buildLogicColor)
-                                .background(color = buildLogicColor.copy(alpha = 0.03f))
-                                .fillMaxWidth()
-                                .weight(0.5f)
-                                .padding(16.dp)
-                                .animateContentSize(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
-
-                            RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
-                                stringItem("$BULLET_1 For complex builds")
-                                stringItem("$BULLET_1 If your conventions can work in isolation")
-                                stringItem("$BULLET_1 If projects apply disjoint sets of conventions")
-                            }
-                        }
-                    }
-                }
-
-                SlideFromBottomAnimatedVisibility({
-                    it !in badReputationAppears..bulletpointsDisappear
-                            && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear
-                            && it !in comparisonAppears..comparisonDisappears
-                }) {
-                    val tree = when {
-                        currentState >= libProjectsFolded -> buildTree {
-                            node("root-project", rootColor) {
-                                node("app", appColor)
-                            }
-                        }
-                        currentState >= treeIsBackForFinalRecap -> buildTree {
-                            node("root-project", rootColor) {
-                                node("app", appColor)
-                                node("lib1", libColor)
-                                node("lib2", libColor)
-                            }
-                        }
-                        currentState >= resetAfterBuildLogicChange -> buildTree {
-                            val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                                node("app-convention", buildLogicColor)
-                            }
-                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                node("lib-convention", buildLogicColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildLogicApp) }
-                                node("lib1", libColor) { node(buildLogicLib) }
-                                node("lib2", libColor) { node(buildLogicLib) }
-                            }
-                        }
-                        currentState >= onlyAppReconfigured -> buildTree {
-                            val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
-                                node("app-convention", highlightColor)
-                            }
-                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                node("lib-convention", buildLogicColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", highlightColor) { node(buildLogicApp) }
-                                node("lib1", libColor) { node(buildLogicLib) }
-                                node("lib2", libColor) { node(buildLogicLib) }
-                            }
-                        }
-                        currentState >= buildLogicAppModified -> buildTree {
-                            val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
-                                node("app-convention", highlightColor)
-                            }
-                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                node("lib-convention", buildLogicColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildLogicApp) }
-                                node("lib1", libColor) { node(buildLogicLib) }
-                                node("lib2", libColor) { node(buildLogicLib) }
-                            }
-                        }
-                        currentState >= appConventionModifiedInBuildLogic -> buildTree {
-                            val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                                node("app-convention", highlightColor)
-                            }
-                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                node("lib-convention", buildLogicColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildLogicApp) }
-                                node("lib1", libColor) { node(buildLogicLib) }
-                                node("lib2", libColor) { node(buildLogicLib) }
-                            }
-                        }
-                        currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
-                            val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                                node("app-convention", buildLogicColor)
-                            }
-                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                node("lib-convention", buildLogicColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildLogicApp) }
-                                node("lib1", libColor) { node(buildLogicLib) }
-                                node("lib2", libColor) { node(buildLogicLib) }
-                            }
-                        }
-                        currentState >= buildLogicAppears -> buildTree {
-                            val buildLogic = reusableNode("build-logic", buildLogicColor) {
-                                node("app-convention", buildLogicColor)
-                                node("lib-convention", buildLogicColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildLogic) }
-                                node("lib1", libColor) { node(buildLogic) }
-                                node("lib2", libColor) { node(buildLogic) }
-                            }
-                        }
-                        currentState >= resetAfterBuildSrcChange -> buildTree {
-                            val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                                node("app-convention", buildSrcColor)
-                                node("lib-convention", buildSrcColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildSrc) }
-                                node("lib1", libColor) { node(buildSrc) }
-                                node("lib2", libColor) { node(buildSrc) }
-                            }
-                        }
-                        currentState >= allSubprojectsReconfigured -> buildTree {
-                            val buildSrc = reusableNode("buildSrc", highlightColor) {
-                                node("app-convention", highlightColor)
-                                node("lib-convention", buildSrcColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", highlightColor) { node(buildSrc) }
-                                node("lib1", highlightColor) { node(buildSrc) }
-                                node("lib2", highlightColor) { node(buildSrc) }
-                            }
-                        }
-                        currentState >= buildSrcModified -> buildTree {
-                            val buildSrc = reusableNode("buildSrc", highlightColor) {
-                                node("app-convention", highlightColor)
-                                node("lib-convention", buildSrcColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildSrc) }
-                                node("lib1", libColor) { node(buildSrc) }
-                                node("lib2", libColor) { node(buildSrc) }
-                            }
-                        }
-                        currentState >= appConventionModifiedInBuildSrc -> buildTree {
-                            val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                                node("app-convention", highlightColor)
-                                node("lib-convention", buildSrcColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildSrc) }
-                                node("lib1", libColor) { node(buildSrc) }
-                                node("lib2", libColor) { node(buildSrc) }
-                            }
-                        }
-                        currentState >= buildSrcAppears -> buildTree {
-                            val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                                node("app-convention", buildSrcColor)
-                                node("lib-convention", buildSrcColor)
-                            }
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(buildSrc) }
-                                node("lib1", libColor) { node(buildSrc) }
-                                node("lib2", libColor) { node(buildSrc) }
-                            }
-                        }
-                        currentState >= appConventionAppears -> buildTree {
-                            val appConvention = reusableNode("app-convention", appColor)
-                            val libConvention = reusableNode("lib-convention", libColor)
-
-                            node("root-project", rootColor) {
-                                node("app", appColor) { node(appConvention) }
-                                node("lib1", libColor) { node(libConvention) }
-                                node("lib2", libColor) { node(libConvention) }
-                            }
-                        }
-                        currentState >= initialState -> buildTree {
-                            val libConvention = reusableNode("lib-convention", libColor)
-
-                            node("root-project", rootColor) {
-                                node("app", appColor)
-                                node("lib1", libColor) { node(libConvention) }
-                                node("lib2", libColor) { node(libConvention) }
-                            }
-                        }
-                        else -> emptyList()
+                        )
+                        Terminal(
+                            textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 180.dp, vertical = 32.dp)
+                        )
                     }
 
-                    AnimatedHorizontalTree(tree) { node ->
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                .background(LocalIdeColors.current.paneBackground)
+                    SlideFromBottomAnimatedVisibility({ it in comparisonAppears until comparisonDisappears }) {
+
+                        Row(
+                            modifier = Modifier.fillMaxSize().padding(top = 32.dp),
+                            horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
                         ) {
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                modifier = Modifier
+                                    .border(1.dp, buildSrcColor)
+                                    .background(color = buildSrcColor.copy(alpha = 0.03f))
+                                    .fillMaxWidth()
+                                    .weight(0.5f)
+                                    .padding(16.dp)
+                                    .animateContentSize(),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalAlignment = Alignment.Start
                             ) {
-                                createChildTransition {
-                                    when {
-                                        it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
-                                            val randomCode by tag()
-                                            """
+                                h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
+
+                                RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
+                                    stringItem("$BULLET_1 For simple builds")
+                                    stringItem("$BULLET_1 If your conventions are tightly coupled")
+                                    stringItem("$BULLET_1 If projects apply similar sets of conventions")
+                                }
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .border(1.dp, buildLogicColor)
+                                    .background(color = buildLogicColor.copy(alpha = 0.03f))
+                                    .fillMaxWidth()
+                                    .weight(0.5f)
+                                    .padding(16.dp)
+                                    .animateContentSize(),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
+
+                                RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
+                                    stringItem("$BULLET_1 For complex builds")
+                                    stringItem("$BULLET_1 If your conventions can work in isolation")
+                                    stringItem("$BULLET_1 If projects apply disjoint sets of conventions")
+                                }
+                            }
+                        }
+                    }
+
+                    SlideFromBottomAnimatedVisibility({
+                        it !in badReputationAppears..bulletpointsDisappear
+                                && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear
+                                && it !in comparisonAppears..comparisonDisappears
+                    }) {
+                        val tree = when {
+                            currentState >= libProjectsFolded -> buildTree {
+                                node("root-project", rootColor) {
+                                    node("app", appColor)
+                                }
+                            }
+                            currentState >= treeIsBackForFinalRecap -> buildTree {
+                                node("root-project", rootColor) {
+                                    node("app", appColor)
+                                    node("lib1", libColor)
+                                    node("lib2", libColor)
+                                }
+                            }
+                            currentState >= resetAfterBuildLogicChange -> buildTree {
+                                val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                                    node("app-convention", buildLogicColor)
+                                }
+                                val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                    node("lib-convention", buildLogicColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildLogicApp) }
+                                    node("lib1", libColor) { node(buildLogicLib) }
+                                    node("lib2", libColor) { node(buildLogicLib) }
+                                }
+                            }
+                            currentState >= onlyAppReconfigured -> buildTree {
+                                val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
+                                    node("app-convention", highlightColor)
+                                }
+                                val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                    node("lib-convention", buildLogicColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", highlightColor) { node(buildLogicApp) }
+                                    node("lib1", libColor) { node(buildLogicLib) }
+                                    node("lib2", libColor) { node(buildLogicLib) }
+                                }
+                            }
+                            currentState >= buildLogicAppModified -> buildTree {
+                                val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
+                                    node("app-convention", highlightColor)
+                                }
+                                val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                    node("lib-convention", buildLogicColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildLogicApp) }
+                                    node("lib1", libColor) { node(buildLogicLib) }
+                                    node("lib2", libColor) { node(buildLogicLib) }
+                                }
+                            }
+                            currentState >= appConventionModifiedInBuildLogic -> buildTree {
+                                val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                                    node("app-convention", highlightColor)
+                                }
+                                val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                    node("lib-convention", buildLogicColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildLogicApp) }
+                                    node("lib1", libColor) { node(buildLogicLib) }
+                                    node("lib2", libColor) { node(buildLogicLib) }
+                                }
+                            }
+                            currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
+                                val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                                    node("app-convention", buildLogicColor)
+                                }
+                                val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                    node("lib-convention", buildLogicColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildLogicApp) }
+                                    node("lib1", libColor) { node(buildLogicLib) }
+                                    node("lib2", libColor) { node(buildLogicLib) }
+                                }
+                            }
+                            currentState >= buildLogicAppears -> buildTree {
+                                val buildLogic = reusableNode("build-logic", buildLogicColor) {
+                                    node("app-convention", buildLogicColor)
+                                    node("lib-convention", buildLogicColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildLogic) }
+                                    node("lib1", libColor) { node(buildLogic) }
+                                    node("lib2", libColor) { node(buildLogic) }
+                                }
+                            }
+                            currentState >= resetAfterBuildSrcChange -> buildTree {
+                                val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                                    node("app-convention", buildSrcColor)
+                                    node("lib-convention", buildSrcColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildSrc) }
+                                    node("lib1", libColor) { node(buildSrc) }
+                                    node("lib2", libColor) { node(buildSrc) }
+                                }
+                            }
+                            currentState >= allSubprojectsReconfigured -> buildTree {
+                                val buildSrc = reusableNode("buildSrc", highlightColor) {
+                                    node("app-convention", highlightColor)
+                                    node("lib-convention", buildSrcColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", highlightColor) { node(buildSrc) }
+                                    node("lib1", highlightColor) { node(buildSrc) }
+                                    node("lib2", highlightColor) { node(buildSrc) }
+                                }
+                            }
+                            currentState >= buildSrcModified -> buildTree {
+                                val buildSrc = reusableNode("buildSrc", highlightColor) {
+                                    node("app-convention", highlightColor)
+                                    node("lib-convention", buildSrcColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildSrc) }
+                                    node("lib1", libColor) { node(buildSrc) }
+                                    node("lib2", libColor) { node(buildSrc) }
+                                }
+                            }
+                            currentState >= appConventionModifiedInBuildSrc -> buildTree {
+                                val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                                    node("app-convention", highlightColor)
+                                    node("lib-convention", buildSrcColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildSrc) }
+                                    node("lib1", libColor) { node(buildSrc) }
+                                    node("lib2", libColor) { node(buildSrc) }
+                                }
+                            }
+                            currentState >= buildSrcAppears -> buildTree {
+                                val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                                    node("app-convention", buildSrcColor)
+                                    node("lib-convention", buildSrcColor)
+                                }
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(buildSrc) }
+                                    node("lib1", libColor) { node(buildSrc) }
+                                    node("lib2", libColor) { node(buildSrc) }
+                                }
+                            }
+                            currentState >= appConventionAppears -> buildTree {
+                                val appConvention = reusableNode("app-convention", appColor)
+                                val libConvention = reusableNode("lib-convention", libColor)
+
+                                node("root-project", rootColor) {
+                                    node("app", appColor) { node(appConvention) }
+                                    node("lib1", libColor) { node(libConvention) }
+                                    node("lib2", libColor) { node(libConvention) }
+                                }
+                            }
+                            currentState >= initialState -> buildTree {
+                                val libConvention = reusableNode("lib-convention", libColor)
+
+                                node("root-project", rootColor) {
+                                    node("app", appColor)
+                                    node("lib1", libColor) { node(libConvention) }
+                                    node("lib2", libColor) { node(libConvention) }
+                                }
+                            }
+                            else -> emptyList()
+                        }
+
+                        AnimatedHorizontalTree(tree) { node ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                                    .background(LocalIdeColors.current.paneBackground)
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                ) {
+                                    createChildTransition {
+                                        when {
+                                            it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
+                                                val randomCode by tag()
+                                                """
                                             plugins {
                                                 id("app-convention")
                                             }
@@ -541,11 +543,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                 project.apply(plugin = "kotlin")
                                             }${randomCode}
                                             """
-                                                .trimIndent()
-                                                .toCodeSample(language = Language.KotlinDsl)
-                                                .focus(randomCode)
-                                        }.String()
-                                        it >= libProjectsFolded && node.value == "app" -> """
+                                                    .trimIndent()
+                                                    .toCodeSample(language = Language.KotlinDsl)
+                                                    .focus(randomCode)
+                                            }.String()
+                                            it >= libProjectsFolded && node.value == "app" -> """
                                             plugins {
                                                 id("app-convention")
                                             }
@@ -555,46 +557,47 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                             """
                                                 .trimIndent()
                                                 .toCode(language = Language.KotlinDsl)
-                                        it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                        it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
-                                            appendLine("plugins {")
-                                            append("    id(")
-                                            withColor(LocalCodeStyle.current.string.color) { append("\"lib-convention\"") }
-                                            appendLine(")")
-                                            append("}")
+                                            it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                            it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
+                                                appendLine("plugins {")
+                                                append("    id(")
+                                                withColor(LocalCodeStyle.current.string.color) { append("\"lib-convention\"") }
+                                                appendLine(")")
+                                                append("}")
+                                            }
+                                            it >= conventionsChangeToNonTypesafe && node.value == "app" -> buildAnnotatedString {
+                                                appendLine("plugins {")
+                                                append("    id(")
+                                                withColor(LocalCodeStyle.current.string.color) { append("\"app-convention\"") }
+                                                appendLine(")")
+                                                append("}")
+                                            }
+                                            it >= subprojectsExpand && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
+                                                appendLine("plugins {")
+                                                withColor(libColor) { appendLine("    `lib-convention`") }
+                                                append("}")
+                                            }
+                                            it >= subprojectsExpand && node.value == "app" -> buildAnnotatedString {
+                                                appendLine("plugins {")
+                                                withColor(appColor) { appendLine("    `app-convention`") }
+                                                append("}")
+                                            }
+                                            else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                         }
-                                        it >= conventionsChangeToNonTypesafe && node.value == "app" -> buildAnnotatedString {
-                                            appendLine("plugins {")
-                                            append("    id(")
-                                            withColor(LocalCodeStyle.current.string.color) { append("\"app-convention\"") }
-                                            appendLine(")")
-                                            append("}")
-                                        }
-                                        it >= subprojectsExpand && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
-                                            appendLine("plugins {")
-                                            withColor(libColor) { appendLine("    `lib-convention`") }
-                                            append("}")
-                                        }
-                                        it >= subprojectsExpand && node.value == "app" -> buildAnnotatedString {
-                                            appendLine("plugins {")
-                                            withColor(appColor) { appendLine("    `app-convention`") }
-                                            append("}")
-                                        }
-                                        else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                    }
-                                }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                    }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                }
                             }
                         }
                     }
-                }
 
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-                    FadeInOutAnimatedVisibility({ it == shrugEmoji }) {
-                        ProvideTextStyle(MaterialTheme.typography.h5) {
-                            androidx.compose.material.Text(
-                                text = """¯\_(ツ)_/¯""",
-                                modifier = Modifier.padding(top = 35.dp, end = 50.dp)
-                            )
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                        FadeInOutAnimatedVisibility({ it == shrugEmoji }) {
+                            ProvideTextStyle(MaterialTheme.typography.h5) {
+                                androidx.compose.material.Text(
+                                    text = """¯\_(ツ)_/¯""",
+                                    modifier = Modifier.padding(top = 35.dp, end = 50.dp)
+                                )
+                            }
                         }
                     }
                 }
