@@ -7,7 +7,7 @@ import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
 
 @Composable
-fun SceneScope<Int>.withIntTransition(content: @Composable Transition<Int>.() -> Unit) {
-    val stateTransition = transition.createChildTransition { it.toState() }
+fun SceneScope<Int>.withIntTransition(initialState: Int = 0 , content: @Composable Transition<Int>.() -> Unit) {
+    val stateTransition = transition.createChildTransition { initialState + it.toState() }
     with(stateTransition) { content() }
 }

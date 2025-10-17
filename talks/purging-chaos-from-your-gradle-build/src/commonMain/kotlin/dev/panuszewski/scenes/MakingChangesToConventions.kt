@@ -33,11 +33,13 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.bnorm.storyboard.toState
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.Terminal
+import dev.panuszewski.template.components.TerminalWithAnnotations
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildTree
@@ -137,9 +139,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition {
+        withIntTransition(initialState = terminalAppears) {
             val title = when {
-                currentState >= titleChangesForFinalRecap -> "Is it the ultimate setup?".annotate()
+                currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
@@ -276,24 +278,35 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
                         val terminalTexts = listOf(
-                            "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project",
-                            "> Task :init\nBUILD SUCCESSFUL",
-                            "$ tree .",
-                            """
-                        .
-                        ├── build.gradle.kts
-                        ├── settings.gradle.kts
-                        ├── app
-                        │   ├── build.gradle.kts
-                        │   └── src
-                        └── build-logic
-                            ├── build.gradle.kts
-                            ├── settings.gradle.kts
-                            └── src
-                        """.trimIndent()
+                            "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project".annotate(),
+                            "> Task :init\nBUILD SUCCESSFUL".annotate(),
+                            "$ tree .".annotate(),
+                            buildAnnotatedString {
+                                appendLine(
+                                    """
+                                    .
+                                    ├── build.gradle.kts
+                                    ├── settings.gradle.kts
+                                    ├── app
+                                    │   ├── build.gradle.kts
+                                    │   └── src
+                                    """.trimIndent()
+                                )
+                                withColor(NICE_ORANGE) {
+                                    append(
+                                        """
+                                        └── build-logic
+                                            ├── build.gradle.kts
+                                            ├── settings.gradle.kts
+                                            └── src
+                                        """.trimIndent()
+                                    )
+                                }
+                            }
                         )
-                        Terminal(
+                        TerminalWithAnnotations(
                             textsToDisplay = terminalTexts.take(max(0, currentState - terminalAppears)),
+                            bottomSpacerHeight = 120.dp,
                             modifier = Modifier.fillMaxSize().padding(horizontal = 180.dp, vertical = 32.dp)
                         )
                     }

@@ -27,8 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.code3
 import dev.panuszewski.template.theme.LocalIdeColors
 import kotlinx.coroutines.delay
@@ -36,11 +38,16 @@ import kotlin.math.max
 
 @Composable
 fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
+    TerminalWithAnnotations(textsToDisplay.map { it.annotate() }, bottomSpacerHeight, modifier)
+}
+
+@Composable
+fun TerminalWithAnnotations(textsToDisplay: List<AnnotatedString>, bottomSpacerHeight: Dp = 50.dp, modifier: Modifier = Modifier) {
     val ideColors = LocalIdeColors.current
-    
+
     // Track which texts have been seen/animated - only new texts should animate
-    val seenTexts = remember { mutableSetOf<String>() }
-    
+    val seenTexts = remember { mutableSetOf<AnnotatedString>() }
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -121,19 +128,19 @@ fun Terminal(textsToDisplay: List<String>, bottomSpacerHeight: Dp = 50.dp, modif
 }
 
 @Composable
-private fun TerminalCommand(text: String, ideColors: dev.panuszewski.template.theme.IdeColorScheme, shouldAnimate: Boolean) {
-    var displayedText by remember(text) { mutableStateOf(if (shouldAnimate) "" else text) }
-    
+private fun TerminalCommand(text: AnnotatedString, ideColors: dev.panuszewski.template.theme.IdeColorScheme, shouldAnimate: Boolean) {
+    var displayedText by remember(text) { mutableStateOf(if (shouldAnimate) "".annotate() else text) }
+
     LaunchedEffect(text) {
         if (shouldAnimate) {
-            displayedText = ""
+            displayedText = "".annotate()
             for (i in 0..text.length) {
-                displayedText = text.take(i)
+                displayedText = AnnotatedString(text.take(i).toString())
                 delay(10)
             }
         }
     }
-    
+
     Spacer(Modifier.height(16.dp))
     code3 { Text(displayedText, color = ideColors.textPrimary) }
 }
