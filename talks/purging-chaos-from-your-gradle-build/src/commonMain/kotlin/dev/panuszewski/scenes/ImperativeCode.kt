@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -146,7 +145,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val wtfAppPlugin by tag()
     val randomDatabase by tag()
     val groovy by tag()
-    val someImperativeCode by tag()
 
     """
     ${pluginsBlock}plugins {${javaPlugin}
@@ -159,11 +157,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         ${topIfCi}apply(plugin = "maven-publish")${bottomIfCi}
     }${bottomIfCi}
     
-    ${mavenPublishImperative}${someImperativeCode}for (project in subprojects) {
-        apply(plugin = "kotlin")
-    }
-    
-    ${someImperativeCode}dependencies {
+    ${mavenPublishImperative}dependencies {
         implementation(projects.subProject)
         implementation(libs.spring.boot.web)${randomDatabase}
         ${topWhen}
@@ -180,7 +174,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom, someImperativeCode) }
+        .startWith { hide(wtfAppPlugin, mavenPublishDeclarative, mavenPublishImperative, randomDatabase, groovy, topIfCi, bottomIfCi, topWhen, bottomWhen, monday, postgres, cassandra, masochistIfTop, masochistIfBottom) }
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }

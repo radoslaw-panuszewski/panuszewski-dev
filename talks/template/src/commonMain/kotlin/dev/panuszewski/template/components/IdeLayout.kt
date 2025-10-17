@@ -693,7 +693,7 @@
 //fun calculateTotalStates(files: List<Pair<String, Any>>): Int {
 //    require(files.isNotEmpty()) { "files list must not be empty" }
 //
-//    val primaryFilePath = files.first().first
+//    val primaryFilePath = files.filter { it.second != DIRECTORY }.first().first
 //    val allCodeSamples = files
 //        .mapNotNull { (path, value) ->
 //            when (value) {
@@ -720,7 +720,7 @@
 //): Transition<IdeState> {
 //    require(files.isNotEmpty()) { "files list must not be empty" }
 //
-//    val primaryFilePath = files.first().first
+//    val primaryFilePath = files.filter { it.second != DIRECTORY }.first().first
 //    val initiallyHiddenFilesMap = files
 //        .mapNotNull { (path, value) ->
 //            if (value is InitiallyHiddenFile) path to value.codeSamples else null
