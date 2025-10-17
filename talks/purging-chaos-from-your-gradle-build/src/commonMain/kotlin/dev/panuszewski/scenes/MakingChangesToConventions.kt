@@ -150,7 +150,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition(initialState = treeIsBackForFinalRecap) {
+        withIntTransition {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
