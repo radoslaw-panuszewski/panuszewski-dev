@@ -30,6 +30,7 @@
 //import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 //import dev.panuszewski.template.extensions.safeGet
 //import dev.panuszewski.template.extensions.startWith
+//import dev.panuszewski.template.theme.NICE_ORANGE
 //import kotlinx.coroutines.delay
 //import org.jetbrains.compose.resources.DrawableResource
 //
@@ -1113,8 +1114,8 @@
 //            isImageVisible.FadeInOutAnimatedVisibility {
 //                val imageRes = currentState.image
 //                if (imageRes != null) {
-//                    Box(Modifier.clip(CircleShape).border(2.dp, MaterialTheme.colors.primary, CircleShape)) {
-//                        ResourceImage(imageRes, modifier = Modifier.width(300.dp))
+//                    Box(Modifier.clip(CircleShape).border(2.dp, NICE_ORANGE, CircleShape)) {
+//                        ResourceImage(imageRes, modifier = Modifier.width(200.dp))
 //                    }
 //                }
 //            }

@@ -191,6 +191,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .pass(3)
         .closePanel("bulletpoints")
         // start extracting convention plugin
+        .revealFile("buildSrc/src/main/kotlin/app-convention.gradle.kts")
         .openInRightPane("buildSrc/src/main/kotlin/app-convention.gradle.kts", switchTo = true)
         .then { focus(javaPlugin, mavenPublishImperative, randomDatabase, groovy) }
         .then { hide(javaPlugin, mavenPublishImperative, randomDatabase, groovy).reveal(wtfAppPlugin).focus(wtfAppPlugin) }

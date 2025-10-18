@@ -23,6 +23,11 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 // TODO terminal pod github issuesem
 // TODO podsumowanie?
 // TODO light theme?
+
+/**
+ * Opowiedzieć więcej o plugins { ... } block że jest kompilowany wcześniej
+ * Powiedzieć o dependencyResolutionManagement że jest już długo incubating
+ */
 val PurgingChaosFromYourGradleBuild = Storyboard.build(
     title = TITLE,
     format = Default,

@@ -109,7 +109,7 @@ private val BUILD_GRADLE = buildCodeSamples {
         jvmToolchain(25)
     }
     
-    tasks.register('sayHello') {
+    tasks.register('customTask') {
         doLast {
             println 'lol'
         }

@@ -2,13 +2,16 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -25,6 +28,7 @@ import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.IdeLayout
+import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
@@ -38,6 +42,7 @@ import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.NICE_ORANGE
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.sogood
 
@@ -50,7 +55,7 @@ fun StoryboardBuilder.DeclarativeGradle() {
     val totalStates = calculateTotalStates(files)
 
     scene(totalStates) {
-        withIntTransition {
+        withIntTransition(initialState = 13) {
 
             val ideState = buildIdeState(files)
 
@@ -165,6 +170,18 @@ fun StoryboardBuilder.DeclarativeGradle() {
                         }
                     }
                 }
+
+                FadeInOutAnimatedVisibility({ it == 13 }) {
+                    Box(Modifier.padding(start = 12.dp, top = 75.dp)) {
+                        Box(
+                            Modifier
+                                .clip(CircleShape)
+                                .border(2.dp, NICE_ORANGE, CircleShape)
+                        ) {
+                            ResourceImage(Res.drawable.sogood, modifier = Modifier.width(200.dp))
+                        }
+                    }
+                }
             }
         }
     }
@@ -208,12 +225,12 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.Kotlin)
         .startWith { hide(declarative) }
         .openPanel("tree")
-        .pass(6)
+        .pass(7)
         .closePanel("tree")
         .then { reveal(declarative).hide(normal) }
         .enlargeSelectedFile()
         .renameSelectedFile("build.gradle.dcl")
-        .showImage(Res.drawable.sogood)
+        .pass()
         .then { hideImage().shrinkSelectedFile() }
         .openAgenda()
         .pass()
