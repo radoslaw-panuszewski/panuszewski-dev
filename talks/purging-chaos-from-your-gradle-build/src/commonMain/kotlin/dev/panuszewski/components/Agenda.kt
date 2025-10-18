@@ -24,13 +24,14 @@ import dev.panuszewski.template.theme.BULLET_1
 
 @Composable
 fun Transition<Int>.Agenda(
+    modifier: Modifier = Modifier,
     configure: AgendaScope.() -> Unit
 ) {
     val scope = AgendaScope()
     scope.configure()
     
     Box(
-        modifier = Modifier.padding(top = 32.dp),
+        modifier = modifier.padding(top = 32.dp),
         contentAlignment = Alignment.TopStart,
     ) {
         Column(

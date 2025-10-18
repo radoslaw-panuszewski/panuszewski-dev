@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.IdeLayout
@@ -152,6 +154,16 @@ fun StoryboardBuilder.DeclarativeGradle() {
                             }
                         }
                     }
+
+                    leftPanel("agenda") { panelState ->
+                        panelState.Agenda {
+                            item("Groovy", crossedOutSince = 0)
+                            item("No type safety", crossedOutSince = 0)
+                            item("Imperative code", crossedOutSince = 0)
+                            item("Cross configuration", crossedOutSince = 0)
+                            item("Mixed concerns", crossedOutSince = 1)
+                        }
+                    }
                 }
             }
         }
@@ -203,4 +215,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .renameSelectedFile("build.gradle.dcl")
         .showImage(Res.drawable.sogood)
         .then { hideImage().shrinkSelectedFile() }
+        .openAgenda()
+        .pass()
+        .closeAgenda()
 }
