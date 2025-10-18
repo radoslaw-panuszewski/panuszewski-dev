@@ -69,14 +69,14 @@ fun StoryboardBuilder.CrossConfiguration() {
         librusAppears,
         resetAfterSubprojectsFilterHighlighted,
         libConventionAppears,
-        libConventionsChangesToTodo,
-        commonConfigHighlighted,
         commonConfigMovedToLibConvention,
         rootProjectChangedToNothingToConfigure,
-        rootProjectShrinks,
-        libsApplyConvention,
-        everythingShrinks,
-        librusDisappears
+        rootAndLibConventionProjectShrink,
+        appConventionAppears,
+        projectsExpand,
+        agendaOpens,
+        agendaItemCrossedOut,
+        agendaCloses
     ) = subsequentNumbers()
 
     val totalStates = calculateTotalStates(files)
@@ -97,12 +97,12 @@ fun StoryboardBuilder.CrossConfiguration() {
                     Box(Modifier.height(if (panelState.currentState < 3) 200.dp else 800.dp)) {
                         Row {
                             LookaheadScope {
-                                panelState.SlideFromLeftAnimatedVisibility({ it in 24 until 26 }) {
+                                panelState.SlideFromLeftAnimatedVisibility({ it in agendaOpens until agendaCloses }) {
                                     panelState.Agenda(Modifier.width(225.dp)) {
                                         item("Groovy", crossedOutSince = 0)
                                         item("No type safety", crossedOutSince = 0)
                                         item("Imperative code", crossedOutSince = 0)
-                                        item("Cross configuration", crossedOutSince = 25)
+                                        item("Cross configuration", crossedOutSince = agendaItemCrossedOut)
                                         item("Mixed concerns")
                                     }
                                 }
@@ -116,29 +116,45 @@ fun StoryboardBuilder.CrossConfiguration() {
                                 val neutralColor = Color.Gray
 
                                 val mainBuildTree = when {
-                                    panelState.currentState >= librusDisappears -> buildTree {
-                                        val wtfLib = reusableNode("lib-convention", libraryColor)
+                                    panelState.currentState >= appConventionAppears -> buildTree {
+                                        val appConvention = reusableNode("app-convention", appColor)
+                                        val libraryConvention = reusableNode("lib-convention", libraryColor)
+
+                                        node("root-project", rootProjectColor) {
+                                            node("app", appColor) {
+                                                node(appConvention)
+                                            }
+                                            node("lib1", libraryColor) {
+                                                node(libraryConvention)
+                                            }
+                                            node("lib2", libraryColor) {
+                                                node(libraryConvention)
+                                            }
+                                        }
+                                    }
+                                    panelState.currentState >= rootAndLibConventionProjectShrink -> buildTree {
+                                        val libraryConvention = reusableNode("lib-convention", libraryColor)
 
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                             node("lib1", libraryColor) {
-                                                node(wtfLib)
+                                                node(libraryConvention)
                                             }
                                             node("lib2", libraryColor) {
-                                                node(wtfLib)
+                                                node(libraryConvention)
                                             }
                                         }
                                     }
                                     panelState.currentState >= libConventionAppears -> buildTree {
-                                        val wtfLib = reusableNode("lib-convention", libraryColor)
+                                        val libraryConvention = reusableNode("lib-convention", libraryColor)
 
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                             node("lib1", libraryColor) {
-                                                node(wtfLib)
+                                                node(libraryConvention)
                                             }
                                             node("lib2", libraryColor) {
-                                                node(wtfLib)
+                                                node(libraryConvention)
                                             }
                                             node("librus")
                                         }
@@ -215,21 +231,16 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         ) {
                                             panelState.createChildTransition {
                                                 when {
-                                                    it >= everythingShrinks && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                    it >= projectsExpand && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
+                                                    it >= projectsExpand && node.value == "app" -> APP_BUILD_GRADLE_KTS[5].String()
 
-                                                    it == libsApplyConvention && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
-
-                                                    it >= rootProjectShrinks && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                    it >= rootAndLibConventionProjectShrink && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                    it >= rootAndLibConventionProjectShrink && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
 
                                                     it >= rootProjectChangedToNothingToConfigure && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
 
                                                     it >= commonConfigMovedToLibConvention && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
                                                     it >= commonConfigMovedToLibConvention && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
-
-                                                    it >= commonConfigHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
-                                                    it >= commonConfigHighlighted && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
-
-                                                    it >= libConventionsChangesToTodo && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
 
                                                     it >= libConventionAppears && node.value == "lib-convention" -> JustName(node)
 
@@ -284,8 +295,9 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
     val subprojectsClosingBrace by tag()
     val subprojectsKeyword by tag()
     val subprojectsConfig by tag()
-    val todo by tag()
+    val movedToConvention by tag()
     val nothingLeft by tag()
+    val todo by tag()
 
     """
     ${subprojectsBlock}${subprojectsKeyword}subprojects${subprojectsKeyword}${subprojectsFilter}
@@ -296,36 +308,38 @@ private val ROOT_BUILD_GRADLE_KTS = buildCodeSamples {
     
         ${subprojectsIndent3}    ${subprojectsIndent3}publishing.publications.create("lib") {
         ${subprojectsIndent4}    ${subprojectsIndent4}    from(components["java"])
-        ${subprojectsIndent5}    ${subprojectsIndent5}}${subprojectsConfig}${todo}
+        ${subprojectsIndent5}    ${subprojectsIndent5}}${subprojectsConfig}${movedToConvention}
+            // moved to convention${movedToConvention}${todo}
         // TODO          ${todo}${subprojectsClosingBrace}
         }${subprojectsClosingBrace}
     }${subprojectsBlock}${nothingLeft}// nothing left to configure here :)${nothingLeft}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
-        .startWith { hide(nothingLeft, subprojectsConfig, subprojectsFilter, subprojectsForEach, subprojectsClosingBrace, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5) }
+        .startWith { hide(movedToConvention, nothingLeft, subprojectsConfig, subprojectsFilter, subprojectsForEach, subprojectsClosingBrace, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5) }
         .then { hide(todo).reveal(subprojectsConfig) }
         .then { focus(subprojectsKeyword) }
         .then { unfocus() }
         .then { reveal(subprojectsFilter, subprojectsForEach, subprojectsIndent1, subprojectsIndent2, subprojectsIndent3, subprojectsIndent4, subprojectsIndent5, subprojectsClosingBrace).focus(subprojectsFilter) }
         .then { unfocus() }
         .then { focus(subprojectsConfig) }
-        .then { unfocus().hide(subprojectsConfig) }
+        .then { unfocus().hide(subprojectsConfig).reveal(movedToConvention) }
         .then { hide(subprojectsBlock).reveal(nothingLeft) }
 }
 
 private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
     val emptyLine by tag()
+    val dependencies by tag()
 
     """
     plugins {
         `app-convention`
     }${emptyLine}
-    ${emptyLine}
+    ${emptyLine}${dependencies}
     dependencies {
         implementation(projects.subProject)
         implementation(libs.spring.boot.web)
-    }
+    }${dependencies}
     """
         .trimIndent()
         .toCodeSample(language = Language.KotlinDsl)
@@ -334,7 +348,8 @@ private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
         .pass()
         .hideIde()
         .then { hide(emptyLine) }
-        .pass(23)
+        .then { hide(dependencies) }
+        .pass(19)
 }
 
 private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {

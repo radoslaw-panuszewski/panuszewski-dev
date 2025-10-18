@@ -73,8 +73,6 @@ import kotlin.math.max
 fun StoryboardBuilder.MakingChangesToConventions() {
     val (
         initialState,
-        appConventionAppears,
-        subprojectsExpand,
         buildSrcAppears,
         badReputationAppears,
         badReputationBullet1,
@@ -553,21 +551,12 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                             node("lib2", libColor) { node(buildSrc) }
                                         }
                                     }
-                                    currentState >= appConventionAppears -> buildTree {
+                                    currentState >= initialState -> buildTree {
                                         val appConvention = reusableNode("app-convention", appColor)
                                         val libConvention = reusableNode("lib-convention", libColor)
 
                                         node("root-project", rootColor) {
                                             node("app", appColor) { node(appConvention) }
-                                            node("lib1", libColor) { node(libConvention) }
-                                            node("lib2", libColor) { node(libConvention) }
-                                        }
-                                    }
-                                    currentState >= initialState -> buildTree {
-                                        val libConvention = reusableNode("lib-convention", libColor)
-
-                                        node("root-project", rootColor) {
-                                            node("app", appColor)
                                             node("lib1", libColor) { node(libConvention) }
                                             node("lib2", libColor) { node(libConvention) }
                                         }
@@ -672,30 +661,34 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         .trimIndent()
                                                         .toCode(language = Language.KotlinDsl)
                                                     it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
-                                                    it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
-                                                        appendLine("plugins {")
-                                                        append("    id(")
-                                                        withColor(LocalCodeStyle.current.string.color) { append("\"lib-convention\"") }
-                                                        appendLine(")")
-                                                        append("}")
-                                                    }
-                                                    it >= conventionsChangeToNonTypesafe && node.value == "app" -> buildAnnotatedString {
-                                                        appendLine("plugins {")
-                                                        append("    id(")
-                                                        withColor(LocalCodeStyle.current.string.color) { append("\"app-convention\"") }
-                                                        appendLine(")")
-                                                        append("}")
-                                                    }
-                                                    it >= subprojectsExpand && node.value.matches("""lib\d+""".toRegex()) -> buildAnnotatedString {
-                                                        appendLine("plugins {")
-                                                        withColor(libColor) { appendLine("    `lib-convention`") }
-                                                        append("}")
-                                                    }
-                                                    it >= subprojectsExpand && node.value == "app" -> buildAnnotatedString {
-                                                        appendLine("plugins {")
-                                                        withColor(appColor) { appendLine("    `app-convention`") }
-                                                        append("}")
-                                                    }
+                                                    it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> """
+                                                        plugins {
+                                                            id("lib-convention")
+                                                        }
+                                                        """
+                                                        .trimIndent()
+                                                        .toCode(language = Language.KotlinDsl)
+                                                    it >= conventionsChangeToNonTypesafe && node.value == "app" -> """
+                                                        plugins {
+                                                            id("app-convention")
+                                                        }
+                                                        """
+                                                        .trimIndent()
+                                                        .toCode(language = Language.KotlinDsl)
+                                                    it >= initialState && node.value.matches("""lib\d+""".toRegex()) -> """
+                                                        plugins {
+                                                            `lib-convention`
+                                                        }
+                                                        """
+                                                        .trimIndent()
+                                                        .toCode(language = Language.KotlinDsl)
+                                                    it >= initialState && node.value == "app" -> """
+                                                        plugins {
+                                                            `app-convention`
+                                                        }
+                                                        """
+                                                        .trimIndent()
+                                                        .toCode(language = Language.KotlinDsl)
                                                     else -> JustName(node)
                                                 }
                                             }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
