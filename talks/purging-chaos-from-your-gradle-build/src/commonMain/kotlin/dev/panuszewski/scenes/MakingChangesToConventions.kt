@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,20 +29,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LookaheadScope
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.TerminalWithAnnotations
 import dev.panuszewski.template.components.TitleScaffold
-import dev.panuszewski.template.components.TreeElement
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
@@ -63,7 +61,6 @@ import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
-import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.withColor
@@ -724,7 +721,3 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         }
     }
 }
-
-@Composable
-private fun JustName(node: TreeElement<String>): AnnotatedString =
-    buildAnnotatedString { withColor(Color.White) { append(node.value) } }

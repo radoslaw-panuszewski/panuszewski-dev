@@ -26,6 +26,7 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.Agenda
+import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.MagicAnnotatedString
@@ -37,6 +38,7 @@ import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.extensions.SlideFromLeftAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
+import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
@@ -49,6 +51,33 @@ fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
         "build.gradle.kts" to APP_BUILD_GRADLE_KTS
     )
+
+    val (
+        ideShrinks,
+        treeAppears,
+        appExpands,
+        appMovesUnderRootProject,
+        appShrinks,
+        libsAppear,
+        libsExpand,
+        rootProjectExpands,
+        crossConfigAddedToRootProject,
+        libsShrink,
+        subprojectsHighlighted,
+        resetAfterSubprojectsHighlighted,
+        subprojectsFilterHighlighted,
+        librusAppears,
+        resetAfterSubprojectsFilterHighlighted,
+        libConventionAppears,
+        libConventionsChangesToTodo,
+        commonConfigHighlighted,
+        commonConfigMovedToLibConvention,
+        rootProjectChangedToNothingToConfigure,
+        rootProjectShrinks,
+        libsApplyConvention,
+        everythingShrinks,
+        librusDisappears
+    ) = subsequentNumbers()
 
     val totalStates = calculateTotalStates(files)
 
@@ -87,7 +116,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                 val neutralColor = Color.Gray
 
                                 val mainBuildTree = when {
-                                    panelState.currentState >= 23 -> buildTree {
+                                    panelState.currentState >= librusDisappears -> buildTree {
                                         val wtfLib = reusableNode("lib-convention", libraryColor)
 
                                         node("root-project", rootProjectColor) {
@@ -100,7 +129,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             }
                                         }
                                     }
-                                    panelState.currentState >= 15 -> buildTree {
+                                    panelState.currentState >= libConventionAppears -> buildTree {
                                         val wtfLib = reusableNode("lib-convention", libraryColor)
 
                                         node("root-project", rootProjectColor) {
@@ -114,7 +143,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             node("librus")
                                         }
                                     }
-                                    panelState.currentState == 14 -> buildTree {
+                                    panelState.currentState >= resetAfterSubprojectsFilterHighlighted -> buildTree {
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                             node("lib1", libraryColor)
@@ -122,7 +151,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             node("librus")
                                         }
                                     }
-                                    panelState.currentState == 13 -> buildTree {
+                                    panelState.currentState >= librusAppears -> buildTree {
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                             node("lib1", highlightColor)
@@ -130,33 +159,40 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             node("librus", highlightColor)
                                         }
                                     }
-                                    panelState.currentState == 12 -> buildTree {
+                                    panelState.currentState >= subprojectsFilterHighlighted -> buildTree {
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                             node("lib1", highlightColor)
                                             node("lib2", highlightColor)
                                         }
                                     }
-                                    panelState.currentState == 10 -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", highlightColor)
-                                            node("lib1", highlightColor)
-                                            node("lib2", highlightColor)
-                                        }
-                                    }
-                                    panelState.currentState >= 5 -> buildTree {
+                                    panelState.currentState >= resetAfterSubprojectsHighlighted -> buildTree {
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                             node("lib1", libraryColor)
                                             node("lib2", libraryColor)
                                         }
                                     }
-                                    panelState.currentState >= 3 -> buildTree {
+                                    panelState.currentState >= subprojectsHighlighted -> buildTree {
+                                        node("root-project", rootProjectColor) {
+                                            node("app", highlightColor)
+                                            node("lib1", highlightColor)
+                                            node("lib2", highlightColor)
+                                        }
+                                    }
+                                    panelState.currentState >= libsAppear -> buildTree {
+                                        node("root-project", rootProjectColor) {
+                                            node("app", appColor)
+                                            node("lib1", libraryColor)
+                                            node("lib2", libraryColor)
+                                        }
+                                    }
+                                    panelState.currentState >= appMovesUnderRootProject -> buildTree {
                                         node("root-project", rootProjectColor) {
                                             node("app", appColor)
                                         }
                                     }
-                                    panelState.currentState >= 1 -> buildTree {
+                                    panelState.currentState >= treeAppears -> buildTree {
                                         node("app", rootProjectColor)
                                     }
                                     else -> buildTree {}
@@ -179,27 +215,48 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         ) {
                                             panelState.createChildTransition {
                                                 when {
-                                                    it >= 22 && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                    it == 21 && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
-                                                    it >= 20 && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                    it >= 19 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
-                                                    it >= 18 && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
-                                                    it >= 18 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
-                                                    it >= 17 && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
-                                                    it >= 17 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
-                                                    it == 16 && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
-                                                    it >= 14 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
-                                                    it >= 12 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
-                                                    it == 11 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
-                                                    it == 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
-                                                    it in 8 until 10 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
-                                                    it == 7 && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
-                                                    it == 10 && node.value == "app" -> "app ❌".annotate()
-                                                    it == 13 && node.value == "librus" -> "librus ❌".annotate()
-                                                    it in listOf(10, 12, 13) && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
-                                                    it == 8 && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
-                                                    it in 6 until 8 && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
-                                                    it in 2 until 4 && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
+                                                    it >= everythingShrinks && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+
+                                                    it == libsApplyConvention && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
+
+                                                    it >= rootProjectShrinks && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+
+                                                    it >= rootProjectChangedToNothingToConfigure && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
+
+                                                    it >= commonConfigMovedToLibConvention && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
+                                                    it >= commonConfigMovedToLibConvention && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
+
+                                                    it >= commonConfigHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[6].String()
+                                                    it >= commonConfigHighlighted && node.value == "lib-convention" -> LIB_CONVENTION[1].String()
+
+                                                    it >= libConventionsChangesToTodo && node.value == "lib-convention" -> LIB_CONVENTION[0].String()
+
+                                                    it >= libConventionAppears && node.value == "lib-convention" -> JustName(node)
+
+                                                    it >= resetAfterSubprojectsFilterHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
+                                                    it >= resetAfterSubprojectsFilterHighlighted && node.value == "librus" -> JustName(node)
+                                                    it >= resetAfterSubprojectsFilterHighlighted && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
+
+                                                    it >= librusAppears && node.value == "librus" -> "librus ❌".annotate()
+
+                                                    it >= subprojectsFilterHighlighted && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
+                                                    it >= subprojectsFilterHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
+
+                                                    it >= resetAfterSubprojectsHighlighted && node.value == "app" ->JustName(node)
+                                                    it >= resetAfterSubprojectsHighlighted && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
+                                                    it >= resetAfterSubprojectsHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
+
+                                                    it >= subprojectsHighlighted && node.value == "app" -> "app ❌".annotate()
+                                                    it >= subprojectsHighlighted && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
+                                                    it >= subprojectsHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
+
+                                                    it >= libsShrink && node.value.contains("lib") -> JustName(node)
+                                                    it >= crossConfigAddedToRootProject && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
+                                                    it >= crossConfigAddedToRootProject && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
+                                                    it >= rootProjectExpands && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
+                                                    it >= libsExpand && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
+                                                    it >= appShrinks && node.value == "app" -> JustName(node)
+                                                    it >= appExpands && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
                                                     else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
                                                 }
                                             }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
