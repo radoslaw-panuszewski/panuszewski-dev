@@ -26,9 +26,9 @@ fun StoryboardBuilder.NoTypeSafety() {
 
     scene(totalStates) {
         withIntTransition {
-            TitleScaffold("No type safety") {
-                val ideState = buildIdeState(files)
+            val ideState = buildIdeState(files, initialTitle = "Issue: No type safety")
 
+            TitleScaffold(ideState.currentState.title) {
                 ideState.IdeLayout {
                     leftPanel("agenda") { panelState ->
                         panelState.Agenda {
@@ -70,7 +70,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
 
     apply(plugin = "org.jetbrains.kotlin.jvm")${imperativePlugin}${declarativePlugin}plugins {
-        ${nonTypesafePlugin}id("org.jetbrains.kotlin.jvm")${nonTypesafePlugin}${typesafePlugin}alias(libs.plugins.kotlin.jvm)${typesafePlugin}
+        ${nonTypesafePlugin}id("org.jetbrains.kotlin.jvm") version "2.2.20"${nonTypesafePlugin}${typesafePlugin}alias(libs.plugins.kotlin.jvm)${typesafePlugin}
     }${declarativePlugin}
 
     dependencies {
@@ -89,14 +89,17 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).unfocus() }
         // version catalog
         .then { focusNoScroll(nonTypesafePlugin, nonTypesafeExternalDependency) }
+        .changeTitle("Solution: Version catalog")
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
         .then { hide(nonTypesafePlugin, nonTypesafeExternalDependency).reveal(typesafePlugin, typesafeExternalDependency).unfocus() }
         // project accessors
         .then { focusNoScroll(nonTypesafeProjectDependency) }
+        .changeTitle("Solution: Typesafe project accessors")
         .switchTo("settings.gradle.kts")
         .then { this }
         .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }
+        .changeTitle("Now we're typesafe!")
         // agenda
         .openAgenda()
         .pass()
@@ -112,7 +115,7 @@ private val LIBS_VERSIONS_TOML = buildCodeSamples {
     kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.20" }
     
     [libraries]
-    spring-boot = "org.springframework.boot:spring-boot-starter-web:3.5.6"
+    spring-boot-web = "org.springframework.boot:spring-boot-starter-web:3.5.6"
 
     ${catalog}${todo}// TODO${todo}
     """

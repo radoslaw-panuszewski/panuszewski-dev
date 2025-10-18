@@ -75,6 +75,8 @@ private val BUILD_GRADLE = buildCodeSamples {
     val noTypesafe1 by tag()
     val noTypesafe2 by tag()
     val noTypesafe3 by tag()
+    val noTypesafe4 by tag()
+    val noTypesafe5 by tag()
     val imperative1 by tag()
     val imperative2 by tag()
     val imperative3 by tag()
@@ -88,15 +90,15 @@ private val BUILD_GRADLE = buildCodeSamples {
             gradlePluginPortal()
         }
         dependencies {
-            classpath('$${noTypesafe1}org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
+            classpath($${noTypesafe1}'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20'$${noTypesafe1})
         }
     }
 
-    $${imperative1}apply plugin: 'org.jetbrains.kotlin.jvm'$${imperative1}
+    $${imperative1}apply plugin: $${noTypesafe4}'org.jetbrains.kotlin.jvm'$${noTypesafe4}$${imperative1}
 
-    $${crossConfig2}subprojects {
-        apply plugin: 'java-library'
-    }$${crossConfig2}
+    $${crossConfig1}subprojects {$${crossConfig1}
+        $${imperative2}apply plugin: $${noTypesafe5}'java-library'$${noTypesafe5}$${imperative2}
+    $${crossConfig2}}$${crossConfig2}
 
     dependencies {
         implementation project($${noTypesafe2}':sub-project')$${noTypesafe2}
@@ -109,7 +111,7 @@ private val BUILD_GRADLE = buildCodeSamples {
     
     tasks.register('sayHello') {
         doLast {
-            $$${'$'}{imperative3}println 'lol'$$${'$'}{imperative3}
+            println 'lol'
         }
     }$${mixedConcerns}$${allCode}
     """
@@ -118,10 +120,11 @@ private val BUILD_GRADLE = buildCodeSamples {
         .startWith { this }
         .pass(2)
         .openAgenda()
-        .then { focus(allCode) }
-        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3, unfocusedStyle = null) }
+//        .then { focus(allCode) }
+        .pass()
+        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3, noTypesafe4, noTypesafe5, unfocusedStyle = null) }
         .then { focus(imperative1, imperative2, imperative3, unfocusedStyle = null) }
-        .then { focus(crossConfig2, unfocusedStyle = null) }
+        .then { focus(crossConfig1, crossConfig2, unfocusedStyle = null) }
         .then { focus(mixedConcerns, unfocusedStyle = null) }
         .then { unfocus() }
         .closeAgenda()

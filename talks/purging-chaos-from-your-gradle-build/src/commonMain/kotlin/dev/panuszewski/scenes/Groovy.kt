@@ -31,7 +31,7 @@ fun StoryboardBuilder.Groovy() {
 
     scene(totalStates) {
         withIntTransition {
-            val ideState = buildIdeState(initialTitle = "Groovy", files = files)
+            val ideState = buildIdeState(initialTitle = "Issue: Groovy", files = files)
 
             val title = ideState.currentState.title
 
@@ -126,7 +126,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
                 .reveal(kotlin)
                 .changeLanguage(Language.KotlinDsl)
                 .hideEmoji()
-                .changeTitle("Kotlin DSL ❤️")
+                .changeTitle("Solution: Kotlin DSL ❤️")
                 .renameSelectedFile("build.gradle.kts")
         }
         .openAgenda()

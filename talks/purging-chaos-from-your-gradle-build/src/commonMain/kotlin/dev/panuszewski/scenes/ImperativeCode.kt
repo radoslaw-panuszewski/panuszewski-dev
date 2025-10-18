@@ -51,7 +51,7 @@ fun StoryboardBuilder.ImperativeCode() {
 
     scene(totalStates) {
         withIntTransition {
-            val ideState = buildIdeState(files, initialTitle = "Imperative code")
+            val ideState = buildIdeState(files, initialTitle = "Issue: Imperative code")
 
             TitleScaffold(ideState.currentState.title) {
 
@@ -137,6 +137,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     val topWhen by tag()
     val bottomWhen by tag()
     val monday by tag()
+    val mongodb by tag()
     val postgres by tag()
     val cassandra by tag()
     val masochistIfTop by tag()
@@ -162,7 +163,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         implementation(libs.spring.boot.web)${randomDatabase}
         ${topWhen}
         when (today()) {
-            ${topWhen}${monday}MONDAY -> ${monday}implementation(libs.mongodb)${postgres}
+            ${topWhen}${monday}MONDAY -> ${monday}${mongodb}implementation(libs.mongodb)${mongodb}${postgres}
             TUESDAY -> implementation(libs.postgres)${postgres}${cassandra}
             else -> implementation(libs.cassandra)${cassandra}${bottomWhen}
         }${bottomWhen}${randomDatabase}${groovy}
@@ -178,6 +179,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { reveal(mavenPublishDeclarative, randomDatabase, groovy) }
         .then { reveal(mavenPublishImperative).hide(mavenPublishDeclarative) }
         .then { reveal(topIfCi, bottomIfCi) }
+        .then { focusNoStyling(mongodb) }
         .then { revealAndFocusNoStyling(topWhen, bottomWhen, monday) }
         .then { reveal(postgres, cassandra) }
         .then { reveal(masochistIfTop, masochistIfBottom) }
@@ -185,7 +187,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .hideEmoji()
         // explain convention plugins
         .openPanel("bulletpoints")
-        .changeTitle("Convention plugins")
+        .changeTitle("Solution: Convention plugins")
         .pass(3)
         .closePanel("bulletpoints")
         // start extracting convention plugin
@@ -247,6 +249,7 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         // showing errors
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
         .openErrorWindow("e: Unresolved reference 'libs'\n\n\n")
+        .changeTitle("Issue: 'libs' not available in convention")
         .closeErrorWindow()
         // switching to settings to import version catalog from parent build
         .switchTo("buildSrc/settings.gradle.kts")
@@ -269,7 +272,7 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         }
         .closePanelAndShowFileTree("terminal")
         // showing typesafe-conventions
-        .openPanel("typesafe-conventions")
+        .then { openPanel("typesafe-conventions").changeTitle("Solution: Typesafe Conventions Plugin") }
         .closePanel("typesafe-conventions")
         // switching to settings to apply typesafe-conventions
         .switchTo("buildSrc/settings.gradle.kts")

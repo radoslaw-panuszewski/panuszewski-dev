@@ -40,6 +40,7 @@ import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
@@ -68,209 +69,212 @@ fun StoryboardBuilder.CrossConfiguration() {
         subprojectsFilterHighlighted,
         librusAppears,
         resetAfterSubprojectsFilterHighlighted,
+        titleChangesToSolution,
         libConventionAppears,
         commonConfigMovedToLibConvention,
         rootProjectChangedToNothingToConfigure,
         rootAndLibConventionProjectShrink,
+        libAppliesConvention,
         appConventionAppears,
-        projectsExpand,
+        appAppliesConvention,
         agendaOpens,
         agendaItemCrossedOut,
-        agendaCloses
+        agendaCloses,
+        totalStates
     ) = subsequentNumbers()
 
-    val totalStates = calculateTotalStates(files)
-
     scene(totalStates) {
-        val intTransition = transition.createChildTransition { it.toState() }
+        withIntTransition {
+            val ideState = buildIdeState(files)
 
-        val ideState = intTransition.buildIdeState(
-            files = files,
-            initialTitle = "Cross configuration"
-        )
+            val title = when {
+                currentState >= titleChangesToSolution -> "Solution: Convention plugins again!"
+                else -> "Issue: Cross configuration"
+            }
 
-        TitleScaffold(ideState.currentState.title) {
+            TitleScaffold(title) {
 
-            ideState.IdeLayout {
-                adaptiveTopPanel("tree") { panelState ->
-
-                    Box(Modifier.height(if (panelState.currentState < 3) 200.dp else 800.dp)) {
-                        Row {
-                            LookaheadScope {
-                                panelState.SlideFromLeftAnimatedVisibility({ it in agendaOpens until agendaCloses }) {
-                                    panelState.Agenda(Modifier.width(225.dp)) {
-                                        item("Groovy", crossedOutSince = 0)
-                                        item("No type safety", crossedOutSince = 0)
-                                        item("Imperative code", crossedOutSince = 0)
-                                        item("Cross configuration", crossedOutSince = agendaItemCrossedOut)
-                                        item("Mixed concerns")
-                                    }
-                                }
-
-                                val rootProjectColor = MaterialTheme.colors.primary
-                                val libraryColor = NICE_BLUE
-                                val appColor = MaterialTheme.colors.secondary
-                                val buildSrcColor = NICE_PINK
-                                val buildLogicColor = NICE_GREEN
-                                val highlightColor = NICE_ORANGE
-                                val neutralColor = Color.Gray
-
-                                val mainBuildTree = when {
-                                    panelState.currentState >= appConventionAppears -> buildTree {
-                                        val appConvention = reusableNode("app-convention", appColor)
-                                        val libraryConvention = reusableNode("lib-convention", libraryColor)
-
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor) {
-                                                node(appConvention)
-                                            }
-                                            node("lib1", libraryColor) {
-                                                node(libraryConvention)
-                                            }
-                                            node("lib2", libraryColor) {
-                                                node(libraryConvention)
-                                            }
+                ideState.IdeLayout {
+                    adaptiveTopPanel("tree") {
+                        Box(Modifier.height(if (currentState < 3) 200.dp else 800.dp)) {
+                            Row {
+                                LookaheadScope {
+                                    SlideFromLeftAnimatedVisibility({ it in agendaOpens until agendaCloses }) {
+                                        Agenda(Modifier.width(225.dp)) {
+                                            item("Groovy", crossedOutSince = 0)
+                                            item("No type safety", crossedOutSince = 0)
+                                            item("Imperative code", crossedOutSince = 0)
+                                            item("Cross configuration", crossedOutSince = agendaItemCrossedOut)
+                                            item("Mixed concerns")
                                         }
                                     }
-                                    panelState.currentState >= rootAndLibConventionProjectShrink -> buildTree {
-                                        val libraryConvention = reusableNode("lib-convention", libraryColor)
 
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", libraryColor) {
-                                                node(libraryConvention)
-                                            }
-                                            node("lib2", libraryColor) {
-                                                node(libraryConvention)
-                                            }
-                                        }
-                                    }
-                                    panelState.currentState >= libConventionAppears -> buildTree {
-                                        val libraryConvention = reusableNode("lib-convention", libraryColor)
+                                    val rootProjectColor = MaterialTheme.colors.primary
+                                    val libraryColor = NICE_BLUE
+                                    val appColor = MaterialTheme.colors.secondary
+                                    val buildSrcColor = NICE_PINK
+                                    val buildLogicColor = NICE_GREEN
+                                    val highlightColor = NICE_ORANGE
+                                    val neutralColor = Color.Gray
 
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", libraryColor) {
-                                                node(libraryConvention)
-                                            }
-                                            node("lib2", libraryColor) {
-                                                node(libraryConvention)
-                                            }
-                                            node("librus")
-                                        }
-                                    }
-                                    panelState.currentState >= resetAfterSubprojectsFilterHighlighted -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", libraryColor)
-                                            node("lib2", libraryColor)
-                                            node("librus")
-                                        }
-                                    }
-                                    panelState.currentState >= librusAppears -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", highlightColor)
-                                            node("lib2", highlightColor)
-                                            node("librus", highlightColor)
-                                        }
-                                    }
-                                    panelState.currentState >= subprojectsFilterHighlighted -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", highlightColor)
-                                            node("lib2", highlightColor)
-                                        }
-                                    }
-                                    panelState.currentState >= resetAfterSubprojectsHighlighted -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", libraryColor)
-                                            node("lib2", libraryColor)
-                                        }
-                                    }
-                                    panelState.currentState >= subprojectsHighlighted -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", highlightColor)
-                                            node("lib1", highlightColor)
-                                            node("lib2", highlightColor)
-                                        }
-                                    }
-                                    panelState.currentState >= libsAppear -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                            node("lib1", libraryColor)
-                                            node("lib2", libraryColor)
-                                        }
-                                    }
-                                    panelState.currentState >= appMovesUnderRootProject -> buildTree {
-                                        node("root-project", rootProjectColor) {
-                                            node("app", appColor)
-                                        }
-                                    }
-                                    panelState.currentState >= treeAppears -> buildTree {
-                                        node("app", rootProjectColor)
-                                    }
-                                    else -> buildTree {}
-                                }
+                                    val mainBuildTree = when {
+                                        currentState >= appConventionAppears -> buildTree {
+                                            val appConvention = reusableNode("app-convention", appColor)
+                                            val libraryConvention = reusableNode("lib-convention", libraryColor)
 
-                                AnimatedHorizontalTree(
-                                    tree = mainBuildTree,
-                                    excludeSharedChildrenFromLayout = true,
-                                    modifier = Modifier.animateBounds(this)
-                                ) { node ->
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                            .background(LocalIdeColors.current.paneBackground)
-                                    ) {
-                                        Column(
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
-                                        ) {
-                                            panelState.createChildTransition {
-                                                when {
-                                                    it >= projectsExpand && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
-                                                    it >= projectsExpand && node.value == "app" -> APP_BUILD_GRADLE_KTS[5].String()
-
-                                                    it >= rootAndLibConventionProjectShrink && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                    it >= rootAndLibConventionProjectShrink && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-
-                                                    it >= rootProjectChangedToNothingToConfigure && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
-
-                                                    it >= commonConfigMovedToLibConvention && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
-                                                    it >= commonConfigMovedToLibConvention && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
-
-                                                    it >= libConventionAppears && node.value == "lib-convention" -> JustName(node)
-
-                                                    it >= resetAfterSubprojectsFilterHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
-                                                    it >= resetAfterSubprojectsFilterHighlighted && node.value == "librus" -> JustName(node)
-                                                    it >= resetAfterSubprojectsFilterHighlighted && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
-
-                                                    it >= librusAppears && node.value == "librus" -> "librus ❌".annotate()
-
-                                                    it >= subprojectsFilterHighlighted && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
-                                                    it >= subprojectsFilterHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
-
-                                                    it >= resetAfterSubprojectsHighlighted && node.value == "app" ->JustName(node)
-                                                    it >= resetAfterSubprojectsHighlighted && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
-                                                    it >= resetAfterSubprojectsHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
-
-                                                    it >= subprojectsHighlighted && node.value == "app" -> "app ❌".annotate()
-                                                    it >= subprojectsHighlighted && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
-                                                    it >= subprojectsHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
-
-                                                    it >= libsShrink && node.value.contains("lib") -> JustName(node)
-                                                    it >= crossConfigAddedToRootProject && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
-                                                    it >= crossConfigAddedToRootProject && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
-                                                    it >= rootProjectExpands && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
-                                                    it >= libsExpand && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
-                                                    it >= appShrinks && node.value == "app" -> JustName(node)
-                                                    it >= appExpands && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
-                                                    else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor) {
+                                                    node(appConvention)
                                                 }
-                                            }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                                node("lib1", libraryColor) {
+                                                    node(libraryConvention)
+                                                }
+                                                node("lib2", libraryColor) {
+                                                    node(libraryConvention)
+                                                }
+                                            }
+                                        }
+                                        currentState >= rootAndLibConventionProjectShrink -> buildTree {
+                                            val libraryConvention = reusableNode("lib-convention", libraryColor)
+
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", libraryColor) {
+                                                    node(libraryConvention)
+                                                }
+                                                node("lib2", libraryColor) {
+                                                    node(libraryConvention)
+                                                }
+                                            }
+                                        }
+                                        currentState >= libConventionAppears -> buildTree {
+                                            val libraryConvention = reusableNode("lib-convention", libraryColor)
+
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", libraryColor) {
+                                                    node(libraryConvention)
+                                                }
+                                                node("lib2", libraryColor) {
+                                                    node(libraryConvention)
+                                                }
+                                                node("librus")
+                                            }
+                                        }
+                                        currentState >= resetAfterSubprojectsFilterHighlighted -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", libraryColor)
+                                                node("lib2", libraryColor)
+                                                node("librus")
+                                            }
+                                        }
+                                        currentState >= librusAppears -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", highlightColor)
+                                                node("lib2", highlightColor)
+                                                node("librus", highlightColor)
+                                            }
+                                        }
+                                        currentState >= subprojectsFilterHighlighted -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", highlightColor)
+                                                node("lib2", highlightColor)
+                                            }
+                                        }
+                                        currentState >= resetAfterSubprojectsHighlighted -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", libraryColor)
+                                                node("lib2", libraryColor)
+                                            }
+                                        }
+                                        currentState >= subprojectsHighlighted -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", highlightColor)
+                                                node("lib1", highlightColor)
+                                                node("lib2", highlightColor)
+                                            }
+                                        }
+                                        currentState >= libsAppear -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                                node("lib1", libraryColor)
+                                                node("lib2", libraryColor)
+                                            }
+                                        }
+                                        currentState >= appMovesUnderRootProject -> buildTree {
+                                            node("root-project", rootProjectColor) {
+                                                node("app", appColor)
+                                            }
+                                        }
+                                        currentState >= treeAppears -> buildTree {
+                                            node("app", rootProjectColor)
+                                        }
+                                        else -> buildTree {}
+                                    }
+
+                                    AnimatedHorizontalTree(
+                                        tree = mainBuildTree,
+                                        excludeSharedChildrenFromLayout = true,
+                                        modifier = Modifier.animateBounds(this)
+                                    ) { node ->
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                                                .background(LocalIdeColors.current.paneBackground)
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                            ) {
+                                                createChildTransition {
+                                                    when {
+                                                        it >= appAppliesConvention && node.value == "app" -> APP_BUILD_GRADLE_KTS[5].String()
+
+                                                        it >= libAppliesConvention && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
+
+                                                        it >= rootAndLibConventionProjectShrink && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                        it >= rootAndLibConventionProjectShrink && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+
+                                                        it >= rootProjectChangedToNothingToConfigure && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
+
+                                                        it >= commonConfigMovedToLibConvention && node.value == "lib-convention" -> LIB_CONVENTION[2].String()
+                                                        it >= commonConfigMovedToLibConvention && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[7].String()
+
+                                                        it >= libConventionAppears && node.value == "lib-convention" -> JustName(node)
+
+                                                        it >= resetAfterSubprojectsFilterHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[5].String()
+                                                        it >= resetAfterSubprojectsFilterHighlighted && node.value == "librus" -> JustName(node)
+                                                        it >= resetAfterSubprojectsFilterHighlighted && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
+
+                                                        it >= librusAppears && node.value == "librus" -> "librus ❌".annotate()
+
+                                                        it >= subprojectsFilterHighlighted && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
+                                                        it >= subprojectsFilterHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[4].String()
+
+                                                        it >= resetAfterSubprojectsHighlighted && node.value == "app" -> JustName(node)
+                                                        it >= resetAfterSubprojectsHighlighted && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
+                                                        it >= resetAfterSubprojectsHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[3].String()
+
+                                                        it >= subprojectsHighlighted && node.value == "app" -> "app ❌".annotate()
+                                                        it >= subprojectsHighlighted && node.value.matches("""lib\d+""".toRegex()) -> "${node.value} ✅".annotate()
+                                                        it >= subprojectsHighlighted && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[2].String()
+
+                                                        it >= libsShrink && node.value.contains("lib") -> JustName(node)
+                                                        it >= crossConfigAddedToRootProject && node.value.contains("lib") -> LIB_BUILD_GRADLE_KTS[1].String()
+                                                        it >= crossConfigAddedToRootProject && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[1].String()
+                                                        it >= rootProjectExpands && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[0].String()
+                                                        it >= libsExpand && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
+                                                        it >= appShrinks && node.value == "app" -> JustName(node)
+                                                        it >= appExpands && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
+                                                        else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                    }
+                                                }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                            }
                                         }
                                     }
                                 }
@@ -349,7 +353,6 @@ private val APP_BUILD_GRADLE_KTS = buildCodeSamples {
         .hideIde()
         .then { hide(emptyLine) }
         .then { hide(dependencies) }
-        .pass(19)
 }
 
 private val LIB_BUILD_GRADLE_KTS = buildCodeSamples {
