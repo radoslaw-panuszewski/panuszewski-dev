@@ -55,7 +55,7 @@ fun StoryboardBuilder.TitleScene() {
         exitTransition = { fadeOut(tween(durationMillis = 10000, delayMillis = 3000)) },
     ) {
 
-        transition.SlideFromTopAnimatedVisibility({ it.toState() < titleDisappears }) {
+        transition.FadeOutAnimatedVisibility({ it.toState() < titleDisappears }) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
