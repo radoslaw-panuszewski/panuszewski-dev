@@ -60,7 +60,7 @@ fun StoryboardBuilder.DeclarativeGradle() {
             val ideState = buildIdeState(files)
 
             val title = when {
-                currentState >= 1 -> "Declarative Gradle"
+                currentState >= 1 -> "Declarative Gradle (EAP)"
                 else -> null
             }
 

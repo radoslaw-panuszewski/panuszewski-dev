@@ -25,8 +25,6 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 // TODO light theme?
 
 /**
- * jasno zaznaczyć że declarative gradle jest experimental
- *
  * Opowiedzieć więcej o plugins { ... } block że jest kompilowany wcześniej
  * Powiedzieć o dependencyResolutionManagement że jest już długo incubating
  */
