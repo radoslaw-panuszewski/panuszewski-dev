@@ -73,7 +73,8 @@ fun StoryboardBuilder.CrossConfiguration() {
         libConventionAppears,
         commonConfigMovedToLibConvention,
         rootProjectChangedToNothingToConfigure,
-        rootAndLibConventionProjectShrink,
+        rootProjectShrinks,
+        libConventionShrinks,
         libAppliesConvention,
         appConventionAppears,
         appAppliesConvention,
@@ -134,7 +135,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                 }
                                             }
                                         }
-                                        currentState >= rootAndLibConventionProjectShrink -> buildTree {
+                                        currentState >= rootProjectShrinks -> buildTree {
                                             val libraryConvention = reusableNode("lib-convention", libraryColor)
 
                                             node("root-project", rootProjectColor) {
@@ -237,8 +238,9 @@ fun StoryboardBuilder.CrossConfiguration() {
 
                                                         it >= libAppliesConvention && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
 
-                                                        it >= rootAndLibConventionProjectShrink && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
-                                                        it >= rootAndLibConventionProjectShrink && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                        it >= libConventionShrinks && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+
+                                                        it >= rootProjectShrinks && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
 
                                                         it >= rootProjectChangedToNothingToConfigure && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
 

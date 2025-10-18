@@ -55,7 +55,7 @@ fun StoryboardBuilder.DeclarativeGradle() {
     val totalStates = calculateTotalStates(files)
 
     scene(totalStates) {
-        withIntTransition(initialState = 13) {
+        withIntTransition {
 
             val ideState = buildIdeState(files)
 

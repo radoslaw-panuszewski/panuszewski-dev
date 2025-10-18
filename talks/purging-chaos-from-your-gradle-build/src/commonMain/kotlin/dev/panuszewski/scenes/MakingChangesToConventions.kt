@@ -12,12 +12,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.getValue
@@ -117,6 +122,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         comparisonBullet1,
         comparisonBullet2,
         comparisonBullet3,
+        comparisonBullet4,
+        comparisonBullet5,
+        comparisonBullet6,
+        comparisonBullet7,
+        comparisonBullet8,
+        comparisonBullet9,
+        comparisonBullet10,
         comparisonDisappears,
         treeIsBackForFinalRecap,
         titleChangesForFinalRecap,
@@ -145,7 +157,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition {
+        withIntTransition(initialState = comparisonBullet8) {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
@@ -276,7 +288,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 annotatedStringItem {
                                     append("Allows to ")
                                     withColor(buildLogicColor) { append("isolate") }
-                                    append(" your conventions in subprojects")
+                                    append(" your conventions")
                                 }
                             }
                         }
@@ -319,48 +331,66 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     SlideFromBottomAnimatedVisibility({ it in comparisonAppears until comparisonDisappears }) {
 
-                        Row(
-                            modifier = Modifier.fillMaxSize().padding(top = 32.dp),
-                            horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
+                        Column (
+                            modifier = Modifier.fillMaxHeight().wrapContentWidth().padding(top = 32.dp),
+                            verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
                         ) {
                             Column(
                                 modifier = Modifier
                                     .border(1.dp, buildSrcColor)
                                     .background(color = buildSrcColor.copy(alpha = 0.03f))
-                                    .fillMaxWidth()
+                                    .width(400.dp)
                                     .weight(0.5f)
                                     .padding(16.dp)
                                     .animateContentSize(),
-                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalAlignment = Alignment.Start
                             ) {
                                 h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
 
+                                Spacer(Modifier.height(8.dp))
+
                                 RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
-                                    stringItem("$BULLET_1 For simple builds")
-                                    stringItem("$BULLET_1 If your conventions are tightly coupled")
-                                    stringItem("$BULLET_1 If projects apply similar sets of conventions")
+                                    stringItem("✅ easy setup, works out-of-the-box")
+                                    stringItem("✅ typesafe accessors for conventions")
                                 }
+
+//                                Spacer(Modifier.height(8.dp))
+//
+//                                RevealSequentially(since = comparisonBullet4, textStyle = MaterialTheme.typography.body1) {
+//                                    stringItem("Use for:")
+//                                    stringItem("$BULLET_1 Simple builds")
+//                                    stringItem("$BULLET_1 Conventions that are tightly coupled")
+//                                    stringItem("$BULLET_1 Helper functions")
+//                                }
                             }
 
                             Column(
                                 modifier = Modifier
                                     .border(1.dp, buildLogicColor)
                                     .background(color = buildLogicColor.copy(alpha = 0.03f))
-                                    .fillMaxWidth()
+                                    .width(400.dp)
                                     .weight(0.5f)
                                     .padding(16.dp)
                                     .animateContentSize(),
-                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalAlignment = Alignment.Start
                             ) {
                                 h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
 
-                                RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
-                                    stringItem("$BULLET_1 For complex builds")
-                                    stringItem("$BULLET_1 If your conventions can work in isolation")
-                                    stringItem("$BULLET_1 If projects apply disjoint sets of conventions")
+                                Spacer(Modifier.height(8.dp))
+
+                                RevealSequentially(since = comparisonBullet3, textStyle = MaterialTheme.typography.body1) {
+                                    stringItem("✅ performance")
+                                    stringItem("✅ well-defined behavior")
                                 }
+
+//                                Spacer(Modifier.height(8.dp))
+//
+//                                RevealSequentially(since = comparisonBullet8, textStyle = MaterialTheme.typography.body1) {
+//                                    stringItem("$BULLET_1 complex builds")
+//                                    stringItem("$BULLET_1 conventions that can work in isolation")
+//                                }
                             }
                         }
                     }
