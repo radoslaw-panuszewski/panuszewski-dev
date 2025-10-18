@@ -75,14 +75,15 @@ fun StoryboardBuilder.CrossConfiguration() {
         rootProjectChangedToNothingToConfigure,
         rootProjectShrinks,
         libConventionShrinks,
-        libAppliesConvention,
-        appConventionAppears,
-        appAppliesConvention,
         agendaOpens,
         agendaItemCrossedOut,
         agendaCloses,
+        appConventionAppears,
+        appAppliesConvention,
         totalStates
     ) = subsequentNumbers()
+
+    val libAppliesConvention = libConventionShrinks
 
     scene(totalStates) {
         withIntTransition {

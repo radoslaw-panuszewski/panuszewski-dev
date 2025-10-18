@@ -33,14 +33,14 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
     format = Default,
     decorator = DARK_THEME,
 ) {
-    TitleScene()
-    Chaos()
-    Ultramarines()
-    IntroductionSlide()
-    KnowYourEnemy()
-    Groovy()
-    NoTypeSafety()
-    ImperativeCode()
+//    TitleScene()
+//    Chaos()
+//    Ultramarines()
+//    IntroductionSlide()
+//    KnowYourEnemy()
+//    Groovy()
+//    NoTypeSafety()
+//    ImperativeCode()
     CrossConfiguration()
     MakingChangesToConventions()
     TwoTypesOfGradleUsers()

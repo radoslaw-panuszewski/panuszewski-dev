@@ -132,5 +132,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openAgenda()
         .pass()
         .closeAgenda()
-        .then { hide(subprojects) }
+        .then { focusNoScroll(subprojects) }
+        .then { hide(subprojects).unfocus() }
 }
