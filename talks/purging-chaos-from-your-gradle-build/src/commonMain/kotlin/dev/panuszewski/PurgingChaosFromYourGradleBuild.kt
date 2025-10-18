@@ -25,8 +25,6 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 // TODO light theme?
 
 /**
- * buildSrc advantages (zero configuration, recognized out-of-the-box, typesafe accessors, good for utils)
- * może "conventions are cool..." jest niepotrzebne
  * jasno zaznaczyć że declarative gradle jest experimental
  *
  * Opowiedzieć więcej o plugins { ... } block że jest kompilowany wcześniej
@@ -47,6 +45,6 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
 //    ImperativeCode()
 //    CrossConfiguration()
     MakingChangesToConventions()
-//    TwoTypesOfGradleUsers()
+    TwoTypesOfGradleUsers()
     DeclarativeGradle()
 }

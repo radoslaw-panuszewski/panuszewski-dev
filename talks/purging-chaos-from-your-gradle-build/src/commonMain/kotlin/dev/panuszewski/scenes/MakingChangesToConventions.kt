@@ -126,19 +126,15 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         comparisonBullet5,
         comparisonBullet6,
         comparisonBullet7,
-        comparisonBullet8,
-        comparisonBullet9,
-        comparisonBullet10,
         comparisonDisappears,
         treeIsBackForFinalRecap,
         titleChangesForFinalRecap,
         finalRecapBullet1,
-        finalRecapBullet2,
         libProjectsFolded,
         randomCodeAddedToAppProject,
         shrugEmoji,
         resetAfterRandomCode,
-        finalRecapBullet3,
+        finalRecapBullet2,
         showAppConvention,
         appConventionExpanded,
         sharedDefaultsAdded,
@@ -157,7 +153,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition(initialState = comparisonBullet8) {
+        withIntTransition {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
@@ -331,66 +327,77 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     SlideFromBottomAnimatedVisibility({ it in comparisonAppears until comparisonDisappears }) {
 
-                        Column (
-                            modifier = Modifier.fillMaxHeight().wrapContentWidth().padding(top = 32.dp),
-                            verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .border(1.dp, buildSrcColor)
-                                    .background(color = buildSrcColor.copy(alpha = 0.03f))
-                                    .width(400.dp)
-                                    .weight(0.5f)
-                                    .padding(16.dp)
-                                    .animateContentSize(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
+                        Column {
+                            LookaheadScope {
+                                Spacer(Modifier.height(16.dp))
 
-                                Spacer(Modifier.height(8.dp))
-
-                                RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
-                                    stringItem("✅ easy setup, works out-of-the-box")
-                                    stringItem("✅ typesafe accessors for conventions")
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(32.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    RevealSequentially(since = comparisonBullet6) {
+                                        annotatedStringItem {
+                                            append("As a rule of thumb, I always start a new project with ")
+                                            withColor(buildSrcColor) { append("buildSrc") }
+                                        }
+                                        annotatedStringItem {
+                                            append("Then I switch to ")
+                                            withColor(buildLogicColor) { append("build-logic") }
+                                            append(" only if I see the performance gain")
+                                        }
+                                    }
                                 }
 
-//                                Spacer(Modifier.height(8.dp))
-//
-//                                RevealSequentially(since = comparisonBullet4, textStyle = MaterialTheme.typography.body1) {
-//                                    stringItem("Use for:")
-//                                    stringItem("$BULLET_1 Simple builds")
-//                                    stringItem("$BULLET_1 Conventions that are tightly coupled")
-//                                    stringItem("$BULLET_1 Helper functions")
-//                                }
-                            }
+                                Spacer(Modifier.height(16.dp))
 
-                            Column(
-                                modifier = Modifier
-                                    .border(1.dp, buildLogicColor)
-                                    .background(color = buildLogicColor.copy(alpha = 0.03f))
-                                    .width(400.dp)
-                                    .weight(0.5f)
-                                    .padding(16.dp)
-                                    .animateContentSize(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
+                                Row(
+                                    modifier = Modifier.fillMaxSize().padding(top = 32.dp).animateBounds(this),
+                                    horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .border(1.dp, buildSrcColor)
+                                            .background(color = buildSrcColor.copy(alpha = 0.03f))
+                                            .fillMaxWidth()
+                                            .weight(0.5f)
+                                            .padding(16.dp)
+                                            .animateContentSize(),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                        horizontalAlignment = Alignment.Start
+                                    ) {
+                                        h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildSrcColor) { append("buildSrc") } } }
 
-                                Spacer(Modifier.height(8.dp))
+                                        Spacer(Modifier.height(8.dp))
 
-                                RevealSequentially(since = comparisonBullet3, textStyle = MaterialTheme.typography.body1) {
-                                    stringItem("✅ performance")
-                                    stringItem("✅ well-defined behavior")
+                                        RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
+                                            stringItem("$BULLET_1 easy setup, works out-of-the-box")
+                                            stringItem("$BULLET_1 typesafe accessors for conventions")
+                                            stringItem("$BULLET_1 ideal for helper functions")
+                                        }
+                                    }
+
+                                    Column(
+                                        modifier = Modifier
+                                            .border(1.dp, buildLogicColor)
+                                            .background(color = buildLogicColor.copy(alpha = 0.03f))
+                                            .fillMaxWidth()
+                                            .weight(0.5f)
+                                            .padding(16.dp)
+                                            .animateContentSize(),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                        horizontalAlignment = Alignment.Start
+                                    ) {
+                                        h5 { Text(Modifier.align(Alignment.CenterHorizontally)) { withColor(buildLogicColor) { append("build-logic") } } }
+
+                                        Spacer(Modifier.height(8.dp))
+
+                                        RevealSequentially(since = comparisonBullet4, textStyle = MaterialTheme.typography.body1) {
+                                            stringItem("$BULLET_1 better performance")
+                                            stringItem("$BULLET_1 well-defined behavior")
+                                        }
+                                    }
                                 }
-
-//                                Spacer(Modifier.height(8.dp))
-//
-//                                RevealSequentially(since = comparisonBullet8, textStyle = MaterialTheme.typography.body1) {
-//                                    stringItem("$BULLET_1 complex builds")
-//                                    stringItem("$BULLET_1 conventions that can work in isolation")
-//                                }
                             }
                         }
                     }
@@ -410,16 +417,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     ) {
                                         RevealSequentially(since = finalRecapBullet1) {
                                             annotatedStringItem {
-                                                append("Conventions are cool, however...")
-                                            }
-                                        }
-                                        RevealSequentially(since = finalRecapBullet2) {
-                                            annotatedStringItem {
-                                                append("They encourages declarativity, but ")
+                                                append("Convention plugins encourages declarativity, but ")
                                                 withColor(NICE_ORANGE) { append("do not enforce it") }
                                             }
                                         }
-                                        RevealSequentially(since = finalRecapBullet3) {
+                                        RevealSequentially(since = finalRecapBullet2) {
                                             annotatedStringItem {
                                                 append("Also, they often mix ")
                                                 withColor(NICE_BLUE) { append("shared defaults") }
