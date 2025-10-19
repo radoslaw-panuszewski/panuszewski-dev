@@ -23,7 +23,6 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 // TODO slajd na przedstawienie sie
 // TODO pożegnalny slajd
 // TODO terminal pod github issuesem
-// TODO podsumowanie?
 // TODO light theme?
 
 /**
@@ -47,6 +46,6 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
 //    MakingChangesToConventions()
 //    TwoTypesOfGradleUsers()
 //    DeclarativeGradle()
-    WrappingUp()
+//    WrappingUp()
     ThankYouSlide()
 }
