@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
-import dev.panuszewski.template.extensions.h1
 import dev.panuszewski.template.extensions.h2
 
 fun StoryboardBuilder.ThankYouSlide() {

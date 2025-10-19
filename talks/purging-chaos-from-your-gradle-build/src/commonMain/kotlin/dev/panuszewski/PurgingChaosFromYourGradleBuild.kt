@@ -15,6 +15,7 @@ import dev.panuszewski.scenes.ThankYouSlide
 import dev.panuszewski.scenes.TitleScene
 import dev.panuszewski.scenes.TwoTypesOfGradleUsers
 import dev.panuszewski.scenes.Ultramarines
+import dev.panuszewski.scenes.WrappingUp
 import dev.panuszewski.template.theme.DARK_THEME
 
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
@@ -34,17 +35,18 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
     format = Default,
     decorator = DARK_THEME,
 ) {
-    TitleScene()
-    Chaos()
-    Ultramarines()
-    IntroductionSlide()
-    KnowYourEnemy()
-    Groovy()
-    NoTypeSafety()
-    ImperativeCode()
-    CrossConfiguration()
-    MakingChangesToConventions()
-    TwoTypesOfGradleUsers()
-    DeclarativeGradle()
+//    TitleScene()
+//    Chaos()
+//    Ultramarines()
+//    IntroductionSlide()
+//    KnowYourEnemy()
+//    Groovy()
+//    NoTypeSafety()
+//    ImperativeCode()
+//    CrossConfiguration()
+//    MakingChangesToConventions()
+//    TwoTypesOfGradleUsers()
+//    DeclarativeGradle()
+    WrappingUp()
     ThankYouSlide()
 }
