@@ -21,7 +21,6 @@ import dev.panuszewski.template.theme.DARK_THEME
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
 
 // TODO slajd na przedstawienie sie
-// TODO pożegnalny slajd
 // TODO terminal pod github issuesem
 // TODO light theme?
 
@@ -34,18 +33,18 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
     format = Default,
     decorator = DARK_THEME,
 ) {
-//    TitleScene()
-//    Chaos()
-//    Ultramarines()
-//    IntroductionSlide()
-//    KnowYourEnemy()
-//    Groovy()
-//    NoTypeSafety()
-//    ImperativeCode()
-//    CrossConfiguration()
-//    MakingChangesToConventions()
-//    TwoTypesOfGradleUsers()
-//    DeclarativeGradle()
-//    WrappingUp()
+    TitleScene()
+    Chaos()
+    Ultramarines()
+    IntroductionSlide()
+    KnowYourEnemy()
+    Groovy()
+    NoTypeSafety()
+    ImperativeCode()
+    CrossConfiguration()
+    MakingChangesToConventions()
+    TwoTypesOfGradleUsers()
+    DeclarativeGradle()
+    WrappingUp()
     ThankYouSlide()
 }
