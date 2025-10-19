@@ -20,25 +20,24 @@ import dev.panuszewski.template.theme.DARK_THEME
 
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
 
-// TODO slajd na przedstawienie sie
 // TODO terminal pod github issuesem
 // TODO light theme?
 
 /**
- * Opowiedzieć więcej o plugins { ... } block że jest kompilowany wcześniej
- * Powiedzieć o dependencyResolutionManagement że jest już długo incubating
+ * opowiedzieć więcej czym jest plugin marker
+ * wkleić screem z docsów, że dependencyResolutionManagement jest preferred way ale jest incubating
  */
 val PurgingChaosFromYourGradleBuild = Storyboard.build(
     title = TITLE,
     format = Default,
     decorator = DARK_THEME,
 ) {
-    TitleScene()
-    Chaos()
-    Ultramarines()
-    IntroductionSlide()
-    KnowYourEnemy()
-    Groovy()
+//    TitleScene()
+//    Chaos()
+//    Ultramarines()
+//    IntroductionSlide()
+//    KnowYourEnemy()
+//    Groovy()
     NoTypeSafety()
     ImperativeCode()
     CrossConfiguration()

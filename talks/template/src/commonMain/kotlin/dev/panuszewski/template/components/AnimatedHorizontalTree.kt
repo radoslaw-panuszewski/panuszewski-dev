@@ -89,7 +89,7 @@ data class TreeElement<T : Any>(
     val isRoot: Boolean,
 )
 
-fun <T : Any> buildTree(block: TreeBuilder<T>.() -> Unit): List<TreeElement<T>> {
+inline fun <T : Any> buildTree(block: TreeBuilder<T>.() -> Unit): List<TreeElement<T>> {
     val builder = TreeBuilder<T>(isRoot = true)
     builder.apply(block)
     return builder.nodes

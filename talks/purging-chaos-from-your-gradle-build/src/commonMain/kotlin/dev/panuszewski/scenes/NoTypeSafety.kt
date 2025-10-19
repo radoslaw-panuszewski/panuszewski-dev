@@ -1,18 +1,37 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.highlight.Language.KotlinDsl
 import dev.panuszewski.components.Agenda
+import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
+import dev.panuszewski.template.components.RoundedTreeNode
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
+import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.components.initiallyHidden
+import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.LocalIdeColors
 
 fun StoryboardBuilder.NoTypeSafety() {
 
@@ -30,6 +49,33 @@ fun StoryboardBuilder.NoTypeSafety() {
 
             TitleScaffold(ideState.currentState.title) {
                 ideState.IdeLayout {
+
+                    topPanel("plugin-marker") { panelState ->
+                        val tree = buildTree {
+                            node("plugin-usage") {
+                                node("plugin-marker")
+                            }
+                        }
+
+                        AnimatedHorizontalTree(tree) { node ->
+                            RoundedTreeNode(node) {
+                                when (it) {
+                                    "plugin-usage" -> {
+                                        """
+                                        plugins {
+                                            id("<pluginId>") version "<version>"
+                                        }
+                                        """.trimIndent().toCode(KotlinDsl)
+                                    }
+                                    "plugin-marker" -> {
+                                        "<pluginId>:<pluginId>.gradle.plugin:<version>".annotate()
+                                    }
+                                    else -> it.annotate()
+                                }
+                            }
+                        }
+                    }
+
                     leftPanel("agenda") { panelState ->
                         panelState.Agenda {
                             item("Groovy", crossedOutSince = 0)
@@ -79,8 +125,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
     }
     """
         .trimIndent()
-        .toCodeSample(language = Language.KotlinDsl)
+        .toCodeSample(language = KotlinDsl)
         .startWith { hide(declarativePlugin, typesafePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
+        .openPanel("plugin-marker")
+        .pass(10)
         // plugins block
         .then { focusNoScroll(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(imperativePlugin) }
