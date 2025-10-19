@@ -242,7 +242,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     append(" (most of the time)")
                                 }
                                 annotatedStringItem {
-                                    append("Modifying code in buildSrc will")
+                                    append("Modifying code in buildSrc will ")
                                     withColor(buildSrcColor) { append("no longer invalidate") }
                                     append(" everything")
                                 }

@@ -11,6 +11,7 @@ import dev.panuszewski.scenes.IntroductionSlide
 import dev.panuszewski.scenes.KnowYourEnemy
 import dev.panuszewski.scenes.MakingChangesToConventions
 import dev.panuszewski.scenes.NoTypeSafety
+import dev.panuszewski.scenes.ThankYouSlide
 import dev.panuszewski.scenes.TitleScene
 import dev.panuszewski.scenes.TwoTypesOfGradleUsers
 import dev.panuszewski.scenes.Ultramarines
@@ -27,24 +28,23 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 /**
  * Opowiedzieć więcej o plugins { ... } block że jest kompilowany wcześniej
  * Powiedzieć o dependencyResolutionManagement że jest już długo incubating
- *
- * Powiedzieć więcej o fixowaniu Unresolved reference 'libs'
  */
 val PurgingChaosFromYourGradleBuild = Storyboard.build(
     title = TITLE,
     format = Default,
     decorator = DARK_THEME,
 ) {
-//    TitleScene()
-//    Chaos()
-//    Ultramarines()
-//    IntroductionSlide()
-//    KnowYourEnemy()
-//    Groovy()
-//    NoTypeSafety()
+    TitleScene()
+    Chaos()
+    Ultramarines()
+    IntroductionSlide()
+    KnowYourEnemy()
+    Groovy()
+    NoTypeSafety()
     ImperativeCode()
     CrossConfiguration()
     MakingChangesToConventions()
     TwoTypesOfGradleUsers()
     DeclarativeGradle()
+    ThankYouSlide()
 }

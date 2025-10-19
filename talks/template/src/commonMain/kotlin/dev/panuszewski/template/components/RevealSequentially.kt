@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import dev.bnorm.storyboard.Frame
@@ -63,8 +64,8 @@ class RevealSequentiallyScope(
         items.add(RevealedItem(stateCount) { Text(content) })
     }
 
-    fun annotatedStringItem(stateCount: Int = 1, content: @Composable AnnotatedString.Builder.() -> Unit) {
-        items.add(RevealedItem(stateCount) { Text(content = content) })
+    fun annotatedStringItem(stateCount: Int = 1, modifier: Modifier = Modifier, content: @Composable AnnotatedString.Builder.() -> Unit) {
+        items.add(RevealedItem(stateCount) { Text(content = content, modifier = modifier) })
     }
 
     @Composable

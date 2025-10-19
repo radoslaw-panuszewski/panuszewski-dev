@@ -1,6 +1,10 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +21,17 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import dev.bnorm.storyboard.AdvanceDirection.Forward
+import dev.bnorm.storyboard.SceneExitTransition
 import dev.bnorm.storyboard.StoryboardBuilder
+import dev.bnorm.storyboard.easel.template.SceneEnter
+import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.TitleScaffold
@@ -54,7 +63,11 @@ fun StoryboardBuilder.DeclarativeGradle() {
 
     val totalStates = calculateTotalStates(files)
 
-    scene(totalStates) {
+    scene(
+        enterTransition = { direction -> if (direction == Forward) EnterTransition.None else SceneEnter(CenterEnd).invoke(direction) },
+        exitTransition = { direction -> if (direction == Forward) SceneExit(CenterEnd).invoke(direction) else ExitTransition.None },
+        stateCount = totalStates
+    ) {
         withIntTransition {
 
             val ideState = buildIdeState(files)

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.Agenda
+import dev.panuszewski.template.components.CenteredColumn
 import dev.panuszewski.template.components.DIRECTORY
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.ResourceImage
@@ -62,11 +63,8 @@ fun StoryboardBuilder.ImperativeCode() {
             TitleScaffold(ideState.currentState.title) {
 
                 ideState.IdeLayout {
-                    topPanel("bulletpoints") { panelState ->
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                    topPanel("convention-plugins") { panelState ->
+                        CenteredColumn {
                             panelState.RevealSequentially(since = 2) {
                                 annotatedStringItem {
                                     append("A ")
@@ -84,6 +82,23 @@ fun StoryboardBuilder.ImperativeCode() {
                                 }
                             }
                         }
+                    }
+
+                    topPanel("unresolved-libs") { panelState ->
+                        CenteredColumn {
+                             panelState.RevealSequentially {
+                                 annotatedStringItem {
+                                     append("We don't have access to ")
+                                     withColor(NICE_LIGHT_TURQUOISE) { append("version catalog") }
+                                     append(" in buildSrc")
+                                 }
+                                 annotatedStringItem {
+                                     append("The ")
+                                     withColor(NICE_LIGHT_TURQUOISE) { append("plugin dependency") }
+                                     append(" is not resolved automatically")
+                                 }
+                             }
+                         }
                     }
 
                     adaptiveLeftPanel("terminal") { panelState ->
@@ -192,10 +207,10 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { unfocus().showEmoji("😬") }
         .hideEmoji()
         // explain convention plugins
-        .openPanel("bulletpoints")
+        .openPanel("convention-plugins")
         .changeTitle("Convention plugins")
         .pass(3)
-        .closePanel("bulletpoints")
+        .closePanel("convention-plugins")
         // start extracting convention plugin
         .revealFile("buildSrc/src/main/kotlin/app-convention.gradle.kts")
         .openInRightPane("buildSrc/src/main/kotlin/app-convention.gradle.kts", switchTo = true)
@@ -256,6 +271,9 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         // showing errors
         .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'\n\n\n") }
         .then { closeErrorWindow().changeTitle("'libs' not available in convention") }
+        .openPanel("unresolved-libs")
+        .pass(2)
+        .closePanel("unresolved-libs")
         // switching to settings to import version catalog from parent build
         .switchTo("buildSrc/settings.gradle.kts")
         .pass()
