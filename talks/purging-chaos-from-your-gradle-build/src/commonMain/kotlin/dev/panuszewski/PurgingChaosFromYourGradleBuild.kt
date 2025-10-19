@@ -27,6 +27,8 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 /**
  * Opowiedzieć więcej o plugins { ... } block że jest kompilowany wcześniej
  * Powiedzieć o dependencyResolutionManagement że jest już długo incubating
+ *
+ * Powiedzieć więcej o fixowaniu Unresolved reference 'libs'
  */
 val PurgingChaosFromYourGradleBuild = Storyboard.build(
     title = TITLE,
@@ -40,7 +42,7 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
 //    KnowYourEnemy()
 //    Groovy()
 //    NoTypeSafety()
-//    ImperativeCode()
+    ImperativeCode()
     CrossConfiguration()
     MakingChangesToConventions()
     TwoTypesOfGradleUsers()

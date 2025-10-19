@@ -1,6 +1,7 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -31,7 +35,9 @@ import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
+import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.withColor
+import org.jetbrains.compose.resources.painterResource
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.placzka
 import talks.purging_chaos_from_your_gradle_build.generated.resources.typesafe_conventions
@@ -51,7 +57,7 @@ fun StoryboardBuilder.ImperativeCode() {
 
     scene(totalStates) {
         withIntTransition {
-            val ideState = buildIdeState(files, initialTitle = "Issue: Imperative code")
+            val ideState = buildIdeState(files, initialTitle = "Imperative code")
 
             TitleScaffold(ideState.currentState.title) {
 
@@ -122,6 +128,20 @@ fun StoryboardBuilder.ImperativeCode() {
                         }
                     }
                 }
+
+                Box(Modifier.align(Alignment.Center)) {
+                    Box(
+                        Modifier
+                            .clip(CircleShape)
+                            .border(2.dp, NICE_ORANGE, CircleShape)
+                            .width(300.dp)
+                            .height(300.dp)
+                            .paint(
+                                painter = painterResource(Res.drawable.placzka),
+                                contentScale = ContentScale.Crop
+                            )
+                    )
+                }
             }
         }
     }
@@ -187,7 +207,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .hideEmoji()
         // explain convention plugins
         .openPanel("bulletpoints")
-        .changeTitle("Solution: Convention plugins")
+        .changeTitle("Convention plugins")
         .pass(3)
         .closePanel("bulletpoints")
         // start extracting convention plugin
@@ -248,10 +268,8 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         // closing build.gradle.kts
         .then { closeLeftPane().showFileTree() }
         // showing errors
-        .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
-        .openErrorWindow("e: Unresolved reference 'libs'\n\n\n")
-        .changeTitle("Issue: 'libs' not available in convention")
-        .closeErrorWindow()
+        .then { highlightAsError(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).openErrorWindow("e: Unresolved reference 'libs'\n\n\n") }
+        .then { closeErrorWindow().changeTitle("'libs' not available in convention") }
         // switching to settings to import version catalog from parent build
         .switchTo("buildSrc/settings.gradle.kts")
         .pass()
@@ -273,7 +291,7 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         }
         .closePanelAndShowFileTree("terminal")
         // showing typesafe-conventions
-        .then { openPanel("typesafe-conventions").changeTitle("Solution: Typesafe Conventions Plugin") }
+        .then { openPanel("typesafe-conventions").changeTitle("Typesafe Conventions Plugin") }
         .closePanel("typesafe-conventions")
         // switching to settings to apply typesafe-conventions
         .switchTo("buildSrc/settings.gradle.kts")
@@ -333,11 +351,8 @@ private val BUILD_GRADLE_KTS_IN_BUILD_SRC = buildCodeSamples {
         `kotlin-dsl`
     }$${pluginMarkerFunction}
     
-    fun pluginMarker(provider: Provider<PluginDependency>): String {
-        val pluginId = provider.get().pluginId
-        val pluginVersion = provider.get().version
-        
-        return "$pluginId:$pluginId.gradle.plugin:$pluginVersion"
+    fun pluginMarker(p: Provider<PluginDependency>) = with(p.get()) { 
+        "$pluginId:$pluginId.gradle.plugin:$version" 
     }$${pluginMarkerFunction}
     
     dependencies { $${pluginDependency}

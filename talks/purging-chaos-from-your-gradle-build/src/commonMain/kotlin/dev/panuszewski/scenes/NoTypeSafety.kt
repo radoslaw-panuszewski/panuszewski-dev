@@ -26,7 +26,7 @@ fun StoryboardBuilder.NoTypeSafety() {
 
     scene(totalStates) {
         withIntTransition {
-            val ideState = buildIdeState(files, initialTitle = "Issue: No type safety")
+            val ideState = buildIdeState(files, initialTitle = "No type safety")
 
             TitleScaffold(ideState.currentState.title) {
                 ideState.IdeLayout {
@@ -89,13 +89,13 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .then { hide(nonTypesafeConfiguration1, nonTypesafeConfiguration2).reveal(typesafeConfiguration1, typesafeConfiguration2).unfocus() }
         // version catalog
         .then { focusNoScroll(nonTypesafePlugin, nonTypesafeExternalDependency) }
-        .changeTitle("Solution: Version catalog")
+        .changeTitle("Version catalog")
         .switchTo(".gradle/libs.versions.toml")
         .then { this }
         .then { hide(nonTypesafePlugin, nonTypesafeExternalDependency).reveal(typesafePlugin, typesafeExternalDependency).unfocus() }
         // project accessors
         .then { focusNoScroll(nonTypesafeProjectDependency) }
-        .changeTitle("Solution: Typesafe project accessors")
+        .changeTitle("Typesafe project accessors")
         .switchTo("settings.gradle.kts")
         .then { this }
         .then { hide(nonTypesafeProjectDependency).reveal(typesafeProjectDependency).unfocus() }

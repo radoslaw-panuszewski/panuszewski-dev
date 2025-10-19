@@ -90,8 +90,8 @@ fun StoryboardBuilder.CrossConfiguration() {
             val ideState = buildIdeState(files)
 
             val title = when {
-                currentState >= titleChangesToSolution -> "Solution: Convention plugins again!"
-                else -> "Issue: Cross configuration"
+                currentState >= titleChangesToSolution -> "Convention plugins again!"
+                else -> "Cross configuration"
             }
 
             TitleScaffold(title) {
