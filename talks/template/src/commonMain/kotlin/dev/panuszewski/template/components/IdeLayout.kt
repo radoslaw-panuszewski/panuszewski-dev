@@ -6,6 +6,7 @@
 //import androidx.compose.foundation.border
 //import androidx.compose.foundation.layout.Box
 //import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.foundation.layout.height
 //import androidx.compose.foundation.layout.padding
 //import androidx.compose.foundation.layout.width
 //import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +24,8 @@
 //import androidx.compose.ui.Alignment
 //import androidx.compose.ui.Modifier
 //import androidx.compose.ui.draw.clip
+//import androidx.compose.ui.draw.paint
+//import androidx.compose.ui.layout.ContentScale
 //import androidx.compose.ui.layout.onSizeChanged
 //import androidx.compose.ui.unit.dp
 //import dev.bnorm.storyboard.text.highlight.Language
@@ -32,7 +35,7 @@
 //import dev.panuszewski.template.extensions.startWith
 //import dev.panuszewski.template.theme.NICE_ORANGE
 //import kotlinx.coroutines.delay
-//import org.jetbrains.compose.resources.DrawableResource
+//import org.jetbrains.compose.resources.painterResource
 //
 //typealias PanelContent = @Composable (Transition<Int>) -> Unit
 //
@@ -158,7 +161,7 @@
 //    val selectedFile: String,
 //    val fileStates: Map<String, Int>,
 //    val emoji: String? = null,
-//    val image: DrawableResource? = null,
+//    val image: DisplayableImage? = null,
 //    val leftPaneFile: String? = null,
 //    val rightPaneFile: String? = null,
 //    val fileTreeHidden: Boolean = false,
@@ -197,7 +200,7 @@
 //    }
 //    var globalState = 0
 //    var currentEmoji: String? = null
-//    var currentImage: DrawableResource? = null
+//    var currentImage: DisplayableImage? = null
 //    var leftPaneFile: String? = null
 //    var rightPaneFile: String? = null
 //    var fileTreeHidden = false
@@ -1112,11 +1115,19 @@
 //            }
 //
 //            isImageVisible.FadeInOutAnimatedVisibility {
-//                val imageRes = currentState.image
-//                if (imageRes != null) {
-//                    Box(Modifier.clip(CircleShape).border(2.dp, NICE_ORANGE, CircleShape)) {
-//                        ResourceImage(imageRes, modifier = Modifier.width(300.dp).height(300.dp))
-//                    }
+//                val image = currentState.image
+//                if (image != null) {
+//                    Box(
+//                        Modifier
+//                            .clip(CircleShape)
+//                            .border(2.dp, NICE_ORANGE, CircleShape)
+//                            .width(image.width)
+//                            .height(image.width)
+//                            .paint(
+//                                painter = painterResource(image.image),
+//                                contentScale = ContentScale.Crop
+//                            )
+//                    )
 //                }
 //            }
 //        }

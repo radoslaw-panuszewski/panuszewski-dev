@@ -75,13 +75,18 @@ data class IdeState(
     val highlightedFile: String? = null,
     val fileTreeWidth: Dp? = null,
     val emoji: String? = null,
-    val image: DrawableResource? = null,
+    val image: DisplayableImage? = null,
     val errorText: String? = null,
     val openPanels: Set<String> = emptySet(),
     val panelStates: Map<String, Int> = emptyMap(),
     val state: Int = 0,
     val title: String? = null,
     val fileRenames: Map<String, String> = emptyMap()
+)
+
+data class DisplayableImage(
+    val image: DrawableResource,
+    val width: Dp = 200.dp,
 )
 
 @Composable

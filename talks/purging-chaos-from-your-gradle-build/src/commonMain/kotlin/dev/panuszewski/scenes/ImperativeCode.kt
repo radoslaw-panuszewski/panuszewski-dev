@@ -128,20 +128,6 @@ fun StoryboardBuilder.ImperativeCode() {
                         }
                     }
                 }
-
-                Box(Modifier.align(Alignment.Center)) {
-                    Box(
-                        Modifier
-                            .clip(CircleShape)
-                            .border(2.dp, NICE_ORANGE, CircleShape)
-                            .width(300.dp)
-                            .height(300.dp)
-                            .paint(
-                                painter = painterResource(Res.drawable.placzka),
-                                contentScale = ContentScale.Crop
-                            )
-                    )
-                }
             }
         }
     }
@@ -277,7 +263,7 @@ private val APP_CONVENTION_GRADLE_KTS = buildCodeSamples {
         .then { focus(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4) }
         .then { hide(libsPlugin, libsDep1, libsDep2, libsDep3, libsDep4).reveal(nonTypesafePlugin, nonTypesafeDep1, nonTypesafeDep2, nonTypesafeDep3, nonTypesafeDep4).highlightAsError(libsPlugin).hideFileTree() }
         // showing that it sucks
-        .showImage(Res.drawable.placzka)
+        .showImage(Res.drawable.placzka, 300.dp)
         .then { hideImage() }
         // git reset
         .openPanel("terminal")

@@ -5,6 +5,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.text.TextTag
 import dev.bnorm.storyboard.text.TextTagScope
 import dev.bnorm.storyboard.text.addStyleByTag
@@ -299,9 +301,9 @@ class CodeSample private constructor(
     fun hideEmoji(): CodeSampleWithIdeOps {
         return CodeSampleWithIdeOps(this, mutableListOf(HideEmoji))
     }
-    
-    fun showImage(imageResource: DrawableResource): CodeSampleWithIdeOps {
-        return CodeSampleWithIdeOps(this, mutableListOf(ShowImage(imageResource)))
+
+    fun showImage(imageResource: DrawableResource, width: Dp = 200.dp): CodeSampleWithIdeOps {
+        return CodeSampleWithIdeOps(this, mutableListOf(ShowImage(DisplayableImage(imageResource, width))))
     }
     
     fun hideImage(): CodeSampleWithIdeOps {
@@ -386,7 +388,7 @@ data class ShowEmoji(val emoji: String)
 
 object HideEmoji
 
-data class ShowImage(val imageResource: DrawableResource)
+data class ShowImage(val imageResource: DisplayableImage)
 
 object HideImage
 
@@ -518,8 +520,8 @@ class CodeSampleWithIdeOps(
         return this
     }
     
-    fun showImage(imageResource: DrawableResource): CodeSampleWithIdeOps {
-        ideOperations.add(ShowImage(imageResource))
+    fun showImage(imageResource: DrawableResource, width: Dp = 200.dp): CodeSampleWithIdeOps {
+        ideOperations.add(ShowImage(DisplayableImage(imageResource, width)))
         return this
     }
     
@@ -691,8 +693,8 @@ class CodeSamplesBuilder : TextTagScope.Default() {
         return this + last().attach(HideEmoji)
     }
 
-    fun List<CodeSample>.showImage(imageResource: DrawableResource): List<CodeSample> {
-        return this + last().attach(ShowImage(imageResource))
+    fun List<CodeSample>.showImage(imageResource: DrawableResource, width: Dp = 200.dp): List<CodeSample> {
+        return this + last().attach(ShowImage(DisplayableImage(imageResource, width)))
     }
 
     fun List<CodeSample>.hideImage(): List<CodeSample> {
