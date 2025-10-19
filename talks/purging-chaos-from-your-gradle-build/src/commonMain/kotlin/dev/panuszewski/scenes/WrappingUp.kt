@@ -9,44 +9,62 @@ import dev.panuszewski.template.components.CenteredColumn
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.INTELLIJ_DARK_CODE_STYLE
+import dev.panuszewski.template.theme.NICE_GREEN
+import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
+import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.NICE_PINK
+import dev.panuszewski.template.theme.NICE_LIGHT_PURPLE
+import dev.panuszewski.template.theme.NICE_LIGHT_RED
+import dev.panuszewski.template.theme.NICE_YELLOW
 import dev.panuszewski.template.theme.appendWithColor
-import dev.panuszewski.template.theme.appendWithSecondaryColor
 
 fun StoryboardBuilder.WrappingUp() {
     scene(
-        stateCount = 7,
+        stateCount = 8,
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),
         exitTransition = SceneExit(alignment = Alignment.CenterEnd),
     ) {
-        withIntTransition(initialState = 6) {
+        withIntTransition {
             TitleScaffold("Wrapping Up") {
                 CenteredColumn {
                     RevealSequentially {
                         annotatedStringItem {
                             append("Groovy sucks, migrate to ")
-                            appendWithColor(Color(0xFF0690cf), "Kotlin DSL!")
+                            appendWithColor(Color(0xFF0690cf), "Kotlin DSL")
+                            append("!")
                         }
                         annotatedStringItem {
                             append("Use ")
-                            append("version catalogs ")
+                            appendWithColor(NICE_LIGHT_PURPLE, "version catalogs ")
                             append("for type safety")
                         }
                         annotatedStringItem {
-                            append("Extract ")
-                            append("imperative code")
-                            append(" to convention plugins")
+                            append("Extract imperative code to ")
+                            appendWithColor(NICE_YELLOW, "convention plugins")
+                        }
+                        annotatedStringItem {
+                            append("Apply the ")
+                            appendWithColor(NICE_LIGHT_TURQUOISE, "typesafe-conventions")
+                            append(" plugin to use ")
+                            appendWithColor(INTELLIJ_DARK_CODE_STYLE.property.color, "libs")
+                            append(" in your conventions")
                         }
                         annotatedStringItem {
                             append("Avoid ")
-                            append("cross configuration")
-                            append(" ")
+                            appendWithColor(NICE_LIGHT_RED, "cross configuration")
+                            append(" (subprojects & allprojects)")
                         }
                         annotatedStringItem {
-                            append("Start with buildSrc, switch to build-logic if you see the performance gain")
+                            append("Start with ")
+                            appendWithColor(NICE_PINK, "buildSrc")
+                            append(" and switch to ")
+                            appendWithColor(NICE_GREEN, "build-logic")
+                            append(" if you see the performance gain")
                         }
                         annotatedStringItem {
-                            append("Declarative Gradle")
-                            append(" is what Gradle needs the most!")
+                            appendWithColor(NICE_ORANGE, "Declarative Gradle")
+                            append(" is what Gradle needs the most! 🔥")
                         }
                     }
                 }

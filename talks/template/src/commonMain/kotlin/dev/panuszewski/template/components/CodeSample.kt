@@ -17,6 +17,7 @@ import dev.bnorm.storyboard.text.replaceAllByTag
 import dev.panuszewski.template.extensions.TagType
 import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.theme.LocalCodeStyle
+import dev.panuszewski.template.theme.NICE_LIGHT_RED
 import org.jetbrains.compose.resources.DrawableResource
 import kotlin.collections.iterator
 
@@ -80,7 +81,7 @@ class CodeSample private constructor(
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
         private val EMPTY = AnnotatedString("")
         private val ERROR_STYLE_LIGHT_THEME = SpanStyle(color = Color(0xFFF50100))
-        private val ERROR_STYLE_DARK_THEME = SpanStyle(color = Color(0xFFFF6B68))
+        private val ERROR_STYLE_DARK_THEME = SpanStyle(color = NICE_LIGHT_RED)
 
         internal fun create(
             text: AnnotatedString,
