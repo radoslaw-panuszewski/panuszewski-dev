@@ -2,8 +2,6 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -13,43 +11,33 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.text.highlight.Language
+import dev.bnorm.storyboard.text.highlight.Language.KotlinDsl
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
-import dev.panuszewski.template.components.AnimatedVerticalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
-import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.StackedImageGallery
-import dev.panuszewski.template.components.RoundedTreeNode
 import dev.panuszewski.template.components.TerminalWithAnnotations
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
@@ -60,7 +48,6 @@ import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
-import dev.panuszewski.template.extensions.body1
 import dev.panuszewski.template.extensions.h5
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.subsequentNumbers
@@ -74,6 +61,7 @@ import dev.panuszewski.template.theme.NICE_GREEN
 import dev.panuszewski.template.theme.NICE_LIGHT_RED
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.NICE_PINK
+import dev.panuszewski.template.theme.appendAsCode
 import dev.panuszewski.template.theme.appendWithColor
 import dev.panuszewski.template.theme.withColor
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
@@ -113,32 +101,6 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         t1,
         t2,
         terminalDisappears,
-        bulletpoint1,
-        bulletpoint2,
-        bulletpoint3,
-        bulletpoint4,
-        bulletpoint5,
-        bulletpointsDisappear,
-        treeAppearsAgain,
-        appConventionModifiedInBuildSrc,
-        buildSrcModified,
-        allSubprojectsReconfigured,
-        resetAfterBuildSrcChange,
-        buildLogicAppears,
-        conventionsChangeToNonTypesafe,
-        buildLogicBulletpointsAppear,
-        blBulletpoint1,
-        blBulletpoint2,
-        blBulletpoint3,
-        blBulletpoint4,
-        blBulletpoint5,
-        buildLogicBulletpointsDisappear,
-        treeWithBuildLogicAppearsAgain,
-        buildLogicSplitsIntoSubprojects,
-        appConventionModifiedInBuildLogic,
-        buildLogicAppModified,
-        onlyAppReconfigured,
-        resetAfterBuildLogicChange,
         comparisonAppears,
         comparisonBullet1,
         comparisonBullet2,
@@ -147,7 +109,24 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         comparisonBullet5,
         comparisonBullet6,
         comparisonBullet7,
+        comparisonBullet8,
+        comparisonTopBullet1,
+        comparisonTopBullet2,
+        comparisonTopBullet3,
         comparisonDisappears,
+        treeAppearsAgain,
+        appConventionModifiedInBuildSrc,
+        buildSrcModified,
+        allSubprojectsReconfigured,
+        resetAfterBuildSrcChange,
+        buildLogicAppears,
+        conventionsChangeToNonTypesafe,
+        treeWithBuildLogicAppearsAgain,
+        buildLogicSplitsIntoSubprojects,
+        appConventionModifiedInBuildLogic,
+        buildLogicAppModified,
+        onlyAppReconfigured,
+        resetAfterBuildLogicChange,
         treeIsBackForFinalRecap,
         titleChangesForFinalRecap,
         finalRecapBullet1,
@@ -174,15 +153,15 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition(initialState = yearsAppear) {
+        withIntTransition {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
-                currentState >= comparisonAppears -> "When to use which?".annotate()
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
-                currentState in year2025Activates until year2025Deactivates -> buildAnnotatedString { append("Gradle Best Practices updated for "); appendWithColor(buildSrcColor, "buildSrc") }
-                currentState in year2023Activates until year2025Activates -> buildAnnotatedString { append("Gradle 8 release delivers fixes for "); appendWithColor(buildSrcColor, "buildSrc") }
+                currentState >= comparisonAppears -> "What's the difference?".annotate()
+                currentState in year2025Activates until year2025Deactivates -> buildAnnotatedString { append("Gradle Best Practices updated") }
+                currentState in year2023Activates until year2025Activates -> buildAnnotatedString { append("Gradle 8 delivers fixes for "); appendWithColor(buildSrcColor, "buildSrc") }
                 currentState >= buildSrcAppears -> buildAnnotatedString { withColor(buildSrcColor) { append("buildSrc") } }
                 else -> "Making changes to convention plugins".annotate()
             }
@@ -300,73 +279,6 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                         }
                     }
 
-                    FadeOutAnimatedVisibility({ it in bulletpoint1 - 1 until bulletpointsDisappear }) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            RevealSequentially(since = bulletpoint1) {
-                                annotatedStringItem {
-                                    append("In recent Gradle versions, it's ")
-                                    withColor(buildSrcColor) { append("not that bad") }
-                                }
-                                annotatedStringItem {
-                                    append("Now it behaves like an ")
-                                    withColor(buildSrcColor) { append("included build") }
-                                    append(" (most of the time)")
-                                }
-                                annotatedStringItem {
-                                    append("Modifying code in buildSrc will ")
-                                    withColor(buildSrcColor) { append("no longer invalidate") }
-                                    append(" everything")
-                                }
-                                annotatedStringItem {
-                                    append("However...")
-                                }
-                                annotatedStringItem {
-                                    append("It's ")
-                                    withColor(buildSrcColor) { append("on classpath") }
-                                    append(" of every buildscript (regardless if it's used or not)")
-                                }
-                            }
-                        }
-                    }
-
-                    FadeOutAnimatedVisibility({ it in buildLogicBulletpointsAppear until buildLogicBulletpointsDisappear }) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            RevealSequentially(since = blBulletpoint1) {
-                                annotatedStringItem {
-                                    append("A regular Gradle ")
-                                    withColor(buildLogicColor) { append("included build") }
-                                    append(", can be of any name")
-                                }
-                                annotatedStringItem {
-                                    append("Requires manual registration via ")
-                                    withColor(buildLogicColor) { append("includeBuild(...)") }
-                                }
-                                annotatedStringItem {
-                                    withColor(buildLogicColor) { append("Doesn't provide ") }
-                                    append("typesafe accessors")
-                                    append(" for convention plugins")
-                                }
-                                annotatedStringItem {
-                                    append("Only on buildscript's classpath if it's ")
-                                    withColor(buildLogicColor) { append("actually used") }
-                                }
-                                annotatedStringItem {
-                                    append("Allows to ")
-                                    withColor(buildLogicColor) { append("isolate") }
-                                    append(" your conventions")
-                                }
-                            }
-                        }
-                    }
-
                     SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
                         val terminalTexts = listOf(
                             "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project \\\n\t\t&& tree .".annotate(),
@@ -411,15 +323,21 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     verticalArrangement = Arrangement.spacedBy(32.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    RevealSequentially(since = comparisonBullet6) {
+                                    RevealSequentially(since = comparisonTopBullet1) {
                                         annotatedStringItem {
-                                            append("As a rule of thumb, I always start a new project with ")
-                                            withColor(buildSrcColor) { append("buildSrc") }
+                                            append("The ")
+                                            withColor(NICE_ORANGE) { append("buildscript's classpath") }
+                                            append(" is so important, because...")
                                         }
                                         annotatedStringItem {
-                                            append("Then I switch to ")
-                                            withColor(buildLogicColor) { append("build-logic") }
-                                            append(" only if I see the performance gain")
+                                            append("...when it changes, all non-builtin tasks will go out-of-date")
+                                        }
+                                        annotatedStringItem {
+                                            append("It means that ")
+                                            appendAsCode("compileJava")
+                                            append(" will stay UP-TO-DATE, but ")
+                                            appendAsCode("bootJar")
+                                            append(" will not")
                                         }
                                     }
                                 }
@@ -446,9 +364,19 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                         Spacer(Modifier.height(8.dp))
 
                                         RevealSequentially(since = comparisonBullet1, textStyle = MaterialTheme.typography.body1) {
-                                            stringItem("$BULLET_1 easy setup, works out-of-the-box")
+                                            stringItem("$BULLET_1 recognized out-of-the-box")
+                                        }
+
+                                        RevealSequentially(since = comparisonBullet3, textStyle = MaterialTheme.typography.body1) {
                                             stringItem("$BULLET_1 typesafe accessors for conventions")
-                                            stringItem("$BULLET_1 ideal for helper functions")
+                                        }
+
+                                        RevealSequentially(since = comparisonBullet5, textStyle = MaterialTheme.typography.body1) {
+                                            stringItem("$BULLET_1 sometimes included build, sometimes not")
+                                        }
+
+                                        RevealSequentially(since = comparisonBullet7, textStyle = MaterialTheme.typography.body1) {
+                                            annotatedStringItem { appendWithColor(NICE_ORANGE, "$BULLET_1 ALWAYS on buildscript's classpath") }
                                         }
                                     }
 
@@ -467,9 +395,20 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                                         Spacer(Modifier.height(8.dp))
 
+                                        RevealSequentially(since = comparisonBullet2, textStyle = MaterialTheme.typography.body1) {
+                                            stringItem("$BULLET_1 needs manual registration")
+                                        }
+
                                         RevealSequentially(since = comparisonBullet4, textStyle = MaterialTheme.typography.body1) {
-                                            stringItem("$BULLET_1 better performance")
-                                            stringItem("$BULLET_1 well-defined behavior")
+                                            stringItem("$BULLET_1 no typesafe accessors for conventions")
+                                        }
+
+                                        RevealSequentially(since = comparisonBullet6, textStyle = MaterialTheme.typography.body1) {
+                                            stringItem("$BULLET_1 behaves 100% as external dependency")
+                                        }
+
+                                        RevealSequentially(since = comparisonBullet8, textStyle = MaterialTheme.typography.body1) {
+                                            annotatedStringItem { appendWithColor(NICE_ORANGE, "$BULLET_1 ONLY on buildscript's classpath if used") }
                                         }
                                     }
                                 }
@@ -478,8 +417,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     }
 
                     SlideFromBottomAnimatedVisibility({
-                        it !in complicatedPastAppears..bulletpointsDisappear
-                                && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear
+                        it !in complicatedPastAppears..complicatedPastDisappears
+                                && it !in yearsAppear..yearsDisappear
+                                && it !in terminalAppears..terminalDisappears
                                 && it !in comparisonAppears..comparisonDisappears
                     }) {
                         Column {
@@ -696,7 +636,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }
                                                         """
                                                             .trimIndent()
-                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .toCodeSample(language = KotlinDsl)
                                                     }.String()
                                                     it >= customBuildLogicAdded && node.value == "app-convention" -> buildCodeSamples {
                                                         val sharedDefaults by tag()
@@ -713,7 +653,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }${customBuildLogic}
                                                         """
                                                             .trimIndent()
-                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .toCodeSample(language = KotlinDsl)
                                                             .focus(customBuildLogic, focusedStyle = SpanStyle(color = NICE_PINK))
                                                     }.String()
                                                     it >= sharedDefaultsAdded && node.value == "app-convention" -> buildCodeSamples {
@@ -727,7 +667,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }${sharedDefaults}
                                                         """
                                                             .trimIndent()
-                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .toCodeSample(language = KotlinDsl)
                                                             .focus(sharedDefaults, focusedStyle = SpanStyle(color = NICE_BLUE))
                                                     }.String()
                                                     it >= appConventionExpanded && node.value == "app-convention" -> buildCodeSamples {
@@ -737,7 +677,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }
                                                         """
                                                             .trimIndent()
-                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .toCodeSample(language = KotlinDsl)
                                                     }.String()
                                                     it >= resetAfterRandomCode && node.value == "app" -> JustName(node)
                                                     it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
@@ -754,7 +694,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }${randomCode}
                                                         """
                                                             .trimIndent()
-                                                            .toCodeSample(language = Language.KotlinDsl)
+                                                            .toCodeSample(language = KotlinDsl)
                                                             .focus(randomCode)
                                                     }.String()
                                                     it >= libProjectsFolded && node.value == "app" -> """
@@ -766,7 +706,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }
                                                         """
                                                         .trimIndent()
-                                                        .toCode(language = Language.KotlinDsl)
+                                                        .toCode(language = KotlinDsl)
                                                     it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
                                                     it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> """
                                                         plugins {
@@ -774,28 +714,28 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         }
                                                         """
                                                         .trimIndent()
-                                                        .toCode(language = Language.KotlinDsl)
+                                                        .toCode(language = KotlinDsl)
                                                     it >= conventionsChangeToNonTypesafe && node.value == "app" -> """
                                                         plugins {
                                                             id("app-convention")
                                                         }
                                                         """
                                                         .trimIndent()
-                                                        .toCode(language = Language.KotlinDsl)
+                                                        .toCode(language = KotlinDsl)
                                                     it >= initialState && node.value.matches("""lib\d+""".toRegex()) -> """
                                                         plugins {
                                                             `lib-convention`
                                                         }
                                                         """
                                                         .trimIndent()
-                                                        .toCode(language = Language.KotlinDsl)
+                                                        .toCode(language = KotlinDsl)
                                                     it >= initialState && node.value == "app" -> """
                                                         plugins {
                                                             `app-convention`
                                                         }
                                                         """
                                                         .trimIndent()
-                                                        .toCode(language = Language.KotlinDsl)
+                                                        .toCode(language = KotlinDsl)
                                                     else -> JustName(node)
                                                 }
                                             }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })

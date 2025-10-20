@@ -1,5 +1,6 @@
 package dev.panuszewski.template.theme
 
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Typography
@@ -211,6 +212,19 @@ fun <T : Any> Builder.withSecondaryVariantColor(block: Builder.() -> T) {
     withStyle(SpanStyle(color = MaterialTheme.colors.secondaryVariant), block)
 }
 
+@Composable
+fun <T : Any> Builder.asCode(block: Builder.() -> T) {
+    withStyle(
+        style = SpanStyle(
+            fontFamily = JetBrainsMono,
+            background = Color.DarkGray,
+            color = Color.LightGray,
+            fontSize = LocalTextStyle.current.fontSize * 0.9
+        ),
+        block = block
+    )
+}
+
 fun Builder.appendWithColor(color: Color, text: String) {
     withColor(color) { append(text) }
 }
@@ -233,4 +247,9 @@ fun Builder.appendWithSecondaryColor(text: String) {
 @Composable
 fun Builder.appendWithSecondaryVariantColor(text: String) {
     withSecondaryVariantColor { append(text) }
+}
+
+@Composable
+fun Builder.appendAsCode(text: String) {
+    asCode { append(text) }
 }
