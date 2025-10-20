@@ -97,10 +97,6 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         gradleBestPractices,
         year2025Deactivates,
         yearsDisappear,
-        terminalAppears,
-        t1,
-        t2,
-        terminalDisappears,
         comparisonAppears,
         comparisonBullet1,
         comparisonBullet2,
@@ -127,6 +123,12 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         buildLogicAppModified,
         onlyAppReconfigured,
         resetAfterBuildLogicChange,
+        whichOneToUseStarts,
+        terminalAppears,
+        t1,
+        t2,
+        terminalDisappears,
+        whichOneToUseEnds,
         treeIsBackForFinalRecap,
         titleChangesForFinalRecap,
         finalRecapBullet1,
@@ -153,9 +155,10 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition {
+        withIntTransition(initialState = resetAfterBuildLogicChange) {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
+                currentState >= whichOneToUseStarts -> "So... which one to use?".annotate()
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
@@ -187,7 +190,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 h6 {
                                     Text {
                                         append("...with a ")
-                                        withColor(buildSrcColor) { append("complicated past") }
+                                        withColor(buildSrcColor) { append("complicated story") }
                                     }
                                 }
                             }
@@ -421,6 +424,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 && it !in yearsAppear..yearsDisappear
                                 && it !in terminalAppears..terminalDisappears
                                 && it !in comparisonAppears..comparisonDisappears
+                                && it !in whichOneToUseStarts..whichOneToUseEnds
                     }) {
                         Column {
                             LookaheadScope {
