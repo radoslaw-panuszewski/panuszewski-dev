@@ -80,6 +80,9 @@ import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_1_light
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_2_light
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_github_issue_light
+import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_included_build_gh_issue
+import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle8_docs
+import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle8_release_notes
 import kotlin.math.max
 
 fun StoryboardBuilder.MakingChangesToConventions() {
@@ -97,7 +100,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         thirdArticle,
         year2020Deactivates,
         year2023Activates,
-        githubIssue,
+        buildSrcIncludedBuildGithubIssue,
         gradle8Release,
         gradle8Docs,
         year2023Deactivates,
@@ -219,12 +222,10 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             val goodColor = NICE_GREEN
 
                             val treeYears = when {
-                                currentState >= year2025Activates -> buildTree { node("2020") { node("2023") { node("2025", highlightColor) } } }
-                                currentState >= year2023Activates -> buildTree { node("2020") { node("2023", highlightColor) { node("2025") } } }
-                                currentState >= year2020Activates -> buildTree { node("2020", highlightColor) { node("2023") { node("2025") } } }
-                                else -> buildTree {
-                                    node("2020") { node("2023") { node("2025") } }
-                                }
+                                currentState in year2025Activates until year2025Deactivates -> buildTree { node("2020") { node("2023") { node("2025", highlightColor) } } }
+                                currentState in year2023Activates until year2023Deactivates -> buildTree { node("2020") { node("2023", highlightColor) { node("2025") } } }
+                                currentState in year2020Activates until year2020Deactivates -> buildTree { node("2020", highlightColor) { node("2023") { node("2025") } } }
+                                else -> buildTree { node("2020") { node("2023") { node("2025") } } }
                             }
 
                             AnimatedHorizontalTree(
@@ -281,6 +282,14 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 image(Res.drawable.buildsrc_article_1_light, since = firstArticle)
                                 image(Res.drawable.buildsrc_article_2_light, since = secondArticle)
                                 image(Res.drawable.buildsrc_github_issue_light, since = thirdArticle)
+                            }
+                        }
+
+                        FadeInOutAnimatedVisibility({ it in year2023Activates until year2023Deactivates }) {
+                            StackedImageGallery {
+                                image(Res.drawable.buildsrc_included_build_gh_issue, since = buildSrcIncludedBuildGithubIssue)
+                                image(Res.drawable.gradle8_release_notes, since = gradle8Release)
+                                image(Res.drawable.gradle8_docs, since = gradle8Docs)
                             }
                         }
                     }

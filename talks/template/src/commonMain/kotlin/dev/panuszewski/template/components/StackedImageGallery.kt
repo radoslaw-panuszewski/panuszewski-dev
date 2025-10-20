@@ -63,7 +63,7 @@ class StackedImageGalleryScope {
 @Composable
 fun Transition<Int>.StackedImageGallery(
     modifier: Modifier = Modifier,
-    imageWidth: Dp = 500.dp,
+    imageWidth: Dp = 600.dp,
     imageTopPadding: Dp = 16.dp,
     shiftAmount: Dp = 32.dp,
     darkenAmount: Float = 0.33f,
@@ -116,6 +116,7 @@ fun Transition<Int>.StackedImageGallery(
                         .width(imageWidth)
                         .padding(end = shift)
                         .border(borderWidth, borderColor),
+                    alignment = Alignment.TopCenter,
                     contentScale = contentScale,
                     colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
                 )
