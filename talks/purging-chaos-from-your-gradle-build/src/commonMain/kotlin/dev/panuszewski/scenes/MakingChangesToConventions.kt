@@ -109,12 +109,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         gradleBestPractices,
         year2025Deactivates,
         yearsDisappear,
-        badReputationDisappears,
         terminalAppears,
         t1,
         t2,
-        t3,
-        t4,
         terminalDisappears,
         bulletpoint1,
         bulletpoint2,
@@ -372,9 +369,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     SlideFromBottomAnimatedVisibility({ it in terminalAppears until terminalDisappears }) {
                         val terminalTexts = listOf(
-                            "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project".annotate(),
-                            "> Task :init\nBUILD SUCCESSFUL".annotate(),
-                            "$ tree .".annotate(),
+                            "$ gradle init \\\n\t\t--type kotlin-application \\\n\t\t--incubating \\\n\t\t--dsl kotlin \\\n\t\t--split-project \\\n\t\t--java-version 25 \\\n\t\t--project-name example-project \\\n\t\t&& tree .".annotate(),
                             buildAnnotatedString {
                                 appendLine(
                                     """

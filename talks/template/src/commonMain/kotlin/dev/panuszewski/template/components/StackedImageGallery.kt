@@ -65,7 +65,7 @@ fun Transition<Int>.StackedImageGallery(
     modifier: Modifier = Modifier,
     imageWidth: Dp = 600.dp,
     imageTopPadding: Dp = 16.dp,
-    shiftAmount: Dp = 32.dp,
+    shiftAmount: Dp = 64.dp,
     darkenAmount: Float = 0.33f,
     borderColor: Color = Color.Gray,
     borderWidth: Dp = 0.5.dp,
