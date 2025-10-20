@@ -2,8 +2,6 @@ package dev.panuszewski.scenes
 
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -13,26 +11,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -42,9 +32,10 @@ import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
+import dev.panuszewski.template.components.AnimatedVerticalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
-import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.components.RoundedTreeNode
 import dev.panuszewski.template.components.TerminalWithAnnotations
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
@@ -62,17 +53,12 @@ import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
-import dev.panuszewski.template.theme.LocalCodeStyle
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.withColor
-import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
-import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_1_light
-import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_2_light
-import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_github_issue_light
 import kotlin.math.max
 
 fun StoryboardBuilder.MakingChangesToConventions() {
@@ -153,7 +139,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition {
+        withIntTransition(initialState = badReputationAppears) {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
@@ -185,43 +171,55 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 h6 {
                                     Text {
                                         append("...with a ")
-                                        withColor(buildSrcColor) { append("very bad reputation") }
+                                        withColor(buildSrcColor) { append("complicated history") }
                                     }
                                 }
                             }
 
-                            Box(
-                                contentAlignment = Alignment.TopCenter,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                SlideFromBottomAnimatedVisibility({ it >= image1 }) {
-                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
-                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_article_1_light,
-                                        modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                    )
-                                }
-                                SlideFromBottomAnimatedVisibility({ it >= image2 }) {
-                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
-                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_article_2_light,
-                                        modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                    )
-                                }
-                                SlideFromBottomAnimatedVisibility({ it >= image3 }) {
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_github_issue_light,
-                                        modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                    )
+                            val tree = buildTree {
+                                node("2020") {
+                                    node("2023") {
+                                        node("2025")
+                                    }
                                 }
                             }
+
+                            AnimatedVerticalTree(tree) { node ->
+                                RoundedTreeNode(node)
+                            }
+
+//                            Box(
+//                                contentAlignment = Alignment.TopCenter,
+//                                modifier = Modifier.fillMaxSize()
+//                            ) {
+//                                SlideFromBottomAnimatedVisibility({ it >= image1 }) {
+//                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
+//                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
+//                                    ResourceImage(
+//                                        Res.drawable.buildsrc_article_1_light,
+//                                        modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+//                                        contentScale = ContentScale.FillWidth,
+//                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+//                                    )
+//                                }
+//                                SlideFromBottomAnimatedVisibility({ it >= image2 }) {
+//                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
+//                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
+//                                    ResourceImage(
+//                                        Res.drawable.buildsrc_article_2_light,
+//                                        modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
+//                                        contentScale = ContentScale.FillWidth,
+//                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
+//                                    )
+//                                }
+//                                SlideFromBottomAnimatedVisibility({ it >= image3 }) {
+//                                    ResourceImage(
+//                                        Res.drawable.buildsrc_github_issue_light,
+//                                        modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
+//                                        contentScale = ContentScale.FillWidth,
+//                                    )
+//                                }
+//                            }
                         }
                     }
 
