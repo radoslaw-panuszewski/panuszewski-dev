@@ -184,6 +184,8 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
+                currentState in year2025Activates until year2025Deactivates -> buildAnnotatedString { append("Gradle Best Practices updated for "); appendWithColor(buildSrcColor, "buildSrc") }
+                currentState in year2023Activates until year2025Activates -> buildAnnotatedString { append("Gradle 8 release delivers fixes for "); appendWithColor(buildSrcColor, "buildSrc") }
                 currentState >= buildSrcAppears -> buildAnnotatedString { withColor(buildSrcColor) { append("buildSrc") } }
                 else -> "Making changes to convention plugins".annotate()
             }
