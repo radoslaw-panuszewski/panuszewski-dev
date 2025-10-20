@@ -83,6 +83,7 @@ import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_g
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_included_build_gh_issue
 import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle8_docs
 import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle8_release_notes
+import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle_best_practices
 import kotlin.math.max
 
 fun StoryboardBuilder.MakingChangesToConventions() {
@@ -290,6 +291,12 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 image(Res.drawable.buildsrc_included_build_gh_issue, since = buildSrcIncludedBuildGithubIssue)
                                 image(Res.drawable.gradle8_release_notes, since = gradle8Release)
                                 image(Res.drawable.gradle8_docs, since = gradle8Docs)
+                            }
+                        }
+
+                        FadeInOutAnimatedVisibility({ it in year2025Activates until year2025Deactivates }) {
+                            StackedImageGallery {
+                                image(Res.drawable.gradle_best_practices, since = gradleBestPractices)
                             }
                         }
                     }
