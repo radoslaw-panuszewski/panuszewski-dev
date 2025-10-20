@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,9 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
@@ -46,6 +51,7 @@ import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
+import dev.panuszewski.template.extensions.body1
 import dev.panuszewski.template.extensions.h5
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.subsequentNumbers
@@ -56,8 +62,10 @@ import dev.panuszewski.template.theme.BULLET_1
 import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
+import dev.panuszewski.template.theme.NICE_LIGHT_RED
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.NICE_PINK
+import dev.panuszewski.template.theme.appendWithColor
 import dev.panuszewski.template.theme.withColor
 import kotlin.math.max
 
@@ -65,9 +73,15 @@ fun StoryboardBuilder.MakingChangesToConventions() {
     val (
         initialState,
         buildSrcAppears,
-        badReputationAppears,
-        badReputationBullet1,
-        badReputationBullet2,
+        complicatedPastAppears,
+        complicatedPastBullet1,
+        complicatedPastBullet2,
+        complicatedPastDisappears,
+        yearsAppear,
+        year2020,
+        year2023,
+        year2025,
+        yearsDisappear,
         image1,
         image2,
         image3,
@@ -139,7 +153,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition(initialState = badReputationAppears) {
+        withIntTransition(initialState = yearsAppear) {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
                 currentState >= comparisonAppears -> "When to use which?".annotate()
@@ -153,13 +167,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
             TitleScaffold(title) {
 
                 FadeOutAnimatedVisibility({ it < hideEverything }) {
-                    FadeOutAnimatedVisibility({ it in badReputationAppears until badReputationDisappears }) {
+                    FadeOutAnimatedVisibility({ it in complicatedPastAppears until complicatedPastDisappears }) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            SlideFromTopAnimatedVisibility({ it >= badReputationBullet1 }) {
+                            SlideFromTopAnimatedVisibility({ it >= complicatedPastBullet1 }) {
                                 h6 {
                                     Text {
                                         append("A special directory recognized by Gradle...")
@@ -167,25 +181,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 }
                             }
 
-                            SlideFromTopAnimatedVisibility({ it >= badReputationBullet2 }) {
+                            SlideFromTopAnimatedVisibility({ it >= complicatedPastBullet2 }) {
                                 h6 {
                                     Text {
                                         append("...with a ")
-                                        withColor(buildSrcColor) { append("complicated history") }
+                                        withColor(buildSrcColor) { append("complicated past") }
                                     }
                                 }
-                            }
-
-                            val treeYears = buildTree {
-                                node("2020") {
-                                    node("2023") {
-                                        node("2025")
-                                    }
-                                }
-                            }
-
-                            AnimatedVerticalTree(treeYears) { verticalNode ->
-                               RoundedTreeNode(verticalNode)
                             }
 
 //                            Box(
@@ -220,6 +222,65 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 //                                    )
 //                                }
 //                            }
+                        }
+                    }
+
+                    FadeInOutAnimatedVisibility({ it in yearsAppear until yearsDisappear }) {
+                        val highlightColor = NICE_BLUE
+                        val badColor = NICE_LIGHT_RED
+                        val goodColor = NICE_GREEN
+
+                        val treeYears = when {
+                            currentState >= year2025 -> buildTree { node("2020") { node("2023") { node("2025", highlightColor) } } }
+                            currentState >= year2023 -> buildTree { node("2020") { node("2023", highlightColor) { node("2025") } } }
+                            currentState >= year2020 -> buildTree { node("2020", highlightColor) { node("2023") { node("2025") } } }
+                            else -> buildTree {
+                                node("2020") { node("2023") { node("2025") } }
+                            }
+                        }
+
+                        AnimatedHorizontalTree(treeYears, contentAlignment = Alignment.TopCenter) { node ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                                    .background(LocalIdeColors.current.paneBackground)
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                ) {
+                                    createChildTransition {
+                                        when {
+                                            it == year2025 && node.value == "2025" -> buildAnnotatedString {
+                                                withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2025") }
+                                                appendLine()
+                                                append("buildSrc is ")
+                                                appendWithColor(badColor, "bad")
+                                                append(" again")
+                                            }
+                                            it == year2023 && node.value == "2023" -> buildAnnotatedString {
+                                                withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2023") }
+                                                appendLine()
+                                                append("buildSrc is ")
+                                                appendWithColor(goodColor, "good")
+                                                append("?")
+                                            }
+                                            it == year2020 && node.value == "2020" -> buildAnnotatedString {
+                                                withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2020") }
+                                                appendLine()
+                                                append("buildSrc is ")
+                                                appendWithColor(badColor, "bad")
+                                            }
+                                            else -> JustName(node)
+                                        }
+                                    }.MagicAnnotatedString(
+                                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        split = { it.splitByChars() }
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -403,7 +464,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                     }
 
                     SlideFromBottomAnimatedVisibility({
-                        it !in badReputationAppears..bulletpointsDisappear
+                        it !in complicatedPastAppears..bulletpointsDisappear
                                 && it !in buildLogicBulletpointsAppear..buildLogicBulletpointsDisappear
                                 && it !in comparisonAppears..comparisonDisappears
                     }) {

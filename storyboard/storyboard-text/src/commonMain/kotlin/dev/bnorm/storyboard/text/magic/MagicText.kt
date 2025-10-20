@@ -35,6 +35,7 @@ const val DefaultDelayDurationMillis = 0
 fun MagicText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     // Used to time FadeOut --(Delay)-> Move --(Delay)-> FadeIn animations.
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
@@ -42,7 +43,7 @@ fun MagicText(
 ) {
     val words = remember(text) { text.splitByWords() }
     val transition = updateTransition(words)
-    MagicText(transition, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
+    MagicText(transition, modifier, horizontalAlignment, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
 
 @Composable
@@ -50,26 +51,28 @@ fun MagicText(
 fun MagicText(
     transition: Transition<AnnotatedString>,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     // Used to time FadeOut --(Delay)-> Move --(Delay)-> FadeIn animations.
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
     val worlds = transition.createChildTransition { remember(it) { it.splitByWords() } }
-    MagicText(worlds, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
+    MagicText(worlds, modifier, horizontalAlignment, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
 
 @Composable
 fun MagicText(
     tokenizedText: List<AnnotatedString>,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     // Used to time FadeOut --(Delay)-> Move --(Delay)-> FadeIn animations.
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
 ) {
     val transition = updateTransition(tokenizedText)
-    MagicText(transition, modifier, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
+    MagicText(transition, modifier, horizontalAlignment, moveDurationMillis, fadeDurationMillis, delayDurationMillis)
 }
 
 @Composable
@@ -77,6 +80,7 @@ fun MagicText(
 fun MagicText(
     transition: Transition<List<AnnotatedString>>,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     // Used to time FadeOut --(Delay)-> Move --(Delay)-> FadeIn animations.
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
@@ -105,7 +109,7 @@ fun MagicText(
         }
 
         val child = transition.createChildTransition { text -> sharedText.getValue(text) }
-        MagicTextInternal(child, modifier, fadeDurationMillis, moveDurationMillis, delayDurationMillis)
+        MagicTextInternal(child, modifier, horizontalAlignment, fadeDurationMillis, moveDurationMillis, delayDurationMillis)
     }
 }
 
@@ -114,6 +118,7 @@ fun MagicText(
 private fun MagicTextInternal(
     transition: Transition<List<SharedText>>,
     modifier: Modifier,
+    horizontalAlignment: Alignment.Horizontal,
     fadeDuration: Int, // Millis
     moveDuration: Int, // Millis
     delayDuration: Int, // Millis
@@ -159,7 +164,7 @@ private fun MagicTextInternal(
                 }
             }
 
-            Column(horizontalAlignment = Alignment.Start) {
+            Column(horizontalAlignment = horizontalAlignment) {
                 val iterator = parts.iterator()
                 while (iterator.hasNext()) {
                     Row {

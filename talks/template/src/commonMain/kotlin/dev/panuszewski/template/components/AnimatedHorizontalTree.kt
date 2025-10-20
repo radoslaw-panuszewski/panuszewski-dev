@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,6 +30,7 @@ fun <T : Any> AnimatedHorizontalTree(
     tree: List<TreeElement<T>>,
     modifier: Modifier = Modifier,
     excludeSharedChildrenFromLayout: Boolean = false,
+    contentAlignment: Alignment = BiasAlignment(0f, -0.5f),
     content: @Composable (node: TreeElement<T>) -> Unit,
 ) {
     SharedTransitionLayout {
@@ -41,7 +43,7 @@ fun <T : Any> AnimatedHorizontalTree(
             val placements = remember { mutableStateMapOf<TreeElement<T>, Rect>() }
 
             Box(
-                contentAlignment = BiasAlignment(0f, -0.5f),
+                contentAlignment = contentAlignment,
                 modifier = modifier.fillMaxSize()
             ) {
                 for ((parent, parentRect) in placements) {

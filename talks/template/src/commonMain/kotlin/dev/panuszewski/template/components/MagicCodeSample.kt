@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
@@ -48,6 +49,7 @@ fun Transition<String>.MagicString(
 @Composable
 fun Transition<AnnotatedString>.MagicAnnotatedString(
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     moveDurationMillis: Int = DefaultMoveDurationMillis,
     fadeDurationMillis: Int = DefaultFadeDurationMillis,
     delayDurationMillis: Int = DefaultDelayDurationMillis,
@@ -56,6 +58,7 @@ fun Transition<AnnotatedString>.MagicAnnotatedString(
     MagicText(
         transition = createChildTransition { split(it) },
         modifier = modifier,
+        horizontalAlignment = horizontalAlignment,
         moveDurationMillis = moveDurationMillis,
         fadeDurationMillis = fadeDurationMillis,
         delayDurationMillis = delayDurationMillis,

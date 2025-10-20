@@ -187,7 +187,6 @@ const val BULLET_1 = " • "
 const val BULLET_2 = " ◦ "
 const val BULLET_3 = " ‣ "
 
-@Composable
 fun <T : Any> Builder.withColor(color: Color, block: Builder.() -> T) {
     withStyle(SpanStyle(color = color), block)
 }
@@ -212,7 +211,6 @@ fun <T : Any> Builder.withSecondaryVariantColor(block: Builder.() -> T) {
     withStyle(SpanStyle(color = MaterialTheme.colors.secondaryVariant), block)
 }
 
-@Composable
 fun Builder.appendWithColor(color: Color, text: String) {
     withColor(color) { append(text) }
 }
