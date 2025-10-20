@@ -48,6 +48,7 @@ import dev.panuszewski.template.components.AnimatedVerticalTree
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
+import dev.panuszewski.template.components.StackedImageGallery
 import dev.panuszewski.template.components.RoundedTreeNode
 import dev.panuszewski.template.components.TerminalWithAnnotations
 import dev.panuszewski.template.components.TitleScaffold
@@ -93,6 +94,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         year2020Activates,
         firstArticle,
         secondArticle,
+        thirdArticle,
         year2020Deactivates,
         year2023Activates,
         githubIssue,
@@ -103,9 +105,6 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         gradleBestPractices,
         year2025Deactivates,
         yearsDisappear,
-        image1,
-        image2,
-        image3,
         badReputationDisappears,
         terminalAppears,
         t1,
@@ -210,97 +209,78 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     }
                                 }
                             }
-
-                            Box(
-                                contentAlignment = Alignment.TopCenter,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                SlideFromBottomAnimatedVisibility({ it >= image1 }) {
-                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 64.dp else if (it >= image2) 32.dp else 0.dp }
-                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.66f else if (it >= image2) 0.33f else 0.01f }
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_article_1_light,
-                                        modifier = Modifier.padding(top = 0.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                    )
-                                }
-                                SlideFromBottomAnimatedVisibility({ it >= image2 }) {
-                                    val shift by animateDp({ tween(300) }) { if (it >= image3) 32.dp else 0.dp }
-                                    val tint by animateFloat({ tween(300) }) { if (it >= image3) 0.33f else 0.01f }
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_article_2_light,
-                                        modifier = Modifier.padding(top = 16.dp, end = shift).width(500.dp).padding(end = shift).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = tint), blendMode = BlendMode.Darken)
-                                    )
-                                }
-                                SlideFromBottomAnimatedVisibility({ it >= image3 }) {
-                                    ResourceImage(
-                                        Res.drawable.buildsrc_github_issue_light,
-                                        modifier = Modifier.padding(top = 32.dp, end = 0.dp).width(500.dp).border(0.5.dp, Color.Gray),
-                                        contentScale = ContentScale.FillWidth,
-                                    )
-                                }
-                            }
                         }
                     }
 
-                    FadeInOutAnimatedVisibility({ it in yearsAppear until yearsDisappear }) {
-                        val highlightColor = NICE_BLUE
-                        val badColor = NICE_LIGHT_RED
-                        val goodColor = NICE_GREEN
+                    Column {
+                        FadeInOutAnimatedVisibility({ it in yearsAppear until yearsDisappear }) {
+                            val highlightColor = NICE_BLUE
+                            val badColor = NICE_LIGHT_RED
+                            val goodColor = NICE_GREEN
 
-                        val treeYears = when {
-                            currentState >= year2025Activates -> buildTree { node("2020") { node("2023") { node("2025", highlightColor) } } }
-                            currentState >= year2023Activates -> buildTree { node("2020") { node("2023", highlightColor) { node("2025") } } }
-                            currentState >= year2020Activates -> buildTree { node("2020", highlightColor) { node("2023") { node("2025") } } }
-                            else -> buildTree {
-                                node("2020") { node("2023") { node("2025") } }
+                            val treeYears = when {
+                                currentState >= year2025Activates -> buildTree { node("2020") { node("2023") { node("2025", highlightColor) } } }
+                                currentState >= year2023Activates -> buildTree { node("2020") { node("2023", highlightColor) { node("2025") } } }
+                                currentState >= year2020Activates -> buildTree { node("2020", highlightColor) { node("2023") { node("2025") } } }
+                                else -> buildTree {
+                                    node("2020") { node("2023") { node("2025") } }
+                                }
+                            }
+
+                            AnimatedHorizontalTree(
+                                treeYears,
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxWidth().height(100.dp)
+                            ) { node ->
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                                        .background(LocalIdeColors.current.paneBackground)
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                    ) {
+                                        createChildTransition {
+                                            when {
+                                                it in year2025Activates until year2025Deactivates && node.value == "2025" -> buildAnnotatedString {
+                                                    withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2025") }
+                                                    withStyle(ParagraphStyle(lineHeight = 30.sp)) { append(" \n") }
+                                                    append("buildSrc is ")
+                                                    appendWithColor(badColor, "bad")
+                                                    append(" again")
+                                                }
+                                                it in year2023Activates until year2023Deactivates && node.value == "2023" -> buildAnnotatedString {
+                                                    withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2023") }
+                                                    withStyle(ParagraphStyle(lineHeight = 30.sp)) { append(" \n") }
+                                                    append("buildSrc is ")
+                                                    appendWithColor(goodColor, "good")
+                                                    append("?")
+                                                }
+                                                it in year2020Activates until year2020Deactivates && node.value == "2020" -> buildAnnotatedString {
+                                                    withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2020") }
+                                                    withStyle(ParagraphStyle(lineHeight = 30.sp)) { append(" \n") }
+                                                    append("buildSrc is ")
+                                                    appendWithColor(badColor, "bad")
+                                                }
+                                                else -> JustName(node)
+                                            }
+                                        }.MagicAnnotatedString(
+                                            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            split = { it.splitByChars() }
+                                        )
+                                    }
+                                }
                             }
                         }
 
-                        AnimatedHorizontalTree(treeYears, contentAlignment = Alignment.TopCenter) { node ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                    .background(LocalIdeColors.current.paneBackground)
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
-                                ) {
-                                    createChildTransition {
-                                        when {
-                                            it in year2025Activates until year2025Deactivates && node.value == "2025" -> buildAnnotatedString {
-                                                withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2025") }
-                                                withStyle(ParagraphStyle(lineHeight = 30.sp)) { append(" \n") }
-                                                append("buildSrc is ")
-                                                appendWithColor(badColor, "bad")
-                                                append(" again")
-                                            }
-                                            it in year2023Activates until year2023Deactivates && node.value == "2023" -> buildAnnotatedString {
-                                                withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2023") }
-                                                withStyle(ParagraphStyle(lineHeight = 30.sp)) { append(" \n") }
-                                                append("buildSrc is ")
-                                                appendWithColor(goodColor, "good")
-                                                append("?")
-                                            }
-                                            it in year2020Activates until year2020Deactivates && node.value == "2020" -> buildAnnotatedString {
-                                                withStyle(SpanStyle(color = highlightColor, fontSize = 20.sp)) { append("2020") }
-                                                withStyle(ParagraphStyle(lineHeight = 30.sp)) { append(" \n") }
-                                                append("buildSrc is ")
-                                                appendWithColor(badColor, "bad")
-                                            }
-                                            else -> JustName(node)
-                                        }
-                                    }.MagicAnnotatedString(
-                                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        split = { it.splitByChars() }
-                                    )
-                                }
+                        FadeInOutAnimatedVisibility({ it in year2020Activates until year2020Deactivates }) {
+                            StackedImageGallery {
+                                image(Res.drawable.buildsrc_article_1_light, since = firstArticle)
+                                image(Res.drawable.buildsrc_article_2_light, since = secondArticle)
+                                image(Res.drawable.buildsrc_github_issue_light, since = thirdArticle)
                             }
                         }
                     }
