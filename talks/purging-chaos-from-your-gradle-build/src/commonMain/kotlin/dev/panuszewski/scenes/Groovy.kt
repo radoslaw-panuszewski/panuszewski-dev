@@ -1,25 +1,33 @@
 package dev.panuszewski.scenes
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.panuszewski.components.Agenda
+import dev.panuszewski.template.components.CenteredColumn
 import dev.panuszewski.template.components.IdeLayout
+import dev.panuszewski.template.components.ResourceImage
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.calculateTotalStates
-import dev.panuszewski.template.extensions.precompose
+import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.startWith
+import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
+import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
+import talks.purging_chaos_from_your_gradle_build.generated.resources.groovy_search_dark
+import talks.purging_chaos_from_your_gradle_build.generated.resources.kotlin_search_dark
 
 fun StoryboardBuilder.Groovy() {
 
@@ -37,18 +45,42 @@ fun StoryboardBuilder.Groovy() {
 
             TitleScaffold(title) {
                 ideState.IdeLayout {
+
                     adaptiveTopPanel("groovy") { panelState ->
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth().height(200.dp),
-                        ) {
-                            panelState.RevealSequentially {
-                                stringItem("Dynamic typing ❌")
-                                stringItem("Poor IDE support ❌")
-                                stringItem("Hard to debug ❌")
+                        val (
+                            bulletpointsDisappear,
+                            screenshotAppears
+                        ) = subsequentNumbers(since = 4)
+
+                        panelState.FadeOutAnimatedVisibility({ it < bulletpointsDisappear }) {
+                            CenteredColumn(Modifier.fillMaxWidth().height(200.dp)) {
+                                panelState.RevealSequentially {
+                                    stringItem("❌ Dynamic typing")
+                                    stringItem("❌ Poor IDE support")
+                                    stringItem("❌ Hard to debug (buildscript's classpath not visible in IDE)")
+                                }
                             }
                         }
+
+                        panelState.SlideFromBottomAnimatedVisibility({ it == screenshotAppears }) {
+                            ResourceImage(
+                                resource = Res.drawable.groovy_search_dark,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .width(550.dp)
+                                    .padding(bottom = 32.dp)
+                            )
+                        }
+                    }
+
+                    adaptiveTopPanel("kotlin") {
+                        ResourceImage(
+                            resource = Res.drawable.kotlin_search_dark,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .width(550.dp)
+                                .padding(bottom = 32.dp)
+                        )
                     }
 
                     leftPanel("agenda") { panelState ->
@@ -115,7 +147,7 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .toCodeSample(language = Language.Groovy)
         .startWith { hide(kotlin) }
         .openPanel("groovy")
-        .pass(3)
+        .pass(5)
         .closePanel("groovy")
         .then { underlineWarning(groovy).focus(nothing) }
         .showEmoji("🤢")
@@ -129,6 +161,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
                 .changeTitle("Kotlin DSL ❤️")
                 .renameSelectedFile("build.gradle.kts")
         }
+        .openPanel("kotlin")
+        .closePanel("kotlin")
         .openAgenda()
         .pass()
         .closeAgenda()
