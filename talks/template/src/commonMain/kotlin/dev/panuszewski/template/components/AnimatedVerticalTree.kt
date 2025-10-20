@@ -51,7 +51,7 @@ fun <T : Any> AnimatedVerticalTree(
                     for (child in parent.children) {
                         val childRect = placements[child] ?: continue
 
-                        Connection(
+                        VerticalConnection(
                             parentRect = parentRect.translate(offset),
                             childRect = childRect.translate(offset),
                             color = Color.Gray,

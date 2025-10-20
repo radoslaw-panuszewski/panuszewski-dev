@@ -176,7 +176,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 }
                             }
 
-                            val tree = buildTree {
+                            val treeYears = buildTree {
                                 node("2020") {
                                     node("2023") {
                                         node("2025")
@@ -184,8 +184,8 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 }
                             }
 
-                            AnimatedVerticalTree(tree) { node ->
-                                RoundedTreeNode(node)
+                            AnimatedVerticalTree(treeYears) { verticalNode ->
+                               RoundedTreeNode(verticalNode)
                             }
 
 //                            Box(
