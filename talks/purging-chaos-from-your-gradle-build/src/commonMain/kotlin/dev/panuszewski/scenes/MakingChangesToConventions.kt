@@ -147,9 +147,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
     ) = subsequentNumbers()
 
     scene(totalStates) {
-        val rootColor = MaterialTheme.colors.primary
+        val rootColor = palette.gray
         val libColor = palette.blue
-        val appColor = MaterialTheme.colors.secondary
+        val appColor = palette.turquoise
         val buildSrcColor = palette.pink
         val buildLogicColor = palette.green
         val highlightColor = palette.orange

@@ -19,6 +19,11 @@ import dev.bnorm.storyboard.easel.overview.StoryOverviewState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+/**
+ * Global theme toggle callback that can be set by applications
+ */
+var globalThemeToggleCallback: (() -> Unit)? = null
+
 @Composable
 fun StoryEasel(
     storyState: StoryState,
@@ -38,6 +43,11 @@ fun StoryEasel(
         if (event.type == KeyEventType.KeyUp && event.key == Key.Escape) {
             storyOverviewState.jumpToIndex(storyState.currentIndex)
             overviewVisible = true
+            return true
+        }
+        // Handle Ctrl+T for theme toggle
+        if (event.type == KeyEventType.KeyDown && event.key == Key.T && event.isCtrlPressed) {
+            globalThemeToggleCallback?.invoke()
             return true
         }
         return false

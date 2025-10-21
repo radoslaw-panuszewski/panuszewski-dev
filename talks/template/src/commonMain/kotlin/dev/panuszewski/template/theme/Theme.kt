@@ -8,6 +8,9 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString.Builder
@@ -51,7 +54,7 @@ val DARK_PALETTE = CustomPalette(
     gray = Color(0xFF555555),
     lightGray = Color.DarkGray,
     darkRed = Color(0xFF682F29),
-    treeNodeBackground = Color.White,
+    treeNodeBackground = Color(0xFF313438),
     monospaceText = Color.LightGray,
     monospaceBackground = Color.DarkGray,
     warningHighlight = Color(0xFFFDF4D4),
@@ -63,7 +66,7 @@ val LIGHT_PALETTE = CustomPalette(
     green = Color(0xFF389E2D),
     pink = Color(0xFFDB26E0),
     turquoise = Color(54, 161, 165),
-    purple = Color(0xFF9436FF),
+    purple = Color(0xFFAC62F8),
     yellow = Color(0xFFB6A329),
     red = Color(0xFFF50100),
     gray = Color(0xFF555555),
@@ -113,6 +116,41 @@ val DARK_THEME = SceneDecorator { content ->
                 LocalCodeStyle provides INTELLIJ_DARK_CODE_STYLE,
                 LocalIdeColors provides DarkIdeColors,
                 LocalPalette provides DARK_PALETTE,
+            ) {
+                content()
+            }
+        }
+    }
+}
+
+/**
+ * Global theme state that can be toggled with Ctrl+T
+ */
+object ThemeState {
+    var isDarkTheme by mutableStateOf(false)
+    
+    fun toggle() {
+        isDarkTheme = !isDarkTheme
+    }
+}
+
+/**
+ * A theme decorator that can be toggled between light and dark themes using Ctrl+T
+ */
+val TOGGLEABLE_THEME = SceneDecorator { content ->
+    val isDark = ThemeState.isDarkTheme
+    
+    val colors = if (isDark) DARK_COLORS else LIGHT_COLORS
+    val codeStyle = if (isDark) INTELLIJ_DARK_CODE_STYLE else INTELLIJ_LIGHT_CODE_STYLE
+    val ideColors = if (isDark) DarkIdeColors else LightIdeColors
+    val palette = if (isDark) DARK_PALETTE else LIGHT_PALETTE
+    
+    MaterialTheme(colors, Typography()) {
+        Surface {
+            CompositionLocalProvider(
+                LocalCodeStyle provides codeStyle,
+                LocalIdeColors provides ideColors,
+                LocalPalette provides palette,
             ) {
                 content()
             }

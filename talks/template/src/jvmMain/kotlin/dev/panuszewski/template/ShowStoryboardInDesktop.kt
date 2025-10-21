@@ -10,9 +10,14 @@ import dev.bnorm.storyboard.Storyboard
 import dev.bnorm.storyboard.easel.DesktopStoryEasel
 import dev.bnorm.storyboard.easel.ExperimentalStoryStateApi
 import dev.bnorm.storyboard.easel.StoryState
+import dev.bnorm.storyboard.easel.globalThemeToggleCallback
+import dev.panuszewski.template.theme.ThemeState
 
 fun showStoryboardInDesktop(storyboard: Storyboard) {
     val state = StoryState()
+    
+    // Initialize theme toggle callback
+    globalThemeToggleCallback = { ThemeState.toggle() }
 
     application {
         remember {

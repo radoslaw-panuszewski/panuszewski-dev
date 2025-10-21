@@ -16,7 +16,7 @@ import dev.panuszewski.scenes.TitleScene
 import dev.panuszewski.scenes.TwoTypesOfGradleUsers
 import dev.panuszewski.scenes.Ultramarines
 import dev.panuszewski.scenes.WrappingUp
-import dev.panuszewski.template.theme.LIGHT_THEME
+import dev.panuszewski.template.theme.TOGGLEABLE_THEME
 
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
 
@@ -30,7 +30,7 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 val PurgingChaosFromYourGradleBuild = Storyboard.build(
     title = TITLE,
     format = Default,
-    decorator = LIGHT_THEME,
+    decorator = TOGGLEABLE_THEME,
 ) {
 //    TitleScene()
 //    Chaos()

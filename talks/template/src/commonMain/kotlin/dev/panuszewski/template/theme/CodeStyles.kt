@@ -39,6 +39,6 @@ val INTELLIJ_LIGHT_CODE_STYLE = CodeStyle.build {
     staticFunctionCall = simple + SpanStyle(fontStyle = FontStyle.Italic)
     typeParameters = simple + SpanStyle(color = Color(0xFF20999D))
     label += simple + SpanStyle(color = Color(0xFF20999D))
-    dsl = simple + SpanStyle(color = Color(0xFFBBB669))
+    dsl = simple + SpanStyle(color = Color(0xFF7F6D0B))
     namedArgument = simple + SpanStyle(color = Color(0xFF4A85E8))
 }
