@@ -79,7 +79,7 @@ class CodeSample private constructor(
 
     companion object {
         private val FOCUSED_STYLE: SpanStyleProvider = { SpanStyle(color = palette.orange) }
-        private val UNFOCUSED_STYLE: SpanStyleProvider = { SpanStyle(color = Color(0xFF555555)) }
+        private val UNFOCUSED_STYLE: SpanStyleProvider = { SpanStyle(color = palette.gray) }
         private val ELLIPSIS = AnnotatedString(" … ", spanStyle = SpanStyle(color = Color(0xFF555555)))
         private val EMPTY = AnnotatedString("")
 

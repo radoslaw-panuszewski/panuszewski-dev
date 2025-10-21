@@ -32,6 +32,7 @@ import dev.bnorm.storyboard.toDpSize
 import dev.panuszewski.template.components.spans.SpanDrawInstructions
 import dev.panuszewski.template.components.spans.SquigglyUnderlineAnimator
 import dev.panuszewski.template.components.spans.SquigglyUnderlineSpanPainter
+import dev.panuszewski.template.theme.palette
 
 private data class UnderlineDrawKey(
     val sampleHash: Int,
@@ -137,8 +138,10 @@ fun Transition<CodeSample>.ScrollableEnhancedMagicCodeSample(
 
 @Composable
 private fun extractWarningRanges(processedString: AnnotatedString, warningTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
+    val warningColor = palette.yellow
+
     return remember(processedString.hashCode(), warningTags.hashCode(), skipIndentation) {
-        extractWarningRangesImpl(processedString, warningTags, skipIndentation)
+        extractWarningRangesImpl(processedString, warningTags, warningColor, skipIndentation)
     }
 }
 
@@ -149,7 +152,12 @@ private fun extractErrorRanges(processedString: AnnotatedString, errorTags: List
     }
 }
 
-private fun extractWarningRangesImpl(processedString: AnnotatedString, warningTags: List<TextTag>, skipIndentation: Boolean = true): Map<IntRange, Color> {
+private fun extractWarningRangesImpl(
+    processedString: AnnotatedString,
+    warningTags: List<TextTag>,
+    warningColor: Color,
+    skipIndentation: Boolean = true,
+): Map<IntRange, Color> {
     val ranges = mutableMapOf<IntRange, Color>()
 
     // Use the warning tags that were stored during CodeSample creation
@@ -164,10 +172,10 @@ private fun extractWarningRangesImpl(processedString: AnnotatedString, warningTa
                 if (skipIndentation) {
                     val adjustedRanges = createRangesSkippingIndentation(processedString.text, range)
                     for (adjustedRange in adjustedRanges) {
-                        ranges[adjustedRange] = Color.Yellow
+                        ranges[adjustedRange] = warningColor
                     }
                 } else {
-                    ranges[range] = Color.Yellow
+                    ranges[range] = warningColor
                 }
             }
         }

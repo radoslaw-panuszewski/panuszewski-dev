@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -25,6 +27,7 @@ import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.palette
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.groovy_search_dark
 import talks.purging_chaos_from_your_gradle_build.generated.resources.kotlin_search_dark
@@ -149,7 +152,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openPanel("groovy")
         .pass(5)
         .closePanel("groovy")
-        .then { underlineWarning(groovy).focus(nothing) }
+//        .then { underlineWarning(groovy).focus(nothing) }
+        .then { focus(groovy, focusedStyle = { SpanStyle(color = palette.gray, background = palette.warningHighlight) }) }
         .showEmoji("🤢")
         .then {
             this
