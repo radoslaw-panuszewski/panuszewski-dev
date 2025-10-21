@@ -147,9 +147,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
     ) = subsequentNumbers()
 
     scene(totalStates) {
-        val rootColor = MaterialTheme.colors.onBackground
+        val rootColor = if (palette.darkMode) palette.darkTurquoise else MaterialTheme.colors.onBackground
         val libColor = palette.blue
-        val appColor = palette.turquoise
+        val appColor = if (palette.darkMode) palette.purple else palette.turquoise
         val buildSrcColor = palette.pink
         val buildLogicColor = palette.green
         val highlightColor = palette.orange
@@ -219,7 +219,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .border(width = 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                        .border(width = if (palette.darkMode) 2.dp else 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
                                         .background(palette.treeNodeBackground)
                                 ) {
                                     Column(
@@ -631,7 +631,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
-                                            .border(width = 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                            .border(width = if (palette.darkMode) 2.dp else 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
                                             .background(palette.treeNodeBackground)
                                     ) {
                                         Column(

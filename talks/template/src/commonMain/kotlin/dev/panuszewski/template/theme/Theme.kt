@@ -23,6 +23,7 @@ import dev.bnorm.storyboard.SceneDecorator
 import dev.panuszewski.template.extensions.JetBrainsMono
 
 data class CustomPalette(
+    val darkMode: Boolean,
     val orange: Color,
     val blue: Color,
     val green: Color,
@@ -44,6 +45,7 @@ data class CustomPalette(
 val palette: CustomPalette @Composable get() = LocalPalette.current
 
 val DARK_PALETTE = CustomPalette(
+    darkMode = true,
     orange = Color(0xFFFF8A04),
     blue = Color(0xFF0A7CFA),
     green = Color(0xFF389E2D),
@@ -63,6 +65,7 @@ val DARK_PALETTE = CustomPalette(
 )
 
 val LIGHT_PALETTE = CustomPalette(
+    darkMode = false,
     orange = Color(0xFFFF8A04),
     blue = Color(0xFF0A7CFA),
     green = Color(0xFF389E2D),

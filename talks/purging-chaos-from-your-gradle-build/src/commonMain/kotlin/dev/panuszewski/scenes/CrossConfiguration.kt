@@ -19,12 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LookaheadScope
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
-import dev.bnorm.storyboard.toState
 import dev.panuszewski.components.Agenda
 import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
@@ -34,16 +32,13 @@ import dev.panuszewski.template.components.TitleScaffold
 import dev.panuszewski.template.components.buildCodeSamples
 import dev.panuszewski.template.components.buildIdeState
 import dev.panuszewski.template.components.buildTree
-import dev.panuszewski.template.components.calculateTotalStates
 import dev.panuszewski.template.extensions.SlideFromLeftAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
-import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.palette
-import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.CrossConfiguration() {
     val files = listOf(
@@ -108,9 +103,9 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         }
                                     }
 
-                                    val rootProjectColor = MaterialTheme.colors.onBackground
+                                    val rootColor = if (palette.darkMode) palette.darkTurquoise else MaterialTheme.colors.onBackground
                                     val libraryColor = palette.blue
-                                    val appColor = palette.turquoise
+                                    val appColor = if (palette.darkMode) palette.purple else palette.turquoise
                                     val buildSrcColor = palette.pink
                                     val buildLogicColor = palette.green
                                     val highlightColor = palette.orange
@@ -121,7 +116,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             val appConvention = reusableNode("app-convention", appColor)
                                             val libraryConvention = reusableNode("lib-convention", libraryColor)
 
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor) {
                                                     node(appConvention)
                                                 }
@@ -136,7 +131,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         currentState >= rootProjectShrinks -> buildTree {
                                             val libraryConvention = reusableNode("lib-convention", libraryColor)
 
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", libraryColor) {
                                                     node(libraryConvention)
@@ -149,7 +144,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         currentState >= libConventionAppears -> buildTree {
                                             val libraryConvention = reusableNode("lib-convention", libraryColor)
 
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", libraryColor) {
                                                     node(libraryConvention)
@@ -161,7 +156,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             }
                                         }
                                         currentState >= resetAfterSubprojectsFilterHighlighted -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", libraryColor)
                                                 node("lib2", libraryColor)
@@ -169,7 +164,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             }
                                         }
                                         currentState >= librusAppears -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", highlightColor)
                                                 node("lib2", highlightColor)
@@ -177,35 +172,35 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             }
                                         }
                                         currentState >= subprojectsFilterHighlighted -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", highlightColor)
                                                 node("lib2", highlightColor)
                                             }
                                         }
                                         currentState >= resetAfterSubprojectsHighlighted -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", libraryColor)
                                                 node("lib2", libraryColor)
                                             }
                                         }
                                         currentState >= subprojectsHighlighted -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", highlightColor)
                                                 node("lib1", highlightColor)
                                                 node("lib2", highlightColor)
                                             }
                                         }
                                         currentState >= libsAppear -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                                 node("lib1", libraryColor)
                                                 node("lib2", libraryColor)
                                             }
                                         }
                                         currentState >= appMovesUnderRootProject -> buildTree {
-                                            node("root-project", rootProjectColor) {
+                                            node("root-project", rootColor) {
                                                 node("app", appColor)
                                             }
                                         }
@@ -223,7 +218,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         Box(
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(8.dp))
-                                                .border(width = 3.dp, color = node.color ?: neutralColor, shape = RoundedCornerShape(8.dp))
+                                                .border(width = if (palette.darkMode) 2.dp else 3.dp, color = node.color ?: neutralColor, shape = RoundedCornerShape(8.dp))
                                                 .background(palette.treeNodeBackground)
                                         ) {
                                             Column(
