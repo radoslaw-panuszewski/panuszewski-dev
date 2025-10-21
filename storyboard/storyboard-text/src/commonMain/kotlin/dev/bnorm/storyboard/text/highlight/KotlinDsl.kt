@@ -81,6 +81,14 @@ fun highlightKotlinDsl(text: String, codeStyle: CodeStyle) = buildAnnotatedStrin
         }
     }
 
+    NAMED_PARAMETER_REGEX.findAll(text).forEach { match ->
+        val range = match.groups[1]?.rangeCompat
+        if (range != null && !isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
+            addStyle(codeStyle.namedArgument, range)
+            highlightedRanges.add(range)
+        }
+    }
+
     FUNCTION_CALL_REGEX.findAll(text).forEach { match ->
         val range = match.groups[1]?.rangeCompat
         if (range != null && !isInsideAnyRange(range, stringRanges) && !overlapsAny(range, highlightedRanges)) {
@@ -120,6 +128,8 @@ private val DSL_KEYWORD_REGEX = """\b(versionCatalogs|MONDAY|TUESDAY|projects|su
 private val KOTLIN_KEYWORD_REGEX = """\b(package|import|class|interface|fun|object|val|var|typealias|constructor|by|companion|init|this|super|typeof|where|if|else|when|try|catch|finally|for|do|while|throw|return|continue|break|as|is|in|true|false|null|abstract|annotation|actual|const|crossinline|data|enum|expect|external|final|infix|inline|inner|internal|lateinit|noinline|open|operator|out|override|private|protected|public|reified|sealed|suspend|tailrec|vararg|dynamic)\b""".toRegex()
 
 private val DSL_FUNCTION_REGEX = """\b(plugins|alias|explicitApi)(?=\s*(?:<[^>]+>)?\s*[(\{])""".toRegex()
+
+private val NAMED_PARAMETER_REGEX = """\b([a-zA-Z_][a-zA-Z0-9_]*)\s*=""".toRegex()
 
 private val FUNCTION_CALL_REGEX = """\b(kotlin|named|repositories|configure|classpath|apply|filter|forEach|endsWith|implementation|project|register)(?=\s*(?:<[^>]+>)?\s*[(\{])""".toRegex()
 

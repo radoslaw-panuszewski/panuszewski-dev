@@ -21,6 +21,7 @@ val INTELLIJ_DARK_CODE_STYLE = CodeStyle.build {
     typeParameters = simple + SpanStyle(color = Color(0xFF16BAAC))
     label += simple + SpanStyle(color = Color(0xFF16BAAC))
     dsl = simple + SpanStyle(color = Color(0xFFBBB669))
+    namedArgument = simple + SpanStyle(color = Color(0xFF56C1D6))
 }
 
 val INTELLIJ_LIGHT_CODE_STYLE = CodeStyle.build {
@@ -39,4 +40,5 @@ val INTELLIJ_LIGHT_CODE_STYLE = CodeStyle.build {
     typeParameters = simple + SpanStyle(color = Color(0xFF20999D))
     label += simple + SpanStyle(color = Color(0xFF20999D))
     dsl = simple + SpanStyle(color = Color(0xFFBBB669))
+    namedArgument = simple + SpanStyle(color = Color(0xFF4A85E8))
 }

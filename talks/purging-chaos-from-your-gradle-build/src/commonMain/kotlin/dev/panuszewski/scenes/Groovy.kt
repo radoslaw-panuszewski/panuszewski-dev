@@ -152,7 +152,6 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .openPanel("groovy")
         .pass(5)
         .closePanel("groovy")
-//        .then { underlineWarning(groovy).focus(nothing) }
         .then { focus(groovy, focusedStyle = { SpanStyle(color = palette.gray, background = palette.warningHighlight) }) }
         .showEmoji("🤢")
         .then {
