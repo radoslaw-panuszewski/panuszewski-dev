@@ -108,9 +108,9 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         }
                                     }
 
-                                    val rootProjectColor = MaterialTheme.colors.primary
+                                    val rootProjectColor = MaterialTheme.colors.onBackground
                                     val libraryColor = palette.blue
-                                    val appColor = MaterialTheme.colors.secondary
+                                    val appColor = palette.turquoise
                                     val buildSrcColor = palette.pink
                                     val buildLogicColor = palette.green
                                     val highlightColor = palette.orange
@@ -210,7 +210,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                             }
                                         }
                                         currentState >= treeAppears -> buildTree {
-                                            node("app", rootProjectColor)
+                                            node("app", appColor)
                                         }
                                         else -> buildTree {}
                                     }
