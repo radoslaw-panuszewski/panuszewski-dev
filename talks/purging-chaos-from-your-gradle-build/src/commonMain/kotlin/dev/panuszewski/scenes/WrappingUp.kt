@@ -56,11 +56,10 @@ fun StoryboardBuilder.WrappingUp() {
                             append(" (subprojects & allprojects)")
                         }
                         annotatedStringItem {
-                            append("Start with ")
-                            appendWithColor(NICE_PINK, "buildSrc")
-                            append(" and switch to ")
+                            append("Always prefer ")
                             appendWithColor(NICE_GREEN, "build-logic")
-                            append(" if you see the performance gain")
+                            append(" over ")
+                            appendWithColor(NICE_PINK, "buildSrc")
                         }
                         annotatedStringItem {
                             appendWithColor(NICE_ORANGE, "Declarative Gradle")
