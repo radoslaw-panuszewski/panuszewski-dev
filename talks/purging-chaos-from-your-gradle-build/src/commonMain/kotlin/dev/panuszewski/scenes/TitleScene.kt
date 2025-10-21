@@ -43,6 +43,7 @@ import dev.panuszewski.template.theme.palette
 import org.jetbrains.compose.resources.painterResource
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.chaotic_groovy_dark
+import talks.purging_chaos_from_your_gradle_build.generated.resources.chaotic_groovy_light
 
 fun StoryboardBuilder.TitleScene() {
 
@@ -98,7 +99,7 @@ fun StoryboardBuilder.TitleScene() {
                 Box(
                     Modifier
                         .paint(
-                            painter = painterResource(Res.drawable.chaotic_groovy_dark),
+                            painter = painterResource(if (palette.darkMode) Res.drawable.chaotic_groovy_dark else Res.drawable.chaotic_groovy_light),
                             contentScale = ContentScale.Crop
                         )
                 )
