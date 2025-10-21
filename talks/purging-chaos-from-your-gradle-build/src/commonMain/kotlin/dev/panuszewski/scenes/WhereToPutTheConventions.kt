@@ -332,18 +332,20 @@ fun StoryboardBuilder.WhereToPutTheConventions() {
                                     RevealSequentially(since = comparisonTopBullet1) {
                                         annotatedStringItem {
                                             append("The ")
-                                            withColor(palette.orange) { append("buildscript's classpath") }
+                                            appendWithColor(palette.orange, "buildscript's classpath")
                                             append(" is so important, because...")
                                         }
                                         annotatedStringItem {
-                                            append("...when it changes, all non-builtin tasks will go out-of-date")
+                                            append("...when it changes, ")
+                                            appendWithColor(palette.orange, "all non built-in tasks")
+                                            append(" will go out-of-date")
                                         }
                                         annotatedStringItem {
                                             append("It means that ")
-                                            appendAsCode("compileJava")
-                                            append(" will stay UP-TO-DATE, but ")
-                                            appendAsCode("bootJar")
-                                            append(" will not")
+                                            appendWithColor(palette.orange, "bootJar")
+                                            append(" would go out-of-date, but ")
+                                            appendWithColor(palette.orange, "compileJava")
+                                            append(" would not")
                                         }
                                     }
                                 }
