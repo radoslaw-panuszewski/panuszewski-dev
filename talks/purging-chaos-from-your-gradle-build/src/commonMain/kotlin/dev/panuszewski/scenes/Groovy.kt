@@ -1,10 +1,13 @@
 package dev.panuszewski.scenes
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,7 +33,9 @@ import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.palette
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.groovy_search_dark
+import talks.purging_chaos_from_your_gradle_build.generated.resources.groovy_search_light
 import talks.purging_chaos_from_your_gradle_build.generated.resources.kotlin_search_dark
+import talks.purging_chaos_from_your_gradle_build.generated.resources.kotlin_search_light
 
 fun StoryboardBuilder.Groovy() {
 
@@ -55,35 +60,39 @@ fun StoryboardBuilder.Groovy() {
                             screenshotAppears
                         ) = subsequentNumbers(since = 4)
 
-                        panelState.FadeOutAnimatedVisibility({ it < bulletpointsDisappear }) {
-                            CenteredColumn(Modifier.fillMaxWidth().height(200.dp)) {
-                                panelState.RevealSequentially {
-                                    stringItem("❌ Dynamic typing")
-                                    stringItem("❌ Poor IDE support")
-                                    stringItem("❌ Hard to debug (buildscript's classpath not visible in IDE)")
+                        Box(Modifier.padding(bottom = 32.dp)) {
+                            panelState.FadeOutAnimatedVisibility({ it < bulletpointsDisappear }) {
+                                CenteredColumn(Modifier.fillMaxWidth().height(200.dp)) {
+                                    panelState.RevealSequentially {
+                                        stringItem("❌ Dynamic typing")
+                                        stringItem("❌ Poor IDE support")
+                                        stringItem("❌ Hard to debug (buildscript's classpath not visible in IDE)")
+                                    }
                                 }
                             }
-                        }
 
-                        panelState.SlideFromBottomAnimatedVisibility({ it == screenshotAppears }) {
-                            ResourceImage(
-                                resource = Res.drawable.groovy_search_dark,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .width(550.dp)
-                                    .padding(bottom = 32.dp)
-                            )
+                            panelState.SlideFromBottomAnimatedVisibility({ it == screenshotAppears }) {
+                                ResourceImage(
+                                    resource = if (palette.darkMode) Res.drawable.groovy_search_dark else Res.drawable.groovy_search_light,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .border(if (palette.darkMode) 0.dp else 1.dp, color = MaterialTheme.colors.onBackground, RoundedCornerShape(8.dp))
+                                        .width(550.dp)
+                                )
+                            }
                         }
                     }
 
                     adaptiveTopPanel("kotlin") {
-                        ResourceImage(
-                            resource = Res.drawable.kotlin_search_dark,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .width(550.dp)
-                                .padding(bottom = 32.dp)
-                        )
+                        Box(Modifier.padding(bottom = 32.dp)) {
+                            ResourceImage(
+                                resource = if (palette.darkMode) Res.drawable.kotlin_search_dark else Res.drawable.kotlin_search_light,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .border(if (palette.darkMode) 0.dp else 1.dp, color = MaterialTheme.colors.onBackground, RoundedCornerShape(8.dp))
+                                    .width(550.dp)
+                            )
+                        }
                     }
 
                     leftPanel("agenda") { panelState ->
