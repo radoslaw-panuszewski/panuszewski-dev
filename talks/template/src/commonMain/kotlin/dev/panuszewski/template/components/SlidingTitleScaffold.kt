@@ -1,5 +1,6 @@
 package dev.panuszewski.template.components
 
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.SceneScope
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 import dev.panuszewski.template.extensions.animateTextStyle
 import dev.panuszewski.template.extensions.annotate
@@ -32,7 +34,7 @@ fun SceneScope<Int>.SlidingTitleScaffold(
     title: String,
     slideToTopAt: Int = 1,
     slideBackAt: Int = Int.MAX_VALUE,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.(Transition<Boolean>) -> Unit
 ) {
     SlidingTitleScaffold(title.annotate(), slideToTopAt, slideBackAt, content)
 }
@@ -42,7 +44,7 @@ fun SceneScope<Int>.SlidingTitleScaffold(
     title: AnnotatedString,
     slideToTopAt: Int = 1,
     slideBackAt: Int = Int.MAX_VALUE,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.(Transition<Boolean>) -> Unit
 ) {
     val isLargeTitle = transition.createChildTransition {
         it.toState() !in slideToTopAt until slideBackAt
@@ -76,8 +78,8 @@ fun SceneScope<Int>.SlidingTitleScaffold(
                 subcompose("Title") {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         ProvideTextStyle(titleTextStyle) {
-                            AnimatedTitle(
-                                title = title,
+                            Text(
+                                text = title,
                                 modifier = Modifier.offset(y = titleVerticalOffset)
                             )
                         }
@@ -85,20 +87,18 @@ fun SceneScope<Int>.SlidingTitleScaffold(
                 }.measureAndPlace()
 
                 subcompose("Body") {
-                    contentVisible.SlideFromBottomAnimatedVisibility {
-                        Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(
-                                    start = 32.dp,
-                                    end = 32.dp,
-                                    top = titleHeight.toDp() + 48.dp,
-                                    bottom = 32.dp,
-                                ),
-                        ) {
-                            content()
-                        }
+                    Box(
+                        contentAlignment = Alignment.TopCenter,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(
+                                start = 32.dp,
+                                end = 32.dp,
+                                top = titleHeight.toDp() + 48.dp,
+                                bottom = 32.dp,
+                            ),
+                    ) {
+                        content(contentVisible)
                     }
                 }.measureAndPlace()
             }

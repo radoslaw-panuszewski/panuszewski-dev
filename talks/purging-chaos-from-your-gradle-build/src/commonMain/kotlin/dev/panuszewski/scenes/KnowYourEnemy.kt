@@ -46,8 +46,8 @@ fun StoryboardBuilder.KnowYourEnemy() {
         withIntTransition {
             val ideState = buildIdeState(files)
 
-            SlidingTitleScaffold("Know your enemy") {
-                SlideFromBottomAnimatedVisibility({ it >= 1 }) {
+            SlidingTitleScaffold("Know your enemy") { contentVisible ->
+                contentVisible.SlideFromBottomAnimatedVisibility {
                     ideState.IdeLayout {
                         leftPanel("agenda") { panelState ->
                             Column(
