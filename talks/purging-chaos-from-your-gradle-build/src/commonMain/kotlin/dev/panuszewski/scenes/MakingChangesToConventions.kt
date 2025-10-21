@@ -134,8 +134,8 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         whichToUseBullet2,
         whichToUseEnds,
         treeIsBackForFinalRecap,
-        buildLogicDisappears,
         titleChangesForFinalRecap,
+        buildLogicDisappears,
         finalRecapBullet1,
         libProjectsFolded,
         randomCodeAddedToAppProject,
@@ -160,7 +160,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         val highlightColor = NICE_ORANGE
         val neutralColor = Color.Gray
 
-        withIntTransition(initialState = resetAfterBuildLogicChange) {
+        withIntTransition {
             val title = when {
                 currentState >= titleChangesForFinalRecap -> "So... is this the ultimate setup?".annotate()
                 currentState >= treeIsBackForFinalRecap -> "We stay with build-logic!".annotate()
