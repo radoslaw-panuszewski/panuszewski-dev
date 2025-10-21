@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language.KotlinDsl
 import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.panuszewski.components.Agenda
 import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.CenteredColumn
@@ -46,6 +48,7 @@ import dev.panuszewski.template.components.buildTree
 import dev.panuszewski.template.extensions.FadeInOutAnimatedVisibility
 import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromLeftAnimatedVisibility
 import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.annotate
@@ -56,7 +59,6 @@ import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
-import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.appendAsCode
 import dev.panuszewski.template.theme.appendWithColor
 import dev.panuszewski.template.theme.palette
@@ -71,7 +73,7 @@ import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle8_re
 import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle_best_practices
 import kotlin.math.max
 
-fun StoryboardBuilder.MakingChangesToConventions() {
+fun StoryboardBuilder.WhereToPutTheConventions() {
     val (
         initialState,
         buildSrcAppears,
@@ -129,8 +131,12 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         whichToUseBullet2,
         whichToUseEnds,
         treeIsBackForFinalRecap,
+        buildLogicFolds,
+        agendaOpens,
+        agendaBuildSrcAdded,
+        agendaBuildSrcCrossedOut,
+        agendaCloses,
         titleChangesForFinalRecap,
-        buildLogicDisappears,
         finalRecapBullet1,
         libProjectsFolded,
         randomCodeAddedToAppProject,
@@ -167,7 +173,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                 currentState in year2025Activates until year2025Deactivates -> buildAnnotatedString { append("Gradle Best Practices updated") }
                 currentState in year2023Activates until year2025Activates -> buildAnnotatedString { append("Gradle 8 delivers fixes for "); appendWithColor(buildSrcColor, "buildSrc") }
                 currentState >= buildSrcAppears -> buildAnnotatedString { withColor(buildSrcColor) { append("buildSrc") } }
-                else -> "Making changes to convention plugins".annotate()
+                else -> "Where to put the conventions?".annotate()
             }
 
             TitleScaffold(title) {
@@ -464,184 +470,199 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     }
                                 }
 
-                                val tree = when {
-                                    currentState >= showAppConvention -> buildTree {
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) {
-                                                node("app-convention", appColor)
+                                Row {
+                                    SlideFromLeftAnimatedVisibility({ it in agendaOpens until agendaCloses }) {
+                                        Agenda(Modifier.width(225.dp)) {
+                                            item("Groovy", crossedOutSince = 0)
+                                            item("No type safety", crossedOutSince = 0)
+                                            item("Imperative code", crossedOutSince = 0)
+                                            item("Cross configuration", crossedOutSince = 0)
+                                            item("buildSrc", appearsSince = agendaBuildSrcAdded, crossedOutSince = agendaBuildSrcCrossedOut)
+                                            item("Mixed concerns")
+                                        }
+                                    }
+
+                                    val tree = when {
+                                        currentState >= showAppConvention -> buildTree {
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) {
+                                                    node("app-convention", appColor)
+                                                }
                                             }
                                         }
-                                    }
-                                    currentState >= libProjectsFolded -> buildTree {
-                                        node("root-project", rootColor) {
-                                            node("app", appColor)
+                                        currentState >= libProjectsFolded -> buildTree {
+                                            node("root-project", rootColor) {
+                                                node("app", appColor)
+                                            }
                                         }
-                                    }
-                                    currentState >= buildLogicDisappears -> buildTree {
-                                        node("root-project", rootColor) {
-                                            node("app", appColor)
-                                            node("lib1", libColor)
-                                            node("lib2", libColor)
-                                        }
-                                    }
-                                    currentState >= resetAfterBuildLogicChange -> buildTree {
-                                        val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                                            node("app-convention", buildLogicColor)
-                                        }
-                                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                            node("lib-convention", buildLogicColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildLogicApp) }
-                                            node("lib1", libColor) { node(buildLogicLib) }
-                                            node("lib2", libColor) { node(buildLogicLib) }
-                                        }
-                                    }
-                                    currentState >= onlyAppReconfigured -> buildTree {
-                                        val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
-                                            node("app-convention", highlightColor)
-                                        }
-                                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                            node("lib-convention", buildLogicColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", highlightColor) { node(buildLogicApp) }
-                                            node("lib1", libColor) { node(buildLogicLib) }
-                                            node("lib2", libColor) { node(buildLogicLib) }
-                                        }
-                                    }
-                                    currentState >= buildLogicAppModified -> buildTree {
-                                        val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
-                                            node("app-convention", highlightColor)
-                                        }
-                                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                            node("lib-convention", buildLogicColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildLogicApp) }
-                                            node("lib1", libColor) { node(buildLogicLib) }
-                                            node("lib2", libColor) { node(buildLogicLib) }
-                                        }
-                                    }
-                                    currentState >= appConventionModifiedInBuildLogic -> buildTree {
-                                        val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                                            node("app-convention", highlightColor)
-                                        }
-                                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                            node("lib-convention", buildLogicColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildLogicApp) }
-                                            node("lib1", libColor) { node(buildLogicLib) }
-                                            node("lib2", libColor) { node(buildLogicLib) }
-                                        }
-                                    }
-                                    currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
-                                        val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
-                                            node("app-convention", buildLogicColor)
-                                        }
-                                        val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
-                                            node("lib-convention", buildLogicColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildLogicApp) }
-                                            node("lib1", libColor) { node(buildLogicLib) }
-                                            node("lib2", libColor) { node(buildLogicLib) }
-                                        }
-                                    }
-                                    currentState >= buildLogicAppears -> buildTree {
-                                        val buildLogic = reusableNode("build-logic", buildLogicColor) {
-                                            node("app-convention", buildLogicColor)
-                                            node("lib-convention", buildLogicColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildLogic) }
-                                            node("lib1", libColor) { node(buildLogic) }
-                                            node("lib2", libColor) { node(buildLogic) }
-                                        }
-                                    }
-                                    currentState >= resetAfterBuildSrcChange -> buildTree {
-                                        val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                                            node("app-convention", buildSrcColor)
-                                            node("lib-convention", buildSrcColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildSrc) }
-                                            node("lib1", libColor) { node(buildSrc) }
-                                            node("lib2", libColor) { node(buildSrc) }
-                                        }
-                                    }
-                                    currentState >= allSubprojectsReconfigured -> buildTree {
-                                        val buildSrc = reusableNode("buildSrc", highlightColor) {
-                                            node("app-convention", highlightColor)
-                                            node("lib-convention", buildSrcColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", highlightColor) { node(buildSrc) }
-                                            node("lib1", highlightColor) { node(buildSrc) }
-                                            node("lib2", highlightColor) { node(buildSrc) }
-                                        }
-                                    }
-                                    currentState >= buildSrcModified -> buildTree {
-                                        val buildSrc = reusableNode("buildSrc", highlightColor) {
-                                            node("app-convention", highlightColor)
-                                            node("lib-convention", buildSrcColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildSrc) }
-                                            node("lib1", libColor) { node(buildSrc) }
-                                            node("lib2", libColor) { node(buildSrc) }
-                                        }
-                                    }
-                                    currentState >= appConventionModifiedInBuildSrc -> buildTree {
-                                        val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                                            node("app-convention", highlightColor)
-                                            node("lib-convention", buildSrcColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildSrc) }
-                                            node("lib1", libColor) { node(buildSrc) }
-                                            node("lib2", libColor) { node(buildSrc) }
-                                        }
-                                    }
-                                    currentState >= buildSrcAppears -> buildTree {
-                                        val buildSrc = reusableNode("buildSrc", buildSrcColor) {
-                                            node("app-convention", buildSrcColor)
-                                            node("lib-convention", buildSrcColor)
-                                        }
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(buildSrc) }
-                                            node("lib1", libColor) { node(buildSrc) }
-                                            node("lib2", libColor) { node(buildSrc) }
-                                        }
-                                    }
-                                    currentState >= initialState -> buildTree {
-                                        val appConvention = reusableNode("app-convention", appColor)
-                                        val libConvention = reusableNode("lib-convention", libColor)
+                                        currentState >= buildLogicFolds -> buildTree {
+                                            val buildLogic = reusableNode("build-logic", buildLogicColor)
 
-                                        node("root-project", rootColor) {
-                                            node("app", appColor) { node(appConvention) }
-                                            node("lib1", libColor) { node(libConvention) }
-                                            node("lib2", libColor) { node(libConvention) }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildLogic) }
+                                                node("lib1", libColor) { node(buildLogic) }
+                                                node("lib2", libColor) { node(buildLogic) }
+                                            }
                                         }
+                                        currentState >= resetAfterBuildLogicChange -> buildTree {
+                                            val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                                                node("app-convention", buildLogicColor)
+                                            }
+                                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                                node("lib-convention", buildLogicColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildLogicApp) }
+                                                node("lib1", libColor) { node(buildLogicLib) }
+                                                node("lib2", libColor) { node(buildLogicLib) }
+                                            }
+                                        }
+                                        currentState >= onlyAppReconfigured -> buildTree {
+                                            val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
+                                                node("app-convention", highlightColor)
+                                            }
+                                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                                node("lib-convention", buildLogicColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", highlightColor) { node(buildLogicApp) }
+                                                node("lib1", libColor) { node(buildLogicLib) }
+                                                node("lib2", libColor) { node(buildLogicLib) }
+                                            }
+                                        }
+                                        currentState >= buildLogicAppModified -> buildTree {
+                                            val buildLogicApp = reusableNode(":build-logic:app", highlightColor) {
+                                                node("app-convention", highlightColor)
+                                            }
+                                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                                node("lib-convention", buildLogicColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildLogicApp) }
+                                                node("lib1", libColor) { node(buildLogicLib) }
+                                                node("lib2", libColor) { node(buildLogicLib) }
+                                            }
+                                        }
+                                        currentState >= appConventionModifiedInBuildLogic -> buildTree {
+                                            val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                                                node("app-convention", highlightColor)
+                                            }
+                                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                                node("lib-convention", buildLogicColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildLogicApp) }
+                                                node("lib1", libColor) { node(buildLogicLib) }
+                                                node("lib2", libColor) { node(buildLogicLib) }
+                                            }
+                                        }
+                                        currentState >= buildLogicSplitsIntoSubprojects -> buildTree {
+                                            val buildLogicApp = reusableNode(":build-logic:app", buildLogicColor) {
+                                                node("app-convention", buildLogicColor)
+                                            }
+                                            val buildLogicLib = reusableNode(":build-logic:lib", buildLogicColor) {
+                                                node("lib-convention", buildLogicColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildLogicApp) }
+                                                node("lib1", libColor) { node(buildLogicLib) }
+                                                node("lib2", libColor) { node(buildLogicLib) }
+                                            }
+                                        }
+                                        currentState >= buildLogicAppears -> buildTree {
+                                            val buildLogic = reusableNode("build-logic", buildLogicColor) {
+                                                node("app-convention", buildLogicColor)
+                                                node("lib-convention", buildLogicColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildLogic) }
+                                                node("lib1", libColor) { node(buildLogic) }
+                                                node("lib2", libColor) { node(buildLogic) }
+                                            }
+                                        }
+                                        currentState >= resetAfterBuildSrcChange -> buildTree {
+                                            val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                                                node("app-convention", buildSrcColor)
+                                                node("lib-convention", buildSrcColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildSrc) }
+                                                node("lib1", libColor) { node(buildSrc) }
+                                                node("lib2", libColor) { node(buildSrc) }
+                                            }
+                                        }
+                                        currentState >= allSubprojectsReconfigured -> buildTree {
+                                            val buildSrc = reusableNode("buildSrc", highlightColor) {
+                                                node("app-convention", highlightColor)
+                                                node("lib-convention", buildSrcColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", highlightColor) { node(buildSrc) }
+                                                node("lib1", highlightColor) { node(buildSrc) }
+                                                node("lib2", highlightColor) { node(buildSrc) }
+                                            }
+                                        }
+                                        currentState >= buildSrcModified -> buildTree {
+                                            val buildSrc = reusableNode("buildSrc", highlightColor) {
+                                                node("app-convention", highlightColor)
+                                                node("lib-convention", buildSrcColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildSrc) }
+                                                node("lib1", libColor) { node(buildSrc) }
+                                                node("lib2", libColor) { node(buildSrc) }
+                                            }
+                                        }
+                                        currentState >= appConventionModifiedInBuildSrc -> buildTree {
+                                            val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                                                node("app-convention", highlightColor)
+                                                node("lib-convention", buildSrcColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildSrc) }
+                                                node("lib1", libColor) { node(buildSrc) }
+                                                node("lib2", libColor) { node(buildSrc) }
+                                            }
+                                        }
+                                        currentState >= buildSrcAppears -> buildTree {
+                                            val buildSrc = reusableNode("buildSrc", buildSrcColor) {
+                                                node("app-convention", buildSrcColor)
+                                                node("lib-convention", buildSrcColor)
+                                            }
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(buildSrc) }
+                                                node("lib1", libColor) { node(buildSrc) }
+                                                node("lib2", libColor) { node(buildSrc) }
+                                            }
+                                        }
+                                        currentState >= initialState -> buildTree {
+                                            val appConvention = reusableNode("app-convention", appColor)
+                                            val libConvention = reusableNode("lib-convention", libColor)
+
+                                            node("root-project", rootColor) {
+                                                node("app", appColor) { node(appConvention) }
+                                                node("lib1", libColor) { node(libConvention) }
+                                                node("lib2", libColor) { node(libConvention) }
+                                            }
+                                        }
+                                        else -> emptyList()
                                     }
-                                    else -> emptyList()
-                                }
-                                AnimatedHorizontalTree(tree, modifier = Modifier.animateBounds(this)) { node ->
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .border(width = if (palette.darkMode) 2.dp else 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
-                                            .background(palette.treeNodeBackground)
-                                    ) {
-                                        Column(
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+
+                                    AnimatedHorizontalTree(tree, modifier = Modifier.animateBounds(this@LookaheadScope)) { node ->
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .border(width = if (palette.darkMode) 2.dp else 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                                .background(palette.treeNodeBackground)
                                         ) {
-                                            createChildTransition {
-                                                when {
-                                                    it >= resetAfterMixedConcerns && node.value == "app-convention" -> buildCodeSamples {
-                                                        """
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.animateContentSize(tween(durationMillis = 300, delayMillis = 300))
+                                            ) {
+                                                createChildTransition {
+                                                    when {
+                                                        it >= resetAfterMixedConcerns && node.value == "app-convention" -> buildCodeSamples {
+                                                            """
                                                         plugins {
                                                             alias(libs.plugins.kotlin.jvm)
                                                         }
@@ -652,13 +673,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                             doLast { println("lol") }
                                                         }
                                                         """
-                                                            .trimIndent()
-                                                            .toCodeSample(language = KotlinDsl)
-                                                    }.String()
-                                                    it >= customBuildLogicAdded && node.value == "app-convention" -> buildCodeSamples {
-                                                        val sharedDefaults by tag()
-                                                        val customBuildLogic by tag()
-                                                        """
+                                                                .trimIndent()
+                                                                .toCodeSample(language = KotlinDsl)
+                                                        }.String()
+                                                        it >= customBuildLogicAdded && node.value == "app-convention" -> buildCodeSamples {
+                                                            val sharedDefaults by tag()
+                                                            val customBuildLogic by tag()
+                                                            """
                                                         plugins {
                                                             alias(libs.plugins.kotlin.jvm)
                                                         }
@@ -669,13 +690,13 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                             doLast { println("lol") }
                                                         }${customBuildLogic}
                                                         """
-                                                            .trimIndent()
-                                                            .toCodeSample(language = KotlinDsl)
-                                                            .focus(customBuildLogic, focusedStyle = { SpanStyle(color = palette.pink) })
-                                                    }.String()
-                                                    it >= sharedDefaultsAdded && node.value == "app-convention" -> buildCodeSamples {
-                                                        val sharedDefaults by tag()
-                                                        """
+                                                                .trimIndent()
+                                                                .toCodeSample(language = KotlinDsl)
+                                                                .focus(customBuildLogic, focusedStyle = { SpanStyle(color = palette.pink) })
+                                                        }.String()
+                                                        it >= sharedDefaultsAdded && node.value == "app-convention" -> buildCodeSamples {
+                                                            val sharedDefaults by tag()
+                                                            """
                                                         plugins {
                                                             alias(libs.plugins.kotlin.jvm)
                                                         }
@@ -683,23 +704,23 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                             jvmToolchain(25)
                                                         }${sharedDefaults}
                                                         """
-                                                            .trimIndent()
-                                                            .toCodeSample(language = KotlinDsl)
-                                                            .focus(sharedDefaults, focusedStyle = { SpanStyle(color = palette.blue) })
-                                                    }.String()
-                                                    it >= appConventionExpanded && node.value == "app-convention" -> buildCodeSamples {
-                                                        """
+                                                                .trimIndent()
+                                                                .toCodeSample(language = KotlinDsl)
+                                                                .focus(sharedDefaults, focusedStyle = { SpanStyle(color = palette.blue) })
+                                                        }.String()
+                                                        it >= appConventionExpanded && node.value == "app-convention" -> buildCodeSamples {
+                                                            """
                                                         plugins {
                                                             alias(libs.plugins.kotlin.jvm)
                                                         }
                                                         """
-                                                            .trimIndent()
-                                                            .toCodeSample(language = KotlinDsl)
-                                                    }.String()
-                                                    it >= resetAfterRandomCode && node.value == "app" -> JustName(node)
-                                                    it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
-                                                        val randomCode by tag()
-                                                        """
+                                                                .trimIndent()
+                                                                .toCodeSample(language = KotlinDsl)
+                                                        }.String()
+                                                        it >= resetAfterRandomCode && node.value == "app" -> JustName(node)
+                                                        it >= randomCodeAddedToAppProject && node.value == "app" -> buildCodeSamples {
+                                                            val randomCode by tag()
+                                                            """
                                                         plugins {
                                                             id("app-convention")
                                                         }
@@ -710,11 +731,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                             project.apply(plugin = "kotlin")
                                                         }${randomCode}
                                                         """
-                                                            .trimIndent()
-                                                            .toCodeSample(language = KotlinDsl)
-                                                            .focus(randomCode)
-                                                    }.String()
-                                                    it >= libProjectsFolded && node.value == "app" -> """
+                                                                .trimIndent()
+                                                                .toCodeSample(language = KotlinDsl)
+                                                                .focus(randomCode)
+                                                        }.String()
+                                                        it >= libProjectsFolded && node.value == "app" -> """
                                                         plugins {
                                                             id("app-convention")
                                                         }
@@ -722,40 +743,41 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                             implementation(libs.spring.boot.web)
                                                         }
                                                         """
-                                                        .trimIndent()
-                                                        .toCode(language = KotlinDsl)
-                                                    it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
-                                                    it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> """
+                                                            .trimIndent()
+                                                            .toCode(language = KotlinDsl)
+                                                        it >= libProjectsFolded && node.value.matches("""lib\d+""".toRegex()) -> JustName(node)
+                                                        it >= conventionsChangeToNonTypesafe && node.value.matches("""lib\d+""".toRegex()) -> """
                                                         plugins {
                                                             id("lib-convention")
                                                         }
                                                         """
-                                                        .trimIndent()
-                                                        .toCode(language = KotlinDsl)
-                                                    it >= conventionsChangeToNonTypesafe && node.value == "app" -> """
+                                                            .trimIndent()
+                                                            .toCode(language = KotlinDsl)
+                                                        it >= conventionsChangeToNonTypesafe && node.value == "app" -> """
                                                         plugins {
                                                             id("app-convention")
                                                         }
                                                         """
-                                                        .trimIndent()
-                                                        .toCode(language = KotlinDsl)
-                                                    it >= initialState && node.value.matches("""lib\d+""".toRegex()) -> """
+                                                            .trimIndent()
+                                                            .toCode(language = KotlinDsl)
+                                                        it >= initialState && node.value.matches("""lib\d+""".toRegex()) -> """
                                                         plugins {
                                                             `lib-convention`
                                                         }
                                                         """
-                                                        .trimIndent()
-                                                        .toCode(language = KotlinDsl)
-                                                    it >= initialState && node.value == "app" -> """
+                                                            .trimIndent()
+                                                            .toCode(language = KotlinDsl)
+                                                        it >= initialState && node.value == "app" -> """
                                                         plugins {
                                                             `app-convention`
                                                         }
                                                         """
-                                                        .trimIndent()
-                                                        .toCode(language = KotlinDsl)
-                                                    else -> JustName(node)
-                                                }
-                                            }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                                            .trimIndent()
+                                                            .toCode(language = KotlinDsl)
+                                                        else -> JustName(node)
+                                                    }
+                                                }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
+                                            }
                                         }
                                     }
                                 }

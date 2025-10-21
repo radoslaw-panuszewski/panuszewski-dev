@@ -1,5 +1,6 @@
 package dev.panuszewski.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.createChildTransition
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.panuszewski.template.components.CodeSample
 import dev.panuszewski.template.components.MagicAnnotatedString
+import dev.panuszewski.template.extensions.SlideFromLeftAnimatedVisibility
+import dev.panuszewski.template.extensions.SlideFromTopAnimatedVisibility
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.theme.BULLET_1
@@ -40,20 +43,22 @@ fun Transition<Int>.Agenda(
         ) {
             h6 {
                 scope.items.forEach { item ->
-                    if (item.crossedOutSince != null) {
-                        createChildTransition {
-                            when {
-                                it >= item.crossedOutSince -> buildAnnotatedString {
-                                    append(BULLET_1)
-                                    withStyle(SpanStyle(textDecoration = LineThrough, color = palette.lightGray)) {
-                                        append(item.text) 
+                    SlideFromLeftAnimatedVisibility({ it >= item.appearsSince }) {
+                        if (item.crossedOutSince != null) {
+                            createChildTransition {
+                                when {
+                                    it >= item.crossedOutSince -> buildAnnotatedString {
+                                        append(BULLET_1)
+                                        withStyle(SpanStyle(textDecoration = LineThrough, color = palette.lightGray)) {
+                                            append(item.text)
+                                        }
                                     }
+                                    else -> "$BULLET_1 ${item.text}".annotate()
                                 }
-                                else -> "$BULLET_1 ${item.text}".annotate()
-                            }
-                        }.MagicAnnotatedString()
-                    } else {
-                        Text("$BULLET_1 ${item.text}")
+                            }.MagicAnnotatedString()
+                        } else {
+                            Text("$BULLET_1 ${item.text}")
+                        }
                     }
                 }
             }
@@ -64,12 +69,13 @@ fun Transition<Int>.Agenda(
 class AgendaScope {
     val items = mutableListOf<AgendaItem>()
 
-    fun item(text: String, crossedOutSince: Int? = null) {
-        items.add(AgendaItem(text, crossedOutSince))
+    fun item(text: String, appearsSince: Int = 0, crossedOutSince: Int? = null) {
+        items.add(AgendaItem(text, appearsSince, crossedOutSince))
     }
 }
 
 data class AgendaItem(
     val text: String,
+    val appearsSince: Int = 0,
     val crossedOutSince: Int?
 )
