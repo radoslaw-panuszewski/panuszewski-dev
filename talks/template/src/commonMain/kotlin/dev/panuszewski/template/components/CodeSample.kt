@@ -17,15 +17,17 @@ import dev.bnorm.storyboard.text.replaceAllByTag
 import dev.panuszewski.template.extensions.TagType
 import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.theme.LocalCodeStyle
-import dev.panuszewski.template.theme.NICE_LIGHT_RED
+import dev.panuszewski.template.theme.palette
 import org.jetbrains.compose.resources.DrawableResource
 import kotlin.collections.iterator
+
+typealias SpanStyleProvider = @Composable () -> SpanStyle?
 
 @Immutable
 class CodeSample private constructor(
     private val focus: List<TextTag>,
-    private val focusedStyle: SpanStyle? = FOCUSED_STYLE,
-    private val unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE,
+    private val focusedStyle: SpanStyleProvider = FOCUSED_STYLE,
+    private val unfocusedStyle: SpanStyleProvider = UNFOCUSED_STYLE,
     private val replaced: Map<TextTag, AnnotatedString>,
     private val styled: Map<TextTag, SpanStyle>,
     private val scrollTag: TextTag?,
@@ -50,7 +52,7 @@ class CodeSample private constructor(
             str = str.addStyleByTag(listOf(tag), tagged = style)
         }
         if (focus.isNotEmpty()) {
-            str = str.addStyleByTag(focus, tagged = focusedStyle, untagged = unfocusedStyle)
+            str = str.addStyleByTag(focus, tagged = focusedStyle.invoke(), untagged = unfocusedStyle.invoke())
         }
         // TODO collapse first and then hide?
         //  - will keep the collapses from being split,
@@ -76,12 +78,10 @@ class CodeSample private constructor(
     }
 
     companion object {
-        private val FOCUSED_STYLE = SpanStyle(color = Color(0xFFFF8A04))
-        private val UNFOCUSED_STYLE = SpanStyle(color = Color(0xFF555555))
-        private val ELLIPSIS = AnnotatedString(" … ", spanStyle = UNFOCUSED_STYLE)
+        private val FOCUSED_STYLE: SpanStyleProvider = { SpanStyle(color = palette.orange) }
+        private val UNFOCUSED_STYLE: SpanStyleProvider = { SpanStyle(color = Color(0xFF555555)) }
+        private val ELLIPSIS = AnnotatedString(" … ", spanStyle = SpanStyle(color = Color(0xFF555555)))
         private val EMPTY = AnnotatedString("")
-        private val ERROR_STYLE_LIGHT_THEME = SpanStyle(color = Color(0xFFF50100))
-        private val ERROR_STYLE_DARK_THEME = SpanStyle(color = NICE_LIGHT_RED)
 
         internal fun create(
             text: AnnotatedString,
@@ -109,8 +109,8 @@ class CodeSample private constructor(
 
     private fun copy(
         focus: List<TextTag> = this.focus,
-        focusedStyle: SpanStyle? = this.focusedStyle,
-        unfocusedStyle: SpanStyle? = this.unfocusedStyle,
+        focusedStyle: SpanStyleProvider = this.focusedStyle,
+        unfocusedStyle: SpanStyleProvider = this.unfocusedStyle,
         replaced: Map<TextTag, AnnotatedString> = this.replaced,
         styled: Map<TextTag, SpanStyle> = this.styled,
         scrollTag: TextTag? = this.scrollTag,
@@ -150,7 +150,7 @@ class CodeSample private constructor(
     fun revealAndFocusNoStyling(vararg tags: TextTag) =
         reveal(*tags).focusNoStyling(*tags)
 
-    fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+    fun focus(tags: List<TextTag>, scroll: Boolean = true, focusedStyle: SpanStyleProvider = FOCUSED_STYLE, unfocusedStyle: SpanStyleProvider = UNFOCUSED_STYLE): CodeSample =
         copy(focus = tags, scrollTag = if (scroll) tags.first() else scrollTag, focusedStyle = focusedStyle, unfocusedStyle = unfocusedStyle)
 
     fun underlineWarning(tag: TextTag): CodeSample =
@@ -205,20 +205,32 @@ class CodeSample private constructor(
         return result
     }
 
-    fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+//    fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+//        focus(tags.asList(), scroll, focusedStyle, unfocusedStyle)
+//
+//    fun focus(tag: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+//        focus(listOf(tag), scroll, focusedStyle, unfocusedStyle)
+//
+//    fun focusNoStyling(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
+//        focus(tags.asList(), scroll, null, null)
+//
+//    fun focusNoScroll(vararg tags: TextTag, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+//        focus(tags.asList(), false, focusedStyle, unfocusedStyle)
+
+    fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyleProvider = FOCUSED_STYLE, unfocusedStyle: SpanStyleProvider = UNFOCUSED_STYLE): CodeSample =
         focus(tags.asList(), scroll, focusedStyle, unfocusedStyle)
 
-    fun focus(tag: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+    fun focus(tag: TextTag, scroll: Boolean = true, focusedStyle: SpanStyleProvider = FOCUSED_STYLE, unfocusedStyle: SpanStyleProvider = UNFOCUSED_STYLE): CodeSample =
         focus(listOf(tag), scroll, focusedStyle, unfocusedStyle)
 
     fun focusNoStyling(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
-        focus(tags.asList(), scroll, null, null)
+        focus(tags.asList(), scroll, { null }, { null })
 
-    fun focusNoScroll(vararg tags: TextTag, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
+    fun focusNoScroll(vararg tags: TextTag, focusedStyle: SpanStyleProvider = FOCUSED_STYLE, unfocusedStyle: SpanStyleProvider = UNFOCUSED_STYLE): CodeSample =
         focus(tags.asList(), false, focusedStyle, unfocusedStyle)
 
     fun highlightAsError(vararg tags: TextTag, scroll: Boolean = false) =
-        focus(tags.asList(), scroll, ERROR_STYLE_DARK_THEME, null)
+        focus(tags.asList(), scroll, { SpanStyle(color = palette.red) }, { null })
 
     fun unfocus(unscroll: Boolean = true): CodeSample =
         copy(focus = emptyList(), scrollTag = if (unscroll) null else scrollTag)

@@ -57,14 +57,9 @@ import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
 import dev.panuszewski.template.theme.LocalIdeColors
-import dev.panuszewski.template.theme.NICE_BLUE
-import dev.panuszewski.template.theme.NICE_GREEN
-import dev.panuszewski.template.theme.NICE_LIGHT_RED
-import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
-import dev.panuszewski.template.theme.NICE_ORANGE
-import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.appendAsCode
 import dev.panuszewski.template.theme.appendWithColor
+import dev.panuszewski.template.theme.palette
 import dev.panuszewski.template.theme.withColor
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.buildsrc_article_1_light
@@ -153,11 +148,11 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
     scene(totalStates) {
         val rootColor = MaterialTheme.colors.primary
-        val libColor = NICE_BLUE
+        val libColor = palette.blue
         val appColor = MaterialTheme.colors.secondary
-        val buildSrcColor = NICE_PINK
-        val buildLogicColor = NICE_GREEN
-        val highlightColor = NICE_ORANGE
+        val buildSrcColor = palette.pink
+        val buildLogicColor = palette.green
+        val highlightColor = palette.orange
         val neutralColor = Color.Gray
 
         withIntTransition {
@@ -205,9 +200,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     Column {
                         FadeInOutAnimatedVisibility({ it in yearsAppear until yearsDisappear }) {
-                            val highlightColor = NICE_BLUE
-                            val badColor = NICE_LIGHT_RED
-                            val goodColor = NICE_GREEN
+                            val highlightColor = palette.blue
+                            val badColor = palette.red
+                            val goodColor = palette.green
 
                             val treeYears = when {
                                 currentState in year2025Activates until year2025Deactivates -> buildTree { node("2020") { node("2023") { node("2025", highlightColor) } } }
@@ -302,7 +297,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     │   └── src
                                     """.trimIndent()
                                 )
-                                withColor(NICE_ORANGE) {
+                                withColor(palette.orange) {
                                     append(
                                         """
                                         └── build-logic
@@ -331,7 +326,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     RevealSequentially(since = comparisonTopBullet1) {
                                         annotatedStringItem {
                                             append("The ")
-                                            withColor(NICE_ORANGE) { append("buildscript's classpath") }
+                                            withColor(palette.orange) { append("buildscript's classpath") }
                                             append(" is so important, because...")
                                         }
                                         annotatedStringItem {
@@ -381,7 +376,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                         }
 
                                         RevealSequentially(since = comparisonBullet7, textStyle = MaterialTheme.typography.body1) {
-                                            annotatedStringItem { appendWithColor(NICE_ORANGE, "$BULLET_1 ALWAYS on buildscript's classpath") }
+                                            annotatedStringItem { appendWithColor(palette.orange, "$BULLET_1 ALWAYS on buildscript's classpath") }
                                         }
                                     }
 
@@ -413,7 +408,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                         }
 
                                         RevealSequentially(since = comparisonBullet8, textStyle = MaterialTheme.typography.body1) {
-                                            annotatedStringItem { appendWithColor(NICE_ORANGE, "$BULLET_1 ONLY on buildscript's classpath if used") }
+                                            annotatedStringItem { appendWithColor(palette.orange, "$BULLET_1 ONLY on buildscript's classpath if used") }
                                         }
                                     }
                                 }
@@ -455,15 +450,15 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                         RevealSequentially(since = finalRecapBullet1) {
                                             annotatedStringItem {
                                                 append("Convention plugins encourages declarativity, but ")
-                                                withColor(NICE_ORANGE) { append("do not enforce it") }
+                                                withColor(palette.orange) { append("do not enforce it") }
                                             }
                                         }
                                         RevealSequentially(since = finalRecapBullet2) {
                                             annotatedStringItem {
                                                 append("Also, they often mix ")
-                                                withColor(NICE_BLUE) { append("shared defaults") }
+                                                withColor(palette.blue) { append("shared defaults") }
                                                 append(" with ")
-                                                withColor(NICE_PINK) { append("custom build logic") }
+                                                withColor(palette.pink) { append("custom build logic") }
                                             }
                                         }
                                     }
@@ -676,7 +671,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         """
                                                             .trimIndent()
                                                             .toCodeSample(language = KotlinDsl)
-                                                            .focus(customBuildLogic, focusedStyle = SpanStyle(color = NICE_PINK))
+                                                            .focus(customBuildLogic, focusedStyle = { SpanStyle(color = palette.pink) })
                                                     }.String()
                                                     it >= sharedDefaultsAdded && node.value == "app-convention" -> buildCodeSamples {
                                                         val sharedDefaults by tag()
@@ -690,7 +685,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                                         """
                                                             .trimIndent()
                                                             .toCodeSample(language = KotlinDsl)
-                                                            .focus(sharedDefaults, focusedStyle = SpanStyle(color = NICE_BLUE))
+                                                            .focus(sharedDefaults, focusedStyle = { SpanStyle(color = palette.blue) })
                                                     }.String()
                                                     it >= appConventionExpanded && node.value == "app-convention" -> buildCodeSamples {
                                                         """
@@ -770,7 +765,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
                         FadeInOutAnimatedVisibility({ it == shrugEmoji }) {
-                            ProvideTextStyle(MaterialTheme.typography.h5.copy(color = NICE_ORANGE)) {
+                            ProvideTextStyle(MaterialTheme.typography.h5.copy(color = palette.orange)) {
                                 androidx.compose.material.Text(
                                     text = """¯\_(ツ)_/¯""",
                                     modifier = Modifier.padding(top = 35.dp, end = 50.dp)

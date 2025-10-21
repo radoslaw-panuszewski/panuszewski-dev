@@ -14,8 +14,8 @@ import dev.panuszewski.template.components.CenteredColumn
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.extensions.h2
 import dev.panuszewski.template.extensions.withIntTransition
-import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.appendWithColor
+import dev.panuszewski.template.theme.palette
 
 fun StoryboardBuilder.ThankYouSlide() {
     scene(
@@ -31,7 +31,7 @@ fun StoryboardBuilder.ThankYouSlide() {
                     RevealSequentially {
                         annotatedStringItem {
                             append("Any ")
-                            appendWithColor(NICE_BLUE, "questions")
+                            appendWithColor(palette.blue, "questions")
                             append("?")
                         }
                     }

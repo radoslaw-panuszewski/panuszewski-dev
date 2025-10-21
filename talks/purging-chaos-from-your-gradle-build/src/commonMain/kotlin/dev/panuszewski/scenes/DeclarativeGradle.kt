@@ -51,7 +51,7 @@ import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
-import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.palette
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.sogood
 
@@ -189,7 +189,7 @@ fun StoryboardBuilder.DeclarativeGradle() {
                         Box(
                             Modifier
                                 .clip(CircleShape)
-                                .border(2.dp, NICE_ORANGE, CircleShape)
+                                .border(2.dp, palette.orange, CircleShape)
                         ) {
                             ResourceImage(Res.drawable.sogood, modifier = Modifier.width(200.dp))
                         }

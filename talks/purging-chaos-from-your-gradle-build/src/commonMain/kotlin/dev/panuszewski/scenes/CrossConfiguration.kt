@@ -42,10 +42,7 @@ import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.LocalIdeColors
-import dev.panuszewski.template.theme.NICE_BLUE
-import dev.panuszewski.template.theme.NICE_GREEN
-import dev.panuszewski.template.theme.NICE_ORANGE
-import dev.panuszewski.template.theme.NICE_PINK
+import dev.panuszewski.template.theme.palette
 import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.CrossConfiguration() {
@@ -112,11 +109,11 @@ fun StoryboardBuilder.CrossConfiguration() {
                                     }
 
                                     val rootProjectColor = MaterialTheme.colors.primary
-                                    val libraryColor = NICE_BLUE
+                                    val libraryColor = palette.blue
                                     val appColor = MaterialTheme.colors.secondary
-                                    val buildSrcColor = NICE_PINK
-                                    val buildLogicColor = NICE_GREEN
-                                    val highlightColor = NICE_ORANGE
+                                    val buildSrcColor = palette.pink
+                                    val buildLogicColor = palette.green
+                                    val highlightColor = palette.orange
                                     val neutralColor = Color.Gray
 
                                     val mainBuildTree = when {

@@ -32,7 +32,7 @@ import dev.panuszewski.template.extensions.safeGet
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
-import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
+import dev.panuszewski.template.theme.palette
 import dev.panuszewski.template.theme.withColor
 
 fun StoryboardBuilder.TwoTypesOfGradleUsers() {
@@ -67,7 +67,7 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
                                     body1 {
                                         Text {
                                             append("Ships new ")
-                                            withColor(NICE_LIGHT_TURQUOISE) { append("features") }
+                                            withColor(palette.turquoise) { append("features") }
                                         }
                                     }
                                 }
@@ -75,7 +75,7 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
                                     body1 {
                                         Text {
                                             append("Interested in: ")
-                                            withColor(NICE_LIGHT_TURQUOISE) { append("JDK version, dependencies") }
+                                            withColor(palette.turquoise) { append("JDK version, dependencies") }
                                         }
                                     }
                                 }
@@ -100,7 +100,7 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
                                     body1 {
                                         Text {
                                             append("Maintains the ")
-                                            withColor(NICE_LIGHT_TURQUOISE) { append("build") }
+                                            withColor(palette.turquoise) { append("build") }
                                         }
                                     }
                                 }
@@ -108,7 +108,7 @@ fun StoryboardBuilder.TwoTypesOfGradleUsers() {
                                     body1 {
                                         Text {
                                             append("Interested in: ")
-                                            withColor(NICE_LIGHT_TURQUOISE) { append("plugins, tasks, configurations") }
+                                            withColor(palette.turquoise) { append("plugins, tasks, configurations") }
                                         }
                                     }
                                 }

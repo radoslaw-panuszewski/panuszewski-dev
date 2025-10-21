@@ -28,12 +28,9 @@ import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.h4
 import dev.panuszewski.template.extensions.h5
-import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.extensions.withIntTransition
-import dev.panuszewski.template.theme.NICE_BLUE
-import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
-import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.appendWithColor
+import dev.panuszewski.template.theme.palette
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.allegro
 import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle
@@ -63,8 +60,8 @@ fun StoryboardBuilder.IntroductionSlide() {
 
                         Column(
                             modifier = Modifier
-                                .border(1.dp, NICE_BLUE)
-                                .background(color = NICE_BLUE.copy(alpha = 0.03f))
+                                .border(1.dp, palette.blue)
+                                .background(color = palette.blue.copy(alpha = 0.03f))
                                 .fillMaxWidth()
                                 .weight(0.5f)
                                 .padding(16.dp)
@@ -74,7 +71,7 @@ fun StoryboardBuilder.IntroductionSlide() {
                         ) {
                             h5 {
                                 Text {
-                                    appendWithColor(NICE_BLUE, "Radek Panuszewski")
+                                    appendWithColor(palette.blue, "Radek Panuszewski")
                                 }
                             }
 
@@ -93,7 +90,7 @@ fun StoryboardBuilder.IntroductionSlide() {
                                 }
                                 annotatedStringItem {
                                     append("working on ")
-                                    appendWithColor(NICE_LIGHT_TURQUOISE, "Developer Experience")
+                                    appendWithColor(palette.turquoise, "Developer Experience")
                                 }
                                 item {
                                     Row {

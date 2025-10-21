@@ -1,22 +1,16 @@
 package dev.panuszewski.scenes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
@@ -35,10 +29,8 @@ import dev.panuszewski.template.components.initiallyHidden
 import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
-import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
-import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.palette
 import dev.panuszewski.template.theme.withColor
-import org.jetbrains.compose.resources.painterResource
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.placzka
 import talks.purging_chaos_from_your_gradle_build.generated.resources.typesafe_conventions
@@ -68,16 +60,16 @@ fun StoryboardBuilder.ImperativeCode() {
                             panelState.RevealSequentially(since = 2) {
                                 annotatedStringItem {
                                     append("A ")
-                                    withColor(NICE_LIGHT_TURQUOISE) { append("convention plugin") }
+                                    withColor(palette.turquoise) { append("convention plugin") }
                                     append(" is just a Gradle plugin local to your project")
                                 }
                                 annotatedStringItem {
                                     append("It can be used to encapsulate an ")
-                                    withColor(NICE_LIGHT_TURQUOISE) { append("imperative build logic") }
+                                    withColor(palette.turquoise) { append("imperative build logic") }
                                 }
                                 annotatedStringItem {
                                     append("Or share some ")
-                                    withColor(NICE_LIGHT_TURQUOISE) { append("common defaults") }
+                                    withColor(palette.turquoise) { append("common defaults") }
                                     append(" (like the JVM version)")
                                 }
                             }
@@ -89,12 +81,12 @@ fun StoryboardBuilder.ImperativeCode() {
                              panelState.RevealSequentially {
                                  annotatedStringItem {
                                      append("We don't have access to ")
-                                     withColor(NICE_LIGHT_TURQUOISE) { append("version catalog") }
+                                     withColor(palette.turquoise) { append("version catalog") }
                                      append(" in buildSrc")
                                  }
                                  annotatedStringItem {
                                      append("The ")
-                                     withColor(NICE_LIGHT_TURQUOISE) { append("plugin dependency") }
+                                     withColor(palette.turquoise) { append("plugin dependency") }
                                      append(" is not resolved automatically")
                                  }
                              }

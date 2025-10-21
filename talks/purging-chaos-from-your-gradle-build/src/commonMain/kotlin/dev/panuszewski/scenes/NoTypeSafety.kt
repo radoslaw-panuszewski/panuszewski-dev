@@ -127,8 +127,8 @@ private val BUILD_GRADLE_KTS = buildCodeSamples {
         .trimIndent()
         .toCodeSample(language = KotlinDsl)
         .startWith { hide(declarativePlugin, typesafePlugin, typesafeConfiguration1, typesafeConfiguration2, typesafeProjectDependency, typesafeExternalDependency) }
-        .openPanel("plugin-marker")
-        .pass(10)
+//        .openPanel("plugin-marker")
+//        .pass(10)
         // plugins block
         .then { focusNoScroll(nonTypesafeConfiguration1, nonTypesafeConfiguration2) }
         .then { focus(imperativePlugin) }

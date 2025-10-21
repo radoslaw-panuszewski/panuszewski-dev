@@ -17,6 +17,7 @@ import dev.panuszewski.scenes.TwoTypesOfGradleUsers
 import dev.panuszewski.scenes.Ultramarines
 import dev.panuszewski.scenes.WrappingUp
 import dev.panuszewski.template.theme.DARK_THEME
+import dev.panuszewski.template.theme.LIGHT_THEME
 
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
 

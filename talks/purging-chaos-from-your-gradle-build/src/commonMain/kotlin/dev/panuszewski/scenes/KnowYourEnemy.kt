@@ -28,7 +28,7 @@ import dev.panuszewski.template.extensions.startWith
 import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
-import dev.panuszewski.template.theme.NICE_ORANGE
+import dev.panuszewski.template.theme.palette
 
 fun StoryboardBuilder.KnowYourEnemy() {
 
@@ -54,7 +54,7 @@ fun StoryboardBuilder.KnowYourEnemy() {
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
                                 modifier = Modifier.padding(top = 32.dp).align(TopStart),
                             ) {
-                                panelState.RevealSequentially(highlightedTextStyle = TextStyle(color = NICE_ORANGE)) {
+                                panelState.RevealSequentially(highlightedTextStyle = TextStyle(color = palette.orange)) {
                                     item { Text("$BULLET_1 Groovy 🤢") }
                                     item { Text("$BULLET_1 No type safety") }
                                     item { Text("$BULLET_1 Imperative code") }
@@ -122,10 +122,10 @@ private val BUILD_GRADLE = buildCodeSamples {
         .openAgenda()
 //        .then { focus(allCode) }
         .pass()
-        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3, noTypesafe4, noTypesafe5, unfocusedStyle = null) }
-        .then { focus(imperative1, imperative2, imperative3, unfocusedStyle = null) }
-        .then { focus(crossConfig1, crossConfig2, unfocusedStyle = null) }
-        .then { focus(mixedConcerns, unfocusedStyle = null) }
+        .then { focus(noTypesafe1, noTypesafe2, noTypesafe3, noTypesafe4, noTypesafe5, unfocusedStyle = { null }) }
+        .then { focus(imperative1, imperative2, imperative3, unfocusedStyle = { null }) }
+        .then { focus(crossConfig1, crossConfig2, unfocusedStyle = { null }) }
+        .then { focus(mixedConcerns, unfocusedStyle = { null }) }
         .then { unfocus() }
         .closeAgenda()
 }
