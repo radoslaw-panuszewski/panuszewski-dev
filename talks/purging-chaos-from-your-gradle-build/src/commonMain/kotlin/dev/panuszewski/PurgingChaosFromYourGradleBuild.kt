@@ -7,7 +7,7 @@ import dev.panuszewski.scenes.CrossConfiguration
 import dev.panuszewski.scenes.DeclarativeGradle
 import dev.panuszewski.scenes.Groovy
 import dev.panuszewski.scenes.ImperativeCode
-import dev.panuszewski.scenes.IntroductionSlide
+import dev.panuszewski.scenes.AboutMe
 import dev.panuszewski.scenes.KnowYourEnemy
 import dev.panuszewski.scenes.MakingChangesToConventions
 import dev.panuszewski.scenes.NoTypeSafety
@@ -16,7 +16,6 @@ import dev.panuszewski.scenes.TitleScene
 import dev.panuszewski.scenes.TwoTypesOfGradleUsers
 import dev.panuszewski.scenes.Ultramarines
 import dev.panuszewski.scenes.WrappingUp
-import dev.panuszewski.template.theme.DARK_THEME
 import dev.panuszewski.template.theme.LIGHT_THEME
 
 private const val TITLE = "Purging the Chaos from Your Gradle Build"
@@ -31,15 +30,15 @@ private const val TITLE = "Purging the Chaos from Your Gradle Build"
 val PurgingChaosFromYourGradleBuild = Storyboard.build(
     title = TITLE,
     format = Default,
-    decorator = DARK_THEME,
+    decorator = LIGHT_THEME,
 ) {
     TitleScene()
-    Chaos()
-    Ultramarines()
-    IntroductionSlide()
-    KnowYourEnemy()
-    Groovy()
-    NoTypeSafety()
+//    Chaos()
+//    Ultramarines()
+//    AboutMe()
+//    KnowYourEnemy()
+//    Groovy()
+//    NoTypeSafety()
     ImperativeCode()
     CrossConfiguration()
     MakingChangesToConventions()

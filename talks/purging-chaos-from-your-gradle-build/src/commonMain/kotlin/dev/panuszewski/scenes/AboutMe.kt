@@ -37,7 +37,7 @@ import talks.purging_chaos_from_your_gradle_build.generated.resources.gradle
 import talks.purging_chaos_from_your_gradle_build.generated.resources.kotlin
 import talks.purging_chaos_from_your_gradle_build.generated.resources.speaker_photo
 
-fun StoryboardBuilder.IntroductionSlide() {
+fun StoryboardBuilder.AboutMe() {
     scene(
         stateCount = 4,
         enterTransition = SceneEnter(alignment = Alignment.CenterEnd),

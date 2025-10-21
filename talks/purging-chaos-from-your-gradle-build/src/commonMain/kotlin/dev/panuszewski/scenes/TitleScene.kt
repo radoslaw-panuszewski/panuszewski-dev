@@ -39,6 +39,7 @@ import dev.panuszewski.template.extensions.Text
 import dev.panuszewski.template.extensions.h3
 import dev.panuszewski.template.extensions.subsequentNumbers
 import dev.panuszewski.template.extensions.withIntTransition
+import dev.panuszewski.template.theme.palette
 import org.jetbrains.compose.resources.painterResource
 import talks.purging_chaos_from_your_gradle_build.generated.resources.Res
 import talks.purging_chaos_from_your_gradle_build.generated.resources.chaotic_groovy_dark
@@ -64,7 +65,7 @@ fun StoryboardBuilder.TitleScene() {
                 h3 {
                     Text {
                         append("Purging the ")
-                        withStyle(SpanStyle(color = Color(0xFF682F29), fontWeight = Medium)) { append("Chaos") }
+                        withStyle(SpanStyle(color = palette.darkRed, fontWeight = Medium)) { append("Chaos") }
                     }
                     Text("from Your Gradle Build")
                 }

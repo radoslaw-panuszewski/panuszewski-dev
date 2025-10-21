@@ -33,7 +33,7 @@
 //import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
 //import dev.panuszewski.template.extensions.safeGet
 //import dev.panuszewski.template.extensions.startWith
-//import dev.panuszewski.template.theme.NICE_ORANGE
+//import dev.panuszewski.template.theme.palette
 //import kotlinx.coroutines.delay
 //import org.jetbrains.compose.resources.painterResource
 //
@@ -1120,7 +1120,7 @@
 //                    Box(
 //                        Modifier
 //                            .clip(CircleShape)
-//                            .border(2.dp, NICE_ORANGE, CircleShape)
+//                            .border(2.dp, palette.orange, CircleShape)
 //                            .width(image.width)
 //                            .height(image.width)
 //                            .paint(

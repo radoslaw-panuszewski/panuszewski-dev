@@ -205,18 +205,6 @@ class CodeSample private constructor(
         return result
     }
 
-//    fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
-//        focus(tags.asList(), scroll, focusedStyle, unfocusedStyle)
-//
-//    fun focus(tag: TextTag, scroll: Boolean = true, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
-//        focus(listOf(tag), scroll, focusedStyle, unfocusedStyle)
-//
-//    fun focusNoStyling(vararg tags: TextTag, scroll: Boolean = true): CodeSample =
-//        focus(tags.asList(), scroll, null, null)
-//
-//    fun focusNoScroll(vararg tags: TextTag, focusedStyle: SpanStyle? = FOCUSED_STYLE, unfocusedStyle: SpanStyle? = UNFOCUSED_STYLE): CodeSample =
-//        focus(tags.asList(), false, focusedStyle, unfocusedStyle)
-
     fun focus(vararg tags: TextTag, scroll: Boolean = true, focusedStyle: SpanStyleProvider = FOCUSED_STYLE, unfocusedStyle: SpanStyleProvider = UNFOCUSED_STYLE): CodeSample =
         focus(tags.asList(), scroll, focusedStyle, unfocusedStyle)
 

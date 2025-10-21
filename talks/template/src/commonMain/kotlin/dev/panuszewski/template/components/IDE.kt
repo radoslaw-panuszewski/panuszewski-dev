@@ -63,6 +63,7 @@ import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.withColor
 import kotlinx.coroutines.delay
 import dev.panuszewski.template.extensions.SlideFromBottomAnimatedVisibility
+import dev.panuszewski.template.theme.palette
 
 data class IdeState(
     val files: List<ProjectFile>,
@@ -340,7 +341,7 @@ fun IDE(ideState: IdeState, modifier: Modifier = Modifier) {
                         currentErrorText.value?.let {
                             Text(
                                 text = it,
-                                color = Color(0xFFFF6B68),
+                                color = palette.red,
                                 modifier = Modifier.graphicsLayer { alpha = animatedAlpha }
                             )
                         }
@@ -702,7 +703,7 @@ private fun FileTreeItemContent(
                                 append(beforeExtension)
                                 append(".")
                                 if (afterExtension == "dcl") {
-                                    withColor(Color(0xFFFF8A04)) { append(afterExtension) }
+                                    withColor(palette.orange) { append(afterExtension) }
                                 } else {
                                     append(afterExtension)
                                 }

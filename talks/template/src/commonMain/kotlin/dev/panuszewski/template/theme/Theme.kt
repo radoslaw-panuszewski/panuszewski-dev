@@ -19,15 +19,6 @@ import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.SceneDecorator
 import dev.panuszewski.template.extensions.JetBrainsMono
 
-//val NICE_ORANGE = Color(0xFFFF8A04)
-//val NICE_BLUE = Color(0xFF0A7CFA)
-//val NICE_GREEN = Color(0xFF389E2D)
-//val NICE_PINK = Color(0xFFDB26E0)
-//val NICE_LIGHT_TURQUOISE = Color(0xFF39CEC2)
-//val NICE_LIGHT_PURPLE = Color(0xFF9436FF)
-//val NICE_YELLOW = Color(0xFFFFE436)
-//val NICE_LIGHT_RED = Color(0xFFFF6B68)
-
 data class CustomPalette(
     val orange: Color,
     val blue: Color,
@@ -37,18 +28,10 @@ data class CustomPalette(
     val purple: Color,
     val yellow: Color,
     val red: Color,
+    val darkRed: Color
 )
 
 val palette: CustomPalette @Composable get() = LocalPalette.current
-
-//@Composable fun orange() = LocalPalette.current.orange
-//@Composable fun blue() = LocalPalette.current.blue
-//@Composable fun green() = LocalPalette.current.green
-//@Composable fun pink() = LocalPalette.current.pink
-//@Composable fun turquoise() = LocalPalette.current.turquoise
-//@Composable fun purple() = LocalPalette.current.purple
-//@Composable fun yellow() = LocalPalette.current.yellow
-//@Composable fun red() = LocalPalette.current.red
 
 val DARK_PALETTE = CustomPalette(
     orange = Color(0xFFFF8A04),
@@ -58,7 +41,8 @@ val DARK_PALETTE = CustomPalette(
     turquoise = Color(0xFF39CEC2),
     purple = Color(0xFF9436FF),
     yellow = Color(0xFFFFE436),
-    red = Color(0xFFFF6B68)
+    red = Color(0xFFFF6B68),
+    darkRed = Color(0xFF682F29)
 )
 
 val LIGHT_PALETTE = CustomPalette(
@@ -66,10 +50,11 @@ val LIGHT_PALETTE = CustomPalette(
     blue = Color(0xFF0A7CFA),
     green = Color(0xFF389E2D),
     pink = Color(0xFFDB26E0),
-    turquoise = Color(0xFF39CEC2),
+    turquoise = Color(54, 161, 165),
     purple = Color(0xFF9436FF),
-    yellow = Color(0xFFFFE436),
-    red = Color(0xFFFF6B68)
+    yellow = Color(0xFFB6A329),
+    red = Color(0xFFF50100),
+    darkRed = Color(0xFFC4574A),
 )
 
 val LIGHT_COLORS = lightColors(
