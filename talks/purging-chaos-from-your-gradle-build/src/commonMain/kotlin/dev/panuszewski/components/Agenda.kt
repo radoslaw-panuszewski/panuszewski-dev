@@ -21,6 +21,7 @@ import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.h6
 import dev.panuszewski.template.theme.BULLET_1
+import dev.panuszewski.template.theme.palette
 
 @Composable
 fun Transition<Int>.Agenda(
@@ -44,7 +45,7 @@ fun Transition<Int>.Agenda(
                             when {
                                 it >= item.crossedOutSince -> buildAnnotatedString {
                                     append(BULLET_1)
-                                    withStyle(SpanStyle(textDecoration = LineThrough, color = Color.DarkGray)) { 
+                                    withStyle(SpanStyle(textDecoration = LineThrough, color = palette.lightGray)) {
                                         append(item.text) 
                                     }
                                 }
