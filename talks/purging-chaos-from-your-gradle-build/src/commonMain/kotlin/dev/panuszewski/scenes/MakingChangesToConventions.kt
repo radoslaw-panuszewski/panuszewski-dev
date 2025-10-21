@@ -219,7 +219,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .border(width = 2.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                        .border(width = 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
                                         .background(palette.treeNodeBackground)
                                 ) {
                                     Column(
@@ -631,7 +631,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
-                                            .border(width = 2.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                            .border(width = 3.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
                                             .background(palette.treeNodeBackground)
                                     ) {
                                         Column(

@@ -37,7 +37,7 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
 //    Ultramarines()
 //    AboutMe()
 //    KnowYourEnemy()
-    Groovy()
+//    Groovy()
 //    NoTypeSafety()
 //    ImperativeCode()
 //    CrossConfiguration()

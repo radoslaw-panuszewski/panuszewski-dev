@@ -223,7 +223,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         Box(
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(8.dp))
-                                                .border(width = 2.dp, color = node.color ?: neutralColor, shape = RoundedCornerShape(8.dp))
+                                                .border(width = 3.dp, color = node.color ?: neutralColor, shape = RoundedCornerShape(8.dp))
                                                 .background(palette.treeNodeBackground)
                                         ) {
                                             Column(
