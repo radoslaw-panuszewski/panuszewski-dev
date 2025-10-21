@@ -219,8 +219,8 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                        .background(LocalIdeColors.current.paneBackground)
+                                        .border(width = 2.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                        .background(palette.treeNodeBackground)
                                 ) {
                                     Column(
                                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -350,7 +350,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                 ) {
                                     Column(
                                         modifier = Modifier
-                                            .border(1.dp, buildSrcColor)
+                                            .border(2.dp, buildSrcColor)
                                             .background(color = buildSrcColor.copy(alpha = 0.03f))
                                             .fillMaxWidth()
                                             .weight(0.5f)
@@ -382,7 +382,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
                                     Column(
                                         modifier = Modifier
-                                            .border(1.dp, buildLogicColor)
+                                            .border(2.dp, buildLogicColor)
                                             .background(color = buildLogicColor.copy(alpha = 0.03f))
                                             .fillMaxWidth()
                                             .weight(0.5f)
@@ -631,8 +631,8 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
-                                            .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                            .background(LocalIdeColors.current.paneBackground)
+                                            .border(width = 2.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+                                            .background(palette.treeNodeBackground)
                                     ) {
                                         Column(
                                             horizontalAlignment = Alignment.CenterHorizontally,

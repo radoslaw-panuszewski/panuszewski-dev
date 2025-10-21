@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import dev.panuszewski.template.extensions.annotate
 import dev.panuszewski.template.extensions.body1
 import dev.panuszewski.template.theme.LocalIdeColors
+import dev.panuszewski.template.theme.palette
 
 @Composable
 fun RoundedTreeNode(
@@ -32,8 +33,8 @@ fun RoundedTreeNode(
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-            .background(LocalIdeColors.current.paneBackground)
+            .border(width = 2.dp, color = node.color ?: Color.Gray, shape = RoundedCornerShape(8.dp))
+            .background(palette.treeNodeBackground)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -28,7 +28,10 @@ data class CustomPalette(
     val purple: Color,
     val yellow: Color,
     val red: Color,
-    val darkRed: Color
+    val darkRed: Color,
+    val treeNodeBackground: Color,
+    val monospaceText: Color,
+    val monospaceBackground: Color
 )
 
 val palette: CustomPalette @Composable get() = LocalPalette.current
@@ -42,7 +45,10 @@ val DARK_PALETTE = CustomPalette(
     purple = Color(0xFF9436FF),
     yellow = Color(0xFFFFE436),
     red = Color(0xFFFF6B68),
-    darkRed = Color(0xFF682F29)
+    darkRed = Color(0xFF682F29),
+    treeNodeBackground = Color.White,
+    monospaceText = Color.LightGray,
+    monospaceBackground = Color.DarkGray,
 )
 
 val LIGHT_PALETTE = CustomPalette(
@@ -55,6 +61,9 @@ val LIGHT_PALETTE = CustomPalette(
     yellow = Color(0xFFB6A329),
     red = Color(0xFFF50100),
     darkRed = Color(0xFFC4574A),
+    treeNodeBackground = Color(0xFFFCFCFC),
+    monospaceText = Color.Black,
+    monospaceBackground = Color(0xFFDADBDD),
 )
 
 val LIGHT_COLORS = lightColors(
@@ -248,8 +257,8 @@ fun <T : Any> Builder.asCode(block: Builder.() -> T) {
     withStyle(
         style = SpanStyle(
             fontFamily = JetBrainsMono,
-            background = Color.DarkGray,
-            color = Color.LightGray,
+            color = palette.monospaceText,
+            background = palette.monospaceBackground,
             fontSize = LocalTextStyle.current.fontSize * 0.9
         ),
         block = block

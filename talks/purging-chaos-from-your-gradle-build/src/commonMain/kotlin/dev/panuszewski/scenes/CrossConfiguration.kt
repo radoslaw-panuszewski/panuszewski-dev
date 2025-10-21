@@ -223,8 +223,8 @@ fun StoryboardBuilder.CrossConfiguration() {
                                         Box(
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(8.dp))
-                                                .border(width = 2.dp, color = node.color ?: Color.Unspecified, shape = RoundedCornerShape(8.dp))
-                                                .background(LocalIdeColors.current.paneBackground)
+                                                .border(width = 2.dp, color = node.color ?: neutralColor, shape = RoundedCornerShape(8.dp))
+                                                .background(palette.treeNodeBackground)
                                         ) {
                                             Column(
                                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -236,9 +236,9 @@ fun StoryboardBuilder.CrossConfiguration() {
 
                                                         it >= libAppliesConvention && node.value.matches("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[2].String()
 
-                                                        it >= libConventionShrinks && node.value == "lib-convention" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                        it >= libConventionShrinks && node.value == "lib-convention" -> JustName(node)
 
-                                                        it >= rootProjectShrinks && node.value == "root-project" -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                        it >= rootProjectShrinks && node.value == "root-project" -> JustName(node)
 
                                                         it >= rootProjectChangedToNothingToConfigure && node.value == "root-project" -> ROOT_BUILD_GRADLE_KTS[8].String()
 
@@ -271,7 +271,7 @@ fun StoryboardBuilder.CrossConfiguration() {
                                                         it >= libsExpand && node.value.contains("""lib\d+""".toRegex()) -> LIB_BUILD_GRADLE_KTS[0].String()
                                                         it >= appShrinks && node.value == "app" -> JustName(node)
                                                         it >= appExpands && node.value == "app" -> APP_BUILD_GRADLE_KTS[4].String()
-                                                        else -> buildAnnotatedString { withColor(Color.White) { append(node.value) } }
+                                                        else -> JustName(node)
                                                     }
                                                 }.MagicAnnotatedString(Modifier.padding(8.dp), split = { it.splitByChars() })
                                             }
