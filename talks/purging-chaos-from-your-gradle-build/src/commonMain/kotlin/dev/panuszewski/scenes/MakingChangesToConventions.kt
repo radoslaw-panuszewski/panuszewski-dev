@@ -35,6 +35,7 @@ import dev.bnorm.storyboard.text.highlight.Language.KotlinDsl
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.extensions.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
+import dev.panuszewski.template.components.CenteredColumn
 import dev.panuszewski.template.components.MagicAnnotatedString
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.StackedImageGallery
@@ -59,6 +60,7 @@ import dev.panuszewski.template.theme.LocalIdeColors
 import dev.panuszewski.template.theme.NICE_BLUE
 import dev.panuszewski.template.theme.NICE_GREEN
 import dev.panuszewski.template.theme.NICE_LIGHT_RED
+import dev.panuszewski.template.theme.NICE_LIGHT_TURQUOISE
 import dev.panuszewski.template.theme.NICE_ORANGE
 import dev.panuszewski.template.theme.NICE_PINK
 import dev.panuszewski.template.theme.appendAsCode
@@ -123,13 +125,16 @@ fun StoryboardBuilder.MakingChangesToConventions() {
         buildLogicAppModified,
         onlyAppReconfigured,
         resetAfterBuildLogicChange,
-        whichOneToUseStarts,
+        whichToUseStarts,
         terminalAppears,
         t1,
         t2,
         terminalDisappears,
-        whichOneToUseEnds,
+        whichToUseBullet1,
+        whichToUseBullet2,
+        whichToUseEnds,
         treeIsBackForFinalRecap,
+        buildLogicDisappears,
         titleChangesForFinalRecap,
         finalRecapBullet1,
         libProjectsFolded,
@@ -157,8 +162,9 @@ fun StoryboardBuilder.MakingChangesToConventions() {
 
         withIntTransition(initialState = resetAfterBuildLogicChange) {
             val title = when {
-                currentState >= titleChangesForFinalRecap -> "Is this the ultimate setup?".annotate()
-                currentState >= whichOneToUseStarts -> "So... which one to use?".annotate()
+                currentState >= titleChangesForFinalRecap -> "So... is this the ultimate setup?".annotate()
+                currentState >= treeIsBackForFinalRecap -> "We stay with build-logic!".annotate()
+                currentState >= whichToUseStarts -> "Which one to use?".annotate()
                 currentState >= treeWithBuildLogicAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= buildLogicAppears -> buildAnnotatedString { withColor(buildLogicColor) { append("build-logic") } }
                 currentState >= treeAppearsAgain -> buildAnnotatedString { append("Making changes: "); withColor(buildSrcColor) { append("buildSrc") } }
@@ -321,11 +327,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                             LookaheadScope {
                                 Spacer(Modifier.height(16.dp))
 
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(32.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
+                                CenteredColumn(modifier = Modifier.fillMaxWidth()) {
                                     RevealSequentially(since = comparisonTopBullet1) {
                                         annotatedStringItem {
                                             append("The ")
@@ -419,12 +421,28 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                         }
                     }
 
+                    FadeInOutAnimatedVisibility({ it in whichToUseStarts until whichToUseEnds }) {
+                        CenteredColumn(Modifier.fillMaxWidth()) {
+                            RevealSequentially(since = whichToUseBullet1) {
+                                annotatedStringItem {
+                                    append("According to the official guidelines, we should be using ")
+                                    appendWithColor(buildLogicColor, "build-logic")
+                                }
+                                annotatedStringItem {
+                                    append("The behavior of ")
+                                    appendWithColor(buildSrcColor, "buildSrc")
+                                    append(" is unpredictable, and its future unclear")
+                                }
+                            }
+                        }
+                    }
+
                     SlideFromBottomAnimatedVisibility({
                         it !in complicatedPastAppears..complicatedPastDisappears
                                 && it !in yearsAppear..yearsDisappear
                                 && it !in terminalAppears..terminalDisappears
                                 && it !in comparisonAppears..comparisonDisappears
-                                && it !in whichOneToUseStarts..whichOneToUseEnds
+                                && it !in whichToUseStarts..whichToUseEnds
                     }) {
                         Column {
                             LookaheadScope {
@@ -464,7 +482,7 @@ fun StoryboardBuilder.MakingChangesToConventions() {
                                             node("app", appColor)
                                         }
                                     }
-                                    currentState >= treeIsBackForFinalRecap -> buildTree {
+                                    currentState >= buildLogicDisappears -> buildTree {
                                         node("root-project", rootColor) {
                                             node("app", appColor)
                                             node("lib1", libColor)
