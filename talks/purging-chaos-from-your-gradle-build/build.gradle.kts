@@ -12,8 +12,3 @@ kotlin {
         }
     }
 }
-
-fun pluginMarker(provider: Provider<PluginDependency>) =
-    with(provider.get()) {
-        "$pluginId:$pluginId.gradle.plugin:$version"
-    }
