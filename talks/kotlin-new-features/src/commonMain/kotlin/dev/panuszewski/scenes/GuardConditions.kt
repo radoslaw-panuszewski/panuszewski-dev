@@ -28,8 +28,8 @@ import dev.panuszewski.scenes.KotlinTimelineStage.KOTLIN_2_1
 import dev.panuszewski.template.components.MagicCodeSample
 import dev.panuszewski.template.extensions.TextMovementSpec
 import dev.panuszewski.template.components.buildCodeSamples
-import dev.panuszewski.template.extensions.code1
 import dev.panuszewski.template.extensions.tag
+import dev.panuszewski.template.theme.code1
 
 fun StoryboardBuilder.GuardConditions() {
     scene(stateCount = SAMPLES.size + 1) {

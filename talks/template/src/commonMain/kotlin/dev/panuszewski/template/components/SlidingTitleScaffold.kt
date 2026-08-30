@@ -78,10 +78,7 @@ fun SceneScope<Int>.SlidingTitleScaffold(
                 subcompose("Title") {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         ProvideTextStyle(titleTextStyle) {
-                            Text(
-                                text = title,
-                                modifier = Modifier.offset(y = titleVerticalOffset)
-                            )
+                            AnimatedTitle(title, Modifier.offset(y = titleVerticalOffset))
                         }
                     }
                 }.measureAndPlace()

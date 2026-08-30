@@ -16,6 +16,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.easel.template.SceneEnter
 import dev.bnorm.storyboard.easel.template.SceneExit
 import dev.bnorm.storyboard.text.highlight.Language
+import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.RevealSequentially
 import dev.panuszewski.template.components.SlidingTitleScaffold
@@ -50,17 +51,12 @@ fun StoryboardBuilder.KnowYourEnemy() {
                 contentVisible.SlideFromBottomAnimatedVisibility {
                     ideState.IdeLayout {
                         leftPanel("agenda") { panelState ->
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(16.dp),
-                                modifier = Modifier.padding(top = 32.dp).align(TopStart),
-                            ) {
-                                panelState.RevealSequentially(highlightedTextStyle = TextStyle(color = palette.orange)) {
-                                    item { Text("$BULLET_1 Groovy 🤢") }
-                                    item { Text("$BULLET_1 No type safety") }
-                                    item { Text("$BULLET_1 Imperative code") }
-                                    item { Text("$BULLET_1 Cross configuration") }
-                                    item { Text("$BULLET_1 Mixed concerns") }
-                                }
+                            panelState.Agenda {
+                                item("Groovy 🤢")
+                                item("No type safety")
+                                item("Imperative code")
+                                item("Cross configuration")
+                                item("Mixed concerns")
                             }
                         }
                     }
@@ -120,7 +116,6 @@ private val BUILD_GRADLE = buildCodeSamples {
         .startWith { this }
         .pass(2)
         .openAgenda()
-//        .then { focus(allCode) }
         .pass()
         .then { focus(noTypesafe1, noTypesafe2, noTypesafe3, noTypesafe4, noTypesafe5, unfocusedStyle = { null }) }
         .then { focus(imperative1, imperative2, imperative3, unfocusedStyle = { null }) }
