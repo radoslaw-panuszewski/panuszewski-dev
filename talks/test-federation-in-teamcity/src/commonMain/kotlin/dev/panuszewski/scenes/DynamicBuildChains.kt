@@ -56,6 +56,9 @@ fun StoryboardBuilder.DynamicBuildChains() {
         generatorBuildConfigExpands,
         dependenciesAppear,
         dynamicModeUnfocuses,
+        ideHides,
+        buildsRename,
+        variantsAppear,
         lastState
     ) = subsequentNumbers()
 
@@ -72,8 +75,34 @@ fun StoryboardBuilder.DynamicBuildChains() {
 
                     ideState.IdeLayout {
                         adaptiveTopPanel("tree") {
-                            Box(Modifier.height(158.dp)) {
+                            Box(Modifier.height(if (currentState >= ideHides) 300.dp else 166.dp)) {
                                 val tree = when {
+                                    currentState >= variantsAppear -> buildTree {
+                                        node("TestFederationCoordinator") {
+                                            val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                            node("Foo", color = palette.turquoise, arrow = FORWARD) {
+                                                node("🛡️ Foo", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                            }
+                                            node("Bar", color = palette.turquoise, arrow = FORWARD) {
+                                                node("💨 Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                                node("🤝 Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                            }
+                                        }
+                                    }
+                                    currentState >= buildsRename -> buildTree {
+                                        node("TestFederationCoordinator") {
+                                            val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                            node("Foo", color = palette.turquoise, arrow = FORWARD) { node(finalBuild) }
+                                            node("Bar", color = palette.turquoise, arrow = FORWARD) { node(finalBuild) }
+                                        }
+                                    }
+                                    currentState >= buildsRename -> buildTree {
+                                        node("TestFederationCoordinator") {
+                                            val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                            node("Foo", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                            node("Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                        }
+                                    }
                                     currentState >= dynamicModeUnfocuses -> buildTree {
                                         node("GeneratorBuild") {
                                             val finalBuild = reusableNode("FinalBuild", arrow = FORWARD)
@@ -184,4 +213,5 @@ private val PROJECT_CONFIG = buildCodeSamples {
         .pass(3)
         .then { focus(dynamicMode) }
         .then { unfocus() }
+        .hideIde()
 }
