@@ -35,7 +35,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language.KotlinDsl
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.components.Agenda
-import dev.panuszewski.extensions.JustName
+import dev.panuszewski.template.components.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.CenteredColumn
 import dev.panuszewski.template.components.MagicAnnotatedString
@@ -59,7 +59,6 @@ import dev.panuszewski.template.extensions.tag
 import dev.panuszewski.template.extensions.toCode
 import dev.panuszewski.template.extensions.withIntTransition
 import dev.panuszewski.template.theme.BULLET_1
-import dev.panuszewski.template.theme.appendAsCode
 import dev.panuszewski.template.theme.appendWithColor
 import dev.panuszewski.template.theme.palette
 import dev.panuszewski.template.theme.withColor

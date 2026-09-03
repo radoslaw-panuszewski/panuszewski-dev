@@ -24,7 +24,7 @@ import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language
 import dev.bnorm.storyboard.text.magic.splitByChars
 import dev.panuszewski.components.Agenda
-import dev.panuszewski.extensions.JustName
+import dev.panuszewski.template.components.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.IdeLayout
 import dev.panuszewski.template.components.MagicAnnotatedString
