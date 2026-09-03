@@ -11,28 +11,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.toState
+import dev.panuszewski.template.components.SlidingTitleScaffold
 import dev.panuszewski.template.extensions.FadeOutAnimatedVisibility
 import dev.panuszewski.template.extensions.h3
+import dev.panuszewski.template.extensions.withIntTransition
 
 fun StoryboardBuilder.TitleScene() {
 
-    val titleDisappears = 1
-
     scene(
-        stateCount = titleDisappears,
+        stateCount = 2,
         enterTransition = { fadeIn(tween(3000)) },
         exitTransition = { fadeOut(tween(durationMillis = 10000, delayMillis = 3000)) },
     ) {
 
-        transition.FadeOutAnimatedVisibility({ it.toState() < titleDisappears }) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                h3 {
-                    Text("Test Federation in TeamCity")
-                }
+        withIntTransition {
+            SlidingTitleScaffold("Test Federation in TeamCity") {
+
             }
         }
     }

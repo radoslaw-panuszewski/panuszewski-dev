@@ -70,7 +70,7 @@ fun SceneScope<Int>.SlidingTitleScaffold(
 
             val titleHeight = subcompose("TitleText") {
                 ProvideTextStyle(titleTextStyle) {
-                    Text(title)
+                    AnimatedTitle(title)
                 }
             }.measureHeight()
 

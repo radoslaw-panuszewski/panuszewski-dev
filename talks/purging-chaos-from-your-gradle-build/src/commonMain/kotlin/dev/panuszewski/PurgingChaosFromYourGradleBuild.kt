@@ -25,10 +25,10 @@ val PurgingChaosFromYourGradleBuild = Storyboard.build(
     format = Default,
     decorator = TOGGLEABLE_THEME,
 ) {
-    TitleScene()
-    Chaos()
-    Ultramarines()
-    AboutMe()
+//    TitleScene()
+//    Chaos()
+//    Ultramarines()
+//    AboutMe()
     KnowYourEnemy()
     Groovy()
     NoTypeSafety()

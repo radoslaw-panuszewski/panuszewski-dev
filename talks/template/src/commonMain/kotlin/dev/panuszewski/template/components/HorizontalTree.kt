@@ -41,7 +41,6 @@ private class TreeNode<T>(
         return listOfNotNull(parent) + additionalParents
     }
 }
-
 /**
  * Overloaded version of HorizontalTree that accepts a single root node.
  * This function is provided for backward compatibility.

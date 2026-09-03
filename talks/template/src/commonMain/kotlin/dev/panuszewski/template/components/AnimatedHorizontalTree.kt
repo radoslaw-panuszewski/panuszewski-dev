@@ -54,6 +54,7 @@ fun <T : Any> AnimatedHorizontalTree(
                             parentRect = parentRect.translate(offset),
                             childRect = childRect.translate(offset),
                             color = Color.Gray,
+                            arrow = child.arrow,
                             modifier = Modifier.sharedElement(
                                 rememberSharedContentState("$parent-$child"),
                                 animatedVisibilityScope = this@AnimatedContent
@@ -89,6 +90,8 @@ data class TreeElement<T : Any>(
     val color: Color? = null,
     val children: List<TreeElement<T>> = emptyList(),
     val isRoot: Boolean,
+    // Describes the arrowhead(s) drawn on the connection coming from this node's parent.
+    val arrow: ArrowDirection = ArrowDirection.NONE,
 )
 
 inline fun <T : Any> buildTree(block: TreeBuilder<T>.() -> Unit): List<TreeElement<T>> {
@@ -102,18 +105,29 @@ class TreeBuilder<T : Any>(
 ) {
     val nodes = mutableListOf<TreeElement<T>>()
 
-    fun reusableNode(value: T, color: Color? = null, block: TreeBuilder<T>.() -> Unit = {}): TreeElement<T> {
+    fun reusableNode(
+        value: T,
+        color: Color? = null,
+        arrow: ArrowDirection = ArrowDirection.NONE,
+        block: TreeBuilder<T>.() -> Unit = {},
+    ): TreeElement<T> {
         val element = TreeElement(
             value = value,
             color = color,
             children = TreeBuilder<T>().apply(block).nodes,
-            isRoot = isRoot
+            isRoot = isRoot,
+            arrow = arrow,
         )
         return element
     }
 
-    fun node(value: T, color: Color? = null, block: TreeBuilder<T>.() -> Unit = {}): TreeElement<T> {
-        val element = reusableNode(value, color, block)
+    fun node(
+        value: T,
+        color: Color? = null,
+        arrow: ArrowDirection = ArrowDirection.NONE,
+        block: TreeBuilder<T>.() -> Unit = {},
+    ): TreeElement<T> {
+        val element = reusableNode(value, color, arrow, block)
         nodes.add(element)
         return element
     }
