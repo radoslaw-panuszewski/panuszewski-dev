@@ -20,7 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.panuszewski.template.extensions.splitByChars
 import dev.panuszewski.scenes.gradle.GradlePhase.CONFIGURATION
 import dev.panuszewski.scenes.gradle.GradlePhase.EXECUTION
 import dev.panuszewski.scenes.gradle.GradlePhase.INITIALIZATION

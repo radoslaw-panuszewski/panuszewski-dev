@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
 import dev.bnorm.storyboard.text.highlight.Language.KotlinDsl
-import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.panuszewski.template.extensions.splitByChars
 import dev.panuszewski.components.Agenda
 import dev.panuszewski.template.components.JustName
 import dev.panuszewski.template.components.AnimatedHorizontalTree

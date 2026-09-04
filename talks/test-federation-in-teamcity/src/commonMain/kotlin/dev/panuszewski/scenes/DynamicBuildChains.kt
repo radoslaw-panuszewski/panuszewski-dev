@@ -23,7 +23,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.bnorm.storyboard.StoryboardBuilder
-import dev.bnorm.storyboard.text.magic.splitByChars
+import dev.panuszewski.template.extensions.splitByChars
 import dev.panuszewski.template.components.AnimatedHorizontalTree
 import dev.panuszewski.template.components.ArrowDirection
 import dev.panuszewski.template.components.ArrowDirection.FORWARD
@@ -59,6 +59,19 @@ fun StoryboardBuilder.DynamicBuildChains() {
         ideHides,
         buildsRename,
         variantsAppear,
+        generatorAppears,
+        perVariantGeneratorsAppear,
+        optimizationAppears,
+        manyGeneratorsAppear,
+        manyGeneratorsDisappear,
+        removeWrappers,
+        makeVariantsReal,
+        selectorAppears,
+        selectorSelectsVariants,
+        notSelectedItemsAppear,
+        selectionChanges,
+        selectionChangesAgain,
+        tableDisappears,
         lastState
     ) = subsequentNumbers()
 
@@ -75,33 +88,236 @@ fun StoryboardBuilder.DynamicBuildChains() {
 
                     ideState.IdeLayout {
                         adaptiveTopPanel("tree") {
-                            Box(Modifier.height(if (currentState >= ideHides) 300.dp else 166.dp)) {
+                            Box(Modifier.height(if (currentState >= ideHides) 400.dp else 166.dp)) {
                                 val tree = when {
+                                    currentState >= selectionChangesAgain -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("TestFederationSelector", color = palette.purple, arrow = FORWARD) {
+                                                node("💨 Foo", arrow = FORWARD) { node(finalBuild) }
+                                                node("💨 Bar", arrow = FORWARD) { node(finalBuild) }
+                                            }
+                                        }
+
+                                        node("🛡️ Foo", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🤝️ Foo", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🛡️️ Bar", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🤝 Bar", arrow = FORWARD) { node(finalBuild) }
+                                    }
+
+                                    currentState >= selectionChanges -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("TestFederationSelector", color = palette.purple, arrow = FORWARD) {
+                                                node("🛡️ Foo", arrow = FORWARD) { node(finalBuild) }
+                                                node("💨 Bar", arrow = FORWARD) { node(finalBuild) }
+                                            }
+                                        }
+
+                                        node("💨️ Foo", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🤝️ Foo", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🛡️️ Bar", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🤝 Bar", arrow = FORWARD) { node(finalBuild) }
+                                    }
+
+                                    currentState >= notSelectedItemsAppear -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("TestFederationSelector", color = palette.purple, arrow = FORWARD) {
+                                                node("🛡️ Foo", arrow = FORWARD) { node(finalBuild) }
+                                                node("💨 Bar", arrow = FORWARD) { node(finalBuild) }
+                                                node("🤝 Bar", arrow = FORWARD) { node(finalBuild) }
+                                            }
+                                        }
+
+                                        node("💨️ Foo", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🤝️ Foo", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                        node("🛡️️ Bar", arrow = FORWARD, color = palette.gray) { node(finalBuild) }
+                                    }
+
+                                    currentState >= selectorSelectsVariants -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("TestFederationSelector", color = palette.purple, arrow = FORWARD) {
+                                                node("🛡️ Foo", arrow = FORWARD) { node(finalBuild) }
+                                                node("💨 Bar", arrow = FORWARD) { node(finalBuild) }
+                                                node("🤝 Bar", arrow = FORWARD) { node(finalBuild) }
+                                            }
+                                        }
+                                    }
+
+                                    currentState >= selectorAppears -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("TestFederationSelector", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                        }
+
+                                        node("🛡️ Foo", arrow = FORWARD) { node(finalBuild) }
+                                        node("💨 Bar", arrow = FORWARD) { node(finalBuild) }
+                                        node("🤝 Bar", arrow = FORWARD) { node(finalBuild) }
+                                    }
+
+                                    currentState >= makeVariantsReal -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("...", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                        }
+
+                                        node("🛡️ Foo", arrow = FORWARD) { node(finalBuild) }
+                                        node("💨 Bar", arrow = FORWARD) { node(finalBuild) }
+                                        node("🤝 Bar", arrow = FORWARD) { node(finalBuild) }
+                                    }
+
+                                    currentState >= removeWrappers -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+
+                                        node("Generator") {
+                                            node("🛡️ Foo", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                            node("💨 Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                            node("🤝 Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
+                                        }
+                                    }
+
+                                    currentState >= manyGeneratorsDisappear -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                        val foo = reusableNode("Foo", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+                                        val bar = reusableNode("Bar", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+
+                                        val generatorFoo = reusableNode("Generator (Foo)") {
+                                            node("🛡️ Foo", color = palette.purple, arrow = FORWARD) {
+                                                node(foo)
+                                            }
+                                        }
+
+                                        val generatorBar = reusableNode("Generator (Bar)") {
+                                            node("💨 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                            node("🤝 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                        }
+                                        node(generatorFoo)
+                                        node(generatorBar)
+                                    }
+
+                                    currentState >= manyGeneratorsAppear -> buildTree {
+                                        node("mvn generate") {
+                                            node("Generator (Foo)")
+                                            node("Generator (Bar)")
+                                            node("Generator (Baz)")
+                                            node("Generator (Qux)")
+                                            node("Generator (...)")
+                                        }
+                                    }
+
+                                    currentState >= optimizationAppears -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                        val foo = reusableNode("Foo", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+                                        val bar = reusableNode("Bar", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+
+                                        val generatorFoo = reusableNode("Generator (Foo)") {
+                                            node("🛡️ Foo", color = palette.purple, arrow = FORWARD) {
+                                                node(foo)
+                                            }
+                                        }
+
+                                        val generatorBar = reusableNode("Generator (Bar)") {
+                                            node("💨 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                            node("🤝 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                        }
+                                        node("mvn generate") {
+                                            node(generatorFoo)
+                                            node(generatorBar)
+                                        }
+                                    }
+
+                                    currentState >= perVariantGeneratorsAppear -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                        val foo = reusableNode("Foo", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+                                        val bar = reusableNode("Bar", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+
+                                        node("Generator (Foo)") {
+                                            node("🛡️ Foo", color = palette.purple, arrow = FORWARD) {
+                                                node(foo)
+                                            }
+                                        }
+
+                                        node("Generator (Bar)") {
+                                            node("💨 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                            node("🤝 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                        }
+                                    }
+                                    currentState >= generatorAppears -> buildTree {
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                        val foo = reusableNode("Foo", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+                                        val bar = reusableNode("Bar", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+
+                                        node("Generator") {
+                                            node("🛡️ Foo", color = palette.purple, arrow = FORWARD) {
+                                                node(foo)
+                                            }
+                                            node("💨 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                            node("🤝 Bar", color = palette.purple, arrow = FORWARD) {
+                                                node(bar)
+                                            }
+                                        }
+                                    }
                                     currentState >= variantsAppear -> buildTree {
-                                        node("TestFederationCoordinator") {
-                                            val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
-                                            node("Foo", color = palette.turquoise, arrow = FORWARD) {
-                                                node("🛡️ Foo", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
-                                            }
-                                            node("Bar", color = palette.turquoise, arrow = FORWARD) {
-                                                node("💨 Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
-                                                node("🤝 Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
-                                            }
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                        val foo = reusableNode("Foo", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+                                        val bar = reusableNode("Bar", color = palette.turquoise, arrow = FORWARD) {
+                                            node(finalBuild)
+                                        }
+
+                                        node("🛡️ Foo", color = palette.purple, arrow = FORWARD) {
+                                            node(foo)
+                                        }
+                                        node("💨 Bar", color = palette.purple, arrow = FORWARD) {
+                                            node(bar)
+                                        }
+                                        node("🤝 Bar", color = palette.purple, arrow = FORWARD) {
+                                            node(bar)
                                         }
                                     }
                                     currentState >= buildsRename -> buildTree {
-                                        node("TestFederationCoordinator") {
-                                            val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
-                                            node("Foo", color = palette.turquoise, arrow = FORWARD) { node(finalBuild) }
-                                            node("Bar", color = palette.turquoise, arrow = FORWARD) { node(finalBuild) }
-                                        }
-                                    }
-                                    currentState >= buildsRename -> buildTree {
-                                        node("TestFederationCoordinator") {
-                                            val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
-                                            node("Foo", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
-                                            node("Bar", color = palette.purple, arrow = FORWARD) { node(finalBuild) }
-                                        }
+                                        val finalBuild = reusableNode("Aggregate", arrow = FORWARD)
+                                        node("Foo", color = palette.turquoise, arrow = FORWARD) { node(finalBuild) }
+                                        node("Bar", color = palette.turquoise, arrow = FORWARD) { node(finalBuild) }
                                     }
                                     currentState >= dynamicModeUnfocuses -> buildTree {
                                         node("GeneratorBuild") {
@@ -214,4 +430,6 @@ private val PROJECT_CONFIG = buildCodeSamples {
         .then { focus(dynamicMode) }
         .then { unfocus() }
         .hideIde()
+        .pass(14)
+        .closePanel("tree")
 }
