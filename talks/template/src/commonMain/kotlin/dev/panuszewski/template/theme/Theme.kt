@@ -133,7 +133,7 @@ val DARK_THEME = SceneDecorator { content ->
  * Global theme state that can be toggled with Ctrl+T
  */
 object ThemeState {
-    var isDarkTheme by mutableStateOf(true)
+    var isDarkTheme by mutableStateOf(false)
     
     fun toggle() {
         isDarkTheme = !isDarkTheme
